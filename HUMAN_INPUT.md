@@ -26,10 +26,11 @@ This file captures decisions, constraints, and open questions that are explicitl
 - Canonical card metadata filename convention: `information/cards/data/<oracle_id>.json`
 - Canonical card image filename convention: `information/cards/images/<oracle_id>.<ext>`
 - All engine implementation code and tests must live under `engine/`
-- Initial playable micro-universe is exactly three card instances:
-  - one copy of `Border Guard` from `Portal`
-  - one copy of `Foot Soldiers` from `Portal`
-  - one copy of `Plains` from `Portal`
+- Initial playable micro-universe contains only these legal card identities from `Portal`:
+  - `Border Guard`
+  - `Foot Soldiers`
+  - `Plains`
+- Multiplicity within the initial micro-universe follows normal game rules and scenario setup needs
 - Initial play mode is two-player normal play structure only
 - For this initial slice, oracle text is the only gameplay text authority; flavor text is never used for implementation
 - No keyword ability support is required in the initial micro-universe
@@ -58,8 +59,7 @@ This file captures decisions, constraints, and open questions that are explicitl
 
 ## Near-Term Human Inputs Needed
 
-- No immediate human input is required for ingestion planning.
-- The next human decisions should be about long-range product scope rather than v0 engine shape.
+- No immediate human input is required for the current v0 rules slice.
 
 ## Change Policy
 

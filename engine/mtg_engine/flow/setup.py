@@ -76,6 +76,7 @@ def initialize_game(setup: SetupInput, card_repository: CardRepository) -> GameB
             battlefield=(),
             graveyard=(),
             mana_pool=(),
+            lands_played_this_turn=0,
         )
 
         event_log.append(
@@ -126,12 +127,10 @@ def _validate_setup(setup: SetupInput, card_repository: CardRepository) -> None:
             raise ValueError(f"opening hand must match the top of library for player {player_id}")
 
     all_cards = [oracle_id for player_id in setup.players for oracle_id in setup.libraries[player_id]]
-    if len(all_cards) != 3:
-        raise ValueError("the initial slice requires exactly three total card instances")
-    if set(all_cards) != MICRO_UNIVERSE_ORACLE_IDS:
-        raise ValueError("setup must use exactly the declared micro-universe card instances")
-    if len(all_cards) != len(set(all_cards)):
-        raise ValueError("the initial slice does not support duplicate card instances")
+    if not all_cards:
+        raise ValueError("setup must include at least one card")
+    if not set(all_cards).issubset(MICRO_UNIVERSE_ORACLE_IDS):
+        raise ValueError("setup must use only the declared micro-universe card identities")
 
     for oracle_id in all_cards:
         if not card_repository.has(oracle_id):

@@ -32,10 +32,11 @@ Describe the responsibilities of the simulation core.
 
 - All engine implementation code and tests live under `engine/`.
 - The first playable slice is a two-player game only.
-- The first playable card universe is exactly three card instances:
-  - one `Border Guard`
-  - one `Foot Soldiers`
-  - one `Plains`
+- The first playable card universe contains only:
+  - `Border Guard`
+  - `Foot Soldiers`
+  - `Plains`
+- Setup scenarios may use multiple legal copies of those card identities.
 - Oracle text is the gameplay authority for cards; flavor text is ignored.
 - The first slice should avoid keyword support unless a chosen initial card set requires it.
 
@@ -44,7 +45,7 @@ Describe the responsibilities of the simulation core.
 - `engine/` must expose a package layout that separates domain state, rules execution, and surface-facing orchestration.
 - `engine/tests/` must mirror the main engine package areas closely enough that coverage is obvious from file layout.
 - The first engine contract work should define:
-  - game setup for the declared three-card universe
+  - game setup for the declared micro-universe
   - minimal zones and player state
   - legal actions available in the initial slice
   - deterministic turn progression for a two-player game

@@ -10,6 +10,8 @@ class CardInstance:
     owner_id: str
     controller_id: str
     zone: str
+    tapped: bool = False
+    entered_battlefield_turn: int | None = None
 
 
 @dataclass(frozen=True)
@@ -21,6 +23,7 @@ class PlayerState:
     battlefield: tuple[str, ...]
     graveyard: tuple[str, ...]
     mana_pool: tuple[str, ...]
+    lands_played_this_turn: int = 0
 
 
 @dataclass(frozen=True)
@@ -32,6 +35,14 @@ class TurnState:
 
 
 @dataclass(frozen=True)
+class CombatState:
+    attacking_player: str
+    defending_player: str
+    attackers: tuple[str, ...]
+    blockers: dict[str, tuple[str, ...]]
+
+
+@dataclass(frozen=True)
 class GameState:
     game_id: str
     rng_seed: int
@@ -39,3 +50,4 @@ class GameState:
     objects: dict[str, CardInstance]
     stack: tuple[str, ...]
     turn: TurnState
+    combat: CombatState | None = None

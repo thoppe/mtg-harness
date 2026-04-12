@@ -52,6 +52,7 @@ Define the minimum append-only event types required for deterministic replay and
 
 - The first slice does not need event families for triggered abilities, replacement effects, or continuous-effect recalculation.
 - The first slice may use a single zone-movement event type rather than highly specialized movement events.
+- The currently implemented event log covers setup, first-turn step progression, drawing, land play, `Plains` mana production, simple creature spell resolution, and minimal combat damage/state-based destruction.
 
 ## Expansion Guardrails
 

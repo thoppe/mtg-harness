@@ -13,3 +13,11 @@ class CardDefinition:
     power: str | None
     toughness: str | None
     set_code: str
+
+    @property
+    def is_land(self) -> bool:
+        return "Land" in self.type_line
+
+    @property
+    def is_creature(self) -> bool:
+        return "Creature" in self.type_line

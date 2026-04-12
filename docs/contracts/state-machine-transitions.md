@@ -54,6 +54,8 @@ Define the minimum legal progression points for the first deterministic engine s
 - The first slice may treat many priority windows as forced-pass paths when no legal actions exist beyond the declared micro-universe.
 - The first slice may limit stack interactions to creature spells and mana abilities required by `Plains`.
 - The first slice may model combat with a single combat-damage checkpoint rather than broader combat variants.
+- The currently implemented turn flow only reaches the active player's first `precombat_main_step`; full turn handoff remains future work.
+- The currently implemented combat model supports at most one blocker per attacker.
 
 ## Expansion Guardrails
 

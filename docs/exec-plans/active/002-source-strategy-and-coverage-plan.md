@@ -40,6 +40,7 @@ The simulator should only claim support based on layer 3, never merely because l
 - Pulled artifacts now exist in-repo with stable filenames and sidecar provenance.
 - Coverage manifests remain YAML as the canonical support declaration for the current micro-universe.
 - Narrative companion markdown should be added only when the supported rule surface grows beyond the current small slice.
+- Engine implementation now covers deterministic setup, first-turn progression through precombat main, land play, `Plains` mana production, creature spell casting, and minimal combat.
 
 ## Workstreams
 
@@ -102,7 +103,7 @@ For cards:
 
 ## Immediate Next Actions
 
-1. Start the first engine package scaffold using the chosen hybrid pattern.
-2. Implement deterministic setup and replay-log foundations for the initial micro-universe.
-3. Map the current rules manifest items to concrete engine tests and event-trace expectations as implementation proceeds.
+1. Implement damage marking and a real lethal-damage path for `state_based_actions_minimal`.
+2. Extend turn progression beyond the current first-turn and combat subset.
+3. Tighten combat support beyond the current one-blocker-per-attacker limitation when needed.
 4. Keep coverage declarations canonical in YAML until the supported rule surface grows enough to justify narrative companion docs.

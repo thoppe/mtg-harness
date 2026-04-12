@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define the smallest believable rules subset for the initial three-card `Portal` micro-universe.
+Define the smallest believable rules subset for the initial `Portal` micro-universe built from `Border Guard`, `Foot Soldiers`, and `Plains`.
 
 ## In Scope
 
@@ -11,8 +11,6 @@ Define the smallest believable rules subset for the initial three-card `Portal` 
 - Basic zones: library, hand, battlefield, stack, graveyard
 - Playing `Plains`
 - Producing white mana from `Plains`
-- Casting `Border Guard`
-- Casting `Foot Soldiers`
 - Basic creature combat
 - Lethal damage and creature death as minimal state-based handling
 - Deterministic setup inputs and replay traces for the above behaviors
@@ -33,6 +31,7 @@ Define the smallest believable rules subset for the initial three-card `Portal` 
 - Multiplayer rules
 - Format-legality enforcement
 - Any card text not present in the declared micro-universe
+
 
 ## Envelope Rule
 

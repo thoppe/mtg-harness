@@ -8,9 +8,10 @@ Define the explicit inputs required to create a reproducible initial game state 
 
 - Two players only
 - Declared micro-universe only:
-  - one `Border Guard`
-  - one `Foot Soldiers`
-  - one `Plains`
+  - `Border Guard`
+  - `Foot Soldiers`
+  - `Plains`
+- Setup may use any multiplicity of those card identities that the scenario requires
 
 ## Required Setup Inputs
 
