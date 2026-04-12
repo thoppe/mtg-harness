@@ -4,10 +4,10 @@
   "name": "Muck Rats",
   "provenance": {
     "collector_number": "102",
-    "fetched_at": "2026-04-12T19:01:00Z",
+    "fetched_at": "2026-04-12T22:17:22Z",
     "image_uri_normal": "https://cards.scryfall.io/normal/front/d/4/d4041226-7ce2-46d1-8844-20fa50b6568a.jpg?1562447844",
     "oracle_id": "bca13a12-6723-4a5e-8f1b-21646a8b3e7e",
-    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor%20%28name%3A%22Border%20Guard%22%20or%20name%3A%22Foot%20Soldiers%22%20or%20name%3A%22Muck%20Rats%22%20or%20name%3A%22Vengeance%22%20or%20name%3A%22Swamp%22%20or%20name%3A%22Forest%22%20or%20name%3A%22Island%22%20or%20name%3A%22Mountain%22%20or%20name%3A%22Plains%22%29",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor%20%28name%3A%22Border%20Guard%22%20or%20name%3A%22Foot%20Soldiers%22%20or%20name%3A%22Muck%20Rats%22%20or%20name%3A%22Vengeance%22%20or%20name%3A%22Path%20of%20Peace%22%20or%20name%3A%22Swamp%22%20or%20name%3A%22Forest%22%20or%20name%3A%22Island%22%20or%20name%3A%22Mountain%22%20or%20name%3A%22Plains%22%29",
     "requested_set_code": "por",
     "scryfall_id": "d4041226-7ce2-46d1-8844-20fa50b6568a",
     "set_code": "por",

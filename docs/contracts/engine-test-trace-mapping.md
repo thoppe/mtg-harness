@@ -86,6 +86,7 @@ Define how the current rule-family coverage should map to future engine tests an
   - `spell_resolved`
   - `object_moved_between_zones`
   - `permanent_destroyed`
+  - `life_total_changed`
 
 ### `combat_minimal`
 
@@ -122,5 +123,5 @@ Define how the current rule-family coverage should map to future engine tests an
 - When a rule family becomes `implemented`, this contract and the coverage manifest must agree on the named tests.
 - Current implementation note:
   - `game_setup_minimal`, `turn_structure_minimal`, `precombat_priority_minimal`, `combat_action_windows_minimal`, `land_playing_minimal`, `mana_generation_basic`, `creature_spells_minimal`, `combat_minimal`, and `state_based_actions_minimal` now have engine coverage.
-  - `targeted_sorcery_spells_minimal` now has engine coverage for `Vengeance`.
+  - `targeted_sorcery_spells_minimal` now has engine coverage for `Vengeance` and `Path of Peace`.
   - The current slice now has a real lethal-damage proof via `Border Guard` versus `Muck Rats`, so the earlier synthetic SBA shortcut is no longer needed.

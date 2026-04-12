@@ -4,10 +4,10 @@
   "name": "Swamp",
   "provenance": {
     "collector_number": "204",
-    "fetched_at": "2026-04-12T19:01:00Z",
+    "fetched_at": "2026-04-12T22:17:22Z",
     "image_uri_normal": "https://cards.scryfall.io/normal/front/e/c/ec0da69e-4ab6-4ef1-a7ae-4d6c47172c81.jpg?1562448324",
     "oracle_id": "56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
-    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor%20%28name%3A%22Border%20Guard%22%20or%20name%3A%22Foot%20Soldiers%22%20or%20name%3A%22Muck%20Rats%22%20or%20name%3A%22Vengeance%22%20or%20name%3A%22Swamp%22%20or%20name%3A%22Forest%22%20or%20name%3A%22Island%22%20or%20name%3A%22Mountain%22%20or%20name%3A%22Plains%22%29",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor%20%28name%3A%22Border%20Guard%22%20or%20name%3A%22Foot%20Soldiers%22%20or%20name%3A%22Muck%20Rats%22%20or%20name%3A%22Vengeance%22%20or%20name%3A%22Path%20of%20Peace%22%20or%20name%3A%22Swamp%22%20or%20name%3A%22Forest%22%20or%20name%3A%22Island%22%20or%20name%3A%22Mountain%22%20or%20name%3A%22Plains%22%29",
     "requested_set_code": "por",
     "scryfall_id": "ec0da69e-4ab6-4ef1-a7ae-4d6c47172c81",
     "set_code": "por",

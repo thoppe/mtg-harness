@@ -6,6 +6,7 @@ Contracts define the interfaces and invariants that future code must satisfy.
 
 - `knowledge-sources.md`
 - `source-artifact-provenance.md`
+- `support-slice-manifest.md`
 - `canonical-card-model.md`
 - `card-coverage-manifest.md`
 - `card-implementation-lifecycle.md`

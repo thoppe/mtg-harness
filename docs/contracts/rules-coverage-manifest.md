@@ -26,6 +26,7 @@ Define the machine-readable inventory of rules support claimed by the simulator.
   - `Foot Soldiers`
   - `Muck Rats`
   - `Vengeance`
+  - `Path of Peace`
   - `Swamp`
   - `Forest`
   - `Island`

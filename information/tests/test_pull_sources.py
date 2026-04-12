@@ -60,6 +60,12 @@ class PullSourcesTests(unittest.TestCase):
                 collector_number="36",
             ),
             sample_card(
+                name="Path of Peace",
+                oracle_id="b7593cf8-4dcb-473b-a2ef-180fffe66738",
+                card_id="a1f3e1c9-bfad-49a1-b171-6fa344ef2eef",
+                collector_number="21",
+            ),
+            sample_card(
                 name="Swamp",
                 oracle_id="56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
                 card_id="ec0da69e-4ab6-4ef1-a7ae-4d6c47172c81",
@@ -104,7 +110,7 @@ class PullSourcesTests(unittest.TestCase):
                 sleep_seconds=0,
             )
 
-            self.assertEqual(len(written), 27)
+            self.assertEqual(len(written), 30)
             metadata_path = root / "cards" / "data" / "1ef5003c-f540-4cdc-913f-7d5280ad9f62.json"
             image_path = root / "cards" / "images" / "1ef5003c-f540-4cdc-913f-7d5280ad9f62.jpg"
             image_provenance_path = (
@@ -152,6 +158,12 @@ class PullSourcesTests(unittest.TestCase):
                 oracle_id="1d001145-5d14-43a9-bf3b-3ce5c20b2a46",
                 card_id="c91c249b-157c-4f1d-8171-29d1e75b1c9f",
                 collector_number="36",
+            ),
+            sample_card(
+                name="Path of Peace",
+                oracle_id="b7593cf8-4dcb-473b-a2ef-180fffe66738",
+                card_id="a1f3e1c9-bfad-49a1-b171-6fa344ef2eef",
+                collector_number="21",
             ),
             sample_card(
                 name="Swamp",

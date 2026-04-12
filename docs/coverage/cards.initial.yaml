@@ -3,7 +3,7 @@ slice: portal_initial_micro_universe
 set_summaries:
   - set_code: por
     status: partial
-    notes: "The declared micro-universe currently includes Border Guard, Foot Soldiers, Muck Rats, Vengeance, and the five Portal basic lands."
+    notes: "The declared micro-universe currently includes Border Guard, Foot Soldiers, Muck Rats, Vengeance, Path of Peace, and the five Portal basic lands."
 cards:
   - set_code: por
     card_key: "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
@@ -71,7 +71,23 @@ cards:
     tests:
       - engine/tests/test_priority.py
       - engine/tests/test_spells.py
-    notes: "Canonical card identity keyed by Scryfall oracle_id. Current support is intentionally narrow and scoped to the printed `Destroy target tapped creature.` effect."
+    notes: "Canonical card identity keyed by Scryfall oracle_id. Current support is intentionally narrow and scoped to the printed `Destroy target tapped creature.` effect within the targeted-sorcery slice."
+  - set_code: por
+    card_key: "b7593cf8-4dcb-473b-a2ef-180fffe66738"
+    display_name: Path of Peace
+    card_instances: variable
+    status: implemented
+    engine_scope: Sorcery-speed noncreature spell support for casting `Path of Peace`, choosing any creature target, destroying that creature on resolution, and granting 4 life to that creature's owner.
+    required_rules:
+      - targeted_sorcery_spells_minimal
+      - precombat_priority_minimal
+      - turn_structure_minimal
+      - zones_minimal
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+      - engine/tests/test_replay_log.py
+    notes: "Canonical card identity keyed by Scryfall oracle_id. Support stays inside the narrow targeted-sorcery slice and does not yet imply broader life-gain or destruction generalization."
   - set_code: por
     card_key: "56719f6a-1a6c-4c0a-8d21-18f7d7350b68"
     display_name: Swamp

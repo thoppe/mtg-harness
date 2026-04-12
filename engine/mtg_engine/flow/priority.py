@@ -199,7 +199,8 @@ def _legal_noncreature_spell_targets(
 ) -> tuple[str, ...]:
     spell = state.objects[spell_instance_id]
     card_definition = card_repository.get(spell.oracle_id)
-    if not _is_supported_tapped_creature_destruction(card_definition):
+    effect = _supported_targeted_sorcery_effect(card_definition)
+    if effect is None:
         return ()
 
     legal_targets: list[str] = []
@@ -207,16 +208,26 @@ def _legal_noncreature_spell_targets(
         for instance_id in player.battlefield:
             permanent = state.objects[instance_id]
             permanent_definition = card_repository.get(permanent.oracle_id)
-            if permanent_definition.is_creature and permanent.tapped:
+            if not permanent_definition.is_creature:
+                continue
+            if effect == "destroy_tapped_creature" and not permanent.tapped:
+                continue
+            if effect == "destroy_creature_owner_gains_4_life":
+                legal_targets.append(instance_id)
+                continue
+            if effect == "destroy_tapped_creature":
                 legal_targets.append(instance_id)
     return tuple(legal_targets)
 
 
-def _is_supported_tapped_creature_destruction(card_definition) -> bool:
-    return (
-        card_definition.is_sorcery
-        and card_definition.oracle_text == "Destroy target tapped creature."
-    )
+def _supported_targeted_sorcery_effect(card_definition) -> str | None:
+    if not card_definition.is_sorcery:
+        return None
+    if card_definition.oracle_text == "Destroy target tapped creature.":
+        return "destroy_tapped_creature"
+    if card_definition.oracle_text == "Destroy target creature. Its owner gains 4 life.":
+        return "destroy_creature_owner_gains_4_life"
+    return None
 
 
 def _parse_mana_cost(mana_cost: str) -> dict[str, int]:

@@ -6,7 +6,7 @@ This file captures decisions, constraints, and open questions that are explicitl
 
 - Project type: Magic: The Gathering simulation platform
 - Primary implementation language: Python
-- Current phase: planning and repository scaffolding only
+- Current phase: narrow v0 engine slice with in-repo source artifacts, contracts, and initial implemented gameplay support
 - Required root files: `AGENTS.md`, `HUMAN_INPUT.md`, `README.md`
 - Contracts must live under `docs/`
 - Frontend implementation is out of scope for now
@@ -30,6 +30,8 @@ This file captures decisions, constraints, and open questions that are explicitl
   - `Border Guard`
   - `Foot Soldiers`
   - `Muck Rats`
+  - `Vengeance`
+  - `Path of Peace`
   - `Swamp`
   - `Forest`
   - `Island`

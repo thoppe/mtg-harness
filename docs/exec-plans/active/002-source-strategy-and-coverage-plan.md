@@ -46,6 +46,8 @@ The simulator should only claim support based on layer 3, never merely because l
 - Coverage manifests remain YAML as the canonical support declaration for the current micro-universe.
 - Narrative companion markdown should be added only when the supported rule surface grows beyond the current small slice.
 - Engine implementation now covers deterministic setup, turn progression through cleanup and next-turn handoff, precombat-main legal-action enumeration, combat declaration action windows, priority passing across the currently supported forced-pass branch, land play, five-basic-land mana production, creature spell casting, and minimal combat with multi-block support.
+- The first targeted-sorcery increment is now in place via `Vengeance`, and the next narrow expansion is `Path of Peace` to widen that same rule family through unconditional creature targeting plus owner life gain.
+- The fixed micro-universe model is now showing strain; the next structural improvement should be a manifest-driven support-slice model rather than continued growth of hardcoded scope lists.
 
 ## Workstreams
 
@@ -108,16 +110,16 @@ For cards:
 
 ## Immediate Next Actions
 
-1. Choose the next text-bearing, non-keyword `Portal` card or small card group that expands the engine without forcing keywords or broad triggered-ability support.
-2. Update the rules envelope and coverage manifests for that next rule family before implementation code claims support.
-3. Extend the engine through simple noncreature spell casting and resolution before widening into more complex combat variants, replacement effects, or triggered abilities.
-4. Keep coverage declarations canonical in YAML until the supported rule surface grows enough to justify narrative companion docs.
+1. Draft the support-slice model that separates source scope, coverage declarations, and declared playable scope.
+2. Add a support-slice manifest contract and plan the migration away from hardcoded micro-universe lists.
+3. Keep card and rules coverage manifests canonical while support slices are introduced as the grouping layer above them.
+4. Only continue widening the `Portal` engine slice after that structural migration is at least planned in repo-local docs.
 
 ## Resume Here
 
-The next session should continue engine work, not return to ingestion scaffolding.
+The next session should continue the engine-facing plan, but the immediate prerequisite is structural cleanup around support-scope declaration.
 
-1. Inspect `Portal` for the next low-complexity text-bearing card group and choose one that adds the smallest new rule family.
-2. Record that choice in the rules envelope and coverage manifests before implementing it.
-3. Add the smallest missing engine capability for that card group, with simple sorcery or other noncreature spell resolution preferred over more complex mechanic families.
-4. Add replay-trace assertions and keep the rules and coverage declarations honest as new turn windows or card mechanics are introduced.
+1. Add the first support-slice manifest representing the current `portal_initial_micro_universe`.
+2. Refactor repository and engine-loading assumptions so the active slice comes from manifest data instead of hardcoded oracle ID sets.
+3. Update tests and coverage docs to validate slice membership explicitly.
+4. After that migration lands, inspect `Portal` again for the next smallest non-keyword card group, with direct-damage or card-draw sorceries as likely next candidates.

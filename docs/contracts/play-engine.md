@@ -37,6 +37,7 @@ Describe the responsibilities of the simulation core.
   - `Foot Soldiers`
   - `Muck Rats`
   - `Vengeance`
+  - `Path of Peace`
   - `Swamp`
   - `Forest`
   - `Island`

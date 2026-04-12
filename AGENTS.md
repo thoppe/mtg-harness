@@ -53,6 +53,6 @@ No frontend implementation should be introduced yet.
 The ingestion scaffold already exists under `information/`, so the next agent should continue the active engine plan.
 
 1. Read `docs/exec-plans/active/002-source-strategy-and-coverage-plan.md` first and follow its `Resume Here` section.
-2. Choose the next text-bearing, non-keyword `Portal` card or small card group before widening mechanics further.
-3. Update the rules envelope and coverage manifests for that next rule family before implementation code.
-4. Extend the engine first through simple sorcery or other noncreature spell resolution before adding keywords, replacement effects, or broader triggered-ability support.
+2. Treat `Path of Peace` as the current next low-complexity `Portal` expansion on top of the existing `Vengeance` slice.
+3. Keep the rules envelope, coverage manifests, and source artifacts aligned with that declared micro-universe before implementation code.
+4. After `Path of Peace`, continue widening the engine through similarly narrow nonkeyword sorceries before adding keywords, replacement effects, or broader triggered-ability support.

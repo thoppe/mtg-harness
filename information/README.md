@@ -18,5 +18,5 @@ This directory holds external-source pull code, tests, and pulled artifacts.
 
 ## Current Workflow
 
-- Run `python information/pull_sources.py` to refresh the declared micro-universe and the current rules snapshot.
+- Run `python information/pull_sources.py` to refresh the declared micro-universe, currently including `Vengeance` and `Path of Peace`, and the current rules snapshot.
 - Run `python -m unittest discover -s information/tests` to validate the pull workflow behavior.

@@ -278,9 +278,15 @@ def cast_noncreature_spell(
     card_definition = card_repository.get(card.oracle_id)
     if card_definition.is_creature or card_definition.is_land:
         raise ValueError("spell must be a supported noncreature spell")
-    if not _is_supported_tapped_creature_destruction(card_definition):
+    effect = _supported_targeted_sorcery_effect(card_definition)
+    if effect is None:
         raise ValueError("unsupported noncreature spell in v0")
-    _require_legal_noncreature_target(state, card_repository, action.target_instance_id)
+    _require_legal_noncreature_target(
+        state,
+        card_repository,
+        action.target_instance_id,
+        effect=effect,
+    )
 
     mana_requirements = _parse_mana_cost(card_definition.mana_cost)
     if not _can_pay_mana_cost(player.mana_pool, mana_requirements):
@@ -358,6 +364,18 @@ def cast_noncreature_spell(
             "to_zone": "graveyard",
         },
     )
+    if effect == "destroy_creature_owner_gains_4_life":
+        target_owner = resolved_state.players[target.owner_id]
+        updated_owner = replace(target_owner, life_total=target_owner.life_total + 4)
+        resolved_state = update_player(resolved_state, updated_owner)
+        event_log.append(
+            event_type="life_total_changed",
+            active_player=action.player_id,
+            payload={
+                "player_id": target.owner_id,
+                "life_total": updated_owner.life_total,
+            },
+        )
     resolved_state = move_object(
         resolved_state,
         instance_id=action.card_instance_id,
@@ -753,6 +771,8 @@ def _require_legal_noncreature_target(
     state: GameState,
     card_repository: CardRepository,
     target_instance_id: str,
+    *,
+    effect: str,
 ) -> None:
     if target_instance_id not in state.objects:
         raise ValueError("target must exist")
@@ -762,15 +782,18 @@ def _require_legal_noncreature_target(
     target_definition = card_repository.get(target.oracle_id)
     if not target_definition.is_creature:
         raise ValueError("target must be a creature")
-    if not target.tapped:
+    if effect == "destroy_tapped_creature" and not target.tapped:
         raise ValueError("target must be tapped")
 
 
-def _is_supported_tapped_creature_destruction(card_definition) -> bool:
-    return (
-        card_definition.is_sorcery
-        and card_definition.oracle_text == "Destroy target tapped creature."
-    )
+def _supported_targeted_sorcery_effect(card_definition) -> str | None:
+    if not card_definition.is_sorcery:
+        return None
+    if card_definition.oracle_text == "Destroy target tapped creature.":
+        return "destroy_tapped_creature"
+    if card_definition.oracle_text == "Destroy target creature. Its owner gains 4 life.":
+        return "destroy_creature_owner_gains_4_life"
+    return None
 
 
 def _other_player(state: GameState, player_id: str) -> str:

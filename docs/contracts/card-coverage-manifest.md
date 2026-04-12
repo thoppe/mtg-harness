@@ -26,6 +26,7 @@ Define the machine-readable inventory of card and set support claimed by the sim
   - `Foot Soldiers`
   - `Muck Rats`
   - `Vengeance`
+  - `Path of Peace`
   - `Swamp`
   - `Forest`
   - `Island`

@@ -53,6 +53,11 @@ MICRO_UNIVERSE = (
         oracle_id="1d001145-5d14-43a9-bf3b-3ce5c20b2a46",
     ),
     CardTarget(
+        name="Path of Peace",
+        set_code="por",
+        oracle_id="b7593cf8-4dcb-473b-a2ef-180fffe66738",
+    ),
+    CardTarget(
         name="Swamp",
         set_code="por",
         oracle_id="56719f6a-1a6c-4c0a-8d21-18f7d7350b68",

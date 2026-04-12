@@ -55,6 +55,8 @@ Current verified official entry points as of April 12, 2026:
   - `Border Guard`
   - `Foot Soldiers`
   - `Muck Rats`
+  - `Vengeance`
+  - `Path of Peace`
   - `Swamp`
   - `Forest`
   - `Island`
