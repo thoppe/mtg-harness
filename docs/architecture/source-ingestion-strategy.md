@@ -1,0 +1,39 @@
+# Source Ingestion Strategy
+
+## Selected Authorities
+
+- Card data authority: Scryfall
+- Rules authority: Wizards of the Coast Comprehensive Rules
+
+## Rules Strategy
+
+- Fetch the official plain-text Comprehensive Rules snapshot from the Wizards rules page.
+- Preserve each fetched rules snapshot with an effective date and source URL.
+- Treat the raw rules corpus as reference material, not as directly executable logic.
+- Build explicit mappings from comprehensive-rules sections to internal contracts and implementation status.
+
+Current verified official entry points as of April 12, 2026:
+
+- Wizards rules page: `https://magic.wizards.com/en/rules`
+- Current text snapshot linked there: effective February 27, 2026
+
+## Card Data Strategy
+
+- Use Scryfall as the canonical external source for card metadata and oracle text.
+- Prefer bulk-data acquisition patterns for large-scale syncs.
+- Download card images as a separate concern from metadata normalization.
+- Keep provenance linking normalized card records back to the source snapshot.
+
+## Image Strategy
+
+- Images are supporting assets, not the authority for rules text.
+- Image download workflows should be rate-aware and cache-aware.
+- Image fetching policy should minimize repeated downloads and avoid unnecessary API pressure.
+
+## Raw Vs Implemented Separation
+
+- Raw source archives answer: "what does the official source say?"
+- Contracts answer: "what semantics does this simulator claim to support?"
+- Coverage manifests answer: "what has been implemented, deferred, or not started?"
+
+This separation is necessary because official rules and card data are much broader than the initial simulator scope.
