@@ -6,14 +6,21 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from dataclasses import replace
-
-from mtg_engine.actions.models import ActivateManaAbilityAction, DeclareAttackersAction, DeclareBlockersAction, PassPriorityAction, PlayLandAction
+from mtg_engine.actions.models import (
+    ActivateManaAbilityAction,
+    CastCreatureSpellAction,
+    DeclareAttackersAction,
+    DeclareBlockersAction,
+    PassPriorityAction,
+    PlayLandAction,
+)
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
 from mtg_engine.flow.turns import (
     activate_mana_ability,
     advance_to_cleanup,
+    advance_to_begin_combat,
+    cast_creature_spell,
     declare_attackers,
     declare_blockers,
     pass_priority,
@@ -25,6 +32,8 @@ from mtg_engine.flow.turns import (
 
 
 INFORMATION_DIR = Path(__file__).resolve().parents[2] / "information"
+PLAINS = "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
+BORDER_GUARD = "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
 
 
 class TurnTests(unittest.TestCase):
@@ -99,28 +108,15 @@ class TurnTests(unittest.TestCase):
 
     def test_cleanup_clears_damage_and_mana_and_ends_turn(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
-        session = _build_main_phase_session(repository)
-        session = play_land(session, PlayLandAction(player_id="alice", card_instance_id="alice:1"), repository)
-        session = activate_mana_ability(
-            session,
-            ActivateManaAbilityAction(player_id="alice", source_instance_id="alice:1"),
-            repository,
-        )
-        session = _advance_to_end_combat_step(session, repository)
-        damaged_state = session.state
-        damaged_objects = dict(damaged_state.objects)
-        damaged_objects["alice:1"] = replace(damaged_objects["alice:1"], damage_marked=2)
-        session = session.__class__(
-            state=replace(damaged_state, objects=damaged_objects),
-            event_log=session.event_log,
-        )
+        session = _build_end_combat_session_with_marked_damage(repository)
 
         result = advance_to_cleanup(session)
 
         self.assertEqual(result.state.turn.step, "cleanup_step")
         self.assertEqual(result.state.players["alice"].mana_pool, ())
         self.assertEqual(result.state.players["alice"].lands_played_this_turn, 0)
-        self.assertEqual(result.state.objects["alice:1"].damage_marked, 0)
+        self.assertEqual(result.state.objects["alice:4"].damage_marked, 0)
+        self.assertEqual(result.state.objects["bob:4"].damage_marked, 0)
         self.assertEqual(result.event_log[-1].event_type, "turn_ended")
 
     def test_start_next_turn_hands_off_to_other_player(self) -> None:
@@ -159,6 +155,76 @@ def _build_main_phase_session(repository: CardRepository):
     return start_first_turn(bootstrap)
 
 
+def _build_end_combat_session_with_marked_damage(repository: CardRepository):
+    setup = SetupInput(
+        game_id="turn-cleanup-damage",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (PLAINS, PLAINS, PLAINS, BORDER_GUARD),
+            "bob": (PLAINS, PLAINS, PLAINS, BORDER_GUARD),
+        },
+        opening_hands={
+            "alice": (PLAINS, PLAINS, PLAINS, BORDER_GUARD),
+            "bob": (PLAINS, PLAINS, PLAINS, BORDER_GUARD),
+        },
+        rng_seed=29,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    session = _cast_creature_from_normal_turns(session, repository, "alice", "alice:4")
+    session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "bob")
+    session = _cast_creature_from_normal_turns(session, repository, "bob", "bob:4")
+    session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
+    session = activate_mana_ability(
+        session,
+        ActivateManaAbilityAction(player_id="alice", source_instance_id="alice:1"),
+        repository,
+    )
+    session = advance_to_begin_combat(session)
+    session = declare_attackers(
+        session,
+        DeclareAttackersAction(player_id="alice", attacker_ids=("alice:4",)),
+        repository,
+    )
+    session = declare_blockers(
+        session,
+        DeclareBlockersAction(player_id="bob", blockers={"alice:4": ("bob:4",)}),
+        repository,
+    )
+    return resolve_combat_damage(session, repository)
+
+
+def _cast_creature_from_normal_turns(session, repository: CardRepository, player_id: str, creature_id: str):
+    current_session = _advance_to_player_main_phase(session, repository, player_id)
+    plains_ids = [instance_id for instance_id in current_session.state.players[player_id].hand if instance_id != creature_id]
+
+    for index, plains_id in enumerate(plains_ids[:3], start=1):
+        current_session = play_land(
+            current_session,
+            PlayLandAction(player_id=player_id, card_instance_id=plains_id),
+            repository,
+        )
+        if index != 3:
+            current_session = _advance_to_player_main_phase(
+                _advance_to_next_turn(current_session, repository),
+                repository,
+                player_id,
+            )
+
+    for source_instance_id in current_session.state.players[player_id].battlefield:
+        current_session = activate_mana_ability(
+            current_session,
+            ActivateManaAbilityAction(player_id=player_id, source_instance_id=source_instance_id),
+            repository,
+        )
+
+    return cast_creature_spell(
+        current_session,
+        CastCreatureSpellAction(player_id=player_id, card_instance_id=creature_id),
+        repository,
+    )
+
+
 def _advance_to_end_combat_step(session, repository: CardRepository):
     active_player = session.state.turn.active_player
     defending_player = "bob" if active_player == "alice" else "alice"
@@ -174,6 +240,19 @@ def _advance_to_end_combat_step(session, repository: CardRepository):
         repository,
     )
     return resolve_combat_damage(session, repository)
+
+
+def _advance_to_next_turn(session, repository: CardRepository):
+    session = _advance_to_end_combat_step(session, repository)
+    session = advance_to_cleanup(session)
+    return start_next_turn(session)
+
+
+def _advance_to_player_main_phase(session, repository: CardRepository, player_id: str):
+    current_session = session
+    while current_session.state.turn.active_player != player_id:
+        current_session = _advance_to_next_turn(current_session, repository)
+    return current_session
 
 
 if __name__ == "__main__":

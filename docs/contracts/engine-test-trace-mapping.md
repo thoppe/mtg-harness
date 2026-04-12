@@ -24,11 +24,22 @@ Define how the current rule-family coverage should map to future engine tests an
 
 - Planned tests:
   - `engine/tests/test_turns.py`
+  - `engine/tests/test_spells.py`
 - Planned trace assertions:
   - `turn_started`
   - `step_changed`
   - `object_moved_between_zones`
   - `turn_ended`
+
+### `precombat_priority_minimal`
+
+- Planned tests:
+  - `engine/tests/test_priority.py`
+  - `engine/tests/test_turns.py`
+  - `engine/tests/test_spells.py`
+- Planned trace assertions:
+  - `priority_passed`
+  - `step_changed`
 
 ### `land_playing_minimal`
 
@@ -48,8 +59,8 @@ Define how the current rule-family coverage should map to future engine tests an
 ### `creature_spells_minimal`
 
 - Planned tests:
-  - `engine/tests/test_turns.py`
-  - `engine/tests/test_replay_log.py`
+  - `engine/tests/test_spells.py`
+  - `engine/tests/test_combat.py`
 - Planned trace assertions:
   - `spell_cast`
   - `spell_resolved`
@@ -89,5 +100,5 @@ Define how the current rule-family coverage should map to future engine tests an
 - Until engine code exists, these mappings are planning declarations rather than implementation claims.
 - When a rule family becomes `implemented`, this contract and the coverage manifest must agree on the named tests.
 - Current implementation note:
-  - `game_setup_minimal`, `turn_structure_minimal`, `land_playing_minimal`, `mana_generation_basic`, `creature_spells_minimal`, `combat_minimal`, and `state_based_actions_minimal` now have engine coverage.
-  - The current lethal-damage proof uses a pre-damaged creature scenario to exercise the SBA path honestly within the declared slice.
+  - `game_setup_minimal`, `turn_structure_minimal`, `precombat_priority_minimal`, `land_playing_minimal`, `mana_generation_basic`, `creature_spells_minimal`, `combat_minimal`, and `state_based_actions_minimal` now have engine coverage.
+  - The current lethal-damage proof still uses a pre-damaged creature scenario because the declared micro-universe cannot produce lethal damage on a 4-toughness creature within one supported combat path.

@@ -9,37 +9,48 @@ cards:
     card_key: "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
     display_name: Border Guard
     card_instances: variable
-    status: not_started
-    engine_scope: Creature support within the initial micro-universe.
+    status: implemented
+    engine_scope: Vanilla creature support including casting, battlefield presence, attacking, blocking, combat damage, and cleanup within the initial micro-universe.
     required_rules:
       - creature_spells_minimal
+      - precombat_priority_minimal
       - combat_minimal
       - state_based_actions_minimal
+      - turn_structure_minimal
       - zones_minimal
-    tests: []
+    tests:
+      - engine/tests/test_spells.py
+      - engine/tests/test_combat.py
+      - engine/tests/test_turns.py
     notes: "Canonical card identity keyed by Scryfall oracle_id."
   - set_code: por
     card_key: "a768ba13-4d1c-4dce-a4a6-86a39c069c3f"
     display_name: Foot Soldiers
     card_instances: variable
-    status: not_started
-    engine_scope: Creature support within the initial micro-universe.
+    status: implemented
+    engine_scope: Vanilla creature support including casting from the active player's precombat main step with four Plains.
     required_rules:
       - creature_spells_minimal
-      - combat_minimal
-      - state_based_actions_minimal
+      - precombat_priority_minimal
+      - turn_structure_minimal
       - zones_minimal
-    tests: []
-    notes: "Canonical card identity keyed by Scryfall oracle_id."
+    tests:
+      - engine/tests/test_spells.py
+    notes: "Canonical card identity keyed by Scryfall oracle_id. Combat support for this card is implied by the same vanilla-creature engine path but is not yet asserted in a dedicated test."
   - set_code: por
     card_key: "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
     display_name: Plains
     card_instances: variable
-    status: not_started
-    engine_scope: Basic land support within the initial micro-universe.
+    status: implemented
+    engine_scope: Basic land support including land play, tapping for white mana, and participation in turn progression through cleanup.
     required_rules:
       - land_playing_minimal
       - mana_generation_basic
+      - precombat_priority_minimal
+      - turn_structure_minimal
       - zones_minimal
-    tests: []
+    tests:
+      - engine/tests/test_turns.py
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
     notes: "Canonical card identity keyed by Scryfall oracle_id."
