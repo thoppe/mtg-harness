@@ -53,6 +53,6 @@ No frontend implementation should be introduced yet.
 The ingestion scaffold already exists under `information/`, so the next agent should continue the active engine plan.
 
 1. Read `docs/exec-plans/active/002-source-strategy-and-coverage-plan.md` first and follow its `Resume Here` section.
-2. Add explicit priority and legal-action enumeration for `precombat_main_step` in the engine flow.
-3. Replace synthetic turn-state shortcuts in tests with engine-driven progression where practical.
-4. Keep combat expansion scoped to the declared micro-universe and only widen it when the active plan or contracts require it.
+2. Choose the next text-bearing, non-keyword `Portal` card or small card group before widening mechanics further.
+3. Update the rules envelope and coverage manifests for that next rule family before implementation code.
+4. Extend the engine first through simple sorcery or other noncreature spell resolution before adding keywords, replacement effects, or broader triggered-ability support.

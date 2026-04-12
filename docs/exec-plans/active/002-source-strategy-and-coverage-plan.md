@@ -108,16 +108,16 @@ For cards:
 
 ## Immediate Next Actions
 
-1. Extend turn progression beyond the current supported subset into a more complete long-run game loop.
-2. Widen priority/action availability only when the supported slice adds new windows or non-active-player decisions beyond the current precombat and combat-declaration windows.
-3. Tighten combat support further only when the supported slice needs attacker-side damage-order choice or broader combat variants.
+1. Choose the next text-bearing, non-keyword `Portal` card or small card group that expands the engine without forcing keywords or broad triggered-ability support.
+2. Update the rules envelope and coverage manifests for that next rule family before implementation code claims support.
+3. Extend the engine through simple noncreature spell casting and resolution before widening into more complex combat variants, replacement effects, or triggered abilities.
 4. Keep coverage declarations canonical in YAML until the supported rule surface grows enough to justify narrative companion docs.
 
 ## Resume Here
 
 The next session should continue engine work, not return to ingestion scaffolding.
 
-1. Extend the explicit priority model beyond the current precombat and combat-declaration windows only when the supported slice needs additional player decisions.
-2. Replace remaining synthetic state shortcuts in tests when a normal engine path exists.
-3. Revisit combat next for attacker-side damage-order choice or broader combat variants only if the slice needs them.
-4. Keep the rules and coverage declarations honest as new turn windows or card mechanics are introduced.
+1. Inspect `Portal` for the next low-complexity text-bearing card group and choose one that adds the smallest new rule family.
+2. Record that choice in the rules envelope and coverage manifests before implementing it.
+3. Add the smallest missing engine capability for that card group, with simple sorcery or other noncreature spell resolution preferred over more complex mechanic families.
+4. Add replay-trace assertions and keep the rules and coverage declarations honest as new turn windows or card mechanics are introduced.

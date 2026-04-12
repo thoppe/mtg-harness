@@ -42,6 +42,8 @@ Define enough contracts and architecture to begin implementation of a Python-fir
 
 The next concrete work remains engine-facing:
 
-- widen the supported `Portal` card slice without introducing keywords or triggered abilities
+- choose the next text-bearing, non-keyword `Portal` card group
+- update the rules envelope and coverage manifests before implementing that next rule family
+- extend the engine through simple noncreature spell resolution before moving into broader mechanic families
 - keep coverage manifests and contracts aligned with the implemented engine path
 - use `.codex/skills/card-source-sync/` whenever the declared source scope under `information/` changes
