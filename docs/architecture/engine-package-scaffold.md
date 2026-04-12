@@ -62,7 +62,7 @@ Define the first package-level layout the repository should create once engine s
 
 - Apply rules-specific logic invoked by flow control.
 - Host state-based action checks for lethal damage in v0.
-- Host minimal combat and spell-resolution logic for the declared micro-universe.
+- Host minimal combat and spell-resolution logic for the active support slice.
 
 ### `engine/output`
 

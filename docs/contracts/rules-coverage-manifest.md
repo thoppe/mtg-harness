@@ -21,7 +21,7 @@ Define the machine-readable inventory of rules support claimed by the simulator.
 
 ## Initial Expectation
 
-- The first manifest should cover only the rules needed for the initial `Portal` micro-universe currently built from:
+- The first manifest should cover only the rules needed for the initial active `Portal` support slice, currently built from:
   - `Border Guard`
   - `Foot Soldiers`
   - `Muck Rats`

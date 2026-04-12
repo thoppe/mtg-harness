@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define the explicit inputs required to create a reproducible initial game state for the first playable slice.
+Define the explicit inputs required to create a reproducible initial game state for the current active support slice.
 
 ## v0 Scope
 

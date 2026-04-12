@@ -6,7 +6,7 @@ This directory holds external-source pull code, tests, and pulled artifacts.
 
 - `cards/`: pulled card metadata and image assets
 - `rules/`: pulled rules artifacts
-- `pull_sources.py`: declared micro-universe source-pull entry point
+- `pull_sources.py`: active support-slice source-pull entry point
 - `tests/`: ingestion workflow tests
 
 ## Constraints
@@ -18,5 +18,5 @@ This directory holds external-source pull code, tests, and pulled artifacts.
 
 ## Current Workflow
 
-- Run `python information/pull_sources.py` to refresh the declared micro-universe, currently including `Vengeance` and `Path of Peace`, and the current rules snapshot.
+- Run `python information/pull_sources.py` to refresh the active support-slice card artifacts and the current rules snapshot.
 - Run `python -m unittest discover -s information/tests` to validate the pull workflow behavior.

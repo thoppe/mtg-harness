@@ -27,6 +27,14 @@ def sample_card(*, name: str, oracle_id: str, card_id: str, collector_number: st
 
 
 class PullSourcesTests(unittest.TestCase):
+    def test_load_active_support_slice_targets_reads_manifest_scope(self) -> None:
+        targets = pull_sources.load_active_support_slice_targets()
+
+        self.assertEqual(targets[0].set_code, "por")
+        self.assertEqual(targets[0].name, "Border Guard")
+        self.assertEqual(targets[-1].name, "Plains")
+        self.assertIn("Path of Peace", [target.name for target in targets])
+
     def test_pull_cards_writes_canonical_paths_and_provenance(self) -> None:
         cards = [
             sample_card(
@@ -110,7 +118,7 @@ class PullSourcesTests(unittest.TestCase):
                 sleep_seconds=0,
             )
 
-            self.assertEqual(len(written), 30)
+            self.assertEqual(len(written), len(pull_sources.load_active_support_slice_targets()) * 3)
             metadata_path = root / "cards" / "data" / "1ef5003c-f540-4cdc-913f-7d5280ad9f62.json"
             image_path = root / "cards" / "images" / "1ef5003c-f540-4cdc-913f-7d5280ad9f62.jpg"
             image_provenance_path = (

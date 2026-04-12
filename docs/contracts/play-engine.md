@@ -52,7 +52,7 @@ Describe the responsibilities of the simulation core.
 - `engine/` must expose a package layout that separates domain state, rules execution, and surface-facing orchestration.
 - `engine/tests/` must mirror the main engine package areas closely enough that coverage is obvious from file layout.
 - The first engine contract work should define:
-  - game setup for the declared micro-universe
+  - game setup for the active support slice
   - minimal zones and player state
   - legal actions available in the initial slice
   - deterministic turn progression for a two-player game

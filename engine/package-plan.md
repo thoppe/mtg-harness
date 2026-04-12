@@ -30,7 +30,7 @@ Define the first package boundaries before writing engine code.
 
 ## First Contracts To Define In Code
 
-- initial game setup from the declared micro-universe
+- initial game setup from the active support slice
 - zone model for library, hand, battlefield, graveyard, and stack
 - legal actions:
   - play land

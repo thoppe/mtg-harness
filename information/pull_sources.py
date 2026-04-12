@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pull the declared micro-universe card artifacts and current rules snapshot."""
+"""Pull the active support-slice card artifacts and current rules snapshot."""
 
 from __future__ import annotations
 
@@ -15,6 +15,8 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlsplit, urlunsplit
 from urllib.request import Request, urlopen
 
+import yaml
+
 SCHEMA_VERSION = 1
 SCRYFALL_SEARCH_URL = "https://api.scryfall.com/cards/search?q="
 WIZARDS_RULES_PAGE_URL = "https://magic.wizards.com/en/rules"
@@ -22,6 +24,7 @@ DEFAULT_USER_AGENT = "mtg-harness/0.1 (information pull workflow; repo-local dev
 DEFAULT_ACCEPT = "application/json"
 DEFAULT_IMAGE_VARIANT = "normal"
 DEFAULT_IMAGE_FORMAT = "jpg"
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 @dataclass(frozen=True)
@@ -31,58 +34,40 @@ class CardTarget:
     oracle_id: str
 
 
-MICRO_UNIVERSE = (
-    CardTarget(
-        name="Border Guard",
-        set_code="por",
-        oracle_id="1ef5003c-f540-4cdc-913f-7d5280ad9f62",
-    ),
-    CardTarget(
-        name="Foot Soldiers",
-        set_code="por",
-        oracle_id="a768ba13-4d1c-4dce-a4a6-86a39c069c3f",
-    ),
-    CardTarget(
-        name="Muck Rats",
-        set_code="por",
-        oracle_id="bca13a12-6723-4a5e-8f1b-21646a8b3e7e",
-    ),
-    CardTarget(
-        name="Vengeance",
-        set_code="por",
-        oracle_id="1d001145-5d14-43a9-bf3b-3ce5c20b2a46",
-    ),
-    CardTarget(
-        name="Path of Peace",
-        set_code="por",
-        oracle_id="b7593cf8-4dcb-473b-a2ef-180fffe66738",
-    ),
-    CardTarget(
-        name="Swamp",
-        set_code="por",
-        oracle_id="56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
-    ),
-    CardTarget(
-        name="Forest",
-        set_code="por",
-        oracle_id="b34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6",
-    ),
-    CardTarget(
-        name="Island",
-        set_code="por",
-        oracle_id="b2c6aa39-2d2a-459c-a555-fb48ba993373",
-    ),
-    CardTarget(
-        name="Mountain",
-        set_code="por",
-        oracle_id="a3fb7228-e76b-4e96-a40e-20b5fed75685",
-    ),
-    CardTarget(
-        name="Plains",
-        set_code="por",
-        oracle_id="bc71ebf6-2056-41f7-be35-b2e5c34afa99",
-    ),
-)
+def load_active_support_slice_targets() -> tuple[CardTarget, ...]:
+    slices_dir = REPO_ROOT / "docs" / "coverage" / "slices"
+    manifests = sorted(slices_dir.glob("*.yaml"))
+    if not manifests:
+        raise ValueError(f"no support-slice manifests found under {slices_dir}")
+
+    active_payloads = []
+    for manifest_path in manifests:
+        payload = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
+        if payload.get("status") == "active":
+            active_payloads.append(payload)
+
+    if not active_payloads:
+        raise ValueError(f"no active support slice found under {slices_dir}")
+    if len(active_payloads) != 1:
+        active_keys = ", ".join(payload["slice_key"] for payload in active_payloads)
+        raise ValueError(f"expected exactly one active support slice, found: {active_keys}")
+
+    active_slice = active_payloads[0]
+    set_code = active_slice["set_code"]
+    card_keys = tuple(active_slice["card_keys"])
+    data_dir = REPO_ROOT / "information" / "cards" / "data"
+    targets: list[CardTarget] = []
+    for oracle_id in card_keys:
+        payload = json.loads((data_dir / f"{oracle_id}.json").read_text(encoding="utf-8"))
+        source = payload["source_record"]
+        targets.append(
+            CardTarget(
+                name=source["name"],
+                set_code=set_code,
+                oracle_id=oracle_id,
+            )
+        )
+    return tuple(targets)
 
 
 def utc_now_iso() -> str:
@@ -124,14 +109,14 @@ def write_json(path: Path, payload: dict) -> None:
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
-def build_micro_universe_query(targets: tuple[CardTarget, ...] = MICRO_UNIVERSE) -> str:
+def build_support_slice_query(targets: tuple[CardTarget, ...]) -> str:
     clauses = [f'name:"{target.name}"' for target in targets]
     set_code = targets[0].set_code
     return f'set:{set_code} ({ " or ".join(clauses) })'
 
 
-def build_scryfall_search_url(targets: tuple[CardTarget, ...] = MICRO_UNIVERSE) -> str:
-    return SCRYFALL_SEARCH_URL + quote(build_micro_universe_query(targets))
+def build_scryfall_search_url(targets: tuple[CardTarget, ...]) -> str:
+    return SCRYFALL_SEARCH_URL + quote(build_support_slice_query(targets))
 
 
 def validate_card_scope(card: dict, target: CardTarget) -> None:
@@ -248,13 +233,14 @@ def pull_cards(
     bytes_fetcher: Callable[[str, dict[str, str]], bytes],
     sleep_seconds: float = 0.1,
 ) -> list[Path]:
-    request_url = build_scryfall_search_url()
+    targets = load_active_support_slice_targets()
+    request_url = build_scryfall_search_url(targets)
     fetched_at = utc_now_iso()
     search_payload = json_fetcher(request_url, build_headers())
     cards_by_name = {card["name"]: card for card in search_payload["data"]}
     written_paths: list[Path] = []
 
-    for target in MICRO_UNIVERSE:
+    for target in targets:
         card = cards_by_name.get(target.name)
         if card is None:
             raise ValueError(f"Missing card in Scryfall response: {target.name}")
@@ -322,7 +308,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--cards-only",
         action="store_true",
-        help="Pull only the declared micro-universe card artifacts",
+        help="Pull only the active support-slice card artifacts",
     )
     parser.add_argument(
         "--rules-only",
