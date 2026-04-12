@@ -12,6 +12,7 @@ Define the smallest believable rules subset for the initial three-card `Portal` 
 - Playing `Plains`
 - Producing white mana from `Plains`
 - Casting `Border Guard`
+- Casting `Foot Soldiers`
 - Basic creature combat
 - Lethal damage and creature death as minimal state-based handling
 

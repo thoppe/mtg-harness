@@ -30,6 +30,7 @@ Current verified official entry points as of April 12, 2026:
 - Treat Scryfall `id` as the printing-level/source-record identity.
 - Persist canonical card metadata files as `information/cards/data/<oracle_id>.json`.
 - Persist card images as `information/cards/images/<oracle_id>.<ext>`.
+- Persist JPG images by default for the current plan.
 
 ## Initial Coverage Target
 
@@ -48,7 +49,7 @@ Current verified official entry points as of April 12, 2026:
 - First implementation set remains `Portal` (`por`).
 - First playable micro-universe contains only:
   - `Border Guard`
-  - `Border Guard`
+  - `Foot Soldiers`
   - `Plains`
 - This micro-universe exists to constrain the first engine slice before broader `Portal` support.
 

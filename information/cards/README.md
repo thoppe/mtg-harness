@@ -11,3 +11,4 @@
 - Printing-level provenance should retain Scryfall `id`, set code, and collector number.
 - Canonical card metadata files must be named `data/<oracle_id>.json`.
 - Card image files must be named `images/<oracle_id>.<ext>`.
+- JPG is the default persisted image asset type for the current plan.

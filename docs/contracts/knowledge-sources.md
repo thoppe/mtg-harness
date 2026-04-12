@@ -29,6 +29,7 @@ Define how external card and rules information enters the repository.
 - Card metadata files and card image files must live in separate subdirectories under `information/cards/`.
 - Canonical per-card metadata filenames must be `information/cards/data/<oracle_id>.json`.
 - Canonical per-card image filenames must be `information/cards/images/<oracle_id>.<ext>`.
+- Default persisted card image asset type is JPG unless a later contract changes it.
 
 ## Raw Vs Implemented Model
 

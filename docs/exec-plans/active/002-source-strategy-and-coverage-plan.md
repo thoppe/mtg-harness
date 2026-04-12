@@ -77,7 +77,7 @@ For cards:
 - The initial rules envelope tied to that set
 - Whether deterministic replay is required in the first engine slice
 - Whether coverage manifests should be hand-authored markdown, structured data files, or both
-- The default image variant to persist
+- The first engine architecture pattern
 
 ## Suggested Next Deliverables
 

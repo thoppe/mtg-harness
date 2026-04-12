@@ -23,5 +23,5 @@ Define the machine-readable inventory of card and set support claimed by the sim
 
 - The first manifest should include only:
   - `Border Guard`
-  - `Border Guard`
+  - `Foot Soldiers`
   - `Plains`

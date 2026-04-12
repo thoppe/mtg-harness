@@ -9,10 +9,10 @@ Define the first actually playable subset before broader `Portal` support.
 The initial playable universe is exactly three card instances:
 
 - `Border Guard` from `Portal`
-- `Border Guard` from `Portal`
+- `Foot Soldiers` from `Portal`
 - `Plains` from `Portal`
 
-This records the user-provided list literally, so the initial universe contains two copies of `Border Guard`.
+This slice uses vanilla `Portal` creatures plus a basic land to minimize the first rules envelope.
 
 ## Play Mode
 

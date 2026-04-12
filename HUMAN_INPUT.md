@@ -27,11 +27,13 @@ This file captures decisions, constraints, and open questions that are explicitl
 - Canonical card image filename convention: `information/cards/images/<oracle_id>.<ext>`
 - All engine implementation code and tests must live under `engine/`
 - Initial playable micro-universe is exactly three card instances:
-  - two copies of `Border Guard` from `Portal`
+  - one copy of `Border Guard` from `Portal`
+  - one copy of `Foot Soldiers` from `Portal`
   - one copy of `Plains` from `Portal`
 - Initial play mode is two-player normal play structure only
 - For this initial slice, oracle text is the only gameplay text authority; flavor text is never used for implementation
 - No keyword ability support is required in the initial micro-universe
+- Default persisted card image asset type: JPG
 
 ## Working Assumptions
 
@@ -45,23 +47,21 @@ This file captures decisions, constraints, and open questions that are explicitl
 
 - Simulation goal:
   - Full-rules fidelity, constrained format fidelity, or staged capability by mechanic family?
-- Engine architecture:
-  - Event-sourced engine, state machine, layered effect system, or hybrid?
 - Determinism strategy:
   - What must be reproducible for testing, replay, and AI-vs-AI simulation?
 - Priority game modes:
   - 1v1 first, multiplayer later, or multiplayer-aware from day one?
 - API boundary:
   - Internal Python objects only at first, or stable JSON contracts early for future browser integration?
-- Image policy:
-  - Which image asset variant should be persisted by default?
 - Implementation progression:
   - Which sets should follow `Portal` as the next supported vertical slices?
+- Engine architecture:
+  - Event-sourced engine, state machine, layered effect system, or hybrid?
 
 ## Near-Term Human Inputs Needed
 
 - Decide whether replayability and deterministic simulation are first-class requirements in v0.
-- Choose the default persisted image asset type.
+- Decide the first engine architecture pattern.
 
 ## Change Policy
 
