@@ -7,16 +7,21 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from mtg_engine.cards.repository import CardRepository
+from mtg_engine.cards.support_slices import load_active_support_slice
 from mtg_engine.flow.setup import SetupInput, initialize_game
 
 
 INFORMATION_DIR = Path(__file__).resolve().parents[2] / "information"
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 class SetupTests(unittest.TestCase):
     def test_repository_loads_declared_micro_universe(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        support_slice = load_active_support_slice(REPO_ROOT)
 
+        self.assertEqual(repository.support_slice_key, "portal_initial_micro_universe")
+        self.assertEqual(set(repository.cards_by_oracle_id.keys()), set(support_slice.card_keys))
         self.assertEqual(set(repository.cards_by_oracle_id.keys()), {
             "1d001145-5d14-43a9-bf3b-3ce5c20b2a46",
             "1ef5003c-f540-4cdc-913f-7d5280ad9f62",
@@ -31,6 +36,15 @@ class SetupTests(unittest.TestCase):
         })
         self.assertEqual(repository.get("bc71ebf6-2056-41f7-be35-b2e5c34afa99").name, "Plains")
         self.assertEqual(repository.get("bca13a12-6723-4a5e-8f1b-21646a8b3e7e").name, "Muck Rats")
+
+    def test_active_support_slice_manifest_is_unique_and_loadable(self) -> None:
+        support_slice = load_active_support_slice(REPO_ROOT)
+
+        self.assertEqual(support_slice.slice_key, "portal_initial_micro_universe")
+        self.assertEqual(support_slice.status, "active")
+        self.assertEqual(support_slice.set_code, "por")
+        self.assertIn("targeted_sorcery_spells_minimal", support_slice.rule_keys)
+        self.assertIn("b7593cf8-4dcb-473b-a2ef-180fffe66738", support_slice.card_keys)
 
     def test_initialize_game_builds_reproducible_opening_state(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)

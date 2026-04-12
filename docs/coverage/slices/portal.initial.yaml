@@ -1,0 +1,34 @@
+slice_key: portal_initial_micro_universe
+display_name: Portal Initial Micro-Universe
+status: active
+set_code: por
+card_keys:
+  - "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
+  - "a768ba13-4d1c-4dce-a4a6-86a39c069c3f"
+  - "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
+  - "1d001145-5d14-43a9-bf3b-3ce5c20b2a46"
+  - "b7593cf8-4dcb-473b-a2ef-180fffe66738"
+  - "56719f6a-1a6c-4c0a-8d21-18f7d7350b68"
+  - "b34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6"
+  - "b2c6aa39-2d2a-459c-a555-fb48ba993373"
+  - "a3fb7228-e76b-4e96-a40e-20b5fed75685"
+  - "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
+rule_keys:
+  - game_setup_minimal
+  - turn_structure_minimal
+  - precombat_priority_minimal
+  - combat_action_windows_minimal
+  - land_playing_minimal
+  - mana_generation_basic
+  - creature_spells_minimal
+  - targeted_sorcery_spells_minimal
+  - combat_minimal
+  - zones_minimal
+  - state_based_actions_minimal
+source_artifacts:
+  - information/cards/data/
+  - information/cards/images/
+  - information/rules/raw/comprehensive_rules_2026-02-27.txt
+notes: >
+  Active v0 support slice for the current Portal bootstrap. This manifest defines
+  the engine-loadable card universe without implying broader Portal support.

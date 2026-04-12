@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from mtg_engine.cards.repository import CardRepository, MICRO_UNIVERSE_ORACLE_IDS
+from mtg_engine.cards.repository import CardRepository
 from mtg_engine.events.log import EventLog
 from mtg_engine.state.models import CardInstance, GameState, PlayerState, TurnState
 
@@ -129,8 +129,10 @@ def _validate_setup(setup: SetupInput, card_repository: CardRepository) -> None:
     all_cards = [oracle_id for player_id in setup.players for oracle_id in setup.libraries[player_id]]
     if not all_cards:
         raise ValueError("setup must include at least one card")
-    if not set(all_cards).issubset(MICRO_UNIVERSE_ORACLE_IDS):
-        raise ValueError("setup must use only the declared micro-universe card identities")
+    if not set(all_cards).issubset(card_repository.allowed_oracle_ids):
+        raise ValueError(
+            f"setup must use only card identities from the active support slice {card_repository.support_slice_key}"
+        )
 
     for oracle_id in all_cards:
         if not card_repository.has(oracle_id):

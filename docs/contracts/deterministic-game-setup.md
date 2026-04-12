@@ -7,10 +7,12 @@ Define the explicit inputs required to create a reproducible initial game state 
 ## v0 Scope
 
 - Two players only
-- Declared micro-universe only:
+- Active support slice only, currently:
   - `Border Guard`
   - `Foot Soldiers`
   - `Muck Rats`
+  - `Vengeance`
+  - `Path of Peace`
   - `Swamp`
   - `Forest`
   - `Island`
@@ -44,7 +46,7 @@ Define the explicit inputs required to create a reproducible initial game state 
 
 ## Invalid Setup Conditions
 
-- Any card outside the declared micro-universe
+- Any card outside the active support slice
 - Any player count other than two
 - Missing or duplicate player identifiers
 - Missing `rng_seed`

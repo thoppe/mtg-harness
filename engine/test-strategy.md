@@ -7,7 +7,7 @@ Define what the first engine tests need to prove before implementation begins.
 ## Initial Test Categories
 
 - fixture-loading tests
-  - the declared micro-universe can be loaded from canonical card files
+  - the active support slice can be loaded from canonical card files and manifest data
 - setup tests
   - a legal two-player starting state can be created
 - replay-log tests

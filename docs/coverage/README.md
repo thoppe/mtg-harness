@@ -6,11 +6,13 @@ This directory holds concrete declared coverage for the simulator.
 
 - `rules.initial.yaml`: initial rules support declaration
 - `cards.initial.yaml`: initial card support declaration
+- `slices/*.yaml`: named support-slice manifests
 
 ## Planned Next Layer
 
 - Named support-slice manifests should become the declared playable scope on top of the card and rules coverage manifests.
-- Until that migration lands, `rules.initial.yaml` and `cards.initial.yaml` remain the canonical declarations of the current narrow playable slice.
+- `docs/coverage/slices/portal.initial.yaml` is the first active support-slice manifest for the current narrow `Portal` slice.
+- `rules.initial.yaml` and `cards.initial.yaml` remain the canonical declarations of implemented card and rule coverage inside that slice.
 
 ## Companion Planning Docs
 
