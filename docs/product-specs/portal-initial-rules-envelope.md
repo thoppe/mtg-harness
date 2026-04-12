@@ -15,6 +15,14 @@ Define the smallest believable rules subset for the initial three-card `Portal` 
 - Casting `Foot Soldiers`
 - Basic creature combat
 - Lethal damage and creature death as minimal state-based handling
+- Deterministic setup inputs and replay traces for the above behaviors
+
+## Engine-Facing Interpretation
+
+- Setup must be reproducible from explicit player order, library order, opening-hand data, and RNG seed.
+- Turn progression must move through named transition points rather than implicit control flow.
+- Accepted actions and automatic rules outcomes must emit replay events in execution order.
+- State-based actions for lethal damage must run at explicit checkpoints.
 
 ## Out Of Scope
 

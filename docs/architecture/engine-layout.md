@@ -24,6 +24,10 @@ All engine implementation code and engine tests must live under `engine/`.
 - `engine/rules/`: rules evaluators such as state-based checks, triggers, and later effect systems
 - `engine/tests/`: package-aligned engine tests
 
+Detailed scaffold:
+
+- `docs/architecture/engine-package-scaffold.md`
+
 ## Expansion Guardrails
 
 - Do not merge rules evaluation directly into state mutation helpers.

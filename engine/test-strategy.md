@@ -10,6 +10,8 @@ Define what the first engine tests need to prove before implementation begins.
   - the declared micro-universe can be loaded from canonical card files
 - setup tests
   - a legal two-player starting state can be created
+- replay-log tests
+  - deterministic setup emits the expected append-only event sequence
 - action-legality tests
   - only valid actions are offered in a given state
 - mana tests

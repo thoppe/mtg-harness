@@ -38,6 +38,8 @@ The simulator should only claim support based on layer 3, never merely because l
   - `Plains`
   - the current official Wizards plain-text Comprehensive Rules snapshot
 - Pulled artifacts now exist in-repo with stable filenames and sidecar provenance.
+- Coverage manifests remain YAML as the canonical support declaration for the current micro-universe.
+- Narrative companion markdown should be added only when the supported rule surface grows beyond the current small slice.
 
 ## Workstreams
 
@@ -91,7 +93,6 @@ For cards:
 ## Decisions Needed
 
 - The initial rules envelope tied to that set
-- Whether coverage manifests should be hand-authored markdown, structured data files, or both
 
 ## Suggested Next Deliverables
 
@@ -101,10 +102,7 @@ For cards:
 
 ## Immediate Next Actions
 
-1. Turn the current `Portal` rules envelope into tighter engine-facing contracts for:
-   - deterministic setup inputs
-   - state-machine transition points
-   - initial replay event types
-2. Define the first engine package scaffold under `docs/architecture/` and `docs/contracts/` using the chosen hybrid pattern.
-3. Decide whether coverage manifests should remain structured files only or gain matching narrative markdown.
-4. Do not start engine implementation until those contracts and package boundaries are written in-repo.
+1. Start the first engine package scaffold using the chosen hybrid pattern.
+2. Implement deterministic setup and replay-log foundations for the initial micro-universe.
+3. Map the current rules manifest items to concrete engine tests and event-trace expectations as implementation proceeds.
+4. Keep coverage declarations canonical in YAML until the supported rule surface grows enough to justify narrative companion docs.

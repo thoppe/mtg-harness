@@ -9,10 +9,14 @@ Contracts define the interfaces and invariants that future code must satisfy.
 - `canonical-card-model.md`
 - `card-coverage-manifest.md`
 - `card-implementation-lifecycle.md`
+- `deterministic-game-setup.md`
+- `engine-test-trace-mapping.md`
 - `game-state.md`
 - `play-engine.md`
+- `replay-event-log.md`
 - `rules-coverage-manifest.md`
 - `rules-implementation-lifecycle.md`
+- `state-machine-transitions.md`
 - `surface-api.md`
 
 ## Contract Rule

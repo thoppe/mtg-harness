@@ -18,7 +18,23 @@ Define the core state boundaries for simulation.
 
 - Game state transitions must be inspectable.
 - The engine must be able to explain why a legal action was accepted or rejected.
-- Deterministic replay must be possible if deterministic simulation is adopted as a project requirement.
+- Deterministic replay must be possible from explicit setup inputs plus the append-only event log.
+
+## v0 Required State Partitions
+
+- `players`: identifiers, life totals, and ownership relations
+- `turn_state`: active player, step, and priority holder
+- `zones`: library, hand, battlefield, graveyard, and stack
+- `objects`: stable object records keyed independently from their current zone
+- `mana_pools`: at minimum the white mana needed for `Plains`
+- `rng_state`: deterministic seed and any derived RNG cursor state
+
+## v0 State Rules
+
+- Hidden-zone ordering must be stable and replayable.
+- Zone movement must preserve object identity across transitions.
+- The engine may derive convenience views, but replay cannot depend on untracked derived state.
+- The first slice may omit counters, attachments, and status markers not required by the declared micro-universe.
 
 ## Open Questions
 

@@ -52,3 +52,9 @@ Describe the responsibilities of the simulation core.
   - the initial event types required for deterministic replay
   - the boundary between transition control and rules evaluation
   - where future state-based actions, triggers, and continuous effects will attach
+
+## v0 Contract References
+
+- Deterministic setup inputs: `docs/contracts/deterministic-game-setup.md`
+- State-machine transition points: `docs/contracts/state-machine-transitions.md`
+- Replay event vocabulary: `docs/contracts/replay-event-log.md`

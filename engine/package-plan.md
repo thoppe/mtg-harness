@@ -8,22 +8,24 @@ Define the first package boundaries before writing engine code.
 
 - `engine/mtg_engine/`
   - `cards/`: loaded canonical card records and card-instance helpers
-  - `game_state/`: players, zones, permanents, turn state
+  - `state/`: players, zones, objects, mana pools, turn state
   - `actions/`: legal player actions in the initial slice
+  - `flow/`: setup, turn structure, and priority orchestration
+  - `events/`: append-only replay event definitions and logging helpers
   - `rules/`: executable rule families for the initial slice
-  - `services/`: setup and orchestration entry points used by CLI or later APIs
+  - `services/`: thin orchestration entry points used by CLI or later APIs when needed
 - `engine/tests/`
-  - `cards/`
-  - `game_state/`
-  - `actions/`
-  - `rules/`
-  - `services/`
+  - setup and replay tests first
+  - package-aligned tests as additional modules come online
 
 ## Boundary Rules
 
 - `cards/` should not own ingestion logic.
+- `state/` should not depend on `flow` or `rules`.
+- `events/` should not own legality decisions.
 - `rules/` should operate on explicit state and actions, not on UI concerns.
-- `services/` may coordinate workflows but must not hide rule decisions.
+- `flow/` may coordinate state, events, and rules but must not hide rule decisions.
+- `services/` may coordinate workflows but should stay thin.
 - Tests should be written against the smallest contract that proves behavior.
 
 ## First Contracts To Define In Code

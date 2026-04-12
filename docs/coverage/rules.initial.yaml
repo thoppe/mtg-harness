@@ -13,7 +13,9 @@ rules:
     engine_contracts:
       - docs/contracts/game-state.md
       - docs/contracts/play-engine.md
-    tests: []
+      - docs/contracts/deterministic-game-setup.md
+    tests:
+      - engine/tests/test_setup.py
     notes: "Ignore unsupported setup complexity until broader card support exists."
   - rule_key: turn_structure_minimal
     source_rules:
@@ -23,7 +25,9 @@ rules:
     engine_contracts:
       - docs/contracts/game-state.md
       - docs/contracts/play-engine.md
-    tests: []
+      - docs/contracts/state-machine-transitions.md
+    tests:
+      - engine/tests/test_turns.py
     notes: "Only the phases required by the initial micro-universe need to be modeled."
   - rule_key: land_playing_minimal
     source_rules:
@@ -32,7 +36,8 @@ rules:
     scope: Playing Plains as the initial slice's only land card.
     engine_contracts:
       - docs/contracts/play-engine.md
-    tests: []
+    tests:
+      - engine/tests/test_turns.py
     notes: ""
   - rule_key: mana_generation_basic
     source_rules:
@@ -42,7 +47,8 @@ rules:
     scope: Basic mana production sufficient for Plains.
     engine_contracts:
       - docs/contracts/play-engine.md
-    tests: []
+    tests:
+      - engine/tests/test_turns.py
     notes: "Only white mana production is required initially."
   - rule_key: creature_spells_minimal
     source_rules:
@@ -52,7 +58,10 @@ rules:
     scope: Casting and resolving Border Guard as a creature spell.
     engine_contracts:
       - docs/contracts/play-engine.md
-    tests: []
+      - docs/contracts/replay-event-log.md
+    tests:
+      - engine/tests/test_turns.py
+      - engine/tests/test_replay_log.py
     notes: "Only the subset needed for the initial cards is in scope."
   - rule_key: combat_minimal
     source_rules:
@@ -65,7 +74,11 @@ rules:
     scope: Basic attack, block, and combat-damage flow for creatures without keywords.
     engine_contracts:
       - docs/contracts/play-engine.md
-    tests: []
+      - docs/contracts/state-machine-transitions.md
+      - docs/contracts/replay-event-log.md
+    tests:
+      - engine/tests/test_combat.py
+      - engine/tests/test_replay_log.py
     notes: ""
   - rule_key: zones_minimal
     source_rules:
@@ -74,7 +87,9 @@ rules:
     scope: Library, hand, battlefield, graveyard, and stack only.
     engine_contracts:
       - docs/contracts/game-state.md
-    tests: []
+    tests:
+      - engine/tests/test_setup.py
+      - engine/tests/test_turns.py
     notes: ""
   - rule_key: state_based_actions_minimal
     source_rules:
@@ -83,7 +98,11 @@ rules:
     scope: Only the subset required for lethal damage and creature death.
     engine_contracts:
       - docs/contracts/play-engine.md
-    tests: []
+      - docs/contracts/state-machine-transitions.md
+      - docs/contracts/replay-event-log.md
+    tests:
+      - engine/tests/test_combat.py
+      - engine/tests/test_replay_log.py
     notes: "Broader SBA coverage is deferred."
   - rule_key: keyword_abilities
     source_rules: []
