@@ -6,10 +6,28 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from mtg_engine.actions.models import ActivateManaAbilityAction, CastCreatureSpellAction, PlayLandAction
+from mtg_engine.actions.models import (
+    ActivateManaAbilityAction,
+    CastCreatureSpellAction,
+    DeclareAttackersAction,
+    DeclareBlockersAction,
+    PassPriorityAction,
+    PlayLandAction,
+)
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
-from mtg_engine.flow.turns import activate_mana_ability, cast_creature_spell, play_land, start_first_turn
+from mtg_engine.flow.turns import (
+    activate_mana_ability,
+    advance_to_cleanup,
+    cast_creature_spell,
+    declare_attackers,
+    declare_blockers,
+    pass_priority,
+    play_land,
+    resolve_combat_damage,
+    start_first_turn,
+    start_next_turn,
+)
 
 
 INFORMATION_DIR = Path(__file__).resolve().parents[2] / "information"
@@ -41,14 +59,27 @@ class SpellTests(unittest.TestCase):
     def test_cast_border_guard_with_three_plains(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         session = _build_castable_main_phase_session(repository)
+        session = _advance_to_player_main_phase(session, repository, "alice")
         session = play_land(session, PlayLandAction(player_id="alice", card_instance_id="alice:1"), repository)
-        session = _next_turn_main_phase_with_reset(session)
+        session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
         session = play_land(session, PlayLandAction(player_id="alice", card_instance_id="alice:2"), repository)
-        session = _next_turn_main_phase_with_reset(session)
+        session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
         session = play_land(session, PlayLandAction(player_id="alice", card_instance_id="alice:3"), repository)
-        session = activate_mana_ability(session, ActivateManaAbilityAction(player_id="alice", source_instance_id="alice:1"), repository)
-        session = activate_mana_ability(session, ActivateManaAbilityAction(player_id="alice", source_instance_id="alice:2"), repository)
-        session = activate_mana_ability(session, ActivateManaAbilityAction(player_id="alice", source_instance_id="alice:3"), repository)
+        session = activate_mana_ability(
+            session,
+            ActivateManaAbilityAction(player_id="alice", source_instance_id="alice:1"),
+            repository,
+        )
+        session = activate_mana_ability(
+            session,
+            ActivateManaAbilityAction(player_id="alice", source_instance_id="alice:2"),
+            repository,
+        )
+        session = activate_mana_ability(
+            session,
+            ActivateManaAbilityAction(player_id="alice", source_instance_id="alice:3"),
+            repository,
+        )
 
         result = cast_creature_spell(
             session,
@@ -85,46 +116,30 @@ def _build_castable_main_phase_session(repository: CardRepository):
     return start_first_turn(initialize_game(setup, repository))
 
 
-def _next_turn_main_phase_with_reset(session):
-    state = session.state
-    alice = state.players["alice"]
-    reset_player = alice.__class__(
-        player_id=alice.player_id,
-        life_total=alice.life_total,
-        library=alice.library,
-        hand=alice.hand,
-        battlefield=alice.battlefield,
-        graveyard=alice.graveyard,
-        mana_pool=(),
-        lands_played_this_turn=0,
+def _advance_to_next_turn(session, repository: CardRepository):
+    active_player = session.state.turn.active_player
+    defending_player = "bob" if active_player == "alice" else "alice"
+    session = pass_priority(session, PassPriorityAction(player_id=active_player), repository)
+    session = declare_attackers(
+        session,
+        DeclareAttackersAction(player_id=active_player, attacker_ids=()),
+        repository,
     )
-    updated_players = dict(state.players)
-    updated_players["alice"] = reset_player
-    reset_objects = {
-        key: value.__class__(
-            instance_id=value.instance_id,
-            oracle_id=value.oracle_id,
-            owner_id=value.owner_id,
-            controller_id=value.controller_id,
-            zone=value.zone,
-            tapped=False,
-        )
-        for key, value in state.objects.items()
-    }
-    next_state = state.__class__(
-        game_id=state.game_id,
-        rng_seed=state.rng_seed,
-        players=updated_players,
-        objects=reset_objects,
-        stack=state.stack,
-        turn=state.turn.__class__(
-            turn_number=state.turn.turn_number + 1,
-            active_player="alice",
-            priority_player="alice",
-            step="precombat_main_step",
-        ),
+    session = declare_blockers(
+        session,
+        DeclareBlockersAction(player_id=defending_player, blockers={}),
+        repository,
     )
-    return session.__class__(state=next_state, event_log=session.event_log)
+    session = resolve_combat_damage(session, repository)
+    session = advance_to_cleanup(session)
+    return start_next_turn(session)
+
+
+def _advance_to_player_main_phase(session, repository: CardRepository, player_id: str):
+    current_session = session
+    while current_session.state.turn.active_player != player_id:
+        current_session = _advance_to_next_turn(current_session, repository)
+    return current_session
 
 
 if __name__ == "__main__":

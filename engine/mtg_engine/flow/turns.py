@@ -6,9 +6,11 @@ import re
 
 from mtg_engine.actions.models import (
     ActivateManaAbilityAction,
+    AdvanceStepAction,
     CastCreatureSpellAction,
     DeclareAttackersAction,
     DeclareBlockersAction,
+    PassPriorityAction,
     PlayLandAction,
 )
 from mtg_engine.actions.validation import require_active_player, require_step
@@ -18,6 +20,7 @@ from mtg_engine.state.models import GameState, TurnState
 from mtg_engine.state.zones import move_object, update_object, update_player
 from mtg_engine.rules.combat import apply_combat_damage, tap_attackers, with_combat_state
 
+from .priority import enumerate_legal_actions
 from .setup import GameBootstrap
 
 FIRST_TURN_STEP_SEQUENCE = (
@@ -255,6 +258,57 @@ def cast_creature_spell(
         },
     )
     return TurnResult(state=resolved_state, event_log=event_log.events)
+
+
+def advance_step(session: TurnResult | GameBootstrap, action: AdvanceStepAction) -> TurnResult:
+    state = session.state
+    require_active_player(state, action.player_id)
+    require_step(state, "precombat_main_step")
+
+    if action.to_step != "begin_combat_step":
+        raise ValueError(f"unsupported step advancement in v0: {action.to_step}")
+
+    return advance_to_begin_combat(session)
+
+
+def pass_priority(
+    session: TurnResult | GameBootstrap,
+    action: PassPriorityAction,
+    card_repository: CardRepository,
+) -> TurnResult:
+    state = session.state
+    if state.turn.priority_player != action.player_id:
+        raise ValueError("player does not have priority")
+    require_step(state, "precombat_main_step")
+
+    next_priority_player = _other_player(state, action.player_id)
+    event_log = EventLog.from_events(state.game_id, session.event_log)
+    event_log.append(
+        event_type="priority_passed",
+        active_player=action.player_id,
+        payload={
+            "player_id": action.player_id,
+            "from_step": state.turn.step,
+            "to_player": next_priority_player,
+        },
+    )
+
+    passed_state = replace(state, turn=replace(state.turn, priority_player=next_priority_player))
+    opposing_actions = enumerate_legal_actions(passed_state, card_repository)
+    if opposing_actions:
+        return TurnResult(state=passed_state, event_log=event_log.events)
+
+    event_log.append(
+        event_type="priority_passed",
+        active_player=next_priority_player,
+        payload={
+            "player_id": next_priority_player,
+            "from_step": state.turn.step,
+            "to_player": state.turn.active_player,
+        },
+    )
+    restored_state = replace(passed_state, turn=replace(passed_state.turn, priority_player=state.turn.active_player))
+    return advance_to_begin_combat(TurnResult(state=restored_state, event_log=event_log.events))
 
 
 def advance_to_begin_combat(session: TurnResult | GameBootstrap) -> TurnResult:

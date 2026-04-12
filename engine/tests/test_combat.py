@@ -7,16 +7,28 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from mtg_engine.actions.models import CastCreatureSpellAction, DeclareAttackersAction, DeclareBlockersAction
+from mtg_engine.actions.models import (
+    ActivateManaAbilityAction,
+    CastCreatureSpellAction,
+    DeclareAttackersAction,
+    DeclareBlockersAction,
+    PassPriorityAction,
+    PlayLandAction,
+)
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
 from mtg_engine.flow.turns import (
+    activate_mana_ability,
+    advance_to_cleanup,
     advance_to_begin_combat,
     cast_creature_spell,
     declare_attackers,
     declare_blockers,
+    pass_priority,
+    play_land,
     resolve_combat_damage,
     start_first_turn,
+    start_next_turn,
 )
 
 
@@ -62,13 +74,13 @@ class CombatTests(unittest.TestCase):
         )
         session = declare_blockers(
             session,
-            DeclareBlockersAction(player_id="bob", blockers={"alice:4": ("bob:3",)}),
+            DeclareBlockersAction(player_id="bob", blockers={"alice:4": ("bob:4",)}),
             repository,
         )
         result = resolve_combat_damage(session, repository)
 
         self.assertEqual(result.state.objects["alice:4"].zone, "battlefield")
-        self.assertEqual(result.state.objects["bob:3"].zone, "battlefield")
+        self.assertEqual(result.state.objects["bob:4"].zone, "battlefield")
         self.assertEqual(
             [event.event_type for event in result.event_log[-6:]],
             [
@@ -87,7 +99,7 @@ class CombatTests(unittest.TestCase):
 
         state = session.state
         updated_objects = dict(state.objects)
-        updated_objects["bob:3"] = replace(updated_objects["bob:3"], damage_marked=3)
+        updated_objects["bob:4"] = replace(updated_objects["bob:4"], damage_marked=3)
         session = session.__class__(state=replace(state, objects=updated_objects), event_log=session.event_log)
 
         session = advance_to_begin_combat(session)
@@ -98,13 +110,13 @@ class CombatTests(unittest.TestCase):
         )
         session = declare_blockers(
             session,
-            DeclareBlockersAction(player_id="bob", blockers={"alice:4": ("bob:3",)}),
+            DeclareBlockersAction(player_id="bob", blockers={"alice:4": ("bob:4",)}),
             repository,
         )
         result = resolve_combat_damage(session, repository)
 
-        self.assertEqual(result.state.objects["bob:3"].zone, "graveyard")
-        self.assertIn("bob:3", result.state.players["bob"].graveyard)
+        self.assertEqual(result.state.objects["bob:4"].zone, "graveyard")
+        self.assertIn("bob:4", result.state.players["bob"].graveyard)
         self.assertEqual(result.event_log[-4].event_type, "state_based_actions_checked")
         self.assertEqual(result.event_log[-3].event_type, "permanent_destroyed")
         self.assertEqual(result.event_log[-2].event_type, "object_moved_between_zones")
@@ -117,81 +129,83 @@ def _state_with_creatures_ready_to_fight(repository: CardRepository, *, include_
         starting_player="alice",
         libraries={
             "alice": (PLAINS, PLAINS, PLAINS, BORDER_GUARD),
-            "bob": (PLAINS, PLAINS, BORDER_GUARD) if include_blocker else (PLAINS,),
+            "bob": (PLAINS, PLAINS, PLAINS, BORDER_GUARD) if include_blocker else (PLAINS,),
         },
         opening_hands={
             "alice": (PLAINS, PLAINS, PLAINS, BORDER_GUARD),
-            "bob": (PLAINS, PLAINS, BORDER_GUARD) if include_blocker else (PLAINS,),
+            "bob": (PLAINS, PLAINS, PLAINS, BORDER_GUARD) if include_blocker else (PLAINS,),
         },
         rng_seed=23,
     )
     session = start_first_turn(initialize_game(setup, repository))
-    session = _cast_creature_for_test(session, repository, "alice", "alice:4")
+    session = _develop_creature_through_normal_turns(session, repository, "alice", "alice:4")
     if include_blocker:
-        session = session.__class__(
-            state=replace(
-                session.state,
-                turn=replace(
-                    session.state.turn,
-                    turn_number=session.state.turn.turn_number + 1,
-                    active_player="bob",
-                    priority_player="bob",
-                    step="precombat_main_step",
-                ),
-            ),
-            event_log=session.event_log,
-        )
-        session = _cast_creature_for_test(session, repository, "bob", "bob:3")
-        session = session.__class__(
-            state=replace(
-                session.state,
-                turn=replace(
-                    session.state.turn,
-                    turn_number=session.state.turn.turn_number + 1,
-                    active_player="alice",
-                    priority_player="alice",
-                    step="precombat_main_step",
-                ),
-            ),
-            event_log=session.event_log,
-        )
+        session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "bob")
+        session = _develop_creature_through_normal_turns(session, repository, "bob", "bob:4")
+    return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
 
-    state = session.state
-    updated_objects = dict(state.objects)
-    updated_objects["alice:4"] = replace(
-        updated_objects["alice:4"],
-        entered_battlefield_turn=state.turn.turn_number - 1,
-        tapped=False,
-    )
-    if include_blocker:
-            updated_objects["bob:3"] = replace(
-                updated_objects["bob:3"],
-                entered_battlefield_turn=state.turn.turn_number - 1,
-                tapped=False,
+
+def _develop_creature_through_normal_turns(session, repository: CardRepository, player_id: str, creature_id: str):
+    current_session = _advance_to_player_main_phase(session, repository, player_id)
+    plains_ids = [instance_id for instance_id in current_session.state.players[player_id].hand if instance_id != creature_id]
+    required_land_count = _required_white_mana(repository, current_session.state.objects[creature_id].oracle_id)
+
+    for index, plains_id in enumerate(plains_ids[:required_land_count], start=1):
+        current_session = play_land(
+            current_session,
+            PlayLandAction(player_id=player_id, card_instance_id=plains_id),
+            repository,
+        )
+        if index != required_land_count:
+            current_session = _advance_to_player_main_phase(
+                _advance_to_next_turn(current_session, repository),
+                repository,
+                player_id,
             )
-    updated_players = dict(state.players)
-    updated_players["alice"] = replace(updated_players["alice"], mana_pool=(), lands_played_this_turn=0)
-    updated_players["bob"] = replace(updated_players["bob"], mana_pool=(), lands_played_this_turn=0)
-    next_state = replace(state, objects=updated_objects, players=updated_players)
-    return session.__class__(state=next_state, event_log=session.event_log)
 
+    for source_instance_id in current_session.state.players[player_id].battlefield:
+        current_session = activate_mana_ability(
+            current_session,
+            ActivateManaAbilityAction(player_id=player_id, source_instance_id=source_instance_id),
+            repository,
+        )
 
-def _cast_creature_for_test(session, repository: CardRepository, player_id: str, creature_id: str):
-    state = session.state
-    player = state.players[player_id]
-    next_state = replace(
-        state,
-        players={
-            **state.players,
-            player_id: replace(player, mana_pool=("W", "W", "W")),
-        },
-    )
-    session = session.__class__(state=next_state, event_log=session.event_log)
     return cast_creature_spell(
-        session,
+        current_session,
         CastCreatureSpellAction(player_id=player_id, card_instance_id=creature_id),
         repository,
     )
+
+
+def _required_white_mana(repository: CardRepository, oracle_id: str) -> int:
+    mana_cost = repository.get(oracle_id).mana_cost
+    return sum(int(symbol) if symbol.isdigit() else 1 for symbol in mana_cost.replace("{", " ").replace("}", " ").split())
+
+
+def _advance_to_next_turn(session, repository: CardRepository):
+    active_player = session.state.turn.active_player
+    defending_player = "bob" if active_player == "alice" else "alice"
+    session = pass_priority(session, PassPriorityAction(player_id=active_player), repository)
+    session = declare_attackers(
+        session,
+        DeclareAttackersAction(player_id=active_player, attacker_ids=()),
+        repository,
+    )
+    session = declare_blockers(
+        session,
+        DeclareBlockersAction(player_id=defending_player, blockers={}),
+        repository,
+    )
+    session = resolve_combat_damage(session, repository)
+    session = advance_to_cleanup(session)
+    return start_next_turn(session)
+
+
+def _advance_to_player_main_phase(session, repository: CardRepository, player_id: str):
+    current_session = session
+    while current_session.state.turn.active_player != player_id:
+        current_session = _advance_to_next_turn(current_session, repository)
+    return current_session
 
 
 if __name__ == "__main__":

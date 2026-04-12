@@ -6,10 +6,22 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from mtg_engine.actions.models import ActivateManaAbilityAction, PlayLandAction
+from dataclasses import replace
+
+from mtg_engine.actions.models import ActivateManaAbilityAction, DeclareAttackersAction, DeclareBlockersAction, PassPriorityAction, PlayLandAction
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
-from mtg_engine.flow.turns import activate_mana_ability, advance_to_cleanup, play_land, start_first_turn, start_next_turn
+from mtg_engine.flow.turns import (
+    activate_mana_ability,
+    advance_to_cleanup,
+    declare_attackers,
+    declare_blockers,
+    pass_priority,
+    play_land,
+    resolve_combat_damage,
+    start_first_turn,
+    start_next_turn,
+)
 
 
 INFORMATION_DIR = Path(__file__).resolve().parents[2] / "information"
@@ -94,32 +106,14 @@ class TurnTests(unittest.TestCase):
             ActivateManaAbilityAction(player_id="alice", source_instance_id="alice:1"),
             repository,
         )
+        session = _advance_to_end_combat_step(session, repository)
         damaged_state = session.state
         damaged_objects = dict(damaged_state.objects)
-        damaged_objects["alice:1"] = damaged_objects["alice:1"].__class__(
-            instance_id=damaged_objects["alice:1"].instance_id,
-            oracle_id=damaged_objects["alice:1"].oracle_id,
-            owner_id=damaged_objects["alice:1"].owner_id,
-            controller_id=damaged_objects["alice:1"].controller_id,
-            zone=damaged_objects["alice:1"].zone,
-            tapped=damaged_objects["alice:1"].tapped,
-            entered_battlefield_turn=damaged_objects["alice:1"].entered_battlefield_turn,
-            damage_marked=2,
+        damaged_objects["alice:1"] = replace(damaged_objects["alice:1"], damage_marked=2)
+        session = session.__class__(
+            state=replace(damaged_state, objects=damaged_objects),
+            event_log=session.event_log,
         )
-        session = session.__class__(state=damaged_state.__class__(
-            game_id=damaged_state.game_id,
-            rng_seed=damaged_state.rng_seed,
-            players=damaged_state.players,
-            objects=damaged_objects,
-            stack=damaged_state.stack,
-            turn=damaged_state.turn.__class__(
-                turn_number=damaged_state.turn.turn_number,
-                active_player=damaged_state.turn.active_player,
-                priority_player=damaged_state.turn.priority_player,
-                step="end_combat_step",
-            ),
-            combat=damaged_state.combat,
-        ), event_log=session.event_log)
 
         result = advance_to_cleanup(session)
 
@@ -132,38 +126,7 @@ class TurnTests(unittest.TestCase):
     def test_start_next_turn_hands_off_to_other_player(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         session = _build_main_phase_session(repository)
-        session = play_land(session, PlayLandAction(player_id="alice", card_instance_id="alice:1"), repository)
-        session = activate_mana_ability(
-            session,
-            ActivateManaAbilityAction(player_id="alice", source_instance_id="alice:1"),
-            repository,
-        )
-        cleanup_session = session.__class__(
-            state=session.state.__class__(
-                game_id=session.state.game_id,
-                rng_seed=session.state.rng_seed,
-                players=session.state.players,
-                objects=session.state.objects,
-                stack=session.state.stack,
-                turn=session.state.turn.__class__(
-                    turn_number=session.state.turn.turn_number,
-                    active_player="alice",
-                    priority_player="alice",
-                    step="cleanup_step",
-                ),
-                combat=session.state.combat,
-            ),
-            event_log=session.event_log + (
-                session.event_log[-1].__class__(
-                    event_id="synthetic",
-                    game_id=session.state.game_id,
-                    sequence=len(session.event_log) + 1,
-                    event_type="turn_ended",
-                    active_player="alice",
-                    payload={"turn_number": 1, "active_player": "alice"},
-                ),
-            ),
-        )
+        cleanup_session = advance_to_cleanup(_advance_to_end_combat_step(session, repository))
 
         result = start_next_turn(cleanup_session)
 
@@ -194,6 +157,23 @@ def _build_main_phase_session(repository: CardRepository):
     )
     bootstrap = initialize_game(setup, repository)
     return start_first_turn(bootstrap)
+
+
+def _advance_to_end_combat_step(session, repository: CardRepository):
+    active_player = session.state.turn.active_player
+    defending_player = "bob" if active_player == "alice" else "alice"
+    session = pass_priority(session, PassPriorityAction(player_id=active_player), repository)
+    session = declare_attackers(
+        session,
+        DeclareAttackersAction(player_id=active_player, attacker_ids=()),
+        repository,
+    )
+    session = declare_blockers(
+        session,
+        DeclareBlockersAction(player_id=defending_player, blockers={}),
+        repository,
+    )
+    return resolve_combat_damage(session, repository)
 
 
 if __name__ == "__main__":

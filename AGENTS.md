@@ -37,7 +37,7 @@ This repository follows a harness-engineering approach.
 
 ## Current Focus
 
-The project is in scaffold/planning phase for a Python-based Magic: The Gathering simulator.
+The project has moved past pure scaffold planning into a narrow v0 engine slice backed by in-repo source artifacts and contracts.
 
 Initial major domains:
 
@@ -50,12 +50,9 @@ No frontend implementation should be introduced yet.
 
 ## Immediate Next Steps
 
-The next agent should prioritize ingestion planning, not engine implementation.
+The ingestion scaffold already exists under `information/`, so the next agent should continue the active engine plan.
 
-1. Use `.codex/skills/card-source-sync/` to scaffold the actual source-pull workflow under `information/`.
-2. Define the provenance file shape for downloaded Scryfall card metadata, card images, and Wizards rules snapshots.
-3. Add the first pull scripts and pull tests under `information/` for the declared micro-universe:
-   - `Border Guard`
-   - `Foot Soldiers`
-   - `Plains`
-4. Keep engine work limited to planning docs until ingestion artifacts and provenance conventions exist in-repo.
+1. Read `docs/exec-plans/active/002-source-strategy-and-coverage-plan.md` first and follow its `Resume Here` section.
+2. Add explicit priority and legal-action enumeration for `precombat_main_step` in the engine flow.
+3. Replace synthetic turn-state shortcuts in tests with engine-driven progression where practical.
+4. Keep combat expansion scoped to the declared micro-universe and only widen it when the active plan or contracts require it.

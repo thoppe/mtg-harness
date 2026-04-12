@@ -51,7 +51,7 @@ Define the minimum legal progression points for the first deterministic engine s
 
 ## v0 Simplifications
 
-- The first slice may treat many priority windows as forced-pass paths when no legal actions exist beyond the declared micro-universe.
+- The first slice currently enumerates `precombat_main_step` actions for the active player and auto-resolves the opposing player's unsupported branch as a forced pass.
 - The first slice may limit stack interactions to creature spells and mana abilities required by `Plains`.
 - The first slice may model combat with a single combat-damage checkpoint rather than broader combat variants.
 - The currently implemented turn flow reaches cleanup, emits `turn_ended`, and can hand off into the next active player's precombat main.

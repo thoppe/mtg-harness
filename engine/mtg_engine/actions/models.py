@@ -22,6 +22,17 @@ class CastCreatureSpellAction:
 
 
 @dataclass(frozen=True)
+class PassPriorityAction:
+    player_id: str
+
+
+@dataclass(frozen=True)
+class AdvanceStepAction:
+    player_id: str
+    to_step: str
+
+
+@dataclass(frozen=True)
 class DeclareAttackersAction:
     player_id: str
     attacker_ids: tuple[str, ...]
