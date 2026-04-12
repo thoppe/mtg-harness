@@ -47,3 +47,15 @@ Initial major domains:
 - Browser-facing API surface for a later viewer/player
 
 No frontend implementation should be introduced yet.
+
+## Immediate Next Steps
+
+The next agent should prioritize ingestion planning, not engine implementation.
+
+1. Use `.codex/skills/card-source-sync/` to scaffold the actual source-pull workflow under `information/`.
+2. Define the provenance file shape for downloaded Scryfall card metadata, card images, and Wizards rules snapshots.
+3. Add the first pull scripts and pull tests under `information/` for the declared micro-universe:
+   - `Border Guard`
+   - `Foot Soldiers`
+   - `Plains`
+4. Keep engine work limited to planning docs until ingestion artifacts and provenance conventions exist in-repo.

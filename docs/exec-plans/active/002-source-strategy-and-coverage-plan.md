@@ -84,3 +84,16 @@ For cards:
 1. A provenance and snapshot policy for external sources
 2. Concrete coverage manifests for the initial micro-universe
 3. A `Portal`-specific first rules envelope
+
+## Immediate Next Actions
+
+1. Use `.codex/skills/card-source-sync/` as the workflow source for acquisition work.
+2. Define the provenance artifact shape for:
+   - `information/cards/data/<oracle_id>.json`
+   - `information/cards/images/<oracle_id>.jpg`
+   - `information/rules/` snapshots
+3. Add ingestion scripts and ingestion tests under `information/` for the initial micro-universe only:
+   - `Border Guard`
+   - `Foot Soldiers`
+   - `Plains`
+4. Do not start engine implementation until those acquisition and provenance pieces exist.

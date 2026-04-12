@@ -37,3 +37,11 @@ This repository is in planning mode. No implementation code has been added yet.
 ## Immediate Goal
 
 Define enough contracts and architecture to begin implementation of a Python-first simulation backend without locking in premature UI work.
+
+## Immediate Next Work
+
+The next concrete work is in `information/`, not `engine/`:
+
+- define provenance for pulled source artifacts
+- scaffold source-pull scripts and tests for the initial three-card micro-universe
+- use `.codex/skills/card-source-sync/` as the repeatable workflow entry point
