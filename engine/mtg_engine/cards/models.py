@@ -22,3 +22,7 @@ class CardDefinition:
     @property
     def is_creature(self) -> bool:
         return "Creature" in self.type_line
+
+    @property
+    def is_sorcery(self) -> bool:
+        return "Sorcery" in self.type_line

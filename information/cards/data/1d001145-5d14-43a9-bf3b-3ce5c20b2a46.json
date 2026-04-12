@@ -1,0 +1,137 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "1d001145-5d14-43a9-bf3b-3ce5c20b2a46",
+  "name": "Vengeance",
+  "provenance": {
+    "collector_number": "36",
+    "fetched_at": "2026-04-12T19:01:00Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/c/9/c91c249b-157c-4f1d-8171-29d1e75b1c9f.jpg?1562447828",
+    "oracle_id": "1d001145-5d14-43a9-bf3b-3ce5c20b2a46",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor%20%28name%3A%22Border%20Guard%22%20or%20name%3A%22Foot%20Soldiers%22%20or%20name%3A%22Muck%20Rats%22%20or%20name%3A%22Vengeance%22%20or%20name%3A%22Swamp%22%20or%20name%3A%22Forest%22%20or%20name%3A%22Island%22%20or%20name%3A%22Mountain%22%20or%20name%3A%22Plains%22%29",
+    "requested_set_code": "por",
+    "scryfall_id": "c91c249b-157c-4f1d-8171-29d1e75b1c9f",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/c91c249b-157c-4f1d-8171-29d1e75b1c9f"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Andrew Robinson",
+    "artist_ids": [
+      "cb577db7-7f47-4f78-8682-6eaef8a77bd1"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10183,
+    "cmc": 4.0,
+    "collector_number": "36",
+    "color_identity": [
+      "W"
+    ],
+    "colors": [
+      "W"
+    ],
+    "digital": false,
+    "edhrec_rank": 27959,
+    "finishes": [
+      "nonfoil"
+    ],
+    "flavor_text": "Bitter as wormwood, sweet as mulled wine.",
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "c91c249b-157c-4f1d-8171-29d1e75b1c9f",
+    "illustration_id": "379d8102-809b-472e-9c36-8f9581e6d92a",
+    "image_status": "highres_scan",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/c/9/c91c249b-157c-4f1d-8171-29d1e75b1c9f.jpg?1562447828",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/c/9/c91c249b-157c-4f1d-8171-29d1e75b1c9f.jpg?1562447828",
+      "large": "https://cards.scryfall.io/large/front/c/9/c91c249b-157c-4f1d-8171-29d1e75b1c9f.jpg?1562447828",
+      "normal": "https://cards.scryfall.io/normal/front/c/9/c91c249b-157c-4f1d-8171-29d1e75b1c9f.jpg?1562447828",
+      "png": "https://cards.scryfall.io/png/front/c/9/c91c249b-157c-4f1d-8171-29d1e75b1c9f.png?1562447828",
+      "small": "https://cards.scryfall.io/small/front/c/9/c91c249b-157c-4f1d-8171-29d1e75b1c9f.jpg?1562447828"
+    },
+    "keywords": [],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "not_legal",
+      "paupercommander": "not_legal",
+      "penny": "not_legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{3}{W}",
+    "multiverse_ids": [
+      4404
+    ],
+    "name": "Vengeance",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "1d001145-5d14-43a9-bf3b-3ce5c20b2a46",
+    "oracle_text": "Destroy target tapped creature.",
+    "oversized": false,
+    "prices": {
+      "eur": "0.19",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "0.25",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A1d001145-5d14-43a9-bf3b-3ce5c20b2a46&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Vengeance&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10183&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F810%3Fpage%3D1"
+    },
+    "rarity": "uncommon",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Vengeance",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4404&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DVengeance",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DVengeance"
+    },
+    "released_at": "1997-05-01",
+    "reprint": false,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/c91c249b-157c-4f1d-8171-29d1e75b1c9f/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/36/vengeance?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 810,
+    "textless": false,
+    "type_line": "Sorcery",
+    "uri": "https://api.scryfall.com/cards/c91c249b-157c-4f1d-8171-29d1e75b1c9f",
+    "variation": false
+  }
+}

@@ -22,6 +22,13 @@ class CastCreatureSpellAction:
 
 
 @dataclass(frozen=True)
+class CastNonCreatureSpellAction:
+    player_id: str
+    card_instance_id: str
+    target_instance_id: str
+
+
+@dataclass(frozen=True)
 class PassPriorityAction:
     player_id: str
 

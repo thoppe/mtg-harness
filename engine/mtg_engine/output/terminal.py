@@ -215,6 +215,20 @@ def _summarize_event(
             for item in destroyed_items
         )
         return f"SBA check destroys {destroyed}"
+    if event.event_type == "mana_added":
+        mana = " ".join(payload.get("mana", ())) or "no mana"
+        source_name = _event_card_name(card_repository, state, payload["source_instance_id"], payload)
+        return f"{source_name} adds {mana}"
+    if event.event_type == "spell_cast":
+        spell_name = _event_card_name(card_repository, state, payload["card_instance_id"], payload)
+        target_ids = payload.get("target_instance_ids", ())
+        if not target_ids:
+            return f"{spell_name} is cast"
+        targets = ", ".join(_event_card_name(card_repository, state, target_id, payload) for target_id in target_ids)
+        return f"{spell_name} is cast targeting {targets}"
+    if event.event_type == "spell_resolved":
+        spell_name = _event_card_name(card_repository, state, payload["card_instance_id"], payload)
+        return f"{spell_name} resolves"
     if event.event_type == "permanent_destroyed":
         card_name = _card_name_from_oracle(card_repository, payload["oracle_id"])
         return f"{card_name} is destroyed for {_reason_text(payload)}"
@@ -254,4 +268,7 @@ def _destroyed_summary(card_repository: CardRepository, state: GameState | None,
 def _reason_text(payload: dict) -> str:
     if payload.get("reason") == "lethal_damage":
         return f"lethal damage ({payload['damage_marked']} >= {payload['toughness']})"
+    if isinstance(payload.get("reason"), str) and payload["reason"].startswith("spell_effect:"):
+        spell_name = payload["reason"].split(":", 1)[1]
+        return f"{spell_name} resolving"
     return payload.get("reason", "an unspecified reason")

@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from dataclasses import replace
 
 from rich.console import Console
 
@@ -11,6 +12,7 @@ sys.path.insert(0, str(ENGINE_DIR))
 from mtg_engine.actions.models import (
     ActivateManaAbilityAction,
     CastCreatureSpellAction,
+    CastNonCreatureSpellAction,
     DeclareAttackersAction,
     DeclareBlockersAction,
     PlayLandAction,
@@ -22,6 +24,7 @@ from mtg_engine.flow.turns import (
     advance_to_begin_combat,
     advance_to_cleanup,
     cast_creature_spell,
+    cast_noncreature_spell,
     declare_attackers,
     declare_blockers,
     play_land,
@@ -30,6 +33,7 @@ from mtg_engine.flow.turns import (
     start_next_turn,
 )
 from mtg_engine.output import print_action_plan, print_game_snapshot, print_recent_events
+from mtg_engine.state.zones import move_object, update_object
 
 
 INFORMATION_DIR = REPO_ROOT / "information"
@@ -37,6 +41,7 @@ SWAMP = "56719f6a-1a6c-4c0a-8d21-18f7d7350b68"
 PLAINS = "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
 BORDER_GUARD = "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
 MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
+VENGEANCE = "1d001145-5d14-43a9-bf3b-3ce5c20b2a46"
 
 
 def build_lethal_damage_demo_state(repository):
@@ -83,6 +88,70 @@ def run_lethal_damage_sequence(session, repository):
         repository,
     )
     return resolve_combat_damage(session, repository)
+
+
+def build_vengeance_demo_state(repository):
+    setup = SetupInput(
+        game_id="demo-vengeance",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (PLAINS, PLAINS, PLAINS, PLAINS, VENGEANCE),
+            "bob": (SWAMP, MUCK_RATS),
+        },
+        opening_hands={
+            "alice": (PLAINS, PLAINS, PLAINS, PLAINS, VENGEANCE),
+            "bob": (SWAMP, MUCK_RATS),
+        },
+        rng_seed=101,
+    )
+
+    session = start_first_turn(initialize_game(setup, repository))
+    current_state = session.state
+
+    for land_id in ("alice:1", "alice:2", "alice:3", "alice:4"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
+
+    current_state = move_object(
+        current_state,
+        instance_id="bob:2",
+        from_zone="hand",
+        to_zone="battlefield",
+        player_id="bob",
+    )
+    current_state = update_object(
+        current_state,
+        replace(current_state.objects["bob:2"], tapped=True),
+    )
+    return replace(session, state=current_state)
+
+
+def run_vengeance_sequence(session, repository):
+    for source_instance_id in session.state.players["alice"].battlefield:
+        current_card = session.state.objects[source_instance_id]
+        if not repository.get(current_card.oracle_id).is_land:
+            continue
+        session = activate_mana_ability(
+            session,
+            ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+            repository,
+        )
+
+    return cast_noncreature_spell(
+        session,
+        CastNonCreatureSpellAction(
+            player_id="alice",
+            card_instance_id="alice:5",
+            target_instance_id="bob:2",
+        ),
+        repository,
+    )
 
 
 def develop_creature(
@@ -191,3 +260,19 @@ print_action_plan(
 after_combat = run_lethal_damage_sequence(before_combat, repository)
 print_game_snapshot(console, after_combat.state, repository, title="Board State After Combat")
 print_recent_events(console, after_combat.event_log[-8:], repository, title="Recent Events", state=after_combat.state)
+
+before_vengeance = build_vengeance_demo_state(repository)
+print_game_snapshot(console, before_vengeance.state, repository, title="Board State Before Vengeance")
+print_action_plan(
+    console,
+    "Vengeance Script",
+    [
+        "Scenario setup places four Plains under Alice and a tapped Muck Rats under Bob.",
+        "Alice taps four Plains for mana.",
+        "Alice casts Vengeance targeting the tapped Muck Rats.",
+    ],
+)
+
+after_vengeance = run_vengeance_sequence(before_vengeance, repository)
+print_game_snapshot(console, after_vengeance.state, repository, title="Board State After Vengeance")
+print_recent_events(console, after_vengeance.event_log[-8:], repository, title="Recent Events", state=after_vengeance.state)

@@ -54,6 +54,12 @@ class PullSourcesTests(unittest.TestCase):
                 collector_number="102",
             ),
             sample_card(
+                name="Vengeance",
+                oracle_id="1d001145-5d14-43a9-bf3b-3ce5c20b2a46",
+                card_id="c91c249b-157c-4f1d-8171-29d1e75b1c9f",
+                collector_number="36",
+            ),
+            sample_card(
                 name="Swamp",
                 oracle_id="56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
                 card_id="ec0da69e-4ab6-4ef1-a7ae-4d6c47172c81",
@@ -98,7 +104,7 @@ class PullSourcesTests(unittest.TestCase):
                 sleep_seconds=0,
             )
 
-            self.assertEqual(len(written), 24)
+            self.assertEqual(len(written), 27)
             metadata_path = root / "cards" / "data" / "1ef5003c-f540-4cdc-913f-7d5280ad9f62.json"
             image_path = root / "cards" / "images" / "1ef5003c-f540-4cdc-913f-7d5280ad9f62.jpg"
             image_provenance_path = (
@@ -140,6 +146,12 @@ class PullSourcesTests(unittest.TestCase):
                 oracle_id="bca13a12-6723-4a5e-8f1b-21646a8b3e7e",
                 card_id="d4041226-7ce2-46d1-8844-20fa50b6568a",
                 collector_number="102",
+            ),
+            sample_card(
+                name="Vengeance",
+                oracle_id="1d001145-5d14-43a9-bf3b-3ce5c20b2a46",
+                card_id="c91c249b-157c-4f1d-8171-29d1e75b1c9f",
+                collector_number="36",
             ),
             sample_card(
                 name="Swamp",

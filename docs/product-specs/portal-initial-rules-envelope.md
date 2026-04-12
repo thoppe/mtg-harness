@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define the smallest believable rules subset for the initial `Portal` micro-universe built from `Border Guard`, `Foot Soldiers`, `Muck Rats`, and the five `Portal` basic lands.
+Define the smallest believable rules subset for the initial `Portal` micro-universe built from `Border Guard`, `Foot Soldiers`, `Muck Rats`, `Vengeance`, and the five `Portal` basic lands.
 
 ## In Scope
 
@@ -11,8 +11,10 @@ Define the smallest believable rules subset for the initial `Portal` micro-unive
 - Basic zones: library, hand, battlefield, stack, graveyard
 - Playing the five `Portal` basic lands
 - Producing basic colored mana from those lands
+- Casting and resolving simple sorcery-speed spells
 - Basic creature combat
 - Lethal damage and creature death as minimal state-based handling
+- Sorcery-speed targeted destruction limited to `Destroy target tapped creature.`
 - Deterministic setup inputs and replay traces for the above behaviors
 
 ## Engine-Facing Interpretation
@@ -21,6 +23,8 @@ Define the smallest believable rules subset for the initial `Portal` micro-unive
 - Turn progression must move through named transition points rather than implicit control flow.
 - Accepted actions and automatic rules outcomes must emit replay events in execution order.
 - State-based actions for lethal damage must run at explicit checkpoints.
+- The first noncreature spell path may stay sorcery-speed only and may validate targets only against battlefield creatures in the declared micro-universe.
+- `Vengeance` may reuse the existing tapped-state model from combat and mana activation rather than introducing a broader effect framework.
 
 ## Out Of Scope
 
@@ -28,6 +32,7 @@ Define the smallest believable rules subset for the initial `Portal` micro-unive
 - Triggered abilities not required by the initial cards
 - Replacement effects
 - Continuous effects beyond what the initial cards require
+- Instants, modal spells, and multi-target spells
 - Multiplayer rules
 - Format-legality enforcement
 - Any card text not present in the declared micro-universe

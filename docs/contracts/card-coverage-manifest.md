@@ -25,6 +25,7 @@ Define the machine-readable inventory of card and set support claimed by the sim
   - `Border Guard`
   - `Foot Soldiers`
   - `Muck Rats`
+  - `Vengeance`
   - `Swamp`
   - `Forest`
   - `Island`

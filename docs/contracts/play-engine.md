@@ -36,6 +36,7 @@ Describe the responsibilities of the simulation core.
   - `Border Guard`
   - `Foot Soldiers`
   - `Muck Rats`
+  - `Vengeance`
   - `Swamp`
   - `Forest`
   - `Island`

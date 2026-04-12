@@ -4,10 +4,10 @@
   "name": "Mountain",
   "provenance": {
     "collector_number": "208",
-    "fetched_at": "2026-04-12T17:29:41Z",
+    "fetched_at": "2026-04-12T19:01:00Z",
     "image_uri_normal": "https://cards.scryfall.io/normal/front/1/7/17cf7ce4-d5d7-49f2-a7e4-021d1a2d58c5.jpg?1562445676",
     "oracle_id": "a3fb7228-e76b-4e96-a40e-20b5fed75685",
-    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor%20%28name%3A%22Border%20Guard%22%20or%20name%3A%22Foot%20Soldiers%22%20or%20name%3A%22Muck%20Rats%22%20or%20name%3A%22Swamp%22%20or%20name%3A%22Forest%22%20or%20name%3A%22Island%22%20or%20name%3A%22Mountain%22%20or%20name%3A%22Plains%22%29",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor%20%28name%3A%22Border%20Guard%22%20or%20name%3A%22Foot%20Soldiers%22%20or%20name%3A%22Muck%20Rats%22%20or%20name%3A%22Vengeance%22%20or%20name%3A%22Swamp%22%20or%20name%3A%22Forest%22%20or%20name%3A%22Island%22%20or%20name%3A%22Mountain%22%20or%20name%3A%22Plains%22%29",
     "requested_set_code": "por",
     "scryfall_id": "17cf7ce4-d5d7-49f2-a7e4-021d1a2d58c5",
     "set_code": "por",

@@ -8,6 +8,7 @@ from mtg_engine.actions.models import (
     ActivateManaAbilityAction,
     AdvanceStepAction,
     CastCreatureSpellAction,
+    CastNonCreatureSpellAction,
     DeclareAttackersAction,
     DeclareBlockersAction,
     PassPriorityAction,
@@ -255,6 +256,124 @@ def cast_creature_spell(
             "oracle_id": card.oracle_id,
             "from_zone": "stack",
             "to_zone": "battlefield",
+        },
+    )
+    return TurnResult(state=resolved_state, event_log=event_log.events)
+
+
+def cast_noncreature_spell(
+    session: TurnResult | GameBootstrap,
+    action: CastNonCreatureSpellAction,
+    card_repository: CardRepository,
+) -> TurnResult:
+    state = session.state
+    require_active_player(state, action.player_id)
+    require_step(state, "precombat_main_step")
+
+    player = state.players[action.player_id]
+    if action.card_instance_id not in player.hand:
+        raise ValueError("spell must be in the active player's hand")
+
+    card = state.objects[action.card_instance_id]
+    card_definition = card_repository.get(card.oracle_id)
+    if card_definition.is_creature or card_definition.is_land:
+        raise ValueError("spell must be a supported noncreature spell")
+    if not _is_supported_tapped_creature_destruction(card_definition):
+        raise ValueError("unsupported noncreature spell in v0")
+    _require_legal_noncreature_target(state, card_repository, action.target_instance_id)
+
+    mana_requirements = _parse_mana_cost(card_definition.mana_cost)
+    if not _can_pay_mana_cost(player.mana_pool, mana_requirements):
+        raise ValueError("insufficient mana to cast noncreature spell")
+
+    remaining_pool = _pay_mana_cost(player.mana_pool, mana_requirements)
+    casting_state = update_player(state, replace(player, mana_pool=remaining_pool))
+    casting_state = move_object(
+        casting_state,
+        instance_id=action.card_instance_id,
+        from_zone="hand",
+        to_zone="stack",
+        player_id=action.player_id,
+    )
+
+    target = casting_state.objects[action.target_instance_id]
+    event_log = EventLog.from_events(state.game_id, session.event_log)
+    event_log.append(
+        event_type="spell_cast",
+        active_player=action.player_id,
+        payload={
+            "player_id": action.player_id,
+            "card_instance_id": action.card_instance_id,
+            "oracle_id": card.oracle_id,
+            "mana_cost": card_definition.mana_cost,
+            "target_instance_ids": [action.target_instance_id],
+        },
+    )
+    event_log.append(
+        event_type="object_moved_between_zones",
+        active_player=action.player_id,
+        payload={
+            "player_id": action.player_id,
+            "card_instance_id": action.card_instance_id,
+            "oracle_id": card.oracle_id,
+            "from_zone": "hand",
+            "to_zone": "stack",
+        },
+    )
+    event_log.append(
+        event_type="spell_resolved",
+        active_player=action.player_id,
+        payload={
+            "player_id": action.player_id,
+            "card_instance_id": action.card_instance_id,
+            "oracle_id": card.oracle_id,
+            "target_instance_ids": [action.target_instance_id],
+        },
+    )
+
+    resolved_state = move_object(
+        casting_state,
+        instance_id=action.target_instance_id,
+        from_zone="battlefield",
+        to_zone="graveyard",
+        player_id=target.owner_id,
+    )
+    event_log.append(
+        event_type="permanent_destroyed",
+        active_player=action.player_id,
+        payload={
+            "card_instance_id": action.target_instance_id,
+            "oracle_id": target.oracle_id,
+            "reason": f"spell_effect:{card_definition.name}",
+        },
+    )
+    event_log.append(
+        event_type="object_moved_between_zones",
+        active_player=action.player_id,
+        payload={
+            "player_id": target.owner_id,
+            "card_instance_id": action.target_instance_id,
+            "oracle_id": target.oracle_id,
+            "from_zone": "battlefield",
+            "to_zone": "graveyard",
+        },
+    )
+    resolved_state = move_object(
+        resolved_state,
+        instance_id=action.card_instance_id,
+        from_zone="stack",
+        to_zone="graveyard",
+        player_id=action.player_id,
+    )
+    event_log.append(
+        event_type="object_moved_between_zones",
+        active_player=action.player_id,
+        payload={
+            "player_id": action.player_id,
+            "card_instance_id": action.card_instance_id,
+            "oracle_id": card.oracle_id,
+            "from_zone": "stack",
+            "to_zone": "graveyard",
         },
     )
     return TurnResult(state=resolved_state, event_log=event_log.events)
@@ -628,6 +747,30 @@ def _pay_mana_cost(mana_pool: tuple[str, ...], requirements: dict[str, int]) -> 
     for _ in range(requirements["generic"]):
         remaining_pool.pop(0)
     return tuple(remaining_pool)
+
+
+def _require_legal_noncreature_target(
+    state: GameState,
+    card_repository: CardRepository,
+    target_instance_id: str,
+) -> None:
+    if target_instance_id not in state.objects:
+        raise ValueError("target must exist")
+    target = state.objects[target_instance_id]
+    if target.zone != "battlefield":
+        raise ValueError("target must be on the battlefield")
+    target_definition = card_repository.get(target.oracle_id)
+    if not target_definition.is_creature:
+        raise ValueError("target must be a creature")
+    if not target.tapped:
+        raise ValueError("target must be tapped")
+
+
+def _is_supported_tapped_creature_destruction(card_definition) -> bool:
+    return (
+        card_definition.is_sorcery
+        and card_definition.oracle_text == "Destroy target tapped creature."
+    )
 
 
 def _other_player(state: GameState, player_id: str) -> str:

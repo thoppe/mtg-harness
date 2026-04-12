@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 import unittest
 from pathlib import Path
 import sys
@@ -10,6 +11,7 @@ from mtg_engine.actions.models import (
     ActivateManaAbilityAction,
     AdvanceStepAction,
     CastCreatureSpellAction,
+    CastNonCreatureSpellAction,
     DeclareAttackersAction,
     DeclareBlockersAction,
     PassPriorityAction,
@@ -31,6 +33,7 @@ from mtg_engine.flow.turns import (
     start_first_turn,
     start_next_turn,
 )
+from mtg_engine.state.zones import move_object, update_object
 
 
 INFORMATION_DIR = Path(__file__).resolve().parents[2] / "information"
@@ -39,6 +42,7 @@ PLAINS = "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
 BORDER_GUARD = "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
 FOOT_SOLDIERS = "a768ba13-4d1c-4dce-a4a6-86a39c069c3f"
 MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
+VENGEANCE = "1d001145-5d14-43a9-bf3b-3ce5c20b2a46"
 
 
 class PriorityTests(unittest.TestCase):
@@ -118,6 +122,21 @@ class PriorityTests(unittest.TestCase):
         self.assertIn(DeclareBlockersAction(player_id="bob", blockers={"alice:4": ("bob:6",)}), actions)
         self.assertIn(DeclareBlockersAction(player_id="bob", blockers={"alice:4": ("bob:4", "bob:6")}), actions)
 
+    def test_precombat_main_enumerates_vengeance_when_tapped_target_and_mana_exist(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_vengeance_ready_session(repository)
+
+        actions = enumerate_legal_actions(session.state, repository)
+
+        self.assertIn(
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:5",
+                target_instance_id="bob:1",
+            ),
+            actions,
+        )
+
 
 def _build_main_phase_session(repository: CardRepository):
     setup = SetupInput(
@@ -179,6 +198,55 @@ def _build_multi_block_ready_session(repository: CardRepository):
     session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "bob")
     session = _cast_creature_from_normal_turns(session, repository, "bob", "bob:6")
     return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
+
+
+def _build_vengeance_ready_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="priority-vengeance",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (PLAINS, PLAINS, PLAINS, PLAINS, VENGEANCE),
+            "bob": (MUCK_RATS,),
+        },
+        opening_hands={
+            "alice": (PLAINS, PLAINS, PLAINS, PLAINS, VENGEANCE),
+            "bob": (MUCK_RATS,),
+        },
+        rng_seed=41,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    current_state = session.state
+
+    for land_id in ("alice:1", "alice:2", "alice:3", "alice:4"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
+
+    current_state = move_object(
+        current_state,
+        instance_id="bob:1",
+        from_zone="hand",
+        to_zone="battlefield",
+        player_id="bob",
+    )
+    current_state = update_object(
+        current_state,
+        replace(current_state.objects["bob:1"], tapped=True),
+    )
+    session = replace(session, state=current_state)
+
+    for source_instance_id in session.state.players["alice"].battlefield:
+        session = activate_mana_ability(
+            session,
+            ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+            repository,
+        )
+    return session
 
 
 def _cast_creature_from_normal_turns(session, repository: CardRepository, player_id: str, creature_id: str):

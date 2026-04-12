@@ -6,6 +6,7 @@ from mtg_engine.actions.models import (
     ActivateManaAbilityAction,
     AdvanceStepAction,
     CastCreatureSpellAction,
+    CastNonCreatureSpellAction,
     DeclareAttackersAction,
     DeclareBlockersAction,
     PassPriorityAction,
@@ -71,6 +72,23 @@ def _enumerate_active_precombat_main_actions(
                 CastCreatureSpellAction(
                     player_id=state.turn.active_player,
                     card_instance_id=instance_id,
+                )
+            )
+
+    for instance_id in player.hand:
+        card = state.objects[instance_id]
+        card_definition = card_repository.get(card.oracle_id)
+        if card_definition.is_creature or card_definition.is_land:
+            continue
+        requirements = _parse_mana_cost(card_definition.mana_cost)
+        if not _can_pay_mana_cost(player.mana_pool, requirements):
+            continue
+        for target_instance_id in _legal_noncreature_spell_targets(state, card_repository, instance_id):
+            actions.append(
+                CastNonCreatureSpellAction(
+                    player_id=state.turn.active_player,
+                    card_instance_id=instance_id,
+                    target_instance_id=target_instance_id,
                 )
             )
 
@@ -172,6 +190,33 @@ def _blocker_assignments(
 
     build(0, {attacker_id: () for attacker_id in attackers})
     return tuple(assignments)
+
+
+def _legal_noncreature_spell_targets(
+    state: GameState,
+    card_repository: CardRepository,
+    spell_instance_id: str,
+) -> tuple[str, ...]:
+    spell = state.objects[spell_instance_id]
+    card_definition = card_repository.get(spell.oracle_id)
+    if not _is_supported_tapped_creature_destruction(card_definition):
+        return ()
+
+    legal_targets: list[str] = []
+    for player in state.players.values():
+        for instance_id in player.battlefield:
+            permanent = state.objects[instance_id]
+            permanent_definition = card_repository.get(permanent.oracle_id)
+            if permanent_definition.is_creature and permanent.tapped:
+                legal_targets.append(instance_id)
+    return tuple(legal_targets)
+
+
+def _is_supported_tapped_creature_destruction(card_definition) -> bool:
+    return (
+        card_definition.is_sorcery
+        and card_definition.oracle_text == "Destroy target tapped creature."
+    )
 
 
 def _parse_mana_cost(mana_cost: str) -> dict[str, int]:

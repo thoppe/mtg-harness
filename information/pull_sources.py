@@ -48,6 +48,11 @@ MICRO_UNIVERSE = (
         oracle_id="bca13a12-6723-4a5e-8f1b-21646a8b3e7e",
     ),
     CardTarget(
+        name="Vengeance",
+        set_code="por",
+        oracle_id="1d001145-5d14-43a9-bf3b-3ce5c20b2a46",
+    ),
+    CardTarget(
         name="Swamp",
         set_code="por",
         oracle_id="56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
