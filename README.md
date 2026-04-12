@@ -26,7 +26,7 @@ This repository is in planning mode. No implementation code has been added yet.
 - `docs/`: contracts, architecture notes, design docs, references, and execution plans
 - `information/`: external-source pull scripts, tests, and pulled source artifacts
 - `engine/`: Python package for engine implementation and engine tests
-- `skills/`: repo-local Codex skill definitions for repeatable workflows
+- `.codex/skills/`: repo-local Codex skill definitions for repeatable workflows
 
 ## How To Use This Repo Right Now
 
