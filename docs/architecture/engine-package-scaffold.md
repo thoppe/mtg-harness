@@ -79,3 +79,9 @@ Define the first package-level layout the repository should create once engine s
 
 - Future continuous-effect or trigger packages may be added under `engine/rules/` without restructuring the current package roots.
 - If the engine later needs a service layer, it should wrap these packages rather than collapse them.
+
+## Next Session Focus
+
+- Add `engine/flow/priority.py`.
+- Add tests that prove action availability at `precombat_main_step`.
+- Prefer replacing test-only state shortcuts with normal engine progression before widening the supported rule surface.

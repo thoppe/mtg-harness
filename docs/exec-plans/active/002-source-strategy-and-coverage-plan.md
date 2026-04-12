@@ -107,3 +107,16 @@ For cards:
 2. Tighten combat support beyond the current one-blocker-per-attacker limitation when needed.
 3. Add priority-passing and action availability modeling beyond the current forced-path subset.
 4. Keep coverage declarations canonical in YAML until the supported rule surface grows enough to justify narrative companion docs.
+
+## Resume Here
+
+The next session should start with engine work, not more ingestion work.
+
+1. Add `engine/mtg_engine/flow/priority.py` and move the next legal-action decisions out of hardcoded forced progression.
+2. Define and implement legal-action enumeration for the active player in `precombat_main_step`:
+   - play land if available and not yet used this turn
+   - activate `Plains` mana ability from untapped battlefield permanents
+   - cast creature spells that the current mana pool can pay for
+   - advance to combat when no other chosen action is taken
+3. Replace synthetic test-state shortcuts with engine-driven turn advancement where practical.
+4. After priority/action availability exists, revisit combat to support more than one blocker per attacker only if the slice needs it.

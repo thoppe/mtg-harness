@@ -39,3 +39,9 @@ Define the first package boundaries before writing engine code.
   - declare attackers
   - declare blockers
 - turn skeleton sufficient to move from setup to combat
+
+## Next Session Targets
+
+- Add `flow/priority.py` for explicit priority and next-action availability.
+- Stop relying on tests to inject mana or turn-state shortcuts when a normal engine path can provide them.
+- Keep `rules/` focused on consequences and checks, while `flow/` owns when action windows open and close.
