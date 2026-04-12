@@ -11,6 +11,7 @@
 - Preserve each fetched rules snapshot with an effective date and source URL.
 - Treat the raw rules corpus as reference material, not as directly executable logic.
 - Build explicit mappings from comprehensive-rules sections to internal contracts and implementation status.
+- Store pulled rules artifacts under `information/rules/`.
 
 Current verified official entry points as of April 12, 2026:
 
@@ -23,12 +24,22 @@ Current verified official entry points as of April 12, 2026:
 - Prefer bulk-data acquisition patterns for large-scale syncs.
 - Download card images as a separate concern from metadata normalization.
 - Keep provenance linking normalized card records back to the source snapshot.
+- Store pulled card artifacts under `information/cards/`.
+- Store one card-data file per card and one image file per card in separate subdirectories.
+- Use Scryfall `oracle_id` as the canonical internal identity for a card concept.
+- Treat Scryfall `id` as the printing-level/source-record identity.
+
+## Initial Coverage Target
+
+- First implementation set: `Portal` (`por`)
+- Reason for selection: reduced rules complexity relative to later expansions, which makes it a better first vertical slice for engine and coverage-manifest design.
 
 ## Image Strategy
 
 - Images are supporting assets, not the authority for rules text.
 - Image download workflows should be rate-aware and cache-aware.
 - Image fetching policy should minimize repeated downloads and avoid unnecessary API pressure.
+- The default persisted image variant is still undecided.
 
 ## Raw Vs Implemented Separation
 

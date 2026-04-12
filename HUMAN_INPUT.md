@@ -18,6 +18,11 @@ This file captures decisions, constraints, and open questions that are explicitl
 - Rules implementation should progress from a raw/unimplemented corpus into explicitly implemented rule contracts
 - Card implementation should progress from raw card data into explicitly supported set-based slices
 - Prefer implementation planning by set rather than by isolated individual cards
+- External information assets must live under `information/rules/` and `information/cards/`
+- Information-pull code and tests must live under `information/`
+- Card data files and card image files must be stored separately under `information/cards/`
+- Initial target implementation set: `Portal` (`por`)
+- Canonical card identity should be based on Scryfall cross-printing identity, with printing/set provenance stored separately
 
 ## Working Assumptions
 
@@ -41,13 +46,13 @@ This file captures decisions, constraints, and open questions that are explicitl
 - Image policy:
   - Which image sizes, cache policy, and local storage conventions should be standard?
 - Implementation progression:
-  - Which sets should define the first supported vertical slices?
+  - Which sets should follow `Portal` as the next supported vertical slices?
 
 ## Near-Term Human Inputs Needed
 
 - Choose the initial target format or rules envelope.
 - Decide whether replayability and deterministic simulation are first-class requirements in v0.
-- Choose the first set or small set group to use for implementation-driven coverage.
+- Choose the standard image variant to persist by default.
 
 ## Change Policy
 

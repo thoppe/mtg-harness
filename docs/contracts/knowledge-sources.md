@@ -24,6 +24,9 @@ Define how external card and rules information enters the repository.
 - Large card-data pulls should prefer bulk data workflows rather than high-volume per-card API traffic.
 - Card-image downloads should avoid unnecessary API load and must respect the distinction between API-hosted metadata and image/file hosting.
 - Requests to Scryfall should send a meaningful `User-Agent` and `Accept` header.
+- External source pull code and tests must live under `information/`.
+- Rules artifacts must live under `information/rules/`.
+- Card metadata files and card image files must live in separate subdirectories under `information/cards/`.
 
 ## Raw Vs Implemented Model
 
@@ -42,3 +45,4 @@ Define how external card and rules information enters the repository.
 - Define snapshot/versioning policy for imported knowledge.
 - Define manifests that track raw coverage versus implemented coverage.
 - Define how set-based implementation status is declared for cards.
+- Define the exact per-card filename convention for metadata and image artifacts.

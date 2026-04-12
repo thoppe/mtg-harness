@@ -31,6 +31,7 @@ The simulator should only claim support based on layer 3, never merely because l
 - Define how and when card images are downloaded.
 - Define how Wizards rules text snapshots are stored.
 - Record provenance fields required for all imported artifacts.
+- Enforce repository layout under `information/`, `information/cards/`, and `information/rules/`.
 
 ### 2. Rules Coverage Model
 
@@ -43,6 +44,7 @@ The simulator should only claim support based on layer 3, never merely because l
 - Normalize Scryfall data into a canonical internal card model.
 - Declare implementation waves by set.
 - Track per-set status and any explicitly deferred cards or mechanics within those sets.
+- Start with `Portal` (`por`) as the first implementation wave.
 
 ### 4. Contract Interaction
 
@@ -72,13 +74,14 @@ For cards:
 
 ## Decisions Needed
 
-- The first implementation set or set cluster
 - The initial rules envelope tied to that set
 - Whether deterministic replay is required in the first engine slice
 - Whether coverage manifests should be hand-authored markdown, structured data files, or both
+- The exact canonical filename convention for per-card metadata and image artifacts
+- The default image variant to persist
 
 ## Suggested Next Deliverables
 
 1. A provenance and snapshot policy for external sources
 2. A draft coverage-manifest format for rules and sets
-3. A first-set recommendation for initial implementation
+3. A `Portal`-specific first rules envelope

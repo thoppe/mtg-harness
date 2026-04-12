@@ -24,6 +24,7 @@ Define how raw card data becomes simulator-supported gameplay objects.
 - Scryfall provides raw source data and image references.
 - The repository's canonical card model defines normalized internal shape.
 - Engine support is declared separately from source ingestion.
+- Set planning should use set code as the first implementation grouping, starting with `Portal` (`por`).
 
 ## Open Questions
 
