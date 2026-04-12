@@ -21,14 +21,14 @@ rules:
     source_rules:
       - "500"
     status: implemented
-    scope: Active player's first turn progression through precombat main, including draw when library content exists.
+    scope: Turn progression through cleanup plus handoff into the next active player's precombat main, including draw when library content exists.
     engine_contracts:
       - docs/contracts/game-state.md
       - docs/contracts/play-engine.md
       - docs/contracts/state-machine-transitions.md
     tests:
       - engine/tests/test_turns.py
-    notes: "Full turn handoff and later-step completion remain future work."
+    notes: "Broader long-run loop completion and unsupported branches remain future work."
   - rule_key: land_playing_minimal
     source_rules:
       - "305"
@@ -99,8 +99,8 @@ rules:
   - rule_key: state_based_actions_minimal
     source_rules:
       - "704"
-    status: not_started
-    scope: Only the subset required for lethal combat damage and creature death.
+    status: implemented
+    scope: Only the subset required for lethal combat damage and creature death from explicitly marked creature damage.
     engine_contracts:
       - docs/contracts/play-engine.md
       - docs/contracts/state-machine-transitions.md
@@ -108,7 +108,7 @@ rules:
     tests:
       - engine/tests/test_combat.py
       - engine/tests/test_replay_log.py
-    notes: "Still deferred because the current engine does not yet model a real lethal-damage path in the declared slice."
+    notes: "Implemented via explicit damage marking plus SBA checks; cleanup-time damage removal remains future work."
   - rule_key: keyword_abilities
     source_rules: []
     status: deferred

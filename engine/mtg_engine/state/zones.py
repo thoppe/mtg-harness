@@ -44,7 +44,15 @@ def move_object(
     entered_turn = object_record.entered_battlefield_turn
     if to_zone == "battlefield":
         entered_turn = state.turn.turn_number
-    updated_object = replace(object_record, zone=to_zone, entered_battlefield_turn=entered_turn)
+    damage_marked = object_record.damage_marked
+    if to_zone != "battlefield":
+        damage_marked = 0
+    updated_object = replace(
+        object_record,
+        zone=to_zone,
+        entered_battlefield_turn=entered_turn,
+        damage_marked=damage_marked,
+    )
     return update_object(state, updated_object)
 
 

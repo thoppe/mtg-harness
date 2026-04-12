@@ -28,6 +28,7 @@ Define the core state boundaries for simulation.
 - `objects`: stable object records keyed independently from their current zone
 - `mana_pools`: at minimum the white mana needed for `Plains`
 - `rng_state`: deterministic seed and any derived RNG cursor state
+- `damage_marks`: creature damage marked on objects until cleared by later turn handling
 
 ## v0 State Rules
 
@@ -35,6 +36,7 @@ Define the core state boundaries for simulation.
 - Zone movement must preserve object identity across transitions.
 - The engine may derive convenience views, but replay cannot depend on untracked derived state.
 - The first slice may omit counters, attachments, and status markers not required by the declared micro-universe.
+- Damage marked on creatures must be represented explicitly rather than inferred only from event history.
 
 ## Open Questions
 

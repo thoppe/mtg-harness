@@ -12,6 +12,7 @@ class CardInstance:
     zone: str
     tapped: bool = False
     entered_battlefield_turn: int | None = None
+    damage_marked: int = 0
 
 
 @dataclass(frozen=True)

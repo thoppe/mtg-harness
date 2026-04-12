@@ -424,6 +424,84 @@ def resolve_combat_damage(
     return TurnResult(state=next_state, event_log=event_log.events)
 
 
+def advance_to_cleanup(session: TurnResult | GameBootstrap) -> TurnResult:
+    state = session.state
+    require_step(state, "end_combat_step")
+
+    event_log = EventLog.from_events(state.game_id, session.event_log)
+    current_state = state
+    current_step = "end_combat_step"
+    for next_step in ("postcombat_main_step", "end_step", "cleanup_step"):
+        current_state = replace(current_state, turn=replace(current_state.turn, step=next_step))
+        event_log.append(
+            event_type="step_changed",
+            active_player=current_state.turn.active_player,
+            payload={
+                "turn_number": current_state.turn.turn_number,
+                "from_step": current_step,
+                "to_step": next_step,
+            },
+        )
+        current_step = next_step
+
+    current_state = _cleanup_end_of_turn_state(current_state)
+    event_log.append(
+        event_type="turn_ended",
+        active_player=current_state.turn.active_player,
+        payload={
+            "turn_number": current_state.turn.turn_number,
+            "active_player": current_state.turn.active_player,
+        },
+    )
+    return TurnResult(state=current_state, event_log=event_log.events)
+
+
+def start_next_turn(session: TurnResult | GameBootstrap) -> TurnResult:
+    state = session.state
+    require_step(state, "cleanup_step")
+
+    next_active_player = _other_player(state, state.turn.active_player)
+    next_turn_number = state.turn.turn_number + 1
+    current_state = replace(
+        state,
+        turn=TurnState(
+            turn_number=next_turn_number,
+            active_player=next_active_player,
+            priority_player=next_active_player,
+            step="turn_begin",
+        ),
+    )
+    current_state = _untap_player_battlefield(current_state, next_active_player)
+
+    event_log = EventLog.from_events(state.game_id, session.event_log)
+    event_log.append(
+        event_type="turn_started",
+        active_player=next_active_player,
+        payload={
+            "turn_number": next_turn_number,
+            "active_player": next_active_player,
+        },
+    )
+
+    current_step = "turn_begin"
+    for next_step in ("untap_step", "upkeep_step", "draw_step", "precombat_main_step"):
+        current_state = replace(current_state, turn=replace(current_state.turn, step=next_step))
+        event_log.append(
+            event_type="step_changed",
+            active_player=next_active_player,
+            payload={
+                "turn_number": next_turn_number,
+                "from_step": current_step,
+                "to_step": next_step,
+            },
+        )
+        current_step = next_step
+        if next_step == "draw_step":
+            current_state = _draw_one_card_if_available(current_state, event_log)
+
+    return TurnResult(state=current_state, event_log=event_log.events)
+
+
 def _draw_one_card_if_available(state: GameState, event_log: EventLog) -> GameState:
     player = state.players[state.turn.active_player]
     if not player.library:
@@ -473,3 +551,24 @@ def _other_player(state: GameState, player_id: str) -> str:
         if candidate != player_id:
             return candidate
     raise ValueError("game state does not contain an opposing player")
+
+
+def _cleanup_end_of_turn_state(state: GameState) -> GameState:
+    updated_players = {
+        player_id: replace(player, mana_pool=(), lands_played_this_turn=0)
+        for player_id, player in state.players.items()
+    }
+    updated_objects = {
+        instance_id: replace(card, damage_marked=0)
+        for instance_id, card in state.objects.items()
+    }
+    return replace(state, players=updated_players, objects=updated_objects)
+
+
+def _untap_player_battlefield(state: GameState, player_id: str) -> GameState:
+    current_state = state
+    for instance_id in current_state.players[player_id].battlefield:
+        card = current_state.objects[instance_id]
+        if card.tapped:
+            current_state = update_object(current_state, replace(card, tapped=False))
+    return current_state

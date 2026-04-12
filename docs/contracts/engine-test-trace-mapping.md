@@ -89,5 +89,5 @@ Define how the current rule-family coverage should map to future engine tests an
 - Until engine code exists, these mappings are planning declarations rather than implementation claims.
 - When a rule family becomes `implemented`, this contract and the coverage manifest must agree on the named tests.
 - Current implementation note:
-  - `game_setup_minimal`, `turn_structure_minimal`, `land_playing_minimal`, `mana_generation_basic`, `creature_spells_minimal`, and `combat_minimal` now have engine coverage.
-  - `state_based_actions_minimal` remains deferred until the engine supports a real lethal-damage path in the declared slice.
+  - `game_setup_minimal`, `turn_structure_minimal`, `land_playing_minimal`, `mana_generation_basic`, `creature_spells_minimal`, `combat_minimal`, and `state_based_actions_minimal` now have engine coverage.
+  - The current lethal-damage proof uses a pre-damaged creature scenario to exercise the SBA path honestly within the declared slice.

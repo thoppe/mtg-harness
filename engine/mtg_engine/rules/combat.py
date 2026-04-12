@@ -110,55 +110,83 @@ def apply_combat_damage(state: GameState, card_repository: CardRepository) -> tu
                 },
             }
         )
+        current_state = update_object(
+            current_state,
+            replace(blocker, damage_marked=blocker.damage_marked + attacker_power),
+        )
+        current_state = update_object(
+            current_state,
+            replace(attacker, damage_marked=attacker.damage_marked + blocker_power),
+        )
 
-        destroyed_ids: list[str] = []
-        if attacker_power >= blocker_toughness:
-            destroyed_ids.append(blocker_id)
-        if blocker_power >= attacker_toughness:
-            destroyed_ids.append(attacker_id)
-
-        if destroyed_ids:
-            events.append(
-                {
-                    "event_type": "state_based_actions_checked",
-                    "active_player": combat.attacking_player,
-                    "payload": {
-                        "destroyed_ids": list(destroyed_ids),
-                    },
-                }
-            )
-
-        for destroyed_id in destroyed_ids:
-            destroyed_object = current_state.objects[destroyed_id]
-            current_state = move_object(
-                current_state,
-                instance_id=destroyed_id,
-                from_zone="battlefield",
-                to_zone="graveyard",
-                player_id=destroyed_object.owner_id,
-            )
-            events.append(
-                {
-                    "event_type": "permanent_destroyed",
-                    "active_player": combat.attacking_player,
-                    "payload": {
-                        "card_instance_id": destroyed_id,
-                        "oracle_id": destroyed_object.oracle_id,
-                    },
-                }
-            )
-            events.append(
-                {
-                    "event_type": "object_moved_between_zones",
-                    "active_player": combat.attacking_player,
-                    "payload": {
-                        "player_id": destroyed_object.owner_id,
-                        "card_instance_id": destroyed_id,
-                        "oracle_id": destroyed_object.oracle_id,
-                        "from_zone": "battlefield",
-                        "to_zone": "graveyard",
-                    },
-                }
-            )
-
+    current_state, sba_events = apply_state_based_actions(current_state, card_repository, active_player=combat.attacking_player)
+    events.extend(sba_events)
     return clear_combat_state(current_state), events
+
+
+def apply_state_based_actions(
+    state: GameState,
+    card_repository: CardRepository,
+    *,
+    active_player: str,
+) -> tuple[GameState, list[dict]]:
+    destroyed_ids: list[str] = []
+    for instance_id in _battlefield_object_ids(state):
+        obj = state.objects[instance_id]
+        card = card_repository.get(obj.oracle_id)
+        if not card.is_creature:
+            continue
+        toughness = int(card.toughness or "0")
+        if obj.damage_marked >= toughness:
+            destroyed_ids.append(instance_id)
+
+    events = [
+        {
+            "event_type": "state_based_actions_checked",
+            "active_player": active_player,
+            "payload": {
+                "destroyed_ids": list(destroyed_ids),
+            },
+        }
+    ]
+    current_state = state
+    for destroyed_id in destroyed_ids:
+        destroyed_object = current_state.objects[destroyed_id]
+        current_state = move_object(
+            current_state,
+            instance_id=destroyed_id,
+            from_zone="battlefield",
+            to_zone="graveyard",
+            player_id=destroyed_object.owner_id,
+        )
+        events.append(
+            {
+                "event_type": "permanent_destroyed",
+                "active_player": active_player,
+                "payload": {
+                    "card_instance_id": destroyed_id,
+                    "oracle_id": destroyed_object.oracle_id,
+                },
+            }
+        )
+        events.append(
+            {
+                "event_type": "object_moved_between_zones",
+                "active_player": active_player,
+                "payload": {
+                    "player_id": destroyed_object.owner_id,
+                    "card_instance_id": destroyed_id,
+                    "oracle_id": destroyed_object.oracle_id,
+                    "from_zone": "battlefield",
+                    "to_zone": "graveyard",
+                },
+            }
+        )
+    return current_state, events
+
+
+def _battlefield_object_ids(state: GameState) -> tuple[str, ...]:
+    all_ids: list[str] = []
+    for player in state.players.values():
+        all_ids.extend(player.battlefield)
+    return tuple(all_ids)

@@ -46,8 +46,9 @@ class CombatTests(unittest.TestCase):
 
         self.assertEqual(result.state.players["bob"].life_total, 19)
         self.assertEqual(result.state.turn.step, "end_combat_step")
-        self.assertEqual(result.event_log[-3].event_type, "combat_damage_applied")
-        self.assertEqual(result.event_log[-2].event_type, "life_total_changed")
+        self.assertEqual(result.event_log[-4].event_type, "combat_damage_applied")
+        self.assertEqual(result.event_log[-3].event_type, "life_total_changed")
+        self.assertEqual(result.event_log[-2].event_type, "state_based_actions_checked")
 
     def test_blocked_combat_records_assignment_and_keeps_creatures_alive(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
@@ -69,15 +70,44 @@ class CombatTests(unittest.TestCase):
         self.assertEqual(result.state.objects["alice:4"].zone, "battlefield")
         self.assertEqual(result.state.objects["bob:3"].zone, "battlefield")
         self.assertEqual(
-            [event.event_type for event in result.event_log[-5:]],
+            [event.event_type for event in result.event_log[-6:]],
             [
                 "blockers_declared",
                 "step_changed",
                 "combat_damage_assigned",
                 "combat_damage_applied",
+                "state_based_actions_checked",
                 "step_changed",
             ],
         )
+
+    def test_state_based_actions_destroy_premarked_creature_after_combat_damage(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _state_with_creatures_ready_to_fight(repository, include_blocker=True)
+
+        state = session.state
+        updated_objects = dict(state.objects)
+        updated_objects["bob:3"] = replace(updated_objects["bob:3"], damage_marked=3)
+        session = session.__class__(state=replace(state, objects=updated_objects), event_log=session.event_log)
+
+        session = advance_to_begin_combat(session)
+        session = declare_attackers(
+            session,
+            DeclareAttackersAction(player_id="alice", attacker_ids=("alice:4",)),
+            repository,
+        )
+        session = declare_blockers(
+            session,
+            DeclareBlockersAction(player_id="bob", blockers={"alice:4": ("bob:3",)}),
+            repository,
+        )
+        result = resolve_combat_damage(session, repository)
+
+        self.assertEqual(result.state.objects["bob:3"].zone, "graveyard")
+        self.assertIn("bob:3", result.state.players["bob"].graveyard)
+        self.assertEqual(result.event_log[-4].event_type, "state_based_actions_checked")
+        self.assertEqual(result.event_log[-3].event_type, "permanent_destroyed")
+        self.assertEqual(result.event_log[-2].event_type, "object_moved_between_zones")
 
 
 def _state_with_creatures_ready_to_fight(repository: CardRepository, *, include_blocker: bool):
