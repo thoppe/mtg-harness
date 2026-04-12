@@ -34,7 +34,7 @@ Define the first package boundaries before writing engine code.
 - zone model for library, hand, battlefield, graveyard, and stack
 - legal actions:
   - play land
-  - tap Plains for white mana
+  - tap a basic land for its intrinsic color
   - cast a creature spell
   - declare attackers
   - declare blockers

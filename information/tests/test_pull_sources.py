@@ -47,6 +47,36 @@ class PullSourcesTests(unittest.TestCase):
                 card_id="90d35453-7fe3-4053-aad9-a124ecc7dcf0",
                 collector_number="196",
             ),
+            sample_card(
+                name="Muck Rats",
+                oracle_id="bca13a12-6723-4a5e-8f1b-21646a8b3e7e",
+                card_id="d4041226-7ce2-46d1-8844-20fa50b6568a",
+                collector_number="102",
+            ),
+            sample_card(
+                name="Swamp",
+                oracle_id="56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
+                card_id="ec0da69e-4ab6-4ef1-a7ae-4d6c47172c81",
+                collector_number="204",
+            ),
+            sample_card(
+                name="Forest",
+                oracle_id="b34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6",
+                card_id="40146f61-d3f0-45e7-82b5-788ff7b0e520",
+                collector_number="212",
+            ),
+            sample_card(
+                name="Island",
+                oracle_id="b2c6aa39-2d2a-459c-a555-fb48ba993373",
+                card_id="e98d1e6f-5902-4e67-91a6-30eb5c3ce4a1",
+                collector_number="200",
+            ),
+            sample_card(
+                name="Mountain",
+                oracle_id="a3fb7228-e76b-4e96-a40e-20b5fed75685",
+                card_id="17cf7ce4-d5d7-49f2-a7e4-021d1a2d58c5",
+                collector_number="208",
+            ),
         ]
 
         def json_fetcher(url: str, headers: dict[str, str]) -> dict:
@@ -68,7 +98,7 @@ class PullSourcesTests(unittest.TestCase):
                 sleep_seconds=0,
             )
 
-            self.assertEqual(len(written), 9)
+            self.assertEqual(len(written), 24)
             metadata_path = root / "cards" / "data" / "1ef5003c-f540-4cdc-913f-7d5280ad9f62.json"
             image_path = root / "cards" / "images" / "1ef5003c-f540-4cdc-913f-7d5280ad9f62.jpg"
             image_provenance_path = (
@@ -104,6 +134,36 @@ class PullSourcesTests(unittest.TestCase):
                 oracle_id="bc71ebf6-2056-41f7-be35-b2e5c34afa99",
                 card_id="90d35453-7fe3-4053-aad9-a124ecc7dcf0",
                 collector_number="196",
+            ),
+            sample_card(
+                name="Muck Rats",
+                oracle_id="bca13a12-6723-4a5e-8f1b-21646a8b3e7e",
+                card_id="d4041226-7ce2-46d1-8844-20fa50b6568a",
+                collector_number="102",
+            ),
+            sample_card(
+                name="Swamp",
+                oracle_id="56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
+                card_id="ec0da69e-4ab6-4ef1-a7ae-4d6c47172c81",
+                collector_number="204",
+            ),
+            sample_card(
+                name="Forest",
+                oracle_id="b34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6",
+                card_id="40146f61-d3f0-45e7-82b5-788ff7b0e520",
+                collector_number="212",
+            ),
+            sample_card(
+                name="Island",
+                oracle_id="b2c6aa39-2d2a-459c-a555-fb48ba993373",
+                card_id="e98d1e6f-5902-4e67-91a6-30eb5c3ce4a1",
+                collector_number="200",
+            ),
+            sample_card(
+                name="Mountain",
+                oracle_id="a3fb7228-e76b-4e96-a40e-20b5fed75685",
+                card_id="17cf7ce4-d5d7-49f2-a7e4-021d1a2d58c5",
+                collector_number="208",
             ),
         ]
 

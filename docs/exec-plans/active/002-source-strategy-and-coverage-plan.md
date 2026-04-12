@@ -35,12 +35,17 @@ The simulator should only claim support based on layer 3, never merely because l
 - The repository now has a repeatable pull script under `information/` for:
   - `Border Guard`
   - `Foot Soldiers`
+  - `Muck Rats`
+  - `Swamp`
+  - `Forest`
+  - `Island`
+  - `Mountain`
   - `Plains`
   - the current official Wizards plain-text Comprehensive Rules snapshot
 - Pulled artifacts now exist in-repo with stable filenames and sidecar provenance.
 - Coverage manifests remain YAML as the canonical support declaration for the current micro-universe.
 - Narrative companion markdown should be added only when the supported rule surface grows beyond the current small slice.
-- Engine implementation now covers deterministic setup, turn progression through cleanup and next-turn handoff, precombat-main legal-action enumeration, priority passing across the currently supported forced-pass branch, land play, `Plains` mana production, creature spell casting, and minimal combat.
+- Engine implementation now covers deterministic setup, turn progression through cleanup and next-turn handoff, precombat-main legal-action enumeration, combat declaration action windows, priority passing across the currently supported forced-pass branch, land play, five-basic-land mana production, creature spell casting, and minimal combat with multi-block support.
 
 ## Workstreams
 
@@ -104,15 +109,15 @@ For cards:
 ## Immediate Next Actions
 
 1. Extend turn progression beyond the current supported subset into a more complete long-run game loop.
-2. Tighten combat support beyond the current one-blocker-per-attacker limitation when needed.
-3. Widen priority/action availability only when the supported slice adds new windows or non-active-player decisions.
+2. Widen priority/action availability only when the supported slice adds new windows or non-active-player decisions beyond the current precombat and combat-declaration windows.
+3. Tighten combat support further only when the supported slice needs attacker-side damage-order choice or broader combat variants.
 4. Keep coverage declarations canonical in YAML until the supported rule surface grows enough to justify narrative companion docs.
 
 ## Resume Here
 
 The next session should continue engine work, not return to ingestion scaffolding.
 
-1. Extend the explicit priority model beyond `precombat_main_step` only when the supported slice needs additional player decisions.
+1. Extend the explicit priority model beyond the current precombat and combat-declaration windows only when the supported slice needs additional player decisions.
 2. Replace remaining synthetic state shortcuts in tests when a normal engine path exists.
-3. After priority/action availability exists, revisit combat to support more than one blocker per attacker only if the slice needs it.
+3. Revisit combat next for attacker-side damage-order choice or broader combat variants only if the slice needs them.
 4. Keep the rules and coverage declarations honest as new turn windows or card mechanics are introduced.

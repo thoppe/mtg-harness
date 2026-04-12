@@ -4,10 +4,10 @@
   "name": "Border Guard",
   "provenance": {
     "collector_number": "9",
-    "fetched_at": "2026-04-12T13:37:13Z",
+    "fetched_at": "2026-04-12T17:29:41Z",
     "image_uri_normal": "https://cards.scryfall.io/normal/front/9/8/985af775-2036-459d-83c6-31ac84a0ffb1.jpg?1562447343",
     "oracle_id": "1ef5003c-f540-4cdc-913f-7d5280ad9f62",
-    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor%20%28name%3A%22Border%20Guard%22%20or%20name%3A%22Foot%20Soldiers%22%20or%20name%3A%22Plains%22%29",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor%20%28name%3A%22Border%20Guard%22%20or%20name%3A%22Foot%20Soldiers%22%20or%20name%3A%22Muck%20Rats%22%20or%20name%3A%22Swamp%22%20or%20name%3A%22Forest%22%20or%20name%3A%22Island%22%20or%20name%3A%22Mountain%22%20or%20name%3A%22Plains%22%29",
     "requested_set_code": "por",
     "scryfall_id": "985af775-2036-459d-83c6-31ac84a0ffb1",
     "set_code": "por",

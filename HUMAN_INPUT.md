@@ -29,6 +29,11 @@ This file captures decisions, constraints, and open questions that are explicitl
 - Initial playable micro-universe contains only these legal card identities from `Portal`:
   - `Border Guard`
   - `Foot Soldiers`
+  - `Muck Rats`
+  - `Swamp`
+  - `Forest`
+  - `Island`
+  - `Mountain`
   - `Plains`
 - Multiplicity within the initial micro-universe follows normal game rules and scenario setup needs
 - Initial play mode is two-player normal play structure only

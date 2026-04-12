@@ -51,12 +51,12 @@ Define the minimum legal progression points for the first deterministic engine s
 
 ## v0 Simplifications
 
-- The first slice currently enumerates `precombat_main_step` actions for the active player and auto-resolves the opposing player's unsupported branch as a forced pass.
-- The first slice may limit stack interactions to creature spells and mana abilities required by `Plains`.
+- The first slice currently enumerates `precombat_main_step`, `declare_attackers_step`, and `declare_blockers_step` actions for the currently relevant player and still auto-resolves unsupported priority branches outside those windows.
+- The first slice may limit stack interactions to creature spells and mana abilities required by the declared five basic lands.
 - The first slice may model combat with a single combat-damage checkpoint rather than broader combat variants.
 - The currently implemented turn flow reaches cleanup, emits `turn_ended`, and can hand off into the next active player's precombat main.
 - Full long-run game-loop completion beyond the supported subset still remains future work.
-- The currently implemented combat model supports at most one blocker per attacker.
+- The currently implemented combat model supports multiple blockers per attacker, but attacker-side damage assignment still follows the listed blocker order without a separate player choice action.
 
 ## Expansion Guardrails
 

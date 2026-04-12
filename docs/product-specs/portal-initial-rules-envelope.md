@@ -2,15 +2,15 @@
 
 ## Purpose
 
-Define the smallest believable rules subset for the initial `Portal` micro-universe built from `Border Guard`, `Foot Soldiers`, and `Plains`.
+Define the smallest believable rules subset for the initial `Portal` micro-universe built from `Border Guard`, `Foot Soldiers`, `Muck Rats`, and the five `Portal` basic lands.
 
 ## In Scope
 
 - Two-player game setup
 - Minimal turn and phase progression
 - Basic zones: library, hand, battlefield, stack, graveyard
-- Playing `Plains`
-- Producing white mana from `Plains`
+- Playing the five `Portal` basic lands
+- Producing basic colored mana from those lands
 - Basic creature combat
 - Lethal damage and creature death as minimal state-based handling
 - Deterministic setup inputs and replay traces for the above behaviors

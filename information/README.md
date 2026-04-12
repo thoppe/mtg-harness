@@ -6,7 +6,7 @@ This directory holds external-source pull code, tests, and pulled artifacts.
 
 - `cards/`: pulled card metadata and image assets
 - `rules/`: pulled rules artifacts
-- `pull_sources.py`: micro-universe source-pull entry point
+- `pull_sources.py`: declared micro-universe source-pull entry point
 - `tests/`: ingestion workflow tests
 
 ## Constraints

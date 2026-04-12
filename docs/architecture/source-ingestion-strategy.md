@@ -54,6 +54,11 @@ Current verified official entry points as of April 12, 2026:
 - First playable micro-universe contains only:
   - `Border Guard`
   - `Foot Soldiers`
+  - `Muck Rats`
+  - `Swamp`
+  - `Forest`
+  - `Island`
+  - `Mountain`
   - `Plains`
 - This micro-universe exists to constrain the first engine slice before broader `Portal` support.
 

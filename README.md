@@ -10,7 +10,7 @@ The repository is intentionally starting in a harness-engineering style:
 
 ## Current Status
 
-This repository is in planning mode. No implementation code has been added yet.
+This repository now contains an initial source-ingestion workflow and a narrow engine slice for a small `Portal` micro-universe.
 
 ## Intended Major Components
 
@@ -40,8 +40,8 @@ Define enough contracts and architecture to begin implementation of a Python-fir
 
 ## Immediate Next Work
 
-The next concrete work is in `information/`, not `engine/`:
+The next concrete work remains engine-facing:
 
-- define provenance for pulled source artifacts
-- scaffold source-pull scripts and tests for the initial three-card micro-universe
-- use `.codex/skills/card-source-sync/` as the repeatable workflow entry point
+- widen the supported `Portal` card slice without introducing keywords or triggered abilities
+- keep coverage manifests and contracts aligned with the implemented engine path
+- use `.codex/skills/card-source-sync/` whenever the declared source scope under `information/` changes

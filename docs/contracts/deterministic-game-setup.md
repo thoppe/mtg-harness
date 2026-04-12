@@ -10,6 +10,11 @@ Define the explicit inputs required to create a reproducible initial game state 
 - Declared micro-universe only:
   - `Border Guard`
   - `Foot Soldiers`
+  - `Muck Rats`
+  - `Swamp`
+  - `Forest`
+  - `Island`
+  - `Mountain`
   - `Plains`
 - Setup may use any multiplicity of those card identities that the scenario requires
 

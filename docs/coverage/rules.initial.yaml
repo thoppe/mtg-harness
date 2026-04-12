@@ -44,12 +44,26 @@ rules:
       - engine/tests/test_priority.py
       - engine/tests/test_turns.py
       - engine/tests/test_spells.py
-    notes: "Current support is intentionally narrow: play land, activate Plains, cast vanilla creature spells, advance to combat, or pass priority."
+    notes: "Current support is intentionally narrow: play land, activate a declared basic land, cast a vanilla creature spell, advance to combat, or pass priority."
+  - rule_key: combat_action_windows_minimal
+    source_rules:
+      - "508"
+      - "509"
+    status: implemented
+    scope: Explicit action enumeration for attacker declaration and blocker declaration in the declared micro-universe.
+    engine_contracts:
+      - docs/contracts/play-engine.md
+      - docs/contracts/state-machine-transitions.md
+      - docs/contracts/replay-event-log.md
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_combat.py
+    notes: "Current support enumerates legal subsets of attackers and blocker assignments for the available vanilla creatures."
   - rule_key: land_playing_minimal
     source_rules:
       - "305"
     status: implemented
-    scope: Playing Plains as the initial slice's only land card.
+    scope: Playing the five Portal basic lands in the declared micro-universe.
     engine_contracts:
       - docs/contracts/play-engine.md
       - docs/contracts/state-machine-transitions.md
@@ -62,19 +76,19 @@ rules:
       - "106"
       - "605"
     status: implemented
-    scope: Basic mana production sufficient for Plains.
+    scope: Basic mana production sufficient for the five Portal basic lands.
     engine_contracts:
       - docs/contracts/play-engine.md
       - docs/contracts/replay-event-log.md
     tests:
       - engine/tests/test_turns.py
-    notes: "Only white mana production is required initially."
+    notes: "Current support covers one-color intrinsic mana production for Plains, Island, Swamp, Mountain, and Forest."
   - rule_key: creature_spells_minimal
     source_rules:
       - "601"
       - "608"
     status: implemented
-    scope: Casting and resolving vanilla creature spells from the declared micro-universe, currently proven for Border Guard and Foot Soldiers.
+    scope: Casting and resolving vanilla creature spells from the declared micro-universe, currently proven for Border Guard, Foot Soldiers, and Muck Rats.
     engine_contracts:
       - docs/contracts/play-engine.md
       - docs/contracts/replay-event-log.md
@@ -90,7 +104,7 @@ rules:
       - "510"
       - "511"
     status: implemented
-    scope: Basic attack, single-blocker declaration, and combat-damage flow for creatures without keywords.
+    scope: Basic attack, multi-block declaration on a single attacker, and combat-damage flow for creatures without keywords.
     engine_contracts:
       - docs/contracts/play-engine.md
       - docs/contracts/state-machine-transitions.md
@@ -98,7 +112,7 @@ rules:
     tests:
       - engine/tests/test_combat.py
       - engine/tests/test_replay_log.py
-    notes: "The supported subset currently allows at most one blocker per attacker."
+    notes: "Multiple blockers per attacker are supported. Attacker-side damage assignment still follows the listed blocker order without a separate player-choice action."
   - rule_key: zones_minimal
     source_rules:
       - "400"
@@ -123,7 +137,7 @@ rules:
     tests:
       - engine/tests/test_combat.py
       - engine/tests/test_replay_log.py
-    notes: "Implemented via explicit damage marking plus SBA checks. The current lethal-damage proof still uses a pre-damaged creature fixture because the declared micro-universe cannot otherwise create lethal damage on a 4-toughness creature within one supported combat."
+    notes: "Implemented via explicit damage marking plus SBA checks. The current lethal-damage proof now uses real combat via Border Guard versus Muck Rats."
   - rule_key: keyword_abilities
     source_rules: []
     status: deferred

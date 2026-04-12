@@ -35,6 +35,11 @@ Describe the responsibilities of the simulation core.
 - The first playable card universe contains only:
   - `Border Guard`
   - `Foot Soldiers`
+  - `Muck Rats`
+  - `Swamp`
+  - `Forest`
+  - `Island`
+  - `Mountain`
   - `Plains`
 - Setup scenarios may use multiple legal copies of those card identities.
 - Oracle text is the gameplay authority for cards; flavor text is ignored.

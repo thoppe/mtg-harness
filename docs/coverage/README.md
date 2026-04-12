@@ -22,4 +22,9 @@ Current declared micro-universe:
 
 - `Border Guard`
 - `Foot Soldiers`
+- `Muck Rats`
+- `Swamp`
+- `Forest`
+- `Island`
+- `Mountain`
 - `Plains`

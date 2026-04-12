@@ -1,0 +1,139 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "bca13a12-6723-4a5e-8f1b-21646a8b3e7e",
+  "name": "Muck Rats",
+  "provenance": {
+    "collector_number": "102",
+    "fetched_at": "2026-04-12T17:29:41Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/d/4/d4041226-7ce2-46d1-8844-20fa50b6568a.jpg?1562447844",
+    "oracle_id": "bca13a12-6723-4a5e-8f1b-21646a8b3e7e",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor%20%28name%3A%22Border%20Guard%22%20or%20name%3A%22Foot%20Soldiers%22%20or%20name%3A%22Muck%20Rats%22%20or%20name%3A%22Swamp%22%20or%20name%3A%22Forest%22%20or%20name%3A%22Island%22%20or%20name%3A%22Mountain%22%20or%20name%3A%22Plains%22%29",
+    "requested_set_code": "por",
+    "scryfall_id": "d4041226-7ce2-46d1-8844-20fa50b6568a",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/d4041226-7ce2-46d1-8844-20fa50b6568a"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Colin MacNeil",
+    "artist_ids": [
+      "d756eb39-8c2f-4f12-b200-ec0d365479f3"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10010,
+    "cmc": 1.0,
+    "collector_number": "102",
+    "color_identity": [
+      "B"
+    ],
+    "colors": [
+      "B"
+    ],
+    "digital": false,
+    "edhrec_rank": 20838,
+    "finishes": [
+      "nonfoil"
+    ],
+    "flavor_text": "The difference between a nuisance and a threat is often merely a matter of numbers.",
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "d4041226-7ce2-46d1-8844-20fa50b6568a",
+    "illustration_id": "d8252777-52c5-46fd-9947-4f4152086158",
+    "image_status": "highres_scan",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/d/4/d4041226-7ce2-46d1-8844-20fa50b6568a.jpg?1562447844",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/d/4/d4041226-7ce2-46d1-8844-20fa50b6568a.jpg?1562447844",
+      "large": "https://cards.scryfall.io/large/front/d/4/d4041226-7ce2-46d1-8844-20fa50b6568a.jpg?1562447844",
+      "normal": "https://cards.scryfall.io/normal/front/d/4/d4041226-7ce2-46d1-8844-20fa50b6568a.jpg?1562447844",
+      "png": "https://cards.scryfall.io/png/front/d/4/d4041226-7ce2-46d1-8844-20fa50b6568a.png?1562447844",
+      "small": "https://cards.scryfall.io/small/front/d/4/d4041226-7ce2-46d1-8844-20fa50b6568a.jpg?1562447844"
+    },
+    "keywords": [],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "not_legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "legal",
+      "paupercommander": "legal",
+      "penny": "not_legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "not_legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{B}",
+    "multiverse_ids": [
+      4231
+    ],
+    "name": "Muck Rats",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "bca13a12-6723-4a5e-8f1b-21646a8b3e7e",
+    "oracle_text": "",
+    "oversized": false,
+    "power": "1",
+    "prices": {
+      "eur": "0.16",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "0.29",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3Abca13a12-6723-4a5e-8f1b-21646a8b3e7e&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Muck+Rats&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10010&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F728%3Fpage%3D1"
+    },
+    "rarity": "common",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Muck+Rats",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4231&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DMuck%2BRats",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DMuck%2BRats"
+    },
+    "released_at": "1997-05-01",
+    "reprint": false,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/d4041226-7ce2-46d1-8844-20fa50b6568a/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/102/muck-rats?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 728,
+    "textless": false,
+    "toughness": "1",
+    "type_line": "Creature \u2014 Rat",
+    "uri": "https://api.scryfall.com/cards/d4041226-7ce2-46d1-8844-20fa50b6568a",
+    "variation": false
+  }
+}

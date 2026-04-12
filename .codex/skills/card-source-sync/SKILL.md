@@ -63,6 +63,11 @@ The initial micro-universe contains:
 
 - `Border Guard`
 - `Foot Soldiers`
+- `Muck Rats`
+- `Swamp`
+- `Forest`
+- `Island`
+- `Mountain`
 - `Plains`
 
-`Border Guard` and `Foot Soldiers` have empty oracle text in Scryfall, so the first rules slice can ignore keywords and triggered abilities.
+`Border Guard`, `Foot Soldiers`, and `Muck Rats` have empty oracle text in Scryfall, and the five basic lands only add intrinsic mana abilities, so the first rules slice can still avoid keywords and triggered abilities.

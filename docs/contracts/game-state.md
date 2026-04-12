@@ -26,7 +26,7 @@ Define the core state boundaries for simulation.
 - `turn_state`: active player, step, and priority holder
 - `zones`: library, hand, battlefield, graveyard, and stack
 - `objects`: stable object records keyed independently from their current zone
-- `mana_pools`: at minimum the white mana needed for `Plains`
+- `mana_pools`: at minimum the five basic colors needed for the declared `Portal` micro-universe
 - `rng_state`: deterministic seed and any derived RNG cursor state
 - `damage_marks`: creature damage marked on objects until cleared by later turn handling
 

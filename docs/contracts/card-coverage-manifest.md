@@ -24,4 +24,9 @@ Define the machine-readable inventory of card and set support claimed by the sim
 - The first manifest should include only:
   - `Border Guard`
   - `Foot Soldiers`
+  - `Muck Rats`
+  - `Swamp`
+  - `Forest`
+  - `Island`
+  - `Mountain`
   - `Plains`

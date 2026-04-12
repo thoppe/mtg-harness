@@ -32,8 +32,10 @@ from mtg_engine.flow.turns import (
 
 INFORMATION_DIR = Path(__file__).resolve().parents[2] / "information"
 PLAINS = "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
+SWAMP = "56719f6a-1a6c-4c0a-8d21-18f7d7350b68"
 BORDER_GUARD = "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
 FOOT_SOLDIERS = "a768ba13-4d1c-4dce-a4a6-86a39c069c3f"
+MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
 
 
 class SpellTests(unittest.TestCase):
@@ -89,6 +91,18 @@ class SpellTests(unittest.TestCase):
             ["spell_cast", "object_moved_between_zones", "spell_resolved", "object_moved_between_zones"],
         )
 
+    def test_cast_muck_rats_with_swamp(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_muck_rats_session(repository)
+
+        result = _cast_creature_from_normal_turns(session, repository, "alice", "alice:2")
+
+        self.assertEqual(result.state.players["alice"].battlefield, ("alice:1", "alice:2"))
+        self.assertEqual(result.state.players["alice"].hand, ())
+        self.assertEqual(result.state.players["alice"].mana_pool, ())
+        self.assertEqual(result.state.objects["alice:2"].zone, "battlefield")
+        self.assertEqual(result.state.objects["alice:2"].oracle_id, MUCK_RATS)
+
 
 def _build_castable_main_phase_session(repository: CardRepository):
     setup = SetupInput(
@@ -126,19 +140,37 @@ def _build_foot_soldiers_session(repository: CardRepository):
     return start_first_turn(initialize_game(setup, repository))
 
 
+def _build_muck_rats_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="spell-cast-muck-rats",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (SWAMP, MUCK_RATS),
+            "bob": (PLAINS,),
+        },
+        opening_hands={
+            "alice": (SWAMP, MUCK_RATS),
+            "bob": (PLAINS,),
+        },
+        rng_seed=23,
+    )
+    return start_first_turn(initialize_game(setup, repository))
+
+
 def _cast_creature_from_normal_turns(session, repository: CardRepository, player_id: str, creature_id: str):
     current_session = _advance_to_player_main_phase(session, repository, player_id)
     player = current_session.state.players[player_id]
-    plains_ids = [instance_id for instance_id in player.hand if instance_id != creature_id]
-    required_land_count = _required_mana_value(repository, current_session.state.objects[creature_id].oracle_id)
+    land_ids = [instance_id for instance_id in player.hand if instance_id != creature_id]
+    chosen_land_ids = _select_land_ids_for_spell(current_session, repository, land_ids, creature_id)
 
-    for index, plains_id in enumerate(plains_ids[:required_land_count], start=1):
+    for index, land_id in enumerate(chosen_land_ids, start=1):
         current_session = play_land(
             current_session,
-            PlayLandAction(player_id=player_id, card_instance_id=plains_id),
+            PlayLandAction(player_id=player_id, card_instance_id=land_id),
             repository,
         )
-        if index != required_land_count:
+        if index != len(chosen_land_ids):
             current_session = _advance_to_player_main_phase(
                 _advance_to_next_turn(current_session, repository),
                 repository,
@@ -146,6 +178,8 @@ def _cast_creature_from_normal_turns(session, repository: CardRepository, player
             )
 
     for source_instance_id in current_session.state.players[player_id].battlefield:
+        if len(repository.get(current_session.state.objects[source_instance_id].oracle_id).produced_mana) != 1:
+            continue
         current_session = activate_mana_ability(
             current_session,
             ActivateManaAbilityAction(player_id=player_id, source_instance_id=source_instance_id),
@@ -162,6 +196,36 @@ def _cast_creature_from_normal_turns(session, repository: CardRepository, player
 def _required_mana_value(repository: CardRepository, oracle_id: str) -> int:
     mana_cost = repository.get(oracle_id).mana_cost
     return sum(int(symbol) if symbol.isdigit() else 1 for symbol in mana_cost.replace("{", " ").replace("}", " ").split())
+
+
+def _select_land_ids_for_spell(session, repository: CardRepository, land_ids: list[str], creature_id: str) -> list[str]:
+    mana_cost = repository.get(session.state.objects[creature_id].oracle_id).mana_cost
+    requirements = _mana_requirements(mana_cost)
+    chosen_ids: list[str] = []
+    remaining_ids = list(land_ids)
+
+    for symbol in ("W", "U", "B", "R", "G"):
+        for _ in range(requirements[symbol]):
+            match_id = next(
+                instance_id
+                for instance_id in remaining_ids
+                if repository.get(session.state.objects[instance_id].oracle_id).produced_mana == (symbol,)
+            )
+            chosen_ids.append(match_id)
+            remaining_ids.remove(match_id)
+
+    chosen_ids.extend(remaining_ids[: requirements["generic"]])
+    return chosen_ids
+
+
+def _mana_requirements(mana_cost: str) -> dict[str, int]:
+    requirements = {"W": 0, "U": 0, "B": 0, "R": 0, "G": 0, "generic": 0}
+    for symbol in mana_cost.replace("{", " ").replace("}", " ").split():
+        if symbol in requirements:
+            requirements[symbol] += 1
+        elif symbol.isdigit():
+            requirements["generic"] += int(symbol)
+    return requirements
 
 
 def _advance_to_next_turn(session, repository: CardRepository):

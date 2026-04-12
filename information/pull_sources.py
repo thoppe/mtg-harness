@@ -43,6 +43,31 @@ MICRO_UNIVERSE = (
         oracle_id="a768ba13-4d1c-4dce-a4a6-86a39c069c3f",
     ),
     CardTarget(
+        name="Muck Rats",
+        set_code="por",
+        oracle_id="bca13a12-6723-4a5e-8f1b-21646a8b3e7e",
+    ),
+    CardTarget(
+        name="Swamp",
+        set_code="por",
+        oracle_id="56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
+    ),
+    CardTarget(
+        name="Forest",
+        set_code="por",
+        oracle_id="b34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6",
+    ),
+    CardTarget(
+        name="Island",
+        set_code="por",
+        oracle_id="b2c6aa39-2d2a-459c-a555-fb48ba993373",
+    ),
+    CardTarget(
+        name="Mountain",
+        set_code="por",
+        oracle_id="a3fb7228-e76b-4e96-a40e-20b5fed75685",
+    ),
+    CardTarget(
         name="Plains",
         set_code="por",
         oracle_id="bc71ebf6-2056-41f7-be35-b2e5c34afa99",

@@ -41,6 +41,16 @@ Define how the current rule-family coverage should map to future engine tests an
   - `priority_passed`
   - `step_changed`
 
+### `combat_action_windows_minimal`
+
+- Planned tests:
+  - `engine/tests/test_priority.py`
+  - `engine/tests/test_combat.py`
+- Planned trace assertions:
+  - `attackers_declared`
+  - `blockers_declared`
+  - `step_changed`
+
 ### `land_playing_minimal`
 
 - Planned tests:
@@ -100,5 +110,5 @@ Define how the current rule-family coverage should map to future engine tests an
 - Until engine code exists, these mappings are planning declarations rather than implementation claims.
 - When a rule family becomes `implemented`, this contract and the coverage manifest must agree on the named tests.
 - Current implementation note:
-  - `game_setup_minimal`, `turn_structure_minimal`, `precombat_priority_minimal`, `land_playing_minimal`, `mana_generation_basic`, `creature_spells_minimal`, `combat_minimal`, and `state_based_actions_minimal` now have engine coverage.
-  - The current lethal-damage proof still uses a pre-damaged creature scenario because the declared micro-universe cannot produce lethal damage on a 4-toughness creature within one supported combat path.
+  - `game_setup_minimal`, `turn_structure_minimal`, `precombat_priority_minimal`, `combat_action_windows_minimal`, `land_playing_minimal`, `mana_generation_basic`, `creature_spells_minimal`, `combat_minimal`, and `state_based_actions_minimal` now have engine coverage.
+  - The current slice now has a real lethal-damage proof via `Border Guard` versus `Muck Rats`, so the earlier synthetic SBA shortcut is no longer needed.

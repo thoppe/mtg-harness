@@ -10,9 +10,14 @@ The initial playable universe contains only these legal card identities:
 
 - `Border Guard` from `Portal`
 - `Foot Soldiers` from `Portal`
+- `Muck Rats` from `Portal`
+- `Swamp` from `Portal`
+- `Forest` from `Portal`
+- `Island` from `Portal`
+- `Mountain` from `Portal`
 - `Plains` from `Portal`
 
-This slice uses vanilla `Portal` creatures plus a basic land to minimize the first rules envelope.
+This slice uses vanilla `Portal` creatures plus all five `Portal` basic lands to minimize the first rules envelope while still enabling colored mana tests and a real lethal-damage path.
 Multiplicity is allowed as normal so long as no card identity outside this universe is introduced.
 
 ## Play Mode
@@ -35,5 +40,5 @@ Multiplicity is allowed as normal so long as no card identity outside this unive
 
 ## Current Implementation Note
 
-- The currently implemented slice supports deterministic setup, first-turn progression, land play, and white-mana generation.
-- Additional setup scenarios may use multiple copies of `Plains`, `Border Guard`, and `Foot Soldiers` without widening the universe.
+- The currently implemented slice supports deterministic setup, first-turn progression, land play, and basic-land mana generation.
+- Additional setup scenarios may use multiple copies of the declared basic lands and vanilla creatures without widening the universe.

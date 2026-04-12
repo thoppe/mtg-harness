@@ -51,7 +51,6 @@ def apply_combat_damage(state: GameState, card_repository: CardRepository) -> tu
         attacker = current_state.objects[attacker_id]
         attacker_card = card_repository.get(attacker.oracle_id)
         attacker_power = int(attacker_card.power or "0")
-        attacker_toughness = int(attacker_card.toughness or "0")
 
         if not blockers:
             defending_player = current_state.players[combat.defending_player]
@@ -80,21 +79,40 @@ def apply_combat_damage(state: GameState, card_repository: CardRepository) -> tu
             )
             continue
 
-        blocker_id = blockers[0]
-        blocker = current_state.objects[blocker_id]
-        blocker_card = card_repository.get(blocker.oracle_id)
-        blocker_power = int(blocker_card.power or "0")
-        blocker_toughness = int(blocker_card.toughness or "0")
+        blocker_damage_assignments: list[dict] = []
+        remaining_attacker_damage = attacker_power
+        total_blocker_damage = 0
 
+        for blocker_id in blockers:
+            blocker = current_state.objects[blocker_id]
+            blocker_card = card_repository.get(blocker.oracle_id)
+            blocker_power = int(blocker_card.power or "0")
+            attacker_damage_to_blocker = remaining_attacker_damage
+            remaining_attacker_damage = max(0, remaining_attacker_damage - attacker_damage_to_blocker)
+            total_blocker_damage += blocker_power
+            blocker_damage_assignments.append(
+                {
+                    "blocker_id": blocker_id,
+                    "attacker_damage": attacker_damage_to_blocker,
+                    "blocker_damage": blocker_power,
+                }
+            )
+            current_state = update_object(
+                current_state,
+                replace(blocker, damage_marked=blocker.damage_marked + attacker_damage_to_blocker),
+            )
+
+        current_state = update_object(
+            current_state,
+            replace(attacker, damage_marked=attacker.damage_marked + total_blocker_damage),
+        )
         events.append(
             {
                 "event_type": "combat_damage_assigned",
                 "active_player": combat.attacking_player,
                 "payload": {
                     "attacker_id": attacker_id,
-                    "blocker_id": blocker_id,
-                    "attacker_damage": attacker_power,
-                    "blocker_damage": blocker_power,
+                    "assignments": blocker_damage_assignments,
                 },
             }
         )
@@ -104,19 +122,9 @@ def apply_combat_damage(state: GameState, card_repository: CardRepository) -> tu
                 "active_player": combat.attacking_player,
                 "payload": {
                     "attacker_id": attacker_id,
-                    "blocker_id": blocker_id,
-                    "attacker_damage": attacker_power,
-                    "blocker_damage": blocker_power,
+                    "assignments": blocker_damage_assignments,
                 },
             }
-        )
-        current_state = update_object(
-            current_state,
-            replace(blocker, damage_marked=blocker.damage_marked + attacker_power),
-        )
-        current_state = update_object(
-            current_state,
-            replace(attacker, damage_marked=attacker.damage_marked + blocker_power),
         )
 
     current_state, sba_events = apply_state_based_actions(current_state, card_repository, active_player=combat.attacking_player)

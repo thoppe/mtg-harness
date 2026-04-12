@@ -13,6 +13,7 @@ class CardDefinition:
     power: str | None
     toughness: str | None
     set_code: str
+    produced_mana: tuple[str, ...] = ()
 
     @property
     def is_land(self) -> bool:

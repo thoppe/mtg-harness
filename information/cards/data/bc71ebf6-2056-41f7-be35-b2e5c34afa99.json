@@ -4,10 +4,10 @@
   "name": "Plains",
   "provenance": {
     "collector_number": "196",
-    "fetched_at": "2026-04-12T13:37:13Z",
+    "fetched_at": "2026-04-12T17:29:41Z",
     "image_uri_normal": "https://cards.scryfall.io/normal/front/9/0/90d35453-7fe3-4053-aad9-a124ecc7dcf0.jpg?1562447334",
     "oracle_id": "bc71ebf6-2056-41f7-be35-b2e5c34afa99",
-    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor%20%28name%3A%22Border%20Guard%22%20or%20name%3A%22Foot%20Soldiers%22%20or%20name%3A%22Plains%22%29",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor%20%28name%3A%22Border%20Guard%22%20or%20name%3A%22Foot%20Soldiers%22%20or%20name%3A%22Muck%20Rats%22%20or%20name%3A%22Swamp%22%20or%20name%3A%22Forest%22%20or%20name%3A%22Island%22%20or%20name%3A%22Mountain%22%20or%20name%3A%22Plains%22%29",
     "requested_set_code": "por",
     "scryfall_id": "90d35453-7fe3-4053-aad9-a124ecc7dcf0",
     "set_code": "por",

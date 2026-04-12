@@ -20,9 +20,15 @@ class SetupTests(unittest.TestCase):
         self.assertEqual(set(repository.cards_by_oracle_id.keys()), {
             "1ef5003c-f540-4cdc-913f-7d5280ad9f62",
             "a768ba13-4d1c-4dce-a4a6-86a39c069c3f",
+            "a3fb7228-e76b-4e96-a40e-20b5fed75685",
+            "b2c6aa39-2d2a-459c-a555-fb48ba993373",
+            "b34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6",
+            "bca13a12-6723-4a5e-8f1b-21646a8b3e7e",
             "bc71ebf6-2056-41f7-be35-b2e5c34afa99",
+            "56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
         })
         self.assertEqual(repository.get("bc71ebf6-2056-41f7-be35-b2e5c34afa99").name, "Plains")
+        self.assertEqual(repository.get("bca13a12-6723-4a5e-8f1b-21646a8b3e7e").name, "Muck Rats")
 
     def test_initialize_game_builds_reproducible_opening_state(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)

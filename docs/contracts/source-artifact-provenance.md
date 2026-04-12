@@ -68,5 +68,10 @@ Define the on-disk shape and minimum provenance fields for downloaded external s
 - The first card pull scope is the declared micro-universe only:
   - `Border Guard`
   - `Foot Soldiers`
+  - `Muck Rats`
+  - `Swamp`
+  - `Forest`
+  - `Island`
+  - `Mountain`
   - `Plains`
 - The first rules pull scope is the current official plain-text Comprehensive Rules snapshot linked from the Wizards rules page.

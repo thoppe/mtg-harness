@@ -15,9 +15,9 @@ Define what the first engine tests need to prove before implementation begins.
 - action-legality tests
   - only valid actions are offered in a given state
 - mana tests
-  - `Plains` can produce white mana and only white mana
+  - each declared basic land can produce its intrinsic color
 - spell-casting tests
-  - `Border Guard` and `Foot Soldiers` can be cast with the required mana
+  - `Border Guard`, `Foot Soldiers`, and `Muck Rats` can be cast with the required mana
 - combat tests
   - attackers and blockers can be declared legally
   - combat damage updates state correctly

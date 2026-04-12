@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import unittest
-from dataclasses import replace
 from pathlib import Path
 import sys
 
@@ -33,9 +32,11 @@ from mtg_engine.flow.turns import (
 
 
 INFORMATION_DIR = Path(__file__).resolve().parents[2] / "information"
+SWAMP = "56719f6a-1a6c-4c0a-8d21-18f7d7350b68"
 PLAINS = "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
 BORDER_GUARD = "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
 FOOT_SOLDIERS = "a768ba13-4d1c-4dce-a4a6-86a39c069c3f"
+MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
 
 
 class CombatTests(unittest.TestCase):
@@ -93,14 +94,9 @@ class CombatTests(unittest.TestCase):
             ],
         )
 
-    def test_state_based_actions_destroy_premarked_creature_after_combat_damage(self) -> None:
+    def test_multiple_blockers_on_one_attacker_are_supported(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
-        session = _state_with_creatures_ready_to_fight(repository, include_blocker=True)
-
-        state = session.state
-        updated_objects = dict(state.objects)
-        updated_objects["bob:4"] = replace(updated_objects["bob:4"], damage_marked=3)
-        session = session.__class__(state=replace(state, objects=updated_objects), event_log=session.event_log)
+        session = _state_with_multiple_blockers_ready(repository)
 
         session = advance_to_begin_combat(session)
         session = declare_attackers(
@@ -110,13 +106,42 @@ class CombatTests(unittest.TestCase):
         )
         session = declare_blockers(
             session,
-            DeclareBlockersAction(player_id="bob", blockers={"alice:4": ("bob:4",)}),
+            DeclareBlockersAction(player_id="bob", blockers={"alice:4": ("bob:4", "bob:6")}),
             repository,
         )
         result = resolve_combat_damage(session, repository)
 
-        self.assertEqual(result.state.objects["bob:4"].zone, "graveyard")
-        self.assertIn("bob:4", result.state.players["bob"].graveyard)
+        self.assertEqual(result.state.objects["alice:4"].damage_marked, 2)
+        self.assertEqual(result.state.objects["bob:4"].damage_marked, 1)
+        self.assertEqual(result.state.objects["bob:6"].damage_marked, 0)
+        self.assertEqual(result.state.turn.step, "end_combat_step")
+        self.assertEqual(
+            result.event_log[-3].payload["assignments"],
+            [
+                {"blocker_id": "bob:4", "attacker_damage": 1, "blocker_damage": 1},
+                {"blocker_id": "bob:6", "attacker_damage": 0, "blocker_damage": 1},
+            ],
+        )
+
+    def test_state_based_actions_destroy_muck_rats_after_lethal_combat_damage(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _state_with_muck_rats_blocker_ready(repository)
+
+        session = advance_to_begin_combat(session)
+        session = declare_attackers(
+            session,
+            DeclareAttackersAction(player_id="alice", attacker_ids=("alice:4",)),
+            repository,
+        )
+        session = declare_blockers(
+            session,
+            DeclareBlockersAction(player_id="bob", blockers={"alice:4": ("bob:2",)}),
+            repository,
+        )
+        result = resolve_combat_damage(session, repository)
+
+        self.assertEqual(result.state.objects["bob:2"].zone, "graveyard")
+        self.assertIn("bob:2", result.state.players["bob"].graveyard)
         self.assertEqual(result.event_log[-4].event_type, "state_based_actions_checked")
         self.assertEqual(result.event_log[-3].event_type, "permanent_destroyed")
         self.assertEqual(result.event_log[-2].event_type, "object_moved_between_zones")
@@ -145,18 +170,64 @@ def _state_with_creatures_ready_to_fight(repository: CardRepository, *, include_
     return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
 
 
+def _state_with_multiple_blockers_ready(repository: CardRepository):
+    setup = SetupInput(
+        game_id="combat-multi-block",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (PLAINS, PLAINS, PLAINS, BORDER_GUARD),
+            "bob": (PLAINS, PLAINS, PLAINS, BORDER_GUARD, SWAMP, MUCK_RATS),
+        },
+        opening_hands={
+            "alice": (PLAINS, PLAINS, PLAINS, BORDER_GUARD),
+            "bob": (PLAINS, PLAINS, PLAINS, BORDER_GUARD, SWAMP, MUCK_RATS),
+        },
+        rng_seed=41,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    session = _develop_creature_through_normal_turns(session, repository, "alice", "alice:4")
+    session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "bob")
+    session = _develop_creature_through_normal_turns(session, repository, "bob", "bob:4")
+    session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "bob")
+    session = _develop_creature_through_normal_turns(session, repository, "bob", "bob:6")
+    return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
+
+
+def _state_with_muck_rats_blocker_ready(repository: CardRepository):
+    setup = SetupInput(
+        game_id="combat-lethal-muck-rats",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (PLAINS, PLAINS, PLAINS, BORDER_GUARD),
+            "bob": (SWAMP, MUCK_RATS),
+        },
+        opening_hands={
+            "alice": (PLAINS, PLAINS, PLAINS, BORDER_GUARD),
+            "bob": (SWAMP, MUCK_RATS),
+        },
+        rng_seed=43,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    session = _develop_creature_through_normal_turns(session, repository, "alice", "alice:4")
+    session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "bob")
+    session = _develop_creature_through_normal_turns(session, repository, "bob", "bob:2")
+    return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
+
+
 def _develop_creature_through_normal_turns(session, repository: CardRepository, player_id: str, creature_id: str):
     current_session = _advance_to_player_main_phase(session, repository, player_id)
-    plains_ids = [instance_id for instance_id in current_session.state.players[player_id].hand if instance_id != creature_id]
-    required_land_count = _required_white_mana(repository, current_session.state.objects[creature_id].oracle_id)
+    land_ids = [instance_id for instance_id in current_session.state.players[player_id].hand if instance_id != creature_id]
+    chosen_land_ids = _select_land_ids_for_spell(current_session, repository, land_ids, creature_id)
 
-    for index, plains_id in enumerate(plains_ids[:required_land_count], start=1):
+    for index, land_id in enumerate(chosen_land_ids, start=1):
         current_session = play_land(
             current_session,
-            PlayLandAction(player_id=player_id, card_instance_id=plains_id),
+            PlayLandAction(player_id=player_id, card_instance_id=land_id),
             repository,
         )
-        if index != required_land_count:
+        if index != len(chosen_land_ids):
             current_session = _advance_to_player_main_phase(
                 _advance_to_next_turn(current_session, repository),
                 repository,
@@ -164,6 +235,8 @@ def _develop_creature_through_normal_turns(session, repository: CardRepository, 
             )
 
     for source_instance_id in current_session.state.players[player_id].battlefield:
+        if len(repository.get(current_session.state.objects[source_instance_id].oracle_id).produced_mana) != 1:
+            continue
         current_session = activate_mana_ability(
             current_session,
             ActivateManaAbilityAction(player_id=player_id, source_instance_id=source_instance_id),
@@ -177,9 +250,34 @@ def _develop_creature_through_normal_turns(session, repository: CardRepository, 
     )
 
 
-def _required_white_mana(repository: CardRepository, oracle_id: str) -> int:
-    mana_cost = repository.get(oracle_id).mana_cost
-    return sum(int(symbol) if symbol.isdigit() else 1 for symbol in mana_cost.replace("{", " ").replace("}", " ").split())
+def _select_land_ids_for_spell(session, repository: CardRepository, land_ids: list[str], creature_id: str) -> list[str]:
+    mana_cost = repository.get(session.state.objects[creature_id].oracle_id).mana_cost
+    requirements = _mana_requirements(mana_cost)
+    chosen_ids: list[str] = []
+    remaining_ids = list(land_ids)
+
+    for symbol in ("W", "U", "B", "R", "G"):
+        for _ in range(requirements[symbol]):
+            match_id = next(
+                instance_id
+                for instance_id in remaining_ids
+                if repository.get(session.state.objects[instance_id].oracle_id).produced_mana == (symbol,)
+            )
+            chosen_ids.append(match_id)
+            remaining_ids.remove(match_id)
+
+    chosen_ids.extend(remaining_ids[: requirements["generic"]])
+    return chosen_ids
+
+
+def _mana_requirements(mana_cost: str) -> dict[str, int]:
+    requirements = {"W": 0, "U": 0, "B": 0, "R": 0, "G": 0, "generic": 0}
+    for symbol in mana_cost.replace("{", " ").replace("}", " ").split():
+        if symbol in requirements:
+            requirements[symbol] += 1
+        elif symbol.isdigit():
+            requirements["generic"] += int(symbol)
+    return requirements
 
 
 def _advance_to_next_turn(session, repository: CardRepository):

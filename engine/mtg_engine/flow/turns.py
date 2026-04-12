@@ -153,12 +153,13 @@ def activate_mana_ability(
 
     source = state.objects[action.source_instance_id]
     card_definition = card_repository.get(source.oracle_id)
-    if card_definition.name != "Plains":
-        raise ValueError("only Plains mana generation is implemented")
+    if len(card_definition.produced_mana) != 1:
+        raise ValueError("only single-color basic land mana generation is implemented")
     if source.tapped:
         raise ValueError("mana source is already tapped")
 
-    updated_player = replace(player, mana_pool=player.mana_pool + ("W",))
+    mana_symbol = card_definition.produced_mana[0]
+    updated_player = replace(player, mana_pool=player.mana_pool + (mana_symbol,))
     next_state = update_player(state, updated_player)
     next_state = update_object(next_state, replace(source, tapped=True))
     event_log = EventLog.from_events(state.game_id, session.event_log)
@@ -168,7 +169,7 @@ def activate_mana_ability(
         payload={
             "player_id": action.player_id,
             "source_instance_id": action.source_instance_id,
-            "mana": ["W"],
+            "mana": [mana_symbol],
         },
     )
     return TurnResult(state=next_state, event_log=event_log.events)
@@ -192,12 +193,11 @@ def cast_creature_spell(
     if not card_definition.is_creature:
         raise ValueError("only creature spell casting is implemented")
 
-    required_white, required_generic = _parse_mana_cost(card_definition.mana_cost)
-    mana_pool = list(player.mana_pool)
-    if mana_pool.count("W") < required_white + required_generic:
+    mana_requirements = _parse_mana_cost(card_definition.mana_cost)
+    if not _can_pay_mana_cost(player.mana_pool, mana_requirements):
         raise ValueError("insufficient mana to cast creature spell")
 
-    remaining_pool = tuple(mana_pool[(required_white + required_generic) :])
+    remaining_pool = _pay_mana_cost(player.mana_pool, mana_requirements)
     casting_state = update_player(state, replace(player, mana_pool=remaining_pool))
     casting_state = move_object(
         casting_state,
@@ -368,7 +368,14 @@ def declare_attackers(
         attackers=action.attacker_ids,
         blockers={},
     )
-    next_state = replace(next_state, turn=replace(next_state.turn, step="declare_blockers_step"))
+    next_state = replace(
+        next_state,
+        turn=replace(
+            next_state.turn,
+            step="declare_blockers_step",
+            priority_player=defending_player,
+        ),
+    )
 
     event_log = EventLog.from_events(state.game_id, session.event_log)
     event_log.append(
@@ -404,12 +411,13 @@ def declare_blockers(
     if action.player_id != state.combat.defending_player:
         raise ValueError("only the defending player may declare blockers")
 
+    assigned_blockers: set[str] = set()
     for attacker_id, blocker_ids in action.blockers.items():
         if attacker_id not in state.combat.attackers:
             raise ValueError("blocker assignment references a non-attacking creature")
-        if len(blocker_ids) > 1:
-            raise ValueError("v0 supports at most one blocker per attacker")
         for blocker_id in blocker_ids:
+            if blocker_id in assigned_blockers:
+                raise ValueError("a blocker may not block more than one attacker")
             if blocker_id not in state.players[action.player_id].battlefield:
                 raise ValueError("blocker must be on defending player's battlefield")
             blocker = state.objects[blocker_id]
@@ -418,6 +426,7 @@ def declare_blockers(
                 raise ValueError("only creatures can block")
             if blocker.tapped:
                 raise ValueError("tapped creature cannot block")
+            assigned_blockers.add(blocker_id)
 
     next_state = with_combat_state(
         state,
@@ -584,20 +593,41 @@ def _draw_one_card_if_available(state: GameState, event_log: EventLog) -> GameSt
     return next_state
 
 
-def _parse_mana_cost(mana_cost: str) -> tuple[int, int]:
+def _parse_mana_cost(mana_cost: str) -> dict[str, int]:
+    requirements = {"W": 0, "U": 0, "B": 0, "R": 0, "G": 0, "generic": 0}
     if not mana_cost:
-        return 0, 0
+        return requirements
     symbols = re.findall(r"\{([^}]+)\}", mana_cost)
-    required_white = 0
-    required_generic = 0
     for symbol in symbols:
-        if symbol == "W":
-            required_white += 1
+        if symbol in {"W", "U", "B", "R", "G"}:
+            requirements[symbol] += 1
         elif symbol.isdigit():
-            required_generic += int(symbol)
+            requirements["generic"] += int(symbol)
         else:
             raise ValueError(f"unsupported mana symbol in v0: {symbol}")
-    return required_white, required_generic
+    return requirements
+
+
+def _can_pay_mana_cost(mana_pool: tuple[str, ...], requirements: dict[str, int]) -> bool:
+    pool_counts = {symbol: mana_pool.count(symbol) for symbol in {"W", "U", "B", "R", "G"}}
+    for symbol in {"W", "U", "B", "R", "G"}:
+        if pool_counts[symbol] < requirements[symbol]:
+            return False
+        pool_counts[symbol] -= requirements[symbol]
+    return sum(pool_counts.values()) >= requirements["generic"]
+
+
+def _pay_mana_cost(mana_pool: tuple[str, ...], requirements: dict[str, int]) -> tuple[str, ...]:
+    if not _can_pay_mana_cost(mana_pool, requirements):
+        raise ValueError("insufficient mana to pay cost")
+
+    remaining_pool = list(mana_pool)
+    for symbol in {"W", "U", "B", "R", "G"}:
+        for _ in range(requirements[symbol]):
+            remaining_pool.remove(symbol)
+    for _ in range(requirements["generic"]):
+        remaining_pool.pop(0)
+    return tuple(remaining_pool)
 
 
 def _other_player(state: GameState, player_id: str) -> str:
