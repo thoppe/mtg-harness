@@ -11,6 +11,7 @@
 - Prefer deterministic, testable simulation behavior over convenience shortcuts.
 - Prefer explicit domain terms from Magic rules over generic game-engine abstractions when they conflict.
 - Prefer simple, inspectable Python modules over opaque frameworks.
+- Prefer demo and example scripts that read as straight-line walkthroughs; avoid `__future__` imports, runtime dependency guards, and `__main__` wrappers unless a script genuinely needs them.
 - Delay interface polish until core game semantics and contracts are stable.
 
 ## Documentation Discipline

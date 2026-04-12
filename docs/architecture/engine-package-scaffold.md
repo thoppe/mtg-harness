@@ -25,6 +25,8 @@ Define the first package-level layout the repository should create once engine s
 - `engine/rules/state_based_actions.py`
 - `engine/rules/combat.py`
 - `engine/rules/spells.py`
+- `engine/output/__init__.py`
+- `engine/output/terminal.py`
 - `engine/tests/test_setup.py`
 - `engine/tests/test_turns.py`
 - `engine/tests/test_combat.py`
@@ -61,6 +63,12 @@ Define the first package-level layout the repository should create once engine s
 - Apply rules-specific logic invoked by flow control.
 - Host state-based action checks for lethal damage in v0.
 - Host minimal combat and spell-resolution logic for the declared micro-universe.
+
+### `engine/output`
+
+- Hold terminal-facing formatting helpers for inspection and demo workflows.
+- Render engine state and event traces without owning simulation rules or legality.
+- Stay optional for callers so engine behavior remains usable without Rich output.
 
 ## Initial Import Rule
 

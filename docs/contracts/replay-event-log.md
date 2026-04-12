@@ -47,6 +47,7 @@ Define the minimum append-only event types required for deterministic replay and
 - Zone changes must be visible as events rather than inferred from unrelated records.
 - Replay tests must be able to assert exact event sequences for the initial slice.
 - The event vocabulary may grow, but existing event meanings should not drift silently.
+- Automatic-destruction events should record the engine reason for that destruction when the current rule family can identify it explicitly.
 
 ## v0 Simplifications
 

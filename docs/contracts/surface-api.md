@@ -10,6 +10,7 @@ Define the boundary between the backend engine and user-facing surfaces.
 - Future browser integration should use explicit serialized contracts rather than internal Python object sharing.
 - Surface-specific formatting should be outside the simulation core.
 - The initial engine surface only needs to serve a two-player local game flow.
+- Reusable terminal presentation helpers may live alongside the engine as a surface-support package, so long as they consume engine state and events without embedding rules decisions.
 
 ## Candidate Interface Types
 

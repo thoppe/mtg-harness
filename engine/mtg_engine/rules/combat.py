@@ -138,7 +138,7 @@ def apply_state_based_actions(
     *,
     active_player: str,
 ) -> tuple[GameState, list[dict]]:
-    destroyed_ids: list[str] = []
+    destroyed_objects: list[dict] = []
     for instance_id in _battlefield_object_ids(state):
         obj = state.objects[instance_id]
         card = card_repository.get(obj.oracle_id)
@@ -146,19 +146,29 @@ def apply_state_based_actions(
             continue
         toughness = int(card.toughness or "0")
         if obj.damage_marked >= toughness:
-            destroyed_ids.append(instance_id)
+            destroyed_objects.append(
+                {
+                    "card_instance_id": instance_id,
+                    "oracle_id": obj.oracle_id,
+                    "reason": "lethal_damage",
+                    "damage_marked": obj.damage_marked,
+                    "toughness": toughness,
+                }
+            )
 
     events = [
         {
             "event_type": "state_based_actions_checked",
             "active_player": active_player,
             "payload": {
-                "destroyed_ids": list(destroyed_ids),
+                "destroyed_ids": [item["card_instance_id"] for item in destroyed_objects],
+                "destroyed": destroyed_objects,
             },
         }
     ]
     current_state = state
-    for destroyed_id in destroyed_ids:
+    for destroyed in destroyed_objects:
+        destroyed_id = destroyed["card_instance_id"]
         destroyed_object = current_state.objects[destroyed_id]
         current_state = move_object(
             current_state,
@@ -174,6 +184,9 @@ def apply_state_based_actions(
                 "payload": {
                     "card_instance_id": destroyed_id,
                     "oracle_id": destroyed_object.oracle_id,
+                    "reason": destroyed["reason"],
+                    "damage_marked": destroyed["damage_marked"],
+                    "toughness": destroyed["toughness"],
                 },
             }
         )
