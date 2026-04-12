@@ -12,6 +12,7 @@ Build a Python-first Magic: The Gathering simulation backend that can ingest aut
 - Deterministic game-state and action modeling
 - CLI-oriented workflows for driving and inspecting games
 - Backend contracts suitable for later browser integration
+- A tiny two-player playable slice starting from a three-card `Portal` universe
 
 ## Out Of Scope For Early Phases
 

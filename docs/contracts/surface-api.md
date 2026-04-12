@@ -9,6 +9,7 @@ Define the boundary between the backend engine and user-facing surfaces.
 - The play engine must be callable from a CLI without special-case logic.
 - Future browser integration should use explicit serialized contracts rather than internal Python object sharing.
 - Surface-specific formatting should be outside the simulation core.
+- The initial engine surface only needs to serve a two-player local game flow.
 
 ## Candidate Interface Types
 

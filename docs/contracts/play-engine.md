@@ -19,9 +19,18 @@ Describe the responsibilities of the simulation core.
 - Full comprehensive-rules coverage on day one
 - UI-specific logic
 - Real-time networking concerns
+- Keyword abilities beyond what is required by the first playable slice
+
+## Initial Slice Constraints
+
+- All engine implementation code and tests live under `engine/`.
+- The first playable slice is a two-player game only.
+- The first playable card universe is exactly three card instances:
+  - two `Border Guard`
+  - one `Plains`
+- Oracle text is the gameplay authority for cards; flavor text is ignored.
+- The first slice should avoid keyword support unless a chosen initial card set requires it.
 
 ## Decisions Needed
 
-- First playable vertical slice
-- Supported mechanic envelope for v0
 - Replay/logging format

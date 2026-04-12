@@ -1,0 +1,32 @@
+version: 1
+slice: portal_initial_micro_universe
+set_summaries:
+  - set_code: por
+    status: partial
+    notes: "Only the initial three-card micro-universe is declared here."
+cards:
+  - set_code: por
+    card_key: "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
+    display_name: Border Guard
+    card_instances: 2
+    status: not_started
+    engine_scope: Creature support within the initial micro-universe.
+    required_rules:
+      - creature_spells_minimal
+      - combat_minimal
+      - state_based_actions_minimal
+      - zones_minimal
+    tests: []
+    notes: "Canonical card identity keyed by Scryfall oracle_id."
+  - set_code: por
+    card_key: "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
+    display_name: Plains
+    card_instances: 1
+    status: not_started
+    engine_scope: Basic land support within the initial micro-universe.
+    required_rules:
+      - land_playing_minimal
+      - mana_generation_basic
+      - zones_minimal
+    tests: []
+    notes: "Canonical card identity keyed by Scryfall oracle_id."

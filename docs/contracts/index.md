@@ -6,9 +6,11 @@ Contracts define the interfaces and invariants that future code must satisfy.
 
 - `knowledge-sources.md`
 - `canonical-card-model.md`
+- `card-coverage-manifest.md`
 - `card-implementation-lifecycle.md`
 - `game-state.md`
 - `play-engine.md`
+- `rules-coverage-manifest.md`
 - `rules-implementation-lifecycle.md`
 - `surface-api.md`
 

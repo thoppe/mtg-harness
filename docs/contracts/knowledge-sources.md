@@ -27,6 +27,8 @@ Define how external card and rules information enters the repository.
 - External source pull code and tests must live under `information/`.
 - Rules artifacts must live under `information/rules/`.
 - Card metadata files and card image files must live in separate subdirectories under `information/cards/`.
+- Canonical per-card metadata filenames must be `information/cards/data/<oracle_id>.json`.
+- Canonical per-card image filenames must be `information/cards/images/<oracle_id>.<ext>`.
 
 ## Raw Vs Implemented Model
 
@@ -45,4 +47,3 @@ Define how external card and rules information enters the repository.
 - Define snapshot/versioning policy for imported knowledge.
 - Define manifests that track raw coverage versus implemented coverage.
 - Define how set-based implementation status is declared for cards.
-- Define the exact per-card filename convention for metadata and image artifacts.

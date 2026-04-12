@@ -28,6 +28,8 @@ Current verified official entry points as of April 12, 2026:
 - Store one card-data file per card and one image file per card in separate subdirectories.
 - Use Scryfall `oracle_id` as the canonical internal identity for a card concept.
 - Treat Scryfall `id` as the printing-level/source-record identity.
+- Persist canonical card metadata files as `information/cards/data/<oracle_id>.json`.
+- Persist card images as `information/cards/images/<oracle_id>.<ext>`.
 
 ## Initial Coverage Target
 
@@ -40,6 +42,15 @@ Current verified official entry points as of April 12, 2026:
 - Image download workflows should be rate-aware and cache-aware.
 - Image fetching policy should minimize repeated downloads and avoid unnecessary API pressure.
 - The default persisted image variant is still undecided.
+
+## Initial Card Universe
+
+- First implementation set remains `Portal` (`por`).
+- First playable micro-universe contains only:
+  - `Border Guard`
+  - `Border Guard`
+  - `Plains`
+- This micro-universe exists to constrain the first engine slice before broader `Portal` support.
 
 ## Raw Vs Implemented Separation
 

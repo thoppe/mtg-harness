@@ -23,6 +23,15 @@ This file captures decisions, constraints, and open questions that are explicitl
 - Card data files and card image files must be stored separately under `information/cards/`
 - Initial target implementation set: `Portal` (`por`)
 - Canonical card identity should be based on Scryfall cross-printing identity, with printing/set provenance stored separately
+- Canonical card metadata filename convention: `information/cards/data/<oracle_id>.json`
+- Canonical card image filename convention: `information/cards/images/<oracle_id>.<ext>`
+- All engine implementation code and tests must live under `engine/`
+- Initial playable micro-universe is exactly three card instances:
+  - two copies of `Border Guard` from `Portal`
+  - one copy of `Plains` from `Portal`
+- Initial play mode is two-player normal play structure only
+- For this initial slice, oracle text is the only gameplay text authority; flavor text is never used for implementation
+- No keyword ability support is required in the initial micro-universe
 
 ## Working Assumptions
 
@@ -30,6 +39,7 @@ This file captures decisions, constraints, and open questions that are explicitl
 - The repository should optimize for agent legibility first: contracts, plans, and decisions must be discoverable in-repo.
 - Early project work should bias toward explicit domain modeling over rapid prototype code.
 - Raw source snapshots and implemented engine behavior are different artifacts and must not be conflated.
+- "standard play format" is interpreted here as normal two-player gameplay structure, not current Standard-constructed legality enforcement.
 
 ## Decisions To Make
 
@@ -44,15 +54,14 @@ This file captures decisions, constraints, and open questions that are explicitl
 - API boundary:
   - Internal Python objects only at first, or stable JSON contracts early for future browser integration?
 - Image policy:
-  - Which image sizes, cache policy, and local storage conventions should be standard?
+  - Which image asset variant should be persisted by default?
 - Implementation progression:
   - Which sets should follow `Portal` as the next supported vertical slices?
 
 ## Near-Term Human Inputs Needed
 
-- Choose the initial target format or rules envelope.
 - Decide whether replayability and deterministic simulation are first-class requirements in v0.
-- Choose the standard image variant to persist by default.
+- Choose the default persisted image asset type.
 
 ## Change Policy
 

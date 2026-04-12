@@ -8,6 +8,7 @@ Define the minimum internal representation of a card object before engine implem
 
 - Stable internal card identifier
 - Source printing identifier
+- Canonical source filename
 - Card name
 - Mana cost representation
 - Type line
@@ -23,6 +24,7 @@ Define the minimum internal representation of a card object before engine implem
 - The model must support future derived annotations without mutating source provenance away.
 - The stable internal card identifier must be based on Scryfall `oracle_id`.
 - Printing-level provenance must retain Scryfall `id`, set code, and collector number when present.
+- Canonical raw metadata storage for a card must be `information/cards/data/<oracle_id>.json`.
 
 ## Open Questions
 

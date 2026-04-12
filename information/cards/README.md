@@ -9,4 +9,5 @@
 
 - Canonical card identity should use Scryfall `oracle_id`.
 - Printing-level provenance should retain Scryfall `id`, set code, and collector number.
-- The exact filename convention is still to be finalized.
+- Canonical card metadata files must be named `data/<oracle_id>.json`.
+- Card image files must be named `images/<oracle_id>.<ext>`.

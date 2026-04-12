@@ -77,11 +77,10 @@ For cards:
 - The initial rules envelope tied to that set
 - Whether deterministic replay is required in the first engine slice
 - Whether coverage manifests should be hand-authored markdown, structured data files, or both
-- The exact canonical filename convention for per-card metadata and image artifacts
 - The default image variant to persist
 
 ## Suggested Next Deliverables
 
 1. A provenance and snapshot policy for external sources
-2. A draft coverage-manifest format for rules and sets
+2. Concrete coverage manifests for the initial micro-universe
 3. A `Portal`-specific first rules envelope

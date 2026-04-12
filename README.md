@@ -25,6 +25,7 @@ This repository is in planning mode. No implementation code has been added yet.
 - `HUMAN_INPUT.md`: human-owned constraints, decisions, and open questions
 - `docs/`: contracts, architecture notes, design docs, references, and execution plans
 - `information/`: external-source pull scripts, tests, and pulled source artifacts
+- `engine/`: Python package for engine implementation and engine tests
 
 ## How To Use This Repo Right Now
 
