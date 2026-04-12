@@ -4,6 +4,12 @@
 
 Turn the selected external authorities into a durable repository strategy for ingestion, provenance, and incremental implementation coverage.
 
+## Status
+
+- Phase: active
+- Acquisition scaffold: in place for the initial micro-universe and current rules snapshot
+- Remaining blocker type: engine-facing contract refinement before package scaffolding
+
 ## Why This Plan Exists
 
 The project now has chosen sources:
@@ -22,6 +28,16 @@ Maintain three distinct layers:
 3. Declared implementation coverage
 
 The simulator should only claim support based on layer 3, never merely because layers 1 or 2 exist.
+
+## Progress Notes
+
+- Source artifact provenance contract now exists for card metadata, card images, and rules snapshots.
+- The repository now has a repeatable pull script under `information/` for:
+  - `Border Guard`
+  - `Foot Soldiers`
+  - `Plains`
+  - the current official Wizards plain-text Comprehensive Rules snapshot
+- Pulled artifacts now exist in-repo with stable filenames and sidecar provenance.
 
 ## Workstreams
 
@@ -75,9 +91,7 @@ For cards:
 ## Decisions Needed
 
 - The initial rules envelope tied to that set
-- Whether deterministic replay is required in the first engine slice
 - Whether coverage manifests should be hand-authored markdown, structured data files, or both
-- The first engine architecture pattern
 
 ## Suggested Next Deliverables
 
@@ -87,13 +101,10 @@ For cards:
 
 ## Immediate Next Actions
 
-1. Use `.codex/skills/card-source-sync/` as the workflow source for acquisition work.
-2. Define the provenance artifact shape for:
-   - `information/cards/data/<oracle_id>.json`
-   - `information/cards/images/<oracle_id>.jpg`
-   - `information/rules/` snapshots
-3. Add ingestion scripts and ingestion tests under `information/` for the initial micro-universe only:
-   - `Border Guard`
-   - `Foot Soldiers`
-   - `Plains`
-4. Do not start engine implementation until those acquisition and provenance pieces exist.
+1. Turn the current `Portal` rules envelope into tighter engine-facing contracts for:
+   - deterministic setup inputs
+   - state-machine transition points
+   - initial replay event types
+2. Define the first engine package scaffold under `docs/architecture/` and `docs/contracts/` using the chosen hybrid pattern.
+3. Decide whether coverage manifests should remain structured files only or gain matching narrative markdown.
+4. Do not start engine implementation until those contracts and package boundaries are written in-repo.

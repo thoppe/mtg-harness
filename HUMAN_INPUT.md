@@ -34,6 +34,8 @@ This file captures decisions, constraints, and open questions that are explicitl
 - For this initial slice, oracle text is the only gameplay text authority; flavor text is never used for implementation
 - No keyword ability support is required in the initial micro-universe
 - Default persisted card image asset type: JPG
+- Deterministic simulation and replayability are first-class requirements in v0, especially for tests
+- The first engine architecture pattern is a deterministic state machine with an append-only event log
 
 ## Working Assumptions
 
@@ -47,21 +49,17 @@ This file captures decisions, constraints, and open questions that are explicitl
 
 - Simulation goal:
   - Full-rules fidelity, constrained format fidelity, or staged capability by mechanic family?
-- Determinism strategy:
-  - What must be reproducible for testing, replay, and AI-vs-AI simulation?
 - Priority game modes:
   - 1v1 first, multiplayer later, or multiplayer-aware from day one?
 - API boundary:
   - Internal Python objects only at first, or stable JSON contracts early for future browser integration?
 - Implementation progression:
   - Which sets should follow `Portal` as the next supported vertical slices?
-- Engine architecture:
-  - Event-sourced engine, state machine, layered effect system, or hybrid?
 
 ## Near-Term Human Inputs Needed
 
-- Decide whether replayability and deterministic simulation are first-class requirements in v0.
-- Decide the first engine architecture pattern.
+- No immediate human input is required for ingestion planning.
+- The next human decisions should be about long-range product scope rather than v0 engine shape.
 
 ## Change Policy
 

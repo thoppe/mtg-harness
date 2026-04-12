@@ -5,6 +5,7 @@ Contracts define the interfaces and invariants that future code must satisfy.
 ## Current Contract Areas
 
 - `knowledge-sources.md`
+- `source-artifact-provenance.md`
 - `canonical-card-model.md`
 - `card-coverage-manifest.md`
 - `card-implementation-lifecycle.md`

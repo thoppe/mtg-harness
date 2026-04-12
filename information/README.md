@@ -6,6 +6,8 @@ This directory holds external-source pull code, tests, and pulled artifacts.
 
 - `cards/`: pulled card metadata and image assets
 - `rules/`: pulled rules artifacts
+- `pull_sources.py`: micro-universe source-pull entry point
+- `tests/`: ingestion workflow tests
 
 ## Constraints
 
@@ -13,3 +15,8 @@ This directory holds external-source pull code, tests, and pulled artifacts.
 - Card metadata files and card image files must be stored in separate subdirectories.
 - One file per card metadata record and one file per card image asset.
 - Raw source presence does not imply gameplay support.
+
+## Current Workflow
+
+- Run `python information/pull_sources.py` to refresh the declared micro-universe and the current rules snapshot.
+- Run `python -m unittest discover -s information/tests` to validate the pull workflow behavior.

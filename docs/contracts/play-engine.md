@@ -14,6 +14,13 @@ Describe the responsibilities of the simulation core.
 - Triggered and activated abilities
 - Deterministic logging of state transitions
 
+## v0 Architecture Commitments
+
+- The engine will use a deterministic state machine as the primary controller of legal progression.
+- The engine will record accepted actions and resolved outcomes in an append-only event log.
+- Replayable execution must be possible from explicit initial inputs plus recorded events.
+- Tests must be able to assert deterministic traces, not only final states.
+
 ## Non-Goals For Initial Slice
 
 - Full comprehensive-rules coverage on day one
@@ -41,7 +48,7 @@ Describe the responsibilities of the simulation core.
   - minimal zones and player state
   - legal actions available in the initial slice
   - deterministic turn progression for a two-player game
-
-## Decisions Needed
-
-- Replay/logging format
+- The first engine contract work should also define:
+  - the initial event types required for deterministic replay
+  - the boundary between transition control and rules evaluation
+  - where future state-based actions, triggers, and continuous effects will attach

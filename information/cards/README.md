@@ -12,3 +12,5 @@
 - Canonical card metadata files must be named `data/<oracle_id>.json`.
 - Card image files must be named `images/<oracle_id>.<ext>`.
 - JPG is the default persisted image asset type for the current plan.
+- JPG image provenance files must be named `images/<oracle_id>.jpg.provenance.json`.
+- Card metadata files must wrap the raw Scryfall payload with provenance fields rather than flattening into the engine model.

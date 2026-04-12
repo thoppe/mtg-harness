@@ -9,6 +9,8 @@
 
 - Fetch the official plain-text Comprehensive Rules snapshot from the Wizards rules page.
 - Preserve each fetched rules snapshot with an effective date and source URL.
+- Store rules text as `information/rules/raw/comprehensive_rules_<effective-date>.txt`.
+- Store a sidecar provenance file next to each rules snapshot.
 - Treat the raw rules corpus as reference material, not as directly executable logic.
 - Build explicit mappings from comprehensive-rules sections to internal contracts and implementation status.
 - Store pulled rules artifacts under `information/rules/`.
@@ -31,6 +33,8 @@ Current verified official entry points as of April 12, 2026:
 - Persist canonical card metadata files as `information/cards/data/<oracle_id>.json`.
 - Persist card images as `information/cards/images/<oracle_id>.<ext>`.
 - Persist JPG images by default for the current plan.
+- Persist image provenance as `information/cards/images/<oracle_id>.jpg.provenance.json`.
+- Persist card metadata as a provenance wrapper around the fetched Scryfall source record, not as an engine-normalized card object.
 
 ## Initial Coverage Target
 
@@ -42,7 +46,7 @@ Current verified official entry points as of April 12, 2026:
 - Images are supporting assets, not the authority for rules text.
 - Image download workflows should be rate-aware and cache-aware.
 - Image fetching policy should minimize repeated downloads and avoid unnecessary API pressure.
-- The default persisted image variant is still undecided.
+- Persist the Scryfall `normal` JPG variant by default for the initial micro-universe.
 
 ## Initial Card Universe
 

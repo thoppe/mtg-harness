@@ -30,6 +30,7 @@ Define how external card and rules information enters the repository.
 - Canonical per-card metadata filenames must be `information/cards/data/<oracle_id>.json`.
 - Canonical per-card image filenames must be `information/cards/images/<oracle_id>.<ext>`.
 - Default persisted card image asset type is JPG unless a later contract changes it.
+- Source artifact provenance must follow `docs/contracts/source-artifact-provenance.md`.
 
 ## Raw Vs Implemented Model
 
@@ -40,11 +41,9 @@ Define how external card and rules information enters the repository.
 ## Unknowns
 
 - Licensing and redistribution implications are not evaluated yet.
-- Exact local storage policy for downloaded images is not chosen yet.
-- Exact raw/implemented directory and manifest layout is not chosen yet.
+- Future large-scale Scryfall sync cadence is not chosen yet.
 
 ## Decisions Needed
 
-- Define snapshot/versioning policy for imported knowledge.
 - Define manifests that track raw coverage versus implemented coverage.
 - Define how set-based implementation status is declared for cards.
