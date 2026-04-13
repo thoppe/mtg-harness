@@ -27,6 +27,7 @@ Define the machine-readable inventory of rules support claimed by the simulator.
   - `Muck Rats`
   - `Vengeance`
   - `Path of Peace`
+  - `Touch of Brilliance`
   - `Swamp`
   - `Forest`
   - `Island`

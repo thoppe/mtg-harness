@@ -25,7 +25,7 @@ class CastCreatureSpellAction:
 class CastNonCreatureSpellAction:
     player_id: str
     card_instance_id: str
-    target_instance_id: str
+    target_instance_id: str | None = None
 
 
 @dataclass(frozen=True)

@@ -27,6 +27,7 @@ Define the machine-readable inventory of card and set support claimed by the sim
   - `Muck Rats`
   - `Vengeance`
   - `Path of Peace`
+  - `Touch of Brilliance`
   - `Swamp`
   - `Forest`
   - `Island`

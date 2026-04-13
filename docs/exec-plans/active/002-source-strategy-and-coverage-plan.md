@@ -46,7 +46,7 @@ The simulator should only claim support based on layer 3, never merely because l
 - Coverage manifests remain YAML as the canonical support declaration for the current micro-universe.
 - Narrative companion markdown should be added only when the supported rule surface grows beyond the current small slice.
 - Engine implementation now covers deterministic setup, turn progression through cleanup and next-turn handoff, precombat-main legal-action enumeration, combat declaration action windows, priority passing across the currently supported forced-pass branch, land play, five-basic-land mana production, creature spell casting, and minimal combat with multi-block support.
-- The first targeted-sorcery increment is now in place via `Vengeance`, and the next narrow expansion is `Path of Peace` to widen that same rule family through unconditional creature targeting plus owner life gain.
+- The first targeted-sorcery increment is now in place via `Vengeance`, the next destruction expansion was `Path of Peace`, and the next narrow sorcery expansion is `Touch of Brilliance` to add simple spell-driven card draw without introducing keywords, triggers, or multi-targeting.
 - The fixed micro-universe model is now showing strain; the next structural improvement should be a manifest-driven support-slice model rather than continued growth of hardcoded scope lists.
 
 ## Workstreams

@@ -32,6 +32,7 @@ Current declared slice contents:
 - `Muck Rats`
 - `Vengeance`
 - `Path of Peace`
+- `Touch of Brilliance`
 - `Swamp`
 - `Forest`
 - `Island`

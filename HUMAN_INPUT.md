@@ -32,6 +32,7 @@ This file captures decisions, constraints, and open questions that are explicitl
   - `Muck Rats`
   - `Vengeance`
   - `Path of Peace`
+  - `Touch of Brilliance`
   - `Swamp`
   - `Forest`
   - `Island`

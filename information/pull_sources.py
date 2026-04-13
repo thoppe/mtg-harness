@@ -29,7 +29,6 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 @dataclass(frozen=True)
 class CardTarget:
-    name: str
     set_code: str
     oracle_id: str
 
@@ -55,19 +54,13 @@ def load_active_support_slice_targets() -> tuple[CardTarget, ...]:
     active_slice = active_payloads[0]
     set_code = active_slice["set_code"]
     card_keys = tuple(active_slice["card_keys"])
-    data_dir = REPO_ROOT / "information" / "cards" / "data"
-    targets: list[CardTarget] = []
-    for oracle_id in card_keys:
-        payload = json.loads((data_dir / f"{oracle_id}.json").read_text(encoding="utf-8"))
-        source = payload["source_record"]
-        targets.append(
-            CardTarget(
-                name=source["name"],
-                set_code=set_code,
-                oracle_id=oracle_id,
-            )
+    return tuple(
+        CardTarget(
+            set_code=set_code,
+            oracle_id=oracle_id,
         )
-    return tuple(targets)
+        for oracle_id in card_keys
+    )
 
 
 def utc_now_iso() -> str:
@@ -110,7 +103,7 @@ def write_json(path: Path, payload: dict) -> None:
 
 
 def build_support_slice_query(targets: tuple[CardTarget, ...]) -> str:
-    clauses = [f'name:"{target.name}"' for target in targets]
+    clauses = [f"oracleid:{target.oracle_id}" for target in targets]
     set_code = targets[0].set_code
     return f'set:{set_code} ({ " or ".join(clauses) })'
 
@@ -237,13 +230,13 @@ def pull_cards(
     request_url = build_scryfall_search_url(targets)
     fetched_at = utc_now_iso()
     search_payload = json_fetcher(request_url, build_headers())
-    cards_by_name = {card["name"]: card for card in search_payload["data"]}
+    cards_by_oracle_id = {card["oracle_id"]: card for card in search_payload["data"]}
     written_paths: list[Path] = []
 
     for target in targets:
-        card = cards_by_name.get(target.name)
+        card = cards_by_oracle_id.get(target.oracle_id)
         if card is None:
-            raise ValueError(f"Missing card in Scryfall response: {target.name}")
+            raise ValueError(f"Missing card in Scryfall response: {target.oracle_id}")
         validate_card_scope(card, target)
 
         metadata_path = card_metadata_path(root, target.oracle_id)

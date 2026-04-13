@@ -302,7 +302,6 @@ def cast_noncreature_spell(
         player_id=action.player_id,
     )
 
-    target = casting_state.objects[action.target_instance_id]
     event_log = EventLog.from_events(state.game_id, session.event_log)
     event_log.append(
         event_type="spell_cast",
@@ -312,7 +311,7 @@ def cast_noncreature_spell(
             "card_instance_id": action.card_instance_id,
             "oracle_id": card.oracle_id,
             "mana_cost": card_definition.mana_cost,
-            "target_instance_ids": [action.target_instance_id],
+            "target_instance_ids": [] if action.target_instance_id is None else [action.target_instance_id],
         },
     )
     event_log.append(
@@ -333,49 +332,60 @@ def cast_noncreature_spell(
             "player_id": action.player_id,
             "card_instance_id": action.card_instance_id,
             "oracle_id": card.oracle_id,
-            "target_instance_ids": [action.target_instance_id],
+            "target_instance_ids": [] if action.target_instance_id is None else [action.target_instance_id],
         },
     )
-
-    resolved_state = move_object(
-        casting_state,
-        instance_id=action.target_instance_id,
-        from_zone="battlefield",
-        to_zone="graveyard",
-        player_id=target.owner_id,
-    )
-    event_log.append(
-        event_type="permanent_destroyed",
-        active_player=action.player_id,
-        payload={
-            "card_instance_id": action.target_instance_id,
-            "oracle_id": target.oracle_id,
-            "reason": f"spell_effect:{card_definition.name}",
-        },
-    )
-    event_log.append(
-        event_type="object_moved_between_zones",
-        active_player=action.player_id,
-        payload={
-            "player_id": target.owner_id,
-            "card_instance_id": action.target_instance_id,
-            "oracle_id": target.oracle_id,
-            "from_zone": "battlefield",
-            "to_zone": "graveyard",
-        },
-    )
-    if effect == "destroy_creature_owner_gains_4_life":
-        target_owner = resolved_state.players[target.owner_id]
-        updated_owner = replace(target_owner, life_total=target_owner.life_total + 4)
-        resolved_state = update_player(resolved_state, updated_owner)
+    resolved_state = casting_state
+    if effect in {"destroy_tapped_creature", "destroy_creature_owner_gains_4_life"}:
+        if action.target_instance_id is None:
+            raise ValueError("targeted sorcery requires a target")
+        target = casting_state.objects[action.target_instance_id]
+        resolved_state = move_object(
+            casting_state,
+            instance_id=action.target_instance_id,
+            from_zone="battlefield",
+            to_zone="graveyard",
+            player_id=target.owner_id,
+        )
         event_log.append(
-            event_type="life_total_changed",
+            event_type="permanent_destroyed",
+            active_player=action.player_id,
+            payload={
+                "card_instance_id": action.target_instance_id,
+                "oracle_id": target.oracle_id,
+                "reason": f"spell_effect:{card_definition.name}",
+            },
+        )
+        event_log.append(
+            event_type="object_moved_between_zones",
             active_player=action.player_id,
             payload={
                 "player_id": target.owner_id,
-                "life_total": updated_owner.life_total,
+                "card_instance_id": action.target_instance_id,
+                "oracle_id": target.oracle_id,
+                "from_zone": "battlefield",
+                "to_zone": "graveyard",
             },
         )
+        if effect == "destroy_creature_owner_gains_4_life":
+            target_owner = resolved_state.players[target.owner_id]
+            updated_owner = replace(target_owner, life_total=target_owner.life_total + 4)
+            resolved_state = update_player(resolved_state, updated_owner)
+            event_log.append(
+                event_type="life_total_changed",
+                active_player=action.player_id,
+                payload={
+                    "player_id": target.owner_id,
+                    "life_total": updated_owner.life_total,
+                },
+            )
+    elif effect == "draw_two_cards":
+        for _ in range(2):
+            resolved_state = _draw_one_card_for_player_if_available(
+                resolved_state,
+                event_log,
+                player_id=action.player_id,
+            )
     resolved_state = move_object(
         resolved_state,
         instance_id=action.card_instance_id,
@@ -703,7 +713,20 @@ def start_next_turn(session: TurnResult | GameBootstrap) -> TurnResult:
 
 
 def _draw_one_card_if_available(state: GameState, event_log: EventLog) -> GameState:
-    player = state.players[state.turn.active_player]
+    return _draw_one_card_for_player_if_available(
+        state,
+        event_log,
+        player_id=state.turn.active_player,
+    )
+
+
+def _draw_one_card_for_player_if_available(
+    state: GameState,
+    event_log: EventLog,
+    *,
+    player_id: str,
+) -> GameState:
+    player = state.players[player_id]
     if not player.library:
         return state
 
@@ -714,13 +737,13 @@ def _draw_one_card_if_available(state: GameState, event_log: EventLog) -> GameSt
         instance_id=top_instance_id,
         from_zone="library",
         to_zone="hand",
-        player_id=state.turn.active_player,
+        player_id=player_id,
     )
     event_log.append(
         event_type="object_moved_between_zones",
         active_player=state.turn.active_player,
         payload={
-            "player_id": state.turn.active_player,
+            "player_id": player_id,
             "card_instance_id": top_instance_id,
             "oracle_id": card.oracle_id,
             "from_zone": "library",
@@ -770,10 +793,16 @@ def _pay_mana_cost(mana_pool: tuple[str, ...], requirements: dict[str, int]) -> 
 def _require_legal_noncreature_target(
     state: GameState,
     card_repository: CardRepository,
-    target_instance_id: str,
+    target_instance_id: str | None,
     *,
     effect: str,
 ) -> None:
+    if effect == "draw_two_cards":
+        if target_instance_id is not None:
+            raise ValueError("draw-two sorcery does not take a target")
+        return
+    if target_instance_id is None:
+        raise ValueError("targeted sorcery requires a target")
     if target_instance_id not in state.objects:
         raise ValueError("target must exist")
     target = state.objects[target_instance_id]
@@ -793,6 +822,8 @@ def _supported_targeted_sorcery_effect(card_definition) -> str | None:
         return "destroy_tapped_creature"
     if card_definition.oracle_text == "Destroy target creature. Its owner gains 4 life.":
         return "destroy_creature_owner_gains_4_life"
+    if card_definition.oracle_text == "Draw two cards.":
+        return "draw_two_cards"
     return None
 
 

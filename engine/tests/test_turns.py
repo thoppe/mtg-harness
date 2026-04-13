@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 import unittest
 from pathlib import Path
 import sys
@@ -8,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from mtg_engine.actions.models import (
     ActivateManaAbilityAction,
+    CastNonCreatureSpellAction,
     CastCreatureSpellAction,
     DeclareAttackersAction,
     DeclareBlockersAction,
@@ -21,6 +23,7 @@ from mtg_engine.flow.turns import (
     advance_to_cleanup,
     advance_to_begin_combat,
     cast_creature_spell,
+    cast_noncreature_spell,
     declare_attackers,
     declare_blockers,
     pass_priority,
@@ -29,6 +32,7 @@ from mtg_engine.flow.turns import (
     start_first_turn,
     start_next_turn,
 )
+from mtg_engine.state.zones import move_object
 
 
 INFORMATION_DIR = Path(__file__).resolve().parents[2] / "information"
@@ -39,6 +43,7 @@ MOUNTAIN = "a3fb7228-e76b-4e96-a40e-20b5fed75685"
 PLAINS = "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
 BORDER_GUARD = "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
 MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
+TOUCH_OF_BRILLIANCE = "6365aba1-78d3-416c-89cd-9449578eedbf"
 
 
 class TurnTests(unittest.TestCase):
@@ -157,6 +162,35 @@ class TurnTests(unittest.TestCase):
         self.assertEqual(result.event_log[-5].event_type, "turn_started")
         self.assertEqual(result.event_log[-1].event_type, "step_changed")
 
+    def test_touch_of_brilliance_reuses_library_to_hand_draw_path(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_touch_of_brilliance_main_phase_session(repository)
+
+        for source_instance_id in session.state.players["alice"].battlefield:
+            session = activate_mana_ability(
+                session,
+                ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+                repository,
+            )
+
+        result = cast_noncreature_spell(
+            session,
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:5",
+                target_instance_id=None,
+            ),
+            repository,
+        )
+
+        self.assertEqual(result.state.players["alice"].hand, ("alice:6", "alice:7", "alice:8"))
+        self.assertEqual(result.state.players["alice"].library, ())
+        move_events = [event for event in result.event_log if event.event_type == "object_moved_between_zones"]
+        self.assertEqual(
+            [event.payload["from_zone"] for event in move_events[-3:]],
+            ["library", "library", "stack"],
+        )
+
 
 def _build_main_phase_session(repository: CardRepository):
     setup = SetupInput(
@@ -196,6 +230,35 @@ def _build_single_land_main_phase_session(repository: CardRepository, land_oracl
         rng_seed=12,
     )
     return start_first_turn(initialize_game(setup, repository))
+
+
+def _build_touch_of_brilliance_main_phase_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="turn-touch-of-brilliance",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (PLAINS, PLAINS, PLAINS, ISLAND, TOUCH_OF_BRILLIANCE, PLAINS, PLAINS, PLAINS),
+            "bob": (PLAINS,),
+        },
+        opening_hands={
+            "alice": (PLAINS, PLAINS, PLAINS, ISLAND, TOUCH_OF_BRILLIANCE),
+            "bob": (PLAINS,),
+        },
+        rng_seed=15,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    current_state = session.state
+
+    for land_id in ("alice:1", "alice:2", "alice:3", "alice:4"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
+    return replace(session, state=current_state)
 
 
 def _build_end_combat_session_with_marked_damage(repository: CardRepository):

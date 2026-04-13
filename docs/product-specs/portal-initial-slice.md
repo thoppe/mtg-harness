@@ -13,13 +13,14 @@ The initial playable universe contains only these legal card identities:
 - `Muck Rats` from `Portal`
 - `Vengeance` from `Portal`
 - `Path of Peace` from `Portal`
+- `Touch of Brilliance` from `Portal`
 - `Swamp` from `Portal`
 - `Forest` from `Portal`
 - `Island` from `Portal`
 - `Mountain` from `Portal`
 - `Plains` from `Portal`
 
-This slice uses vanilla `Portal` creatures, the sorceries `Vengeance` and `Path of Peace`, and all five `Portal` basic lands to widen the engine through a narrow targeted noncreature-spell path before broader mechanics are introduced.
+This slice uses vanilla `Portal` creatures, the sorceries `Vengeance`, `Path of Peace`, and `Touch of Brilliance`, and all five `Portal` basic lands to widen the engine through a narrow sorcery-speed noncreature-spell path before broader mechanics are introduced.
 Multiplicity is allowed as normal so long as no card identity outside this universe is introduced.
 
 ## Play Mode
@@ -42,5 +43,5 @@ Multiplicity is allowed as normal so long as no card identity outside this unive
 
 ## Current Implementation Note
 
-- The currently implemented slice supports deterministic setup, first-turn progression, land play, basic-land mana generation, vanilla creature spell resolution, and the narrow targeted-sorcery path required for `Vengeance` and `Path of Peace`.
+- The currently implemented slice supports deterministic setup, first-turn progression, land play, basic-land mana generation, vanilla creature spell resolution, the narrow targeted-sorcery path required for `Vengeance` and `Path of Peace`, and simple sorcery-driven card draw for `Touch of Brilliance`.
 - Additional setup scenarios may use multiple copies of the declared basic lands and vanilla creatures without widening the universe.

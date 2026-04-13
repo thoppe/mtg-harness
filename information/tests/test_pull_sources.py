@@ -31,9 +31,9 @@ class PullSourcesTests(unittest.TestCase):
         targets = pull_sources.load_active_support_slice_targets()
 
         self.assertEqual(targets[0].set_code, "por")
-        self.assertEqual(targets[0].name, "Border Guard")
-        self.assertEqual(targets[-1].name, "Plains")
-        self.assertIn("Path of Peace", [target.name for target in targets])
+        self.assertEqual(targets[0].oracle_id, "1ef5003c-f540-4cdc-913f-7d5280ad9f62")
+        self.assertEqual(targets[-1].oracle_id, "bc71ebf6-2056-41f7-be35-b2e5c34afa99")
+        self.assertIn("b7593cf8-4dcb-473b-a2ef-180fffe66738", [target.oracle_id for target in targets])
 
     def test_pull_cards_writes_canonical_paths_and_provenance(self) -> None:
         cards = [
@@ -72,6 +72,12 @@ class PullSourcesTests(unittest.TestCase):
                 oracle_id="b7593cf8-4dcb-473b-a2ef-180fffe66738",
                 card_id="a1f3e1c9-bfad-49a1-b171-6fa344ef2eef",
                 collector_number="21",
+            ),
+            sample_card(
+                name="Touch of Brilliance",
+                oracle_id="6365aba1-78d3-416c-89cd-9449578eedbf",
+                card_id="196474ce-e28e-48f0-b407-dc5535adf1b6",
+                collector_number="76",
             ),
             sample_card(
                 name="Swamp",
@@ -172,6 +178,12 @@ class PullSourcesTests(unittest.TestCase):
                 oracle_id="b7593cf8-4dcb-473b-a2ef-180fffe66738",
                 card_id="a1f3e1c9-bfad-49a1-b171-6fa344ef2eef",
                 collector_number="21",
+            ),
+            sample_card(
+                name="Touch of Brilliance",
+                oracle_id="6365aba1-78d3-416c-89cd-9449578eedbf",
+                card_id="196474ce-e28e-48f0-b407-dc5535adf1b6",
+                collector_number="76",
             ),
             sample_card(
                 name="Swamp",

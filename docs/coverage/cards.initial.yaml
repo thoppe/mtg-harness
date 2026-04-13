@@ -3,14 +3,14 @@ slice: portal_initial_micro_universe
 set_summaries:
   - set_code: por
     status: partial
-    notes: "The declared micro-universe currently includes Border Guard, Foot Soldiers, Muck Rats, Vengeance, Path of Peace, and the five Portal basic lands."
+    notes: "The declared support slice currently includes Border Guard, Foot Soldiers, Muck Rats, Vengeance, Path of Peace, Touch of Brilliance, and the five Portal basic lands."
 cards:
   - set_code: por
     card_key: "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
     display_name: Border Guard
     card_instances: variable
     status: implemented
-    engine_scope: Vanilla creature support including casting, battlefield presence, attacking, blocking, combat damage, and cleanup within the initial micro-universe.
+    engine_scope: Vanilla creature support including casting, battlefield presence, attacking, blocking, combat damage, and cleanup within the initial support slice.
     required_rules:
       - creature_spells_minimal
       - precombat_priority_minimal
@@ -167,3 +167,19 @@ cards:
       - engine/tests/test_priority.py
       - engine/tests/test_spells.py
     notes: "Canonical card identity keyed by Scryfall oracle_id."
+  - set_code: por
+    card_key: "6365aba1-78d3-416c-89cd-9449578eedbf"
+    display_name: Touch of Brilliance
+    card_instances: variable
+    status: implemented
+    engine_scope: Sorcery-speed noncreature spell support for casting `Touch of Brilliance`, resolving it without targets, drawing two cards from the caster's library, and moving the spell from stack to graveyard.
+    required_rules:
+      - simple_card_draw_sorceries_minimal
+      - precombat_priority_minimal
+      - turn_structure_minimal
+      - zones_minimal
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+      - engine/tests/test_turns.py
+    notes: "Canonical card identity keyed by Scryfall oracle_id. Support is intentionally narrow and limited to the printed `Draw two cards.` effect."

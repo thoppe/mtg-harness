@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define the smallest believable rules subset for the initial `Portal` micro-universe built from `Border Guard`, `Foot Soldiers`, `Muck Rats`, `Vengeance`, `Path of Peace`, and the five `Portal` basic lands.
+Define the smallest believable rules subset for the initial `Portal` support slice built from `Border Guard`, `Foot Soldiers`, `Muck Rats`, `Vengeance`, `Path of Peace`, `Touch of Brilliance`, and the five `Portal` basic lands.
 
 ## In Scope
 
@@ -15,6 +15,7 @@ Define the smallest believable rules subset for the initial `Portal` micro-unive
 - Basic creature combat
 - Lethal damage and creature death as minimal state-based handling
 - Sorcery-speed targeted destruction limited to `Destroy target tapped creature.` and `Destroy target creature. Its owner gains 4 life.`
+- Sorcery-speed card draw limited to `Draw two cards.`
 - Deterministic setup inputs and replay traces for the above behaviors
 
 ## Engine-Facing Interpretation
@@ -26,6 +27,7 @@ Define the smallest believable rules subset for the initial `Portal` micro-unive
 - The first noncreature spell path may stay sorcery-speed only and may validate targets only against battlefield creatures in the declared micro-universe.
 - `Vengeance` may reuse the existing tapped-state model from combat and mana activation rather than introducing a broader effect framework.
 - `Path of Peace` may reuse the same targeted-destruction path while adding only owner life gain, without introducing damage prevention, regeneration, or broader effect layering.
+- `Touch of Brilliance` may reuse existing library-to-hand zone movement from turn draws while resolving as a no-target sorcery for exactly two cards.
 
 ## Out Of Scope
 

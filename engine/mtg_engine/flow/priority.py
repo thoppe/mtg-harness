@@ -83,7 +83,17 @@ def _enumerate_active_precombat_main_actions(
         requirements = _parse_mana_cost(card_definition.mana_cost)
         if not _can_pay_mana_cost(player.mana_pool, requirements):
             continue
-        for target_instance_id in _legal_noncreature_spell_targets(state, card_repository, instance_id):
+        legal_targets = _legal_noncreature_spell_targets(state, card_repository, instance_id)
+        if legal_targets == (None,):
+            actions.append(
+                CastNonCreatureSpellAction(
+                    player_id=state.turn.active_player,
+                    card_instance_id=instance_id,
+                    target_instance_id=None,
+                )
+            )
+            continue
+        for target_instance_id in legal_targets:
             actions.append(
                 CastNonCreatureSpellAction(
                     player_id=state.turn.active_player,
@@ -200,6 +210,8 @@ def _legal_noncreature_spell_targets(
     spell = state.objects[spell_instance_id]
     card_definition = card_repository.get(spell.oracle_id)
     effect = _supported_targeted_sorcery_effect(card_definition)
+    if effect == "draw_two_cards":
+        return (None,)
     if effect is None:
         return ()
 
@@ -227,6 +239,8 @@ def _supported_targeted_sorcery_effect(card_definition) -> str | None:
         return "destroy_tapped_creature"
     if card_definition.oracle_text == "Destroy target creature. Its owner gains 4 life.":
         return "destroy_creature_owner_gains_4_life"
+    if card_definition.oracle_text == "Draw two cards.":
+        return "draw_two_cards"
     return None
 
 

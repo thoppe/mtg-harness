@@ -57,6 +57,7 @@ Current verified official entry points as of April 12, 2026:
   - `Muck Rats`
   - `Vengeance`
   - `Path of Peace`
+  - `Touch of Brilliance`
   - `Swamp`
   - `Forest`
   - `Island`

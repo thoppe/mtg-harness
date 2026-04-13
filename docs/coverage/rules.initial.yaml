@@ -9,7 +9,7 @@ rules:
     source_rules:
       - "103"
     status: implemented
-    scope: Minimal two-player game setup for the declared `Portal` micro-universe.
+    scope: Minimal two-player game setup for the declared active `Portal` support slice.
     engine_contracts:
       - docs/contracts/game-state.md
       - docs/contracts/play-engine.md
@@ -44,13 +44,13 @@ rules:
       - engine/tests/test_priority.py
       - engine/tests/test_turns.py
       - engine/tests/test_spells.py
-    notes: "Current support is intentionally narrow: play land, activate a declared basic land, cast a vanilla creature spell, cast the supported `Vengeance` or `Path of Peace` sorcery, advance to combat, or pass priority."
+    notes: "Current support is intentionally narrow: play land, activate a declared basic land, cast a vanilla creature spell, cast the supported `Vengeance`, `Path of Peace`, or `Touch of Brilliance` sorcery, advance to combat, or pass priority."
   - rule_key: combat_action_windows_minimal
     source_rules:
       - "508"
       - "509"
     status: implemented
-    scope: Explicit action enumeration for attacker declaration and blocker declaration in the declared micro-universe.
+    scope: Explicit action enumeration for attacker declaration and blocker declaration in the declared support slice.
     engine_contracts:
       - docs/contracts/play-engine.md
       - docs/contracts/state-machine-transitions.md
@@ -63,7 +63,7 @@ rules:
     source_rules:
       - "305"
     status: implemented
-    scope: Playing the five Portal basic lands in the declared micro-universe.
+    scope: Playing the five Portal basic lands in the declared support slice.
     engine_contracts:
       - docs/contracts/play-engine.md
       - docs/contracts/state-machine-transitions.md
@@ -88,7 +88,7 @@ rules:
       - "601"
       - "608"
     status: implemented
-    scope: Casting and resolving vanilla creature spells from the declared micro-universe, currently proven for Border Guard, Foot Soldiers, and Muck Rats.
+    scope: Casting and resolving vanilla creature spells from the declared support slice, currently proven for Border Guard, Foot Soldiers, and Muck Rats.
     engine_contracts:
       - docs/contracts/play-engine.md
       - docs/contracts/replay-event-log.md
@@ -112,6 +112,21 @@ rules:
       - engine/tests/test_spells.py
       - engine/tests/test_replay_log.py
     notes: "Current support is intentionally narrow and name-scoped to `Vengeance` and `Path of Peace`, without claiming broader damage, prevention, or effect-layer support."
+  - rule_key: simple_card_draw_sorceries_minimal
+    source_rules:
+      - "601"
+      - "608"
+    status: implemented
+    scope: Casting and resolving the supported `Portal` sorcery `Touch of Brilliance`, drawing exactly two cards for the caster, and moving the spell from stack to graveyard.
+    engine_contracts:
+      - docs/contracts/play-engine.md
+      - docs/contracts/state-machine-transitions.md
+      - docs/contracts/replay-event-log.md
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+      - engine/tests/test_turns.py
+    notes: "Current support is intentionally narrow and name-scoped to `Touch of Brilliance` with oracle text `Draw two cards.`"
   - rule_key: combat_minimal
     source_rules:
       - "506"
@@ -157,7 +172,7 @@ rules:
   - rule_key: keyword_abilities
     source_rules: []
     status: deferred
-    scope: No keyword ability support in the initial micro-universe.
+    scope: No keyword ability support in the initial support slice.
     engine_contracts:
       - docs/contracts/play-engine.md
     tests: []
