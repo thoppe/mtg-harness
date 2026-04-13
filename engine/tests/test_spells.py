@@ -45,6 +45,7 @@ PATH_OF_PEACE = "b7593cf8-4dcb-473b-a2ef-180fffe66738"
 ISLAND = "b2c6aa39-2d2a-459c-a555-fb48ba993373"
 TOUCH_OF_BRILLIANCE = "6365aba1-78d3-416c-89cd-9449578eedbf"
 TIME_EBB = "30cc8f7b-3c28-40f5-8f8f-157e8212280b"
+ARMORED_PEGASUS = "f097a059-5505-4c3c-b879-7853ab6972ed"
 
 
 class SpellTests(unittest.TestCase):
@@ -111,6 +112,19 @@ class SpellTests(unittest.TestCase):
         self.assertEqual(result.state.players["alice"].mana_pool, ())
         self.assertEqual(result.state.objects["alice:2"].zone, "battlefield")
         self.assertEqual(result.state.objects["alice:2"].oracle_id, MUCK_RATS)
+
+    def test_cast_armored_pegasus_with_two_plains(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_armored_pegasus_session(repository)
+
+        result = _cast_creature_from_normal_turns(session, repository, "alice", "alice:3")
+
+        self.assertEqual(result.state.players["alice"].battlefield, ("alice:1", "alice:2", "alice:3"))
+        self.assertEqual(result.state.players["alice"].hand, ())
+        self.assertEqual(result.state.players["alice"].mana_pool, ())
+        self.assertEqual(result.state.objects["alice:3"].zone, "battlefield")
+        self.assertEqual(result.state.objects["alice:3"].oracle_id, ARMORED_PEGASUS)
+        self.assertTrue(repository.get(ARMORED_PEGASUS).has_flying)
 
     def test_cast_vengeance_destroys_tapped_creature_and_moves_spell_to_graveyard(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
@@ -327,6 +341,24 @@ def _build_muck_rats_session(repository: CardRepository):
             "bob": (PLAINS,),
         },
         rng_seed=23,
+    )
+    return start_first_turn(initialize_game(setup, repository))
+
+
+def _build_armored_pegasus_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="spell-cast-armored-pegasus",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (PLAINS, PLAINS, ARMORED_PEGASUS),
+            "bob": (PLAINS,),
+        },
+        opening_hands={
+            "alice": (PLAINS, PLAINS, ARMORED_PEGASUS),
+            "bob": (PLAINS,),
+        },
+        rng_seed=27,
     )
     return start_first_turn(initialize_game(setup, repository))
 

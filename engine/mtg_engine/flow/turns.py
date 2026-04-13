@@ -21,7 +21,7 @@ from mtg_engine.state.models import GameState, TurnState
 from mtg_engine.state.zones import move_object, move_object_to_top_of_library, update_object, update_player
 from mtg_engine.rules.combat import apply_combat_damage, tap_attackers, with_combat_state
 
-from .priority import enumerate_legal_actions
+from .priority import can_block_attacker, enumerate_legal_actions
 from .setup import GameBootstrap
 
 FIRST_TURN_STEP_SEQUENCE = (
@@ -595,6 +595,13 @@ def declare_blockers(
                 raise ValueError("only creatures can block")
             if blocker.tapped:
                 raise ValueError("tapped creature cannot block")
+            if not can_block_attacker(
+                state=state,
+                card_repository=card_repository,
+                blocker_id=blocker_id,
+                attacker_id=attacker_id,
+            ):
+                raise ValueError("blocker cannot block the selected attacker")
             assigned_blockers.add(blocker_id)
 
     next_state = with_combat_state(

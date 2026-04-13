@@ -13,10 +13,11 @@ from mtg_engine.flow.setup import SetupInput, initialize_game
 
 INFORMATION_DIR = Path(__file__).resolve().parents[2] / "information"
 REPO_ROOT = Path(__file__).resolve().parents[2]
+ARMORED_PEGASUS = "f097a059-5505-4c3c-b879-7853ab6972ed"
 
 
 class SetupTests(unittest.TestCase):
-    def test_repository_loads_declared_micro_universe(self) -> None:
+    def test_repository_loads_active_support_slice(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         support_slice = load_active_support_slice(REPO_ROOT)
 
@@ -28,6 +29,7 @@ class SetupTests(unittest.TestCase):
             "b7593cf8-4dcb-473b-a2ef-180fffe66738",
             "6365aba1-78d3-416c-89cd-9449578eedbf",
             "30cc8f7b-3c28-40f5-8f8f-157e8212280b",
+            "f097a059-5505-4c3c-b879-7853ab6972ed",
             "a768ba13-4d1c-4dce-a4a6-86a39c069c3f",
             "a3fb7228-e76b-4e96-a40e-20b5fed75685",
             "b2c6aa39-2d2a-459c-a555-fb48ba993373",
@@ -38,6 +40,7 @@ class SetupTests(unittest.TestCase):
         })
         self.assertEqual(repository.get("bc71ebf6-2056-41f7-be35-b2e5c34afa99").name, "Plains")
         self.assertEqual(repository.get("bca13a12-6723-4a5e-8f1b-21646a8b3e7e").name, "Muck Rats")
+        self.assertTrue(repository.get(ARMORED_PEGASUS).has_flying)
 
     def test_active_support_slice_manifest_is_unique_and_loadable(self) -> None:
         support_slice = load_active_support_slice(REPO_ROOT)
@@ -46,7 +49,9 @@ class SetupTests(unittest.TestCase):
         self.assertEqual(support_slice.status, "active")
         self.assertEqual(support_slice.set_code, "por")
         self.assertIn("targeted_sorcery_spells_minimal", support_slice.rule_keys)
+        self.assertIn("flying_keyword_minimal", support_slice.rule_keys)
         self.assertIn("b7593cf8-4dcb-473b-a2ef-180fffe66738", support_slice.card_keys)
+        self.assertIn(ARMORED_PEGASUS, support_slice.card_keys)
 
     def test_initialize_game_builds_reproducible_opening_state(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
@@ -78,7 +83,7 @@ class SetupTests(unittest.TestCase):
         self.assertEqual(bootstrap.state.players["bob"].library, ())
         self.assertEqual(bootstrap.state.objects["alice:2"].oracle_id, "1ef5003c-f540-4cdc-913f-7d5280ad9f62")
 
-    def test_initialize_game_rejects_cards_outside_micro_universe(self) -> None:
+    def test_initialize_game_rejects_cards_outside_active_support_slice(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         setup = SetupInput(
             game_id="game-002",

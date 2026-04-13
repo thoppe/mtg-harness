@@ -14,6 +14,7 @@ class CardDefinition:
     toughness: str | None
     set_code: str
     produced_mana: tuple[str, ...] = ()
+    keywords: tuple[str, ...] = ()
 
     @property
     def is_land(self) -> bool:
@@ -26,3 +27,10 @@ class CardDefinition:
     @property
     def is_sorcery(self) -> bool:
         return "Sorcery" in self.type_line
+
+    def has_keyword(self, keyword: str) -> bool:
+        return keyword in self.keywords
+
+    @property
+    def has_flying(self) -> bool:
+        return self.has_keyword("Flying")

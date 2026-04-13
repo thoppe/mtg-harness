@@ -34,6 +34,7 @@ class CardRepository:
                 toughness=source.get("toughness"),
                 set_code=source["set"],
                 produced_mana=tuple(source.get("produced_mana", ())),
+                keywords=tuple(source.get("keywords", ())),
             )
 
         return cls(

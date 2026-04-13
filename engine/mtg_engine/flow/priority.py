@@ -159,7 +159,12 @@ def _enumerate_declare_blockers_actions(
         if blocker_card.is_creature and not blocker.tapped:
             available_blockers.append(instance_id)
 
-    assignments = _blocker_assignments(tuple(state.combat.attackers), tuple(available_blockers))
+    assignments = _blocker_assignments(
+        tuple(state.combat.attackers),
+        tuple(available_blockers),
+        state=state,
+        card_repository=card_repository,
+    )
     return tuple(
         DeclareBlockersAction(
             player_id=state.combat.defending_player,
@@ -179,6 +184,9 @@ def _ordered_subsets(values: tuple[str, ...]) -> tuple[tuple[str, ...], ...]:
 def _blocker_assignments(
     attackers: tuple[str, ...],
     blockers: tuple[str, ...],
+    *,
+    state: GameState,
+    card_repository: CardRepository,
 ) -> tuple[dict[str, tuple[str, ...]], ...]:
     assignments: list[dict[str, tuple[str, ...]]] = []
 
@@ -190,6 +198,13 @@ def _blocker_assignments(
         blocker_id = blockers[index]
         build(index + 1, current)
         for attacker_id in attackers:
+            if not can_block_attacker(
+                state=state,
+                card_repository=card_repository,
+                blocker_id=blocker_id,
+                attacker_id=attacker_id,
+            ):
+                continue
             build(
                 index + 1,
                 {
@@ -247,6 +262,23 @@ def _supported_targeted_sorcery_effect(card_definition) -> str | None:
     if card_definition.oracle_text == "Put target creature on top of its owner's library.":
         return "put_creature_on_top_of_library"
     return None
+
+
+def can_block_attacker(
+    *,
+    state: GameState,
+    card_repository: CardRepository,
+    blocker_id: str,
+    attacker_id: str,
+) -> bool:
+    blocker = state.objects[blocker_id]
+    attacker = state.objects[attacker_id]
+    blocker_definition = card_repository.get(blocker.oracle_id)
+    attacker_definition = card_repository.get(attacker.oracle_id)
+
+    if attacker_definition.has_flying and not blocker_definition.has_flying:
+        return False
+    return True
 
 
 def _parse_mana_cost(mana_cost: str) -> dict[str, int]:

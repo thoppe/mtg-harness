@@ -29,6 +29,7 @@ Define the machine-readable inventory of card and set support claimed by the sim
   - `Path of Peace`
   - `Touch of Brilliance`
   - `Time Ebb`
+  - `Armored Pegasus`
   - `Swamp`
   - `Forest`
   - `Island`

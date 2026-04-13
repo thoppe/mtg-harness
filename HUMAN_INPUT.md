@@ -34,6 +34,7 @@ This file captures decisions, constraints, and open questions that are explicitl
   - `Path of Peace`
   - `Touch of Brilliance`
   - `Time Ebb`
+  - `Armored Pegasus`
   - `Swamp`
   - `Forest`
   - `Island`
@@ -42,7 +43,7 @@ This file captures decisions, constraints, and open questions that are explicitl
 - Multiplicity within the initial micro-universe follows normal game rules and scenario setup needs
 - Initial play mode is two-player normal play structure only
 - For this initial slice, oracle text is the only gameplay text authority; flavor text is never used for implementation
-- No keyword ability support is required in the initial micro-universe
+- Only the minimal `Flying` support required by `Armored Pegasus` is in scope for the current support slice; broader keyword support remains deferred
 - Default persisted card image asset type: JPG
 - Deterministic simulation and replayability are first-class requirements in v0, especially for tests
 - The first engine architecture pattern is a deterministic state machine with an append-only event log

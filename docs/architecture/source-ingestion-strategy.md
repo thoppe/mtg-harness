@@ -59,6 +59,7 @@ Current verified official entry points as of April 12, 2026:
   - `Path of Peace`
   - `Touch of Brilliance`
   - `Time Ebb`
+  - `Armored Pegasus`
   - `Swamp`
   - `Forest`
   - `Island`

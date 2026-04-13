@@ -34,6 +34,7 @@ Current declared slice contents:
 - `Path of Peace`
 - `Touch of Brilliance`
 - `Time Ebb`
+- `Armored Pegasus`
 - `Swamp`
 - `Forest`
 - `Island`

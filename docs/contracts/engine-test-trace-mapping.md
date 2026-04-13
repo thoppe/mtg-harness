@@ -110,6 +110,18 @@ Define how the current rule-family coverage should map to future engine tests an
   - `spell_resolved`
   - `object_moved_between_zones`
 
+### `flying_keyword_minimal`
+
+- Planned tests:
+  - `engine/tests/test_combat.py`
+  - `engine/tests/test_priority.py`
+  - `engine/tests/test_spells.py`
+- Planned trace assertions:
+  - `spell_cast`
+  - `spell_resolved`
+  - `attackers_declared`
+  - `blockers_declared`
+
 ### `combat_minimal`
 
 - Planned tests:
@@ -148,4 +160,5 @@ Define how the current rule-family coverage should map to future engine tests an
   - `targeted_sorcery_spells_minimal` now has engine coverage for `Vengeance` and `Path of Peace`.
   - `simple_card_draw_sorceries_minimal` now has engine coverage for `Touch of Brilliance`.
   - `targeted_battlefield_to_library_sorceries_minimal` now has engine coverage for `Time Ebb`.
+  - `flying_keyword_minimal` now has engine coverage for `Armored Pegasus`.
   - The current slice now has a real lethal-damage proof via `Border Guard` versus `Muck Rats`, so the earlier synthetic SBA shortcut is no longer needed.

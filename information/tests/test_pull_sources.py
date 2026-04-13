@@ -34,6 +34,7 @@ class PullSourcesTests(unittest.TestCase):
         self.assertEqual(targets[0].oracle_id, "1ef5003c-f540-4cdc-913f-7d5280ad9f62")
         self.assertEqual(targets[-1].oracle_id, "bc71ebf6-2056-41f7-be35-b2e5c34afa99")
         self.assertIn("b7593cf8-4dcb-473b-a2ef-180fffe66738", [target.oracle_id for target in targets])
+        self.assertIn("f097a059-5505-4c3c-b879-7853ab6972ed", [target.oracle_id for target in targets])
 
     def test_pull_cards_writes_canonical_paths_and_provenance(self) -> None:
         cards = [
@@ -84,6 +85,12 @@ class PullSourcesTests(unittest.TestCase):
                 oracle_id="30cc8f7b-3c28-40f5-8f8f-157e8212280b",
                 card_id="e5fd26ca-dc7d-453d-8653-7f967e8f6dc7",
                 collector_number="75",
+            ),
+            sample_card(
+                name="Armored Pegasus",
+                oracle_id="f097a059-5505-4c3c-b879-7853ab6972ed",
+                card_id="a81b61af-cdb7-468f-9ff0-db82aa084023",
+                collector_number="6",
             ),
             sample_card(
                 name="Swamp",
@@ -196,6 +203,12 @@ class PullSourcesTests(unittest.TestCase):
                 oracle_id="30cc8f7b-3c28-40f5-8f8f-157e8212280b",
                 card_id="e5fd26ca-dc7d-453d-8653-7f967e8f6dc7",
                 collector_number="75",
+            ),
+            sample_card(
+                name="Armored Pegasus",
+                oracle_id="f097a059-5505-4c3c-b879-7853ab6972ed",
+                card_id="a81b61af-cdb7-468f-9ff0-db82aa084023",
+                collector_number="6",
             ),
             sample_card(
                 name="Swamp",

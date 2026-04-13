@@ -37,6 +37,7 @@ PLAINS = "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
 BORDER_GUARD = "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
 FOOT_SOLDIERS = "a768ba13-4d1c-4dce-a4a6-86a39c069c3f"
 MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
+ARMORED_PEGASUS = "f097a059-5505-4c3c-b879-7853ab6972ed"
 
 
 class CombatTests(unittest.TestCase):
@@ -146,6 +147,35 @@ class CombatTests(unittest.TestCase):
         self.assertEqual(result.event_log[-3].event_type, "permanent_destroyed")
         self.assertEqual(result.event_log[-2].event_type, "object_moved_between_zones")
 
+    def test_armored_pegasus_cannot_be_blocked_by_nonflying_creature(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _state_with_armored_pegasus_ready(repository)
+
+        session = advance_to_begin_combat(session)
+        session = declare_attackers(
+            session,
+            DeclareAttackersAction(player_id="alice", attacker_ids=("alice:3",)),
+            repository,
+        )
+
+        with self.assertRaises(ValueError):
+            declare_blockers(
+                session,
+                DeclareBlockersAction(player_id="bob", blockers={"alice:3": ("bob:2",)}),
+                repository,
+            )
+
+        session = declare_blockers(
+            session,
+            DeclareBlockersAction(player_id="bob", blockers={}),
+            repository,
+        )
+        result = resolve_combat_damage(session, repository)
+
+        self.assertEqual(result.state.players["bob"].life_total, 19)
+        self.assertEqual(result.state.objects["alice:3"].zone, "battlefield")
+        self.assertEqual(result.state.objects["bob:2"].zone, "battlefield")
+
 
 def _state_with_creatures_ready_to_fight(repository: CardRepository, *, include_blocker: bool):
     setup = SetupInput(
@@ -211,6 +241,28 @@ def _state_with_muck_rats_blocker_ready(repository: CardRepository):
     )
     session = start_first_turn(initialize_game(setup, repository))
     session = _develop_creature_through_normal_turns(session, repository, "alice", "alice:4")
+    session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "bob")
+    session = _develop_creature_through_normal_turns(session, repository, "bob", "bob:2")
+    return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
+
+
+def _state_with_armored_pegasus_ready(repository: CardRepository):
+    setup = SetupInput(
+        game_id="combat-armored-pegasus",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (PLAINS, PLAINS, ARMORED_PEGASUS),
+            "bob": (SWAMP, MUCK_RATS),
+        },
+        opening_hands={
+            "alice": (PLAINS, PLAINS, ARMORED_PEGASUS),
+            "bob": (SWAMP, MUCK_RATS),
+        },
+        rng_seed=47,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    session = _develop_creature_through_normal_turns(session, repository, "alice", "alice:3")
     session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "bob")
     session = _develop_creature_through_normal_turns(session, repository, "bob", "bob:2")
     return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")

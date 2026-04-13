@@ -47,6 +47,7 @@ VENGEANCE = "1d001145-5d14-43a9-bf3b-3ce5c20b2a46"
 PATH_OF_PEACE = "b7593cf8-4dcb-473b-a2ef-180fffe66738"
 TOUCH_OF_BRILLIANCE = "6365aba1-78d3-416c-89cd-9449578eedbf"
 TIME_EBB = "30cc8f7b-3c28-40f5-8f8f-157e8212280b"
+ARMORED_PEGASUS = "f097a059-5505-4c3c-b879-7853ab6972ed"
 
 
 class PriorityTests(unittest.TestCase):
@@ -184,6 +185,23 @@ class PriorityTests(unittest.TestCase):
                 target_instance_id="bob:1",
             ),
             actions,
+        )
+
+    def test_declare_blockers_window_excludes_nonflying_blockers_against_armored_pegasus(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_flying_block_ready_session(repository)
+        session = advance_to_begin_combat(session)
+        session = declare_attackers(
+            session,
+            DeclareAttackersAction(player_id="alice", attacker_ids=("alice:3",)),
+            repository,
+        )
+
+        actions = enumerate_legal_actions(session.state, repository)
+
+        self.assertEqual(
+            actions,
+            (DeclareBlockersAction(player_id="bob", blockers={}),),
         )
 
 
@@ -422,6 +440,28 @@ def _build_time_ebb_ready_session(repository: CardRepository):
             repository,
         )
     return session
+
+
+def _build_flying_block_ready_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="priority-flying-blockers",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (PLAINS, PLAINS, ARMORED_PEGASUS),
+            "bob": (SWAMP, MUCK_RATS),
+        },
+        opening_hands={
+            "alice": (PLAINS, PLAINS, ARMORED_PEGASUS),
+            "bob": (SWAMP, MUCK_RATS),
+        },
+        rng_seed=51,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    session = _cast_creature_from_normal_turns(session, repository, "alice", "alice:3")
+    session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "bob")
+    session = _cast_creature_from_normal_turns(session, repository, "bob", "bob:2")
+    return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
 
 
 def _cast_creature_from_normal_turns(session, repository: CardRepository, player_id: str, creature_id: str):
