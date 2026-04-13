@@ -36,8 +36,15 @@ Describe the responsibilities of the simulation core.
   - `Border Guard`
   - `Foot Soldiers`
   - `Muck Rats`
+  - `Wind Drake`
+  - `Bog Imp`
+  - `Storm Crow`
+  - `Armored Pegasus`
+  - `Wall of Granite`
   - `Vengeance`
   - `Path of Peace`
+  - `Touch of Brilliance`
+  - `Time Ebb`
   - `Swamp`
   - `Forest`
   - `Island`

@@ -17,6 +17,7 @@ ARMORED_PEGASUS = "f097a059-5505-4c3c-b879-7853ab6972ed"
 WIND_DRAKE = "d6ffdaf0-ac08-4de9-bbce-2eab2f86bcca"
 BOG_IMP = "45b94e3c-a905-435b-aee5-bec9239fd24c"
 STORM_CROW = "000d5588-5a4c-434e-988d-396632ade42c"
+WALL_OF_GRANITE = "8445094f-008b-491a-977c-e8582d5ab72c"
 
 
 class SetupTests(unittest.TestCase):
@@ -33,6 +34,7 @@ class SetupTests(unittest.TestCase):
             "6365aba1-78d3-416c-89cd-9449578eedbf",
             "30cc8f7b-3c28-40f5-8f8f-157e8212280b",
             "f097a059-5505-4c3c-b879-7853ab6972ed",
+            "8445094f-008b-491a-977c-e8582d5ab72c",
             "d6ffdaf0-ac08-4de9-bbce-2eab2f86bcca",
             "45b94e3c-a905-435b-aee5-bec9239fd24c",
             "000d5588-5a4c-434e-988d-396632ade42c",
@@ -50,6 +52,7 @@ class SetupTests(unittest.TestCase):
         self.assertTrue(repository.get(WIND_DRAKE).has_flying)
         self.assertTrue(repository.get(BOG_IMP).has_flying)
         self.assertTrue(repository.get(STORM_CROW).has_flying)
+        self.assertTrue(repository.get(WALL_OF_GRANITE).has_defender)
 
     def test_active_support_slice_manifest_is_unique_and_loadable(self) -> None:
         support_slice = load_active_support_slice(REPO_ROOT)
@@ -59,11 +62,13 @@ class SetupTests(unittest.TestCase):
         self.assertEqual(support_slice.set_code, "por")
         self.assertIn("targeted_sorcery_spells_minimal", support_slice.rule_keys)
         self.assertIn("flying_keyword_minimal", support_slice.rule_keys)
+        self.assertIn("defender_keyword_minimal", support_slice.rule_keys)
         self.assertIn("b7593cf8-4dcb-473b-a2ef-180fffe66738", support_slice.card_keys)
         self.assertIn(ARMORED_PEGASUS, support_slice.card_keys)
         self.assertIn(WIND_DRAKE, support_slice.card_keys)
         self.assertIn(BOG_IMP, support_slice.card_keys)
         self.assertIn(STORM_CROW, support_slice.card_keys)
+        self.assertIn(WALL_OF_GRANITE, support_slice.card_keys)
 
     def test_initialize_game_builds_reproducible_opening_state(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)

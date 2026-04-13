@@ -34,3 +34,7 @@ class CardDefinition:
     @property
     def has_flying(self) -> bool:
         return self.has_keyword("Flying")
+
+    @property
+    def has_defender(self) -> bool:
+        return self.has_keyword("Defender")

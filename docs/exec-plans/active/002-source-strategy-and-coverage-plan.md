@@ -46,7 +46,7 @@ The simulator should only claim support based on layer 3, never merely because l
 - Coverage manifests remain YAML as the canonical support declaration for the current micro-universe.
 - Narrative companion markdown should be added only when the supported rule surface grows beyond the current small slice.
 - Engine implementation now covers deterministic setup, turn progression through cleanup and next-turn handoff, precombat-main legal-action enumeration, combat declaration action windows, priority passing across the currently supported forced-pass branch, land play, five-basic-land mana production, creature spell casting, and minimal combat with multi-block support.
-- The first targeted-sorcery increment is now in place via `Vengeance`, the next destruction expansion was `Path of Peace`, the next narrow sorcery expansion was `Touch of Brilliance`, `Time Ebb` now covers targeted battlefield-to-library-top movement, `Armored Pegasus` established the first minimal flying-keyword card, and the current next step is widening that same strict-flying slice with `Wind Drake`, `Bog Imp`, and `Storm Crow`.
+- The first targeted-sorcery increment is now in place via `Vengeance`, the next destruction expansion was `Path of Peace`, the next narrow sorcery expansion was `Touch of Brilliance`, `Time Ebb` now covers targeted battlefield-to-library-top movement, `Armored Pegasus` established the first minimal flying-keyword card, and `Wall of Granite` now establishes the first strict `Defender` card.
 - The fixed micro-universe model is now showing strain; the next structural improvement should be a manifest-driven support-slice model rather than continued growth of hardcoded scope lists.
 
 ## Workstreams
@@ -79,6 +79,11 @@ The simulator should only claim support based on layer 3, never merely because l
 - Define how those simplifications are recorded so the repo stays honest.
 
 ## Proposed Raw-To-Implemented Pipeline
+
+## Deferred Next Candidate
+
+- After `Wall of Granite`, the next candidate should return to the smallest nonkeyword `Portal` expansion rather than widening further keyword support.
+- Favor direct-damage or similarly narrow sorcery patterns before adding broader static-ability, replacement-effect, or triggered-ability families.
 
 For rules:
 

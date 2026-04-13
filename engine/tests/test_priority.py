@@ -40,6 +40,7 @@ INFORMATION_DIR = Path(__file__).resolve().parents[2] / "information"
 SWAMP = "56719f6a-1a6c-4c0a-8d21-18f7d7350b68"
 ISLAND = "b2c6aa39-2d2a-459c-a555-fb48ba993373"
 PLAINS = "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
+MOUNTAIN = "a3fb7228-e76b-4e96-a40e-20b5fed75685"
 BORDER_GUARD = "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
 FOOT_SOLDIERS = "a768ba13-4d1c-4dce-a4a6-86a39c069c3f"
 MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
@@ -48,6 +49,7 @@ PATH_OF_PEACE = "b7593cf8-4dcb-473b-a2ef-180fffe66738"
 TOUCH_OF_BRILLIANCE = "6365aba1-78d3-416c-89cd-9449578eedbf"
 TIME_EBB = "30cc8f7b-3c28-40f5-8f8f-157e8212280b"
 ARMORED_PEGASUS = "f097a059-5505-4c3c-b879-7853ab6972ed"
+WALL_OF_GRANITE = "8445094f-008b-491a-977c-e8582d5ab72c"
 
 
 class PriorityTests(unittest.TestCase):
@@ -202,6 +204,18 @@ class PriorityTests(unittest.TestCase):
         self.assertEqual(
             actions,
             (DeclareBlockersAction(player_id="bob", blockers={}),),
+        )
+
+    def test_declare_attackers_window_excludes_wall_of_granite_from_attack_subsets(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_defender_attack_ready_session(repository)
+        session = advance_to_begin_combat(session)
+
+        actions = enumerate_legal_actions(session.state, repository)
+
+        self.assertEqual(
+            actions,
+            (DeclareAttackersAction(player_id="alice", attacker_ids=()),),
         )
 
 
@@ -461,6 +475,26 @@ def _build_flying_block_ready_session(repository: CardRepository):
     session = _cast_creature_from_normal_turns(session, repository, "alice", "alice:3")
     session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "bob")
     session = _cast_creature_from_normal_turns(session, repository, "bob", "bob:2")
+    return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
+
+
+def _build_defender_attack_ready_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="priority-defender-attackers",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (MOUNTAIN, MOUNTAIN, PLAINS, WALL_OF_GRANITE),
+            "bob": (PLAINS,),
+        },
+        opening_hands={
+            "alice": (MOUNTAIN, MOUNTAIN, PLAINS, WALL_OF_GRANITE),
+            "bob": (PLAINS,),
+        },
+        rng_seed=53,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    session = _cast_creature_from_normal_turns(session, repository, "alice", "alice:4")
     return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
 
 

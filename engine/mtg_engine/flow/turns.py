@@ -524,6 +524,8 @@ def declare_attackers(
         attacker_card = card_repository.get(attacker.oracle_id)
         if not attacker_card.is_creature:
             raise ValueError("only creatures can attack")
+        if attacker_card.has_defender:
+            raise ValueError("creature with defender cannot attack")
         if attacker.tapped:
             raise ValueError("attacker is already tapped")
         if attacker.entered_battlefield_turn == state.turn.turn_number:

@@ -35,11 +35,13 @@ INFORMATION_DIR = Path(__file__).resolve().parents[2] / "information"
 SWAMP = "56719f6a-1a6c-4c0a-8d21-18f7d7350b68"
 PLAINS = "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
 ISLAND = "b2c6aa39-2d2a-459c-a555-fb48ba993373"
+MOUNTAIN = "a3fb7228-e76b-4e96-a40e-20b5fed75685"
 BORDER_GUARD = "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
 FOOT_SOLDIERS = "a768ba13-4d1c-4dce-a4a6-86a39c069c3f"
 MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
 ARMORED_PEGASUS = "f097a059-5505-4c3c-b879-7853ab6972ed"
 WIND_DRAKE = "d6ffdaf0-ac08-4de9-bbce-2eab2f86bcca"
+WALL_OF_GRANITE = "8445094f-008b-491a-977c-e8582d5ab72c"
 
 
 class CombatTests(unittest.TestCase):
@@ -207,6 +209,50 @@ class CombatTests(unittest.TestCase):
         self.assertEqual(result.state.objects["alice:4"].zone, "battlefield")
         self.assertEqual(result.state.objects["bob:2"].zone, "battlefield")
 
+    def test_wall_of_granite_cannot_attack(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _state_with_wall_of_granite_ready(repository)
+
+        session = advance_to_begin_combat(session)
+
+        with self.assertRaises(ValueError):
+            declare_attackers(
+                session,
+                DeclareAttackersAction(player_id="alice", attacker_ids=("alice:4",)),
+                repository,
+            )
+
+    def test_wall_of_granite_can_block_and_survive_combat(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _state_with_wall_of_granite_block_ready(repository)
+
+        session = advance_to_begin_combat(session)
+        session = declare_attackers(
+            session,
+            DeclareAttackersAction(player_id="alice", attacker_ids=("alice:4",)),
+            repository,
+        )
+        session = declare_blockers(
+            session,
+            DeclareBlockersAction(player_id="bob", blockers={"alice:4": ("bob:4",)}),
+            repository,
+        )
+        result = resolve_combat_damage(session, repository)
+
+        self.assertEqual(result.state.players["bob"].life_total, 20)
+        self.assertEqual(result.state.objects["alice:4"].zone, "battlefield")
+        self.assertEqual(result.state.objects["bob:4"].zone, "battlefield")
+        self.assertEqual(result.state.objects["bob:4"].damage_marked, 1)
+        self.assertEqual(
+            [event.event_type for event in result.event_log[-4:]],
+            [
+                "combat_damage_assigned",
+                "combat_damage_applied",
+                "state_based_actions_checked",
+                "step_changed",
+            ],
+        )
+
 
 def _state_with_creatures_ready_to_fight(repository: CardRepository, *, include_blocker: bool):
     setup = SetupInput(
@@ -318,6 +364,48 @@ def _state_with_wind_drake_ready(repository: CardRepository):
     session = _develop_creature_through_normal_turns(session, repository, "alice", "alice:4")
     session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "bob")
     session = _develop_creature_through_normal_turns(session, repository, "bob", "bob:2")
+    return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
+
+
+def _state_with_wall_of_granite_ready(repository: CardRepository):
+    setup = SetupInput(
+        game_id="combat-wall-of-granite-attack",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (MOUNTAIN, MOUNTAIN, PLAINS, WALL_OF_GRANITE),
+            "bob": (PLAINS,),
+        },
+        opening_hands={
+            "alice": (MOUNTAIN, MOUNTAIN, PLAINS, WALL_OF_GRANITE),
+            "bob": (PLAINS,),
+        },
+        rng_seed=49,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    session = _develop_creature_through_normal_turns(session, repository, "alice", "alice:4")
+    return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
+
+
+def _state_with_wall_of_granite_block_ready(repository: CardRepository):
+    setup = SetupInput(
+        game_id="combat-wall-of-granite-block",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (PLAINS, PLAINS, PLAINS, BORDER_GUARD),
+            "bob": (MOUNTAIN, MOUNTAIN, PLAINS, WALL_OF_GRANITE),
+        },
+        opening_hands={
+            "alice": (PLAINS, PLAINS, PLAINS, BORDER_GUARD),
+            "bob": (MOUNTAIN, MOUNTAIN, PLAINS, WALL_OF_GRANITE),
+        },
+        rng_seed=50,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    session = _develop_creature_through_normal_turns(session, repository, "alice", "alice:4")
+    session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "bob")
+    session = _develop_creature_through_normal_turns(session, repository, "bob", "bob:4")
     return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
 
 

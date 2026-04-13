@@ -37,6 +37,7 @@ from mtg_engine.state.zones import move_object, update_object
 INFORMATION_DIR = Path(__file__).resolve().parents[2] / "information"
 PLAINS = "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
 SWAMP = "56719f6a-1a6c-4c0a-8d21-18f7d7350b68"
+MOUNTAIN = "a3fb7228-e76b-4e96-a40e-20b5fed75685"
 BORDER_GUARD = "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
 FOOT_SOLDIERS = "a768ba13-4d1c-4dce-a4a6-86a39c069c3f"
 MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
@@ -49,6 +50,7 @@ ARMORED_PEGASUS = "f097a059-5505-4c3c-b879-7853ab6972ed"
 WIND_DRAKE = "d6ffdaf0-ac08-4de9-bbce-2eab2f86bcca"
 BOG_IMP = "45b94e3c-a905-435b-aee5-bec9239fd24c"
 STORM_CROW = "000d5588-5a4c-434e-988d-396632ade42c"
+WALL_OF_GRANITE = "8445094f-008b-491a-977c-e8582d5ab72c"
 
 
 class SpellTests(unittest.TestCase):
@@ -158,6 +160,16 @@ class SpellTests(unittest.TestCase):
         self.assertEqual(result.state.players["alice"].battlefield, ("alice:1", "alice:2", "alice:3"))
         self.assertEqual(result.state.objects["alice:3"].oracle_id, STORM_CROW)
         self.assertTrue(repository.get(STORM_CROW).has_flying)
+
+    def test_cast_wall_of_granite_with_two_mountains_and_one_generic(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_wall_of_granite_session(repository)
+
+        result = _cast_creature_from_normal_turns(session, repository, "alice", "alice:4")
+
+        self.assertEqual(result.state.players["alice"].battlefield, ("alice:1", "alice:2", "alice:3", "alice:4"))
+        self.assertEqual(result.state.objects["alice:4"].oracle_id, WALL_OF_GRANITE)
+        self.assertTrue(repository.get(WALL_OF_GRANITE).has_defender)
 
     def test_cast_vengeance_destroys_tapped_creature_and_moves_spell_to_graveyard(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
@@ -446,6 +458,24 @@ def _build_storm_crow_session(repository: CardRepository):
             "bob": (PLAINS,),
         },
         rng_seed=30,
+    )
+    return start_first_turn(initialize_game(setup, repository))
+
+
+def _build_wall_of_granite_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="spell-cast-wall-of-granite",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (MOUNTAIN, MOUNTAIN, PLAINS, WALL_OF_GRANITE),
+            "bob": (PLAINS,),
+        },
+        opening_hands={
+            "alice": (MOUNTAIN, MOUNTAIN, PLAINS, WALL_OF_GRANITE),
+            "bob": (PLAINS,),
+        },
+        rng_seed=31,
     )
     return start_first_turn(initialize_game(setup, repository))
 

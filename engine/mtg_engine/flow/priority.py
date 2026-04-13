@@ -129,6 +129,8 @@ def _enumerate_declare_attackers_actions(
         attacker_card = card_repository.get(attacker.oracle_id)
         if not attacker_card.is_creature or attacker.tapped:
             continue
+        if attacker_card.has_defender:
+            continue
         if attacker.entered_battlefield_turn == state.turn.turn_number:
             continue
         legal_attackers.append(instance_id)

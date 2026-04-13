@@ -58,7 +58,22 @@ rules:
     tests:
       - engine/tests/test_priority.py
       - engine/tests/test_combat.py
-    notes: "Current support enumerates legal subsets of attackers and blocker assignments for the available vanilla creatures."
+    notes: "Current support enumerates legal subsets of attackers and blocker assignments for the available creatures, including defender-based attack exclusion for `Wall of Granite`."
+  - rule_key: defender_keyword_minimal
+    source_rules:
+      - "702.3"
+      - "508"
+    status: implemented
+    scope: Only the subset of defender required for `Wall of Granite`, namely that a creature with defender cannot be declared as an attacker in the current support slice.
+    engine_contracts:
+      - docs/contracts/play-engine.md
+      - docs/contracts/state-machine-transitions.md
+      - docs/contracts/replay-event-log.md
+    tests:
+      - engine/tests/test_combat.py
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+    notes: "Current support is intentionally narrow and limited to defender-based attack legality for the supported Portal card `Wall of Granite`."
   - rule_key: land_playing_minimal
     source_rules:
       - "305"
@@ -88,7 +103,7 @@ rules:
       - "601"
       - "608"
     status: implemented
-    scope: Casting and resolving creature spells from the declared support slice, currently proven for Border Guard, Foot Soldiers, Muck Rats, Armored Pegasus, Wind Drake, Bog Imp, and Storm Crow.
+    scope: Casting and resolving creature spells from the declared support slice, currently proven for Border Guard, Foot Soldiers, Muck Rats, Armored Pegasus, Wind Drake, Bog Imp, Storm Crow, and Wall of Granite.
     engine_contracts:
       - docs/contracts/play-engine.md
       - docs/contracts/replay-event-log.md
@@ -203,7 +218,7 @@ rules:
   - rule_key: keyword_abilities
     source_rules: []
     status: deferred
-    scope: Keyword abilities beyond the minimal flying support required by `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow` remain unsupported in the initial support slice.
+    scope: Keyword abilities beyond the minimal flying support required by `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow` and the minimal defender support required by `Wall of Granite` remain unsupported in the initial support slice.
     engine_contracts:
       - docs/contracts/play-engine.md
     tests: []
