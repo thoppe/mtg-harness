@@ -57,6 +57,7 @@ Define the minimum append-only event types required for deterministic replay and
 - The currently implemented event log covers setup, first-turn step progression, drawing, explicit action windows for precombat main and combat declarations, precombat priority passing through the currently supported forced-pass branch, land play, five-basic-land mana production, simple creature spell resolution, narrow targeted sorcery resolution for `Vengeance`, `Path of Peace`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, and `Symbol of Unsummoning`, and minimal combat and spell damage/state-based destruction.
 - The current SBA path emits `state_based_actions_checked` even when no permanents are destroyed.
 - The current turn-flow implementation also emits `turn_ended` after cleanup.
+- The current noncreature-spell implementation may emit repeated `permanent_destroyed` and `object_moved_between_zones` events when one spell destroys multiple permanents.
 
 ## Expansion Guardrails
 

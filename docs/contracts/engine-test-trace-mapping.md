@@ -159,6 +159,31 @@ Define how the current rule-family coverage should map to future engine tests an
   - `spell_resolved`
   - `object_moved_between_zones`
 
+### `global_land_destruction_sorceries_minimal`
+
+- Planned tests:
+  - `engine/tests/test_spells.py`
+  - `engine/tests/test_priority.py`
+  - `engine/tests/test_replay_log.py`
+- Planned trace assertions:
+  - `spell_cast`
+  - `spell_resolved`
+  - `permanent_destroyed`
+  - `object_moved_between_zones`
+
+### `opponent_mass_creature_destruction_sorceries_minimal`
+
+- Planned tests:
+  - `engine/tests/test_spells.py`
+  - `engine/tests/test_priority.py`
+  - `engine/tests/test_replay_log.py`
+- Planned trace assertions:
+  - `spell_cast`
+  - `spell_resolved`
+  - `permanent_destroyed`
+  - `object_moved_between_zones`
+  - `life_total_changed`
+
 ### `flying_keyword_minimal`
 
 - Planned tests:
@@ -224,6 +249,8 @@ Define how the current rule-family coverage should map to future engine tests an
   - `targeted_discard_sorceries_minimal` now has engine coverage for `Mind Rot`.
   - `targeted_land_destruction_sorceries_minimal` now has engine coverage for `Winter's Grasp`.
   - `targeted_battlefield_to_hand_sorceries_minimal` now has engine coverage for `Symbol of Unsummoning`.
+  - `global_land_destruction_sorceries_minimal` now has engine coverage for `Armageddon`.
+  - `opponent_mass_creature_destruction_sorceries_minimal` now has engine coverage for `Rain of Daggers`.
   - `flying_keyword_minimal` now has engine coverage for `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`.
   - `defender_keyword_minimal` now has engine coverage for `Wall of Granite`.
   - The current slice now has a real lethal-damage proof via `Border Guard` versus `Muck Rats`, so the earlier synthetic SBA shortcut is no longer needed.

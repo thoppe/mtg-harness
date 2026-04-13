@@ -229,12 +229,20 @@ def _legal_noncreature_spell_targets(
     effect = _supported_targeted_sorcery_effect(card_definition)
     if effect == "draw_two_cards":
         return (None,)
+    if effect == "destroy_all_lands":
+        return (None,)
     if effect is None:
         return ()
     if effect == "damage_target_player":
         return tuple(state.players)
     if effect == "target_player_discards_two":
         return tuple(state.players)
+    if effect == "destroy_all_creatures_target_opponent_you_lose_2_per_creature":
+        return tuple(
+            player_id
+            for player_id in state.players
+            if player_id != state.turn.active_player
+        )
 
     legal_targets: list[str] = []
     if effect == "damage_any_target":
@@ -290,6 +298,13 @@ def _supported_targeted_sorcery_effect(card_definition) -> str | None:
         return "destroy_target_land"
     if card_definition.oracle_text == "Return target creature to its owner's hand.\nDraw a card.":
         return "return_creature_to_hand_and_draw_one"
+    if card_definition.oracle_text == "Destroy all lands.":
+        return "destroy_all_lands"
+    if (
+        card_definition.oracle_text
+        == "Destroy all creatures target opponent controls. You lose 2 life for each creature destroyed this way."
+    ):
+        return "destroy_all_creatures_target_opponent_you_lose_2_per_creature"
     return None
 
 

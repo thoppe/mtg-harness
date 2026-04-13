@@ -44,7 +44,7 @@ rules:
       - engine/tests/test_priority.py
       - engine/tests/test_turns.py
       - engine/tests/test_spells.py
-    notes: "Current support is intentionally narrow: play land, activate a declared basic land, cast a supported creature spell including `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`, cast the supported `Vengeance`, `Path of Peace`, `Touch of Brilliance`, `Time Ebb`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, or `Symbol of Unsummoning` sorcery, advance to combat, or pass priority."
+    notes: "Current support is intentionally narrow: play land, activate a declared basic land, cast a supported creature spell including `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`, cast the supported `Vengeance`, `Path of Peace`, `Touch of Brilliance`, `Time Ebb`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, `Symbol of Unsummoning`, `Armageddon`, or `Rain of Daggers` sorcery, advance to combat, or pass priority."
   - rule_key: combat_action_windows_minimal
     source_rules:
       - "508"
@@ -225,6 +225,39 @@ rules:
       - engine/tests/test_spells.py
       - engine/tests/test_replay_log.py
     notes: "Current support is intentionally narrow and name-scoped to `Symbol of Unsummoning`, while establishing the reusable battlefield-to-hand sorcery path for future cards."
+  - rule_key: global_land_destruction_sorceries_minimal
+    source_rules:
+      - "601"
+      - "608"
+      - "701.7"
+    status: implemented
+    scope: Casting and resolving the supported `Portal` sorcery `Armageddon`, destroying all lands on the battlefield, and moving the spell from stack to graveyard.
+    engine_contracts:
+      - docs/contracts/play-engine.md
+      - docs/contracts/state-machine-transitions.md
+      - docs/contracts/replay-event-log.md
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+      - engine/tests/test_replay_log.py
+    notes: "Current support is intentionally narrow and name-scoped to `Armageddon`, without implying a broader mass-destruction framework."
+  - rule_key: opponent_mass_creature_destruction_sorceries_minimal
+    source_rules:
+      - "115"
+      - "601"
+      - "608"
+      - "701.7"
+    status: implemented
+    scope: Casting and resolving `Rain of Daggers` in the current two-player slice by targeting the opposing player, destroying all creatures that player controls, counting how many were destroyed that way, applying 2 life loss to the caster for each, and moving the spell from stack to graveyard.
+    engine_contracts:
+      - docs/contracts/play-engine.md
+      - docs/contracts/state-machine-transitions.md
+      - docs/contracts/replay-event-log.md
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+      - engine/tests/test_replay_log.py
+    notes: "Current support is intentionally narrow and name-scoped to `Rain of Daggers`, limited to two-player opponent targeting and omitting regeneration, replacement effects, and multiplayer opponent selection."
   - rule_key: flying_keyword_minimal
     source_rules:
       - "702.9"

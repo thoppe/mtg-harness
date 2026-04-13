@@ -27,6 +27,8 @@ MIND_ROT = "ad44cf74-b717-48fb-9fa2-77512024d76a"
 FOREST = "b34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6"
 WINTERS_GRASP = "e9b8679d-52a9-4f0f-9365-f3e4b7a69805"
 SYMBOL_OF_UNSUMMONING = "c44f1a81-269b-4f05-8ff2-e7ce19a93937"
+ARMAGEDDON = "c9ed8b01-959a-47d6-891e-0abbdccf6e4f"
+RAIN_OF_DAGGERS = "e2048201-6dc9-4cf5-916f-1d867ae8dbdd"
 
 
 class ReplayLogTests(unittest.TestCase):
@@ -389,6 +391,160 @@ class ReplayLogTests(unittest.TestCase):
                 "object_moved_between_zones",
             ],
         )
+
+    def test_armageddon_replay_trace_includes_repeated_land_destruction(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        setup = SetupInput(
+            game_id="replay-armageddon",
+            players=("alice", "bob"),
+            starting_player="alice",
+            libraries={
+                "alice": (PLAINS, PLAINS, PLAINS, PLAINS, ARMAGEDDON),
+                "bob": (PLAINS, SWAMP),
+            },
+            opening_hands={
+                "alice": (PLAINS, PLAINS, PLAINS, PLAINS, ARMAGEDDON),
+                "bob": (PLAINS, SWAMP),
+            },
+            rng_seed=61,
+        )
+
+        session = start_first_turn(initialize_game(setup, repository))
+        current_state = session.state
+        for land_id in ("alice:1", "alice:2", "alice:3", "alice:4"):
+            current_state = move_object(
+                current_state,
+                instance_id=land_id,
+                from_zone="hand",
+                to_zone="battlefield",
+                player_id="alice",
+            )
+        for land_id in ("bob:1", "bob:2"):
+            current_state = move_object(
+                current_state,
+                instance_id=land_id,
+                from_zone="hand",
+                to_zone="battlefield",
+                player_id="bob",
+            )
+        session = type(session)(state=current_state, event_log=session.event_log)
+
+        for source_instance_id in session.state.players["alice"].battlefield:
+            session = activate_mana_ability(
+                session,
+                ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+                repository,
+            )
+
+        result = cast_noncreature_spell(
+            session,
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:5",
+                target_instance_id=None,
+            ),
+            repository,
+        )
+
+        self.assertEqual(
+            [event.event_type for event in result.event_log[-16:]],
+            [
+                "spell_cast",
+                "object_moved_between_zones",
+                "spell_resolved",
+                "permanent_destroyed",
+                "object_moved_between_zones",
+                "permanent_destroyed",
+                "object_moved_between_zones",
+                "permanent_destroyed",
+                "object_moved_between_zones",
+                "permanent_destroyed",
+                "object_moved_between_zones",
+                "permanent_destroyed",
+                "object_moved_between_zones",
+                "permanent_destroyed",
+                "object_moved_between_zones",
+                "object_moved_between_zones",
+            ],
+        )
+        self.assertEqual(result.event_log[-1].payload["to_zone"], "graveyard")
+
+    def test_rain_of_daggers_replay_trace_includes_mass_creature_destruction_and_life_loss(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        setup = SetupInput(
+            game_id="replay-rain-of-daggers",
+            players=("alice", "bob"),
+            starting_player="alice",
+            libraries={
+                "alice": (SWAMP, SWAMP, SWAMP, SWAMP, SWAMP, SWAMP, RAIN_OF_DAGGERS),
+                "bob": (MUCK_RATS, BORDER_GUARD),
+            },
+            opening_hands={
+                "alice": (SWAMP, SWAMP, SWAMP, SWAMP, SWAMP, SWAMP, RAIN_OF_DAGGERS),
+                "bob": (MUCK_RATS, BORDER_GUARD),
+            },
+            rng_seed=62,
+        )
+
+        session = start_first_turn(initialize_game(setup, repository))
+        current_state = session.state
+        for land_id in ("alice:1", "alice:2", "alice:3", "alice:4", "alice:5", "alice:6"):
+            current_state = move_object(
+                current_state,
+                instance_id=land_id,
+                from_zone="hand",
+                to_zone="battlefield",
+                player_id="alice",
+            )
+        current_state = move_object(
+            current_state,
+            instance_id="bob:1",
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="bob",
+        )
+        current_state = move_object(
+            current_state,
+            instance_id="bob:2",
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="bob",
+        )
+        session = type(session)(state=current_state, event_log=session.event_log)
+
+        for source_instance_id in session.state.players["alice"].battlefield:
+            session = activate_mana_ability(
+                session,
+                ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+                repository,
+            )
+
+        result = cast_noncreature_spell(
+            session,
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:7",
+                target_instance_id="bob",
+            ),
+            repository,
+        )
+
+        self.assertEqual(
+            [event.event_type for event in result.event_log[-9:]],
+            [
+                "spell_cast",
+                "object_moved_between_zones",
+                "spell_resolved",
+                "permanent_destroyed",
+                "object_moved_between_zones",
+                "permanent_destroyed",
+                "object_moved_between_zones",
+                "life_total_changed",
+                "object_moved_between_zones",
+            ],
+        )
+        self.assertEqual(result.event_log[-2].payload["player_id"], "alice")
+        self.assertEqual(result.event_log[-2].payload["life_total"], 16)
 
     def test_symbol_of_unsummoning_replay_trace_includes_bounce_and_draw(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)

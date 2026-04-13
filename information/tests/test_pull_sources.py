@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
+import re
 import tempfile
 import unittest
 from pathlib import Path
+from urllib.parse import unquote
 
 import sys
 
@@ -12,12 +14,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import pull_sources
 
 
-def sample_card(*, name: str, oracle_id: str, card_id: str, collector_number: str) -> dict:
+def sample_card(*, name: str, oracle_id: str, card_id: str, collector_number: str, set_code: str = "por") -> dict:
     return {
         "id": card_id,
         "oracle_id": oracle_id,
         "name": name,
-        "set": "por",
+        "set": set_code,
         "collector_number": collector_number,
         "uri": f"https://api.scryfall.com/cards/{card_id}",
         "image_uris": {
@@ -33,6 +35,8 @@ class PullSourcesTests(unittest.TestCase):
         self.assertEqual(targets[0].set_code, "por")
         self.assertEqual(targets[0].oracle_id, "1ef5003c-f540-4cdc-913f-7d5280ad9f62")
         self.assertEqual(targets[-1].oracle_id, "bc71ebf6-2056-41f7-be35-b2e5c34afa99")
+        self.assertIn("c9ed8b01-959a-47d6-891e-0abbdccf6e4f", [target.oracle_id for target in targets])
+        self.assertIn("e2048201-6dc9-4cf5-916f-1d867ae8dbdd", [target.oracle_id for target in targets])
         self.assertIn("b7593cf8-4dcb-473b-a2ef-180fffe66738", [target.oracle_id for target in targets])
         self.assertIn("f097a059-5505-4c3c-b879-7853ab6972ed", [target.oracle_id for target in targets])
         self.assertIn("d6ffdaf0-ac08-4de9-bbce-2eab2f86bcca", [target.oracle_id for target in targets])
@@ -114,6 +118,19 @@ class PullSourcesTests(unittest.TestCase):
                 collector_number="6",
             ),
             sample_card(
+                name="Armageddon",
+                oracle_id="c9ed8b01-959a-47d6-891e-0abbdccf6e4f",
+                card_id="2073ca8b-2bca-4539-94d7-989da157e4b8",
+                collector_number="5",
+            ),
+            sample_card(
+                name="Rain of Daggers",
+                oracle_id="e2048201-6dc9-4cf5-916f-1d867ae8dbdd",
+                card_id="f48b345f-c814-4f89-9bff-078d0ec5acfc",
+                collector_number="94",
+                set_code="me4",
+            ),
+            sample_card(
                 name="Swamp",
                 oracle_id="56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
                 card_id="ec0da69e-4ab6-4ef1-a7ae-4d6c47172c81",
@@ -142,8 +159,27 @@ class PullSourcesTests(unittest.TestCase):
         def json_fetcher(url: str, headers: dict[str, str]) -> dict:
             self.assertIn("User-Agent", headers)
             self.assertEqual(headers["Accept"], "application/json")
-            self.assertIn("set%3Apor", url)
-            return {"data": cards}
+            decoded_url = unquote(url)
+            for card in cards:
+                if card["oracle_id"] in decoded_url:
+                    return {"data": [card]}
+            oracle_match = re.search(r"oracleid:([0-9a-f-]+)", decoded_url)
+            set_match = re.search(r"set:([a-z0-9]+)", decoded_url)
+            if oracle_match and set_match:
+                oracle_id = oracle_match.group(1)
+                set_code = set_match.group(1)
+                return {
+                    "data": [
+                        sample_card(
+                            name=f"Card {oracle_id}",
+                            oracle_id=oracle_id,
+                            card_id=f"{oracle_id}-print",
+                            collector_number="0",
+                            set_code=set_code,
+                        )
+                    ]
+                }
+            self.fail(f"unexpected card query URL: {url}")
 
         def bytes_fetcher(url: str, headers: dict[str, str]) -> bytes:
             self.assertEqual(headers["Accept"], "image/jpeg")
@@ -250,6 +286,19 @@ class PullSourcesTests(unittest.TestCase):
                 collector_number="6",
             ),
             sample_card(
+                name="Armageddon",
+                oracle_id="c9ed8b01-959a-47d6-891e-0abbdccf6e4f",
+                card_id="2073ca8b-2bca-4539-94d7-989da157e4b8",
+                collector_number="5",
+            ),
+            sample_card(
+                name="Rain of Daggers",
+                oracle_id="e2048201-6dc9-4cf5-916f-1d867ae8dbdd",
+                card_id="f48b345f-c814-4f89-9bff-078d0ec5acfc",
+                collector_number="94",
+                set_code="me4",
+            ),
+            sample_card(
                 name="Swamp",
                 oracle_id="56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
                 card_id="ec0da69e-4ab6-4ef1-a7ae-4d6c47172c81",
@@ -279,7 +328,9 @@ class PullSourcesTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 pull_sources.pull_cards(
                     Path(tmpdir),
-                    json_fetcher=lambda url, headers: {"data": bad_cards},
+                    json_fetcher=lambda url, headers: {
+                        "data": [card for card in bad_cards if card["oracle_id"] in url] or bad_cards[:1]
+                    },
                     bytes_fetcher=lambda url, headers: b"unused",
                     sleep_seconds=0,
                 )

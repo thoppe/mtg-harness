@@ -21,6 +21,12 @@ Define the manifest shape for named implementation slices that replace reliance 
 - `source_artifacts`: references to the raw source scope the slice depends on
 - `notes`: optional explanation of simplifications, exclusions, or migration intent
 
+## Optional Fields
+
+- `card_entries`: explicit per-card source declarations, each containing:
+  - `oracle_id`: canonical card identity
+  - `set_code`: source set used to fetch and provenance that card's raw artifact
+
 ## Guarantees
 
 - A support slice is a declared gameplay scope, not merely a source-ingestion scope.
@@ -28,6 +34,7 @@ Define the manifest shape for named implementation slices that replace reliance 
 - A card may exist in local source artifacts without belonging to any active support slice.
 - A rule family may exist in coverage manifests without belonging to every slice.
 - The active slice must not imply broader set support than the manifest explicitly names.
+- When `card_entries` exists, raw-source provenance should come from those per-card set declarations rather than assuming the slice-level `set_code` applies to every card.
 
 ## Separation Rule
 
@@ -39,6 +46,7 @@ Define the manifest shape for named implementation slices that replace reliance 
 
 - The current `portal_initial_micro_universe` should become a named support slice rather than a hardcoded repo-wide assumption.
 - Early slices may remain small and `Portal`-only.
+- Later slices may stay Portal-led while incorporating a small number of off-set oracle identities when their source provenance is explicit in `card_entries`.
 - Engine loading may continue to use a narrow active slice in v0, but the active slice should eventually come from manifest data instead of embedded oracle ID lists.
 
 ## Non-Goals

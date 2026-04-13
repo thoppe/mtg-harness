@@ -52,15 +52,18 @@ def load_active_support_slice_targets() -> tuple[CardTarget, ...]:
         raise ValueError(f"expected exactly one active support slice, found: {active_keys}")
 
     active_slice = active_payloads[0]
+    if "card_entries" in active_slice:
+        return tuple(
+            CardTarget(
+                set_code=entry["set_code"],
+                oracle_id=entry["oracle_id"],
+            )
+            for entry in active_slice["card_entries"]
+        )
+
     set_code = active_slice["set_code"]
     card_keys = tuple(active_slice["card_keys"])
-    return tuple(
-        CardTarget(
-            set_code=set_code,
-            oracle_id=oracle_id,
-        )
-        for oracle_id in card_keys
-    )
+    return tuple(CardTarget(set_code=set_code, oracle_id=oracle_id) for oracle_id in card_keys)
 
 
 def utc_now_iso() -> str:
@@ -103,9 +106,15 @@ def write_json(path: Path, payload: dict) -> None:
 
 
 def build_support_slice_query(targets: tuple[CardTarget, ...]) -> str:
-    clauses = [f"oracleid:{target.oracle_id}" for target in targets]
-    set_code = targets[0].set_code
-    return f'set:{set_code} ({ " or ".join(clauses) })'
+    by_set: dict[str, list[str]] = {}
+    for target in targets:
+        by_set.setdefault(target.set_code, []).append(target.oracle_id)
+
+    set_clauses = []
+    for set_code, oracle_ids in by_set.items():
+        oracle_clauses = " or ".join(f"oracleid:{oracle_id}" for oracle_id in oracle_ids)
+        set_clauses.append(f"set:{set_code} ({oracle_clauses})")
+    return " or ".join(f"({clause})" for clause in set_clauses)
 
 
 def build_scryfall_search_url(targets: tuple[CardTarget, ...]) -> str:
@@ -114,10 +123,10 @@ def build_scryfall_search_url(targets: tuple[CardTarget, ...]) -> str:
 
 def validate_card_scope(card: dict, target: CardTarget) -> None:
     if card.get("set") != target.set_code:
-        raise ValueError(f"{target.name} returned unexpected set {card.get('set')!r}")
+        raise ValueError(f"{target.oracle_id} returned unexpected set {card.get('set')!r}")
     if card.get("oracle_id") != target.oracle_id:
         raise ValueError(
-            f"{target.name} returned unexpected oracle_id {card.get('oracle_id')!r}"
+            f"{target.oracle_id} returned unexpected oracle_id {card.get('oracle_id')!r}"
         )
 
 
@@ -227,16 +236,16 @@ def pull_cards(
     sleep_seconds: float = 0.1,
 ) -> list[Path]:
     targets = load_active_support_slice_targets()
-    request_url = build_scryfall_search_url(targets)
     fetched_at = utc_now_iso()
-    search_payload = json_fetcher(request_url, build_headers())
-    cards_by_oracle_id = {card["oracle_id"]: card for card in search_payload["data"]}
     written_paths: list[Path] = []
 
     for target in targets:
-        card = cards_by_oracle_id.get(target.oracle_id)
-        if card is None:
-            raise ValueError(f"Missing card in Scryfall response: {target.oracle_id}")
+        request_url = build_scryfall_search_url((target,))
+        search_payload = json_fetcher(request_url, build_headers())
+        cards = search_payload["data"]
+        if len(cards) != 1:
+            raise ValueError(f"Expected exactly one card in Scryfall response for {target.oracle_id}")
+        card = cards[0]
         validate_card_scope(card, target)
 
         metadata_path = card_metadata_path(root, target.oracle_id)

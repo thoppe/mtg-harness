@@ -48,6 +48,8 @@ Describe the responsibilities of the simulation core.
   - `Mind Rot`
   - `Winter's Grasp`
   - `Symbol of Unsummoning`
+  - `Armageddon`
+  - `Rain of Daggers`
   - `Touch of Brilliance`
   - `Time Ebb`
   - `Swamp`

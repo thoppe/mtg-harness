@@ -1,0 +1,137 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "c9ed8b01-959a-47d6-891e-0abbdccf6e4f",
+  "name": "Armageddon",
+  "provenance": {
+    "collector_number": "5",
+    "fetched_at": "2026-04-13T00:00:00Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/2/0/2073ca8b-2bca-4539-94d7-989da157e4b8.jpg?1562445694",
+    "oracle_id": "c9ed8b01-959a-47d6-891e-0abbdccf6e4f",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor%20oracleid%3Ac9ed8b01-959a-47d6-891e-0abbdccf6e4f",
+    "requested_set_code": "por",
+    "scryfall_id": "2073ca8b-2bca-4539-94d7-989da157e4b8",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/2073ca8b-2bca-4539-94d7-989da157e4b8"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "John Avon",
+    "artist_ids": [
+      "798f3932-30e0-4420-aa3f-db4d613f89ca"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10152,
+    "cmc": 4.0,
+    "collector_number": "5",
+    "color_identity": [
+      "W"
+    ],
+    "colors": [
+      "W"
+    ],
+    "digital": false,
+    "edhrec_rank": 4032,
+    "finishes": [
+      "nonfoil"
+    ],
+    "flavor_text": "\"'O miserable of happy! Is this the end Of this new glorious world . . . ?'\"\n\u2014John Milton, *Paradise Lost*",
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "2073ca8b-2bca-4539-94d7-989da157e4b8",
+    "illustration_id": "295f62a3-b65d-4c24-b608-791b964eef78",
+    "image_status": "highres_scan",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/2/0/2073ca8b-2bca-4539-94d7-989da157e4b8.jpg?1562445694",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/2/0/2073ca8b-2bca-4539-94d7-989da157e4b8.jpg?1562445694",
+      "large": "https://cards.scryfall.io/large/front/2/0/2073ca8b-2bca-4539-94d7-989da157e4b8.jpg?1562445694",
+      "normal": "https://cards.scryfall.io/normal/front/2/0/2073ca8b-2bca-4539-94d7-989da157e4b8.jpg?1562445694",
+      "png": "https://cards.scryfall.io/png/front/2/0/2073ca8b-2bca-4539-94d7-989da157e4b8.png?1562445694",
+      "small": "https://cards.scryfall.io/small/front/2/0/2073ca8b-2bca-4539-94d7-989da157e4b8.jpg?1562445694"
+    },
+    "keywords": [],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "not_legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "not_legal",
+      "paupercommander": "not_legal",
+      "penny": "not_legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{3}{W}",
+    "multiverse_ids": [
+      4373
+    ],
+    "name": "Armageddon",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "c9ed8b01-959a-47d6-891e-0abbdccf6e4f",
+    "oracle_text": "Destroy all lands.",
+    "oversized": false,
+    "prices": {
+      "eur": "29.99",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "31.89",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3Ac9ed8b01-959a-47d6-891e-0abbdccf6e4f&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Armageddon&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10152&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F613%3Fpage%3D1"
+    },
+    "rarity": "rare",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Armageddon",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4373&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DArmageddon",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DArmageddon"
+    },
+    "released_at": "1997-05-01",
+    "reprint": true,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/2073ca8b-2bca-4539-94d7-989da157e4b8/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/5/armageddon?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 613,
+    "textless": false,
+    "type_line": "Sorcery",
+    "uri": "https://api.scryfall.com/cards/2073ca8b-2bca-4539-94d7-989da157e4b8",
+    "variation": false
+  }
+}

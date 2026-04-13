@@ -340,33 +340,15 @@ def cast_noncreature_spell(
         if action.target_instance_id is None:
             raise ValueError("targeted sorcery requires a target")
         target = casting_state.objects[action.target_instance_id]
-        resolved_state = move_object(
+        resolved_state, destroyed_count = _destroy_permanents(
             casting_state,
-            instance_id=action.target_instance_id,
-            from_zone="battlefield",
-            to_zone="graveyard",
-            player_id=target.owner_id,
-        )
-        event_log.append(
-            event_type="permanent_destroyed",
+            event_log,
+            instance_ids=(action.target_instance_id,),
             active_player=action.player_id,
-            payload={
-                "card_instance_id": action.target_instance_id,
-                "oracle_id": target.oracle_id,
-                "reason": f"spell_effect:{card_definition.name}",
-            },
+            reason=f"spell_effect:{card_definition.name}",
         )
-        event_log.append(
-            event_type="object_moved_between_zones",
-            active_player=action.player_id,
-            payload={
-                "player_id": target.owner_id,
-                "card_instance_id": action.target_instance_id,
-                "oracle_id": target.oracle_id,
-                "from_zone": "battlefield",
-                "to_zone": "graveyard",
-            },
-        )
+        if destroyed_count != 1:
+            raise ValueError("expected exactly one permanent to be destroyed")
         if effect == "destroy_creature_owner_gains_4_life":
             target_owner = resolved_state.players[target.owner_id]
             updated_owner = replace(target_owner, life_total=target_owner.life_total + 4)
@@ -435,6 +417,19 @@ def cast_noncreature_spell(
             event_log,
             player_id=action.player_id,
         )
+    elif effect == "destroy_all_lands":
+        land_ids = _battlefield_permanents_matching(
+            casting_state,
+            card_repository,
+            predicate=lambda definition: definition.is_land,
+        )
+        resolved_state, _ = _destroy_permanents(
+            casting_state,
+            event_log,
+            instance_ids=land_ids,
+            active_player=action.player_id,
+            reason=f"spell_effect:{card_definition.name}",
+        )
     elif effect in {"damage_any_target", "damage_target_player"}:
         resolved_state, damage_events = _resolve_direct_damage_sorcery(
             casting_state,
@@ -459,6 +454,36 @@ def cast_noncreature_spell(
             count=2,
             active_player=action.player_id,
         )
+    elif effect == "destroy_all_creatures_target_opponent_you_lose_2_per_creature":
+        if action.target_instance_id is None:
+            raise ValueError("targeted sorcery requires a target")
+        creature_ids = tuple(
+            instance_id
+            for instance_id in casting_state.players[action.target_instance_id].battlefield
+            if card_repository.get(casting_state.objects[instance_id].oracle_id).is_creature
+        )
+        resolved_state, destroyed_count = _destroy_permanents(
+            casting_state,
+            event_log,
+            instance_ids=creature_ids,
+            active_player=action.player_id,
+            reason=f"spell_effect:{card_definition.name}",
+        )
+        if destroyed_count:
+            acting_player = resolved_state.players[action.player_id]
+            updated_player = replace(
+                acting_player,
+                life_total=acting_player.life_total - (destroyed_count * 2),
+            )
+            resolved_state = update_player(resolved_state, updated_player)
+            event_log.append(
+                event_type="life_total_changed",
+                active_player=action.player_id,
+                payload={
+                    "player_id": action.player_id,
+                    "life_total": updated_player.life_total,
+                },
+            )
     resolved_state = move_object(
         resolved_state,
         instance_id=action.card_instance_id,
@@ -879,9 +904,9 @@ def _require_legal_noncreature_target(
     *,
     effect: str,
 ) -> None:
-    if effect == "draw_two_cards":
+    if effect in {"draw_two_cards", "destroy_all_lands"}:
         if target_instance_id is not None:
-            raise ValueError("draw-two sorcery does not take a target")
+            raise ValueError("sorcery does not take a target")
         return
     if target_instance_id is None:
         raise ValueError("targeted sorcery requires a target")
@@ -892,6 +917,12 @@ def _require_legal_noncreature_target(
     if effect == "target_player_discards_two":
         if target_instance_id not in state.players:
             raise ValueError("target must be a player")
+        return
+    if effect == "destroy_all_creatures_target_opponent_you_lose_2_per_creature":
+        if target_instance_id not in state.players:
+            raise ValueError("target must be a player")
+        if target_instance_id == state.turn.active_player:
+            raise ValueError("target must be an opponent")
         return
     if effect == "destroy_target_land":
         if target_instance_id not in state.objects:
@@ -958,7 +989,76 @@ def _supported_targeted_sorcery_effect(card_definition) -> str | None:
         return "destroy_target_land"
     if card_definition.oracle_text == "Return target creature to its owner's hand.\nDraw a card.":
         return "return_creature_to_hand_and_draw_one"
+    if card_definition.oracle_text == "Destroy all lands.":
+        return "destroy_all_lands"
+    if (
+        card_definition.oracle_text
+        == "Destroy all creatures target opponent controls. You lose 2 life for each creature destroyed this way."
+    ):
+        return "destroy_all_creatures_target_opponent_you_lose_2_per_creature"
     return None
+
+
+def _battlefield_permanents_matching(
+    state: GameState,
+    card_repository: CardRepository,
+    *,
+    predicate,
+) -> tuple[str, ...]:
+    instance_ids: list[str] = []
+    for player in state.players.values():
+        for instance_id in player.battlefield:
+            definition = card_repository.get(state.objects[instance_id].oracle_id)
+            if predicate(definition):
+                instance_ids.append(instance_id)
+    return tuple(instance_ids)
+
+
+def _destroy_permanents(
+    state: GameState,
+    event_log: EventLog,
+    *,
+    instance_ids: tuple[str, ...],
+    active_player: str,
+    reason: str,
+) -> tuple[GameState, int]:
+    current_state = state
+    destroyed_count = 0
+    for instance_id in instance_ids:
+        if instance_id not in current_state.objects:
+            continue
+        permanent = current_state.objects[instance_id]
+        if permanent.zone != "battlefield":
+            continue
+        current_state = move_object(
+            current_state,
+            instance_id=instance_id,
+            from_zone="battlefield",
+            to_zone="graveyard",
+            player_id=permanent.owner_id,
+        )
+        destroyed_count += 1
+        event_log.append(
+            event_type="permanent_destroyed",
+            active_player=active_player,
+            payload={
+                "card_instance_id": instance_id,
+                "oracle_id": permanent.oracle_id,
+                "reason": reason,
+            },
+        )
+        event_log.append(
+            event_type="object_moved_between_zones",
+            active_player=active_player,
+            payload={
+                "player_id": permanent.owner_id,
+                "card_instance_id": instance_id,
+                "oracle_id": permanent.oracle_id,
+                "from_zone": "battlefield",
+                "to_zone": "graveyard",
+            },
+        )
+    return current_state, destroyed_count
 
 
 def _resolve_direct_damage_sorcery(
