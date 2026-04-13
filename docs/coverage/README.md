@@ -30,6 +30,9 @@ Current declared slice contents:
 - `Border Guard`
 - `Foot Soldiers`
 - `Muck Rats`
+- `Wind Drake`
+- `Bog Imp`
+- `Storm Crow`
 - `Vengeance`
 - `Path of Peace`
 - `Touch of Brilliance`

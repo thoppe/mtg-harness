@@ -160,5 +160,5 @@ Define how the current rule-family coverage should map to future engine tests an
   - `targeted_sorcery_spells_minimal` now has engine coverage for `Vengeance` and `Path of Peace`.
   - `simple_card_draw_sorceries_minimal` now has engine coverage for `Touch of Brilliance`.
   - `targeted_battlefield_to_library_sorceries_minimal` now has engine coverage for `Time Ebb`.
-  - `flying_keyword_minimal` now has engine coverage for `Armored Pegasus`.
+  - `flying_keyword_minimal` now has engine coverage for `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`.
   - The current slice now has a real lethal-damage proof via `Border Guard` versus `Muck Rats`, so the earlier synthetic SBA shortcut is no longer needed.

@@ -55,6 +55,9 @@ Current verified official entry points as of April 12, 2026:
   - `Border Guard`
   - `Foot Soldiers`
   - `Muck Rats`
+  - `Wind Drake`
+  - `Bog Imp`
+  - `Storm Crow`
   - `Vengeance`
   - `Path of Peace`
   - `Touch of Brilliance`

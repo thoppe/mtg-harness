@@ -35,6 +35,9 @@ class PullSourcesTests(unittest.TestCase):
         self.assertEqual(targets[-1].oracle_id, "bc71ebf6-2056-41f7-be35-b2e5c34afa99")
         self.assertIn("b7593cf8-4dcb-473b-a2ef-180fffe66738", [target.oracle_id for target in targets])
         self.assertIn("f097a059-5505-4c3c-b879-7853ab6972ed", [target.oracle_id for target in targets])
+        self.assertIn("d6ffdaf0-ac08-4de9-bbce-2eab2f86bcca", [target.oracle_id for target in targets])
+        self.assertIn("45b94e3c-a905-435b-aee5-bec9239fd24c", [target.oracle_id for target in targets])
+        self.assertIn("000d5588-5a4c-434e-988d-396632ade42c", [target.oracle_id for target in targets])
 
     def test_pull_cards_writes_canonical_paths_and_provenance(self) -> None:
         cards = [
@@ -61,6 +64,24 @@ class PullSourcesTests(unittest.TestCase):
                 oracle_id="bca13a12-6723-4a5e-8f1b-21646a8b3e7e",
                 card_id="d4041226-7ce2-46d1-8844-20fa50b6568a",
                 collector_number="102",
+            ),
+            sample_card(
+                name="Wind Drake",
+                oracle_id="d6ffdaf0-ac08-4de9-bbce-2eab2f86bcca",
+                card_id="5486d2dc-9a5d-4f58-a5ec-d94de54b852f",
+                collector_number="77",
+            ),
+            sample_card(
+                name="Bog Imp",
+                oracle_id="45b94e3c-a905-435b-aee5-bec9239fd24c",
+                card_id="8681b3fd-33e5-4a45-8650-a4a142405096",
+                collector_number="81",
+            ),
+            sample_card(
+                name="Storm Crow",
+                oracle_id="000d5588-5a4c-434e-988d-396632ade42c",
+                card_id="dfe87b59-b456-4532-a695-0dea3110d878",
+                collector_number="69",
             ),
             sample_card(
                 name="Vengeance",
@@ -179,6 +200,24 @@ class PullSourcesTests(unittest.TestCase):
                 oracle_id="bca13a12-6723-4a5e-8f1b-21646a8b3e7e",
                 card_id="d4041226-7ce2-46d1-8844-20fa50b6568a",
                 collector_number="102",
+            ),
+            sample_card(
+                name="Wind Drake",
+                oracle_id="d6ffdaf0-ac08-4de9-bbce-2eab2f86bcca",
+                card_id="5486d2dc-9a5d-4f58-a5ec-d94de54b852f",
+                collector_number="77",
+            ),
+            sample_card(
+                name="Bog Imp",
+                oracle_id="45b94e3c-a905-435b-aee5-bec9239fd24c",
+                card_id="8681b3fd-33e5-4a45-8650-a4a142405096",
+                collector_number="81",
+            ),
+            sample_card(
+                name="Storm Crow",
+                oracle_id="000d5588-5a4c-434e-988d-396632ade42c",
+                card_id="dfe87b59-b456-4532-a695-0dea3110d878",
+                collector_number="69",
             ),
             sample_card(
                 name="Vengeance",

@@ -25,6 +25,9 @@ Define the machine-readable inventory of card and set support claimed by the sim
   - `Border Guard`
   - `Foot Soldiers`
   - `Muck Rats`
+  - `Wind Drake`
+  - `Bog Imp`
+  - `Storm Crow`
   - `Vengeance`
   - `Path of Peace`
   - `Touch of Brilliance`

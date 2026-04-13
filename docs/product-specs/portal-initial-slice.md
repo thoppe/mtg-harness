@@ -11,6 +11,9 @@ The initial playable universe contains only these legal card identities:
 - `Border Guard` from `Portal`
 - `Foot Soldiers` from `Portal`
 - `Muck Rats` from `Portal`
+- `Wind Drake` from `Portal`
+- `Bog Imp` from `Portal`
+- `Storm Crow` from `Portal`
 - `Vengeance` from `Portal`
 - `Path of Peace` from `Portal`
 - `Touch of Brilliance` from `Portal`
@@ -22,7 +25,7 @@ The initial playable universe contains only these legal card identities:
 - `Mountain` from `Portal`
 - `Plains` from `Portal`
 
-This slice uses mostly vanilla `Portal` creatures plus `Armored Pegasus` as the first flying keyword card, the sorceries `Vengeance`, `Path of Peace`, `Touch of Brilliance`, and `Time Ebb`, and all five `Portal` basic lands to widen the engine through a narrow keyword and sorcery-speed noncreature-spell path before broader mechanics are introduced.
+This slice uses mostly vanilla `Portal` creatures plus the simple flyers `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`, the sorceries `Vengeance`, `Path of Peace`, `Touch of Brilliance`, and `Time Ebb`, and all five `Portal` basic lands to widen the engine through a narrow keyword and sorcery-speed noncreature-spell path before broader mechanics are introduced.
 Multiplicity is allowed as normal so long as no card identity outside this universe is introduced.
 
 ## Play Mode
@@ -45,5 +48,5 @@ Multiplicity is allowed as normal so long as no card identity outside this unive
 
 ## Current Implementation Note
 
-- The currently implemented slice supports deterministic setup, first-turn progression, land play, basic-land mana generation, creature spell resolution including minimal flying for `Armored Pegasus`, the narrow targeted-sorcery path required for `Vengeance` and `Path of Peace`, simple sorcery-driven card draw for `Touch of Brilliance`, and targeted battlefield-to-top-of-library movement for `Time Ebb`.
+- The currently implemented slice supports deterministic setup, first-turn progression, land play, basic-land mana generation, creature spell resolution including minimal flying for `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`, the narrow targeted-sorcery path required for `Vengeance` and `Path of Peace`, simple sorcery-driven card draw for `Touch of Brilliance`, and targeted battlefield-to-top-of-library movement for `Time Ebb`.
 - Additional setup scenarios may use multiple copies of the declared basic lands and vanilla creatures without widening the universe.

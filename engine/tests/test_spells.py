@@ -46,6 +46,9 @@ ISLAND = "b2c6aa39-2d2a-459c-a555-fb48ba993373"
 TOUCH_OF_BRILLIANCE = "6365aba1-78d3-416c-89cd-9449578eedbf"
 TIME_EBB = "30cc8f7b-3c28-40f5-8f8f-157e8212280b"
 ARMORED_PEGASUS = "f097a059-5505-4c3c-b879-7853ab6972ed"
+WIND_DRAKE = "d6ffdaf0-ac08-4de9-bbce-2eab2f86bcca"
+BOG_IMP = "45b94e3c-a905-435b-aee5-bec9239fd24c"
+STORM_CROW = "000d5588-5a4c-434e-988d-396632ade42c"
 
 
 class SpellTests(unittest.TestCase):
@@ -125,6 +128,36 @@ class SpellTests(unittest.TestCase):
         self.assertEqual(result.state.objects["alice:3"].zone, "battlefield")
         self.assertEqual(result.state.objects["alice:3"].oracle_id, ARMORED_PEGASUS)
         self.assertTrue(repository.get(ARMORED_PEGASUS).has_flying)
+
+    def test_cast_wind_drake_with_two_islands_and_one_generic(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_wind_drake_session(repository)
+
+        result = _cast_creature_from_normal_turns(session, repository, "alice", "alice:4")
+
+        self.assertEqual(result.state.players["alice"].battlefield, ("alice:1", "alice:2", "alice:3", "alice:4"))
+        self.assertEqual(result.state.objects["alice:4"].oracle_id, WIND_DRAKE)
+        self.assertTrue(repository.get(WIND_DRAKE).has_flying)
+
+    def test_cast_bog_imp_with_two_swamps(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_bog_imp_session(repository)
+
+        result = _cast_creature_from_normal_turns(session, repository, "alice", "alice:3")
+
+        self.assertEqual(result.state.players["alice"].battlefield, ("alice:1", "alice:2", "alice:3"))
+        self.assertEqual(result.state.objects["alice:3"].oracle_id, BOG_IMP)
+        self.assertTrue(repository.get(BOG_IMP).has_flying)
+
+    def test_cast_storm_crow_with_two_islands(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_storm_crow_session(repository)
+
+        result = _cast_creature_from_normal_turns(session, repository, "alice", "alice:3")
+
+        self.assertEqual(result.state.players["alice"].battlefield, ("alice:1", "alice:2", "alice:3"))
+        self.assertEqual(result.state.objects["alice:3"].oracle_id, STORM_CROW)
+        self.assertTrue(repository.get(STORM_CROW).has_flying)
 
     def test_cast_vengeance_destroys_tapped_creature_and_moves_spell_to_graveyard(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
@@ -359,6 +392,60 @@ def _build_armored_pegasus_session(repository: CardRepository):
             "bob": (PLAINS,),
         },
         rng_seed=27,
+    )
+    return start_first_turn(initialize_game(setup, repository))
+
+
+def _build_wind_drake_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="spell-cast-wind-drake",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (ISLAND, ISLAND, PLAINS, WIND_DRAKE),
+            "bob": (PLAINS,),
+        },
+        opening_hands={
+            "alice": (ISLAND, ISLAND, PLAINS, WIND_DRAKE),
+            "bob": (PLAINS,),
+        },
+        rng_seed=28,
+    )
+    return start_first_turn(initialize_game(setup, repository))
+
+
+def _build_bog_imp_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="spell-cast-bog-imp",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (SWAMP, SWAMP, BOG_IMP),
+            "bob": (PLAINS,),
+        },
+        opening_hands={
+            "alice": (SWAMP, SWAMP, BOG_IMP),
+            "bob": (PLAINS,),
+        },
+        rng_seed=29,
+    )
+    return start_first_turn(initialize_game(setup, repository))
+
+
+def _build_storm_crow_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="spell-cast-storm-crow",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (ISLAND, ISLAND, STORM_CROW),
+            "bob": (PLAINS,),
+        },
+        opening_hands={
+            "alice": (ISLAND, ISLAND, STORM_CROW),
+            "bob": (PLAINS,),
+        },
+        rng_seed=30,
     )
     return start_first_turn(initialize_game(setup, repository))
 

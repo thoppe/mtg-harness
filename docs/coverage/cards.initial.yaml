@@ -3,7 +3,7 @@ slice: portal_initial_micro_universe
 set_summaries:
   - set_code: por
     status: partial
-    notes: "The declared support slice currently includes Border Guard, Foot Soldiers, Muck Rats, Armored Pegasus, Vengeance, Path of Peace, Touch of Brilliance, Time Ebb, and the five Portal basic lands."
+    notes: "The declared support slice currently includes Border Guard, Foot Soldiers, Muck Rats, Wind Drake, Bog Imp, Storm Crow, Armored Pegasus, Vengeance, Path of Peace, Touch of Brilliance, Time Ebb, and the five Portal basic lands."
 cards:
   - set_code: por
     card_key: "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
@@ -57,6 +57,60 @@ cards:
       - engine/tests/test_spells.py
       - engine/tests/test_combat.py
     notes: "Canonical card identity keyed by Scryfall oracle_id."
+  - set_code: por
+    card_key: "d6ffdaf0-ac08-4de9-bbce-2eab2f86bcca"
+    display_name: Wind Drake
+    card_instances: variable
+    status: implemented
+    engine_scope: Creature spell support for casting `Wind Drake`, battlefield presence, attacking, and flying-based blocking restrictions in combat.
+    required_rules:
+      - creature_spells_minimal
+      - flying_keyword_minimal
+      - precombat_priority_minimal
+      - combat_action_windows_minimal
+      - combat_minimal
+      - turn_structure_minimal
+      - zones_minimal
+    tests:
+      - engine/tests/test_spells.py
+      - engine/tests/test_combat.py
+    notes: "Canonical card identity keyed by Scryfall oracle_id. Support is intentionally narrow and limited to the printed `Flying` keyword."
+  - set_code: por
+    card_key: "45b94e3c-a905-435b-aee5-bec9239fd24c"
+    display_name: Bog Imp
+    card_instances: variable
+    status: implemented
+    engine_scope: Creature spell support for casting `Bog Imp`, battlefield presence, attacking, and flying-based blocking restrictions in combat.
+    required_rules:
+      - creature_spells_minimal
+      - flying_keyword_minimal
+      - precombat_priority_minimal
+      - combat_action_windows_minimal
+      - combat_minimal
+      - turn_structure_minimal
+      - zones_minimal
+    tests:
+      - engine/tests/test_spells.py
+      - engine/tests/test_combat.py
+    notes: "Canonical card identity keyed by Scryfall oracle_id. Support is intentionally narrow and limited to the printed `Flying` keyword."
+  - set_code: por
+    card_key: "000d5588-5a4c-434e-988d-396632ade42c"
+    display_name: Storm Crow
+    card_instances: variable
+    status: implemented
+    engine_scope: Creature spell support for casting `Storm Crow`, battlefield presence, attacking, and flying-based blocking restrictions in combat.
+    required_rules:
+      - creature_spells_minimal
+      - flying_keyword_minimal
+      - precombat_priority_minimal
+      - combat_action_windows_minimal
+      - combat_minimal
+      - turn_structure_minimal
+      - zones_minimal
+    tests:
+      - engine/tests/test_spells.py
+      - engine/tests/test_combat.py
+    notes: "Canonical card identity keyed by Scryfall oracle_id. Support is intentionally narrow and limited to the printed `Flying` keyword."
   - set_code: por
     card_key: "1d001145-5d14-43a9-bf3b-3ce5c20b2a46"
     display_name: Vengeance

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define the smallest believable rules subset for the initial `Portal` support slice built from `Border Guard`, `Foot Soldiers`, `Muck Rats`, `Armored Pegasus`, `Vengeance`, `Path of Peace`, `Touch of Brilliance`, `Time Ebb`, and the five `Portal` basic lands.
+Define the smallest believable rules subset for the initial `Portal` support slice built from `Border Guard`, `Foot Soldiers`, `Muck Rats`, `Armored Pegasus`, `Wind Drake`, `Bog Imp`, `Storm Crow`, `Vengeance`, `Path of Peace`, `Touch of Brilliance`, `Time Ebb`, and the five `Portal` basic lands.
 
 ## In Scope
 
@@ -13,7 +13,7 @@ Define the smallest believable rules subset for the initial `Portal` support sli
 - Producing basic colored mana from those lands
 - Casting and resolving simple sorcery-speed spells
 - Basic creature combat
-- Flying keyword support limited to the combat and blocking behavior required by `Armored Pegasus`
+- Flying keyword support limited to the combat and blocking behavior required by `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`
 - Lethal damage and creature death as minimal state-based handling
 - Sorcery-speed targeted destruction limited to `Destroy target tapped creature.` and `Destroy target creature. Its owner gains 4 life.`
 - Sorcery-speed card draw limited to `Draw two cards.`
@@ -31,7 +31,7 @@ Define the smallest believable rules subset for the initial `Portal` support sli
 - `Path of Peace` may reuse the same targeted-destruction path while adding only owner life gain, without introducing damage prevention, regeneration, or broader effect layering.
 - `Touch of Brilliance` may reuse existing library-to-hand zone movement from turn draws while resolving as a no-target sorcery for exactly two cards.
 - `Time Ebb` may reuse targeted sorcery selection while adding only battlefield-to-library-top movement for creatures, without introducing shuffle, reveal, or replacement-effect support.
-- `Armored Pegasus` may introduce only the minimal flying restriction that nonflying creatures cannot block it; broader keyword handling remains out of scope until another card requires it.
+- `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow` may introduce only the minimal flying restriction that nonflying creatures cannot block them; broader keyword handling remains out of scope until another card requires it.
 
 ## Out Of Scope
 
