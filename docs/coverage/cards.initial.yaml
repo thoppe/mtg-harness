@@ -3,7 +3,7 @@ slice: portal_initial_micro_universe
 set_summaries:
   - set_code: por
     status: partial
-    notes: "The declared support slice currently includes Border Guard, Foot Soldiers, Muck Rats, Wind Drake, Bog Imp, Storm Crow, Armored Pegasus, Wall of Granite, Vengeance, Path of Peace, Touch of Brilliance, Time Ebb, and the five Portal basic lands."
+    notes: "The declared support slice currently includes Border Guard, Foot Soldiers, Muck Rats, Wind Drake, Bog Imp, Storm Crow, Armored Pegasus, Wall of Granite, Vengeance, Path of Peace, Touch of Brilliance, Time Ebb, Volcanic Hammer, Lava Axe, Mind Rot, Winter's Grasp, Symbol of Unsummoning, and the five Portal basic lands."
 cards:
   - set_code: por
     card_key: "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
@@ -253,6 +253,87 @@ cards:
       - engine/tests/test_spells.py
       - engine/tests/test_replay_log.py
     notes: "Canonical card identity keyed by Scryfall oracle_id. Support is intentionally narrow and limited to the printed `Put target creature on top of its owner's library.` effect."
+  - set_code: por
+    card_key: "98fa5a06-0553-40fd-999c-bc31c9b3f4db"
+    display_name: Volcanic Hammer
+    card_instances: variable
+    status: implemented
+    engine_scope: Sorcery-speed noncreature spell support for casting `Volcanic Hammer`, choosing a creature or player target in the current slice, dealing 3 damage on resolution, and moving the spell from stack to graveyard.
+    required_rules:
+      - targeted_damage_sorceries_minimal
+      - precombat_priority_minimal
+      - turn_structure_minimal
+      - zones_minimal
+      - state_based_actions_minimal
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+      - engine/tests/test_replay_log.py
+    notes: "Canonical card identity keyed by Scryfall oracle_id. Support is intentionally narrow and omits planeswalker targeting from the printed `any target` text because planeswalkers are outside the current slice."
+  - set_code: por
+    card_key: "387b6b07-a283-412d-94c3-f7f1dc76e858"
+    display_name: Lava Axe
+    card_instances: variable
+    status: implemented
+    engine_scope: Sorcery-speed noncreature spell support for casting `Lava Axe`, choosing a player target in the current slice, dealing 5 damage on resolution, and moving the spell from stack to graveyard.
+    required_rules:
+      - targeted_damage_sorceries_minimal
+      - precombat_priority_minimal
+      - turn_structure_minimal
+      - zones_minimal
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+      - engine/tests/test_replay_log.py
+    notes: "Canonical card identity keyed by Scryfall oracle_id. Support is intentionally narrow and omits planeswalker targeting from the printed `target player or planeswalker` text because planeswalkers are outside the current slice."
+  - set_code: por
+    card_key: "ad44cf74-b717-48fb-9fa2-77512024d76a"
+    display_name: Mind Rot
+    card_instances: variable
+    status: implemented
+    engine_scope: Sorcery-speed noncreature spell support for casting `Mind Rot`, choosing any player target, forcing that player to discard two cards on resolution using deterministic hand-order selection, and moving the spell from stack to graveyard.
+    required_rules:
+      - targeted_discard_sorceries_minimal
+      - precombat_priority_minimal
+      - turn_structure_minimal
+      - zones_minimal
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+      - engine/tests/test_replay_log.py
+    notes: "Canonical card identity keyed by Scryfall oracle_id. Current support intentionally uses deterministic hand-order discard rather than a separate player-choice action."
+  - set_code: por
+    card_key: "e9b8679d-52a9-4f0f-9365-f3e4b7a69805"
+    display_name: Winter's Grasp
+    card_instances: variable
+    status: implemented
+    engine_scope: Sorcery-speed noncreature spell support for casting `Winter's Grasp`, choosing a land target on the battlefield, destroying that land on resolution, and moving the spell from stack to graveyard.
+    required_rules:
+      - targeted_land_destruction_sorceries_minimal
+      - precombat_priority_minimal
+      - turn_structure_minimal
+      - zones_minimal
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+      - engine/tests/test_replay_log.py
+    notes: "Canonical card identity keyed by Scryfall oracle_id. Support is intentionally narrow and limited to the printed `Destroy target land.` effect."
+  - set_code: por
+    card_key: "c44f1a81-269b-4f05-8ff2-e7ce19a93937"
+    display_name: Symbol of Unsummoning
+    card_instances: variable
+    status: implemented
+    engine_scope: Sorcery-speed noncreature spell support for casting `Symbol of Unsummoning`, choosing a creature target on the battlefield, returning that creature to its owner's hand, drawing one card for the caster, and moving the spell from stack to graveyard.
+    required_rules:
+      - targeted_battlefield_to_hand_sorceries_minimal
+      - precombat_priority_minimal
+      - turn_structure_minimal
+      - zones_minimal
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+      - engine/tests/test_replay_log.py
+    notes: "Canonical card identity keyed by Scryfall oracle_id. Support is intentionally narrow and limited to the printed `Return target creature to its owner's hand. Draw a card.` effect."
   - set_code: por
     card_key: "f097a059-5505-4c3c-b879-7853ab6972ed"
     display_name: Armored Pegasus

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define the smallest believable rules subset for the initial `Portal` support slice built from `Border Guard`, `Foot Soldiers`, `Muck Rats`, `Armored Pegasus`, `Wind Drake`, `Bog Imp`, `Storm Crow`, `Wall of Granite`, `Vengeance`, `Path of Peace`, `Touch of Brilliance`, `Time Ebb`, and the five `Portal` basic lands.
+Define the smallest believable rules subset for the initial `Portal` support slice built from `Border Guard`, `Foot Soldiers`, `Muck Rats`, `Armored Pegasus`, `Wind Drake`, `Bog Imp`, `Storm Crow`, `Wall of Granite`, `Vengeance`, `Path of Peace`, `Touch of Brilliance`, `Time Ebb`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, `Symbol of Unsummoning`, and the five `Portal` basic lands.
 
 ## In Scope
 
@@ -19,6 +19,10 @@ Define the smallest believable rules subset for the initial `Portal` support sli
 - Sorcery-speed targeted destruction limited to `Destroy target tapped creature.` and `Destroy target creature. Its owner gains 4 life.`
 - Sorcery-speed card draw limited to `Draw two cards.`
 - Sorcery-speed targeted creature repositioning limited to `Put target creature on top of its owner's library.`
+- Sorcery-speed targeted creature bounce limited to `Return target creature to its owner's hand.` plus draw-one follow-up for `Symbol of Unsummoning`
+- Sorcery-speed direct damage limited to `Volcanic Hammer deals 3 damage to any target.` and `Lava Axe deals 5 damage to target player or planeswalker.` with planeswalker targeting omitted in the current slice
+- Sorcery-speed targeted discard limited to `Target player discards two cards.` using deterministic hand-order selection in the current slice
+- Sorcery-speed targeted land destruction limited to `Destroy target land.`
 - Deterministic setup inputs and replay traces for the above behaviors
 
 ## Engine-Facing Interpretation
@@ -32,6 +36,10 @@ Define the smallest believable rules subset for the initial `Portal` support sli
 - `Path of Peace` may reuse the same targeted-destruction path while adding only owner life gain, without introducing damage prevention, regeneration, or broader effect layering.
 - `Touch of Brilliance` may reuse existing library-to-hand zone movement from turn draws while resolving as a no-target sorcery for exactly two cards.
 - `Time Ebb` may reuse targeted sorcery selection while adding only battlefield-to-library-top movement for creatures, without introducing shuffle, reveal, or replacement-effect support.
+- `Volcanic Hammer` and `Lava Axe` may introduce only the minimal direct-damage path required to mark damage on creatures, reduce player life totals, and run the existing lethal-damage SBA check, without introducing prevention, redirection, or planeswalker support.
+- `Mind Rot` may introduce only the minimal targeted-discard path required for a player to discard exactly two cards, with the current deterministic implementation using the target player's hand order rather than a separate choice action.
+- `Winter's Grasp` may introduce only the minimal targeted land-destruction path required to choose a land on the battlefield, move it to its owner's graveyard, and emit the matching destruction and zone-move events, without introducing mana burn, land animation, or broader permanent-destruction generalization.
+- `Symbol of Unsummoning` may introduce only the minimal targeted battlefield-to-hand path required to return a creature to its owner's hand and then draw one card for the caster, without introducing instant timing, save effects, or broader hand-size rules.
 - `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow` may introduce only the minimal flying restriction that nonflying creatures cannot block them; broader keyword handling remains out of scope until another card requires it.
 - `Wall of Granite` may introduce only the minimal defender restriction that it cannot be declared as an attacker; broader static-ability handling remains out of scope until another card requires it.
 

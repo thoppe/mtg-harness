@@ -44,7 +44,7 @@ rules:
       - engine/tests/test_priority.py
       - engine/tests/test_turns.py
       - engine/tests/test_spells.py
-    notes: "Current support is intentionally narrow: play land, activate a declared basic land, cast a supported creature spell including `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`, cast the supported `Vengeance`, `Path of Peace`, `Touch of Brilliance`, or `Time Ebb` sorcery, advance to combat, or pass priority."
+    notes: "Current support is intentionally narrow: play land, activate a declared basic land, cast a supported creature spell including `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`, cast the supported `Vengeance`, `Path of Peace`, `Touch of Brilliance`, `Time Ebb`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, or `Symbol of Unsummoning` sorcery, advance to combat, or pass priority."
   - rule_key: combat_action_windows_minimal
     source_rules:
       - "508"
@@ -158,6 +158,73 @@ rules:
       - engine/tests/test_spells.py
       - engine/tests/test_replay_log.py
     notes: "Current support is intentionally narrow and name-scoped to `Time Ebb` with oracle text `Put target creature on top of its owner's library.`"
+  - rule_key: targeted_damage_sorceries_minimal
+    source_rules:
+      - "115"
+      - "120"
+      - "601"
+      - "608"
+      - "704"
+    status: implemented
+    scope: Casting and resolving the supported `Portal` sorceries `Volcanic Hammer` and `Lava Axe`, choosing a legal target in the current slice, dealing the declared amount of damage, applying player life-total changes or creature damage marking, and running the existing lethal-damage SBA path when needed.
+    engine_contracts:
+      - docs/contracts/play-engine.md
+      - docs/contracts/state-machine-transitions.md
+      - docs/contracts/replay-event-log.md
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+      - engine/tests/test_replay_log.py
+    notes: "Current support is intentionally narrow and name-scoped to `Volcanic Hammer` and `Lava Axe`, omitting planeswalker targets, prevention, replacement, and redirection effects."
+  - rule_key: targeted_discard_sorceries_minimal
+    source_rules:
+      - "115"
+      - "701.8"
+      - "601"
+      - "608"
+    status: implemented
+    scope: Casting and resolving the supported `Portal` sorcery `Mind Rot`, choosing a player target, and making that player discard two cards using deterministic hand-order selection in the current slice.
+    engine_contracts:
+      - docs/contracts/play-engine.md
+      - docs/contracts/state-machine-transitions.md
+      - docs/contracts/replay-event-log.md
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+      - engine/tests/test_replay_log.py
+    notes: "Current support is intentionally narrow and name-scoped to `Mind Rot`, with a documented v0 simplification that the target player discards the first two cards in hand order rather than making a separate choice."
+  - rule_key: targeted_land_destruction_sorceries_minimal
+    source_rules:
+      - "115"
+      - "601"
+      - "608"
+    status: implemented
+    scope: Casting and resolving the supported `Portal` sorcery `Winter's Grasp`, choosing a land target on the battlefield, destroying that land, and moving the spell from stack to graveyard.
+    engine_contracts:
+      - docs/contracts/play-engine.md
+      - docs/contracts/state-machine-transitions.md
+      - docs/contracts/replay-event-log.md
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+      - engine/tests/test_replay_log.py
+    notes: "Current support is intentionally narrow and name-scoped to `Winter's Grasp`, without implying broader permanent-destruction or land-rule support."
+  - rule_key: targeted_battlefield_to_hand_sorceries_minimal
+    source_rules:
+      - "115"
+      - "601"
+      - "608"
+    status: implemented
+    scope: Casting and resolving the supported `Portal` sorcery `Symbol of Unsummoning`, choosing a creature target on the battlefield, returning that creature to its owner's hand, drawing one card for the caster, and moving the spell from stack to graveyard.
+    engine_contracts:
+      - docs/contracts/play-engine.md
+      - docs/contracts/state-machine-transitions.md
+      - docs/contracts/replay-event-log.md
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+      - engine/tests/test_replay_log.py
+    notes: "Current support is intentionally narrow and name-scoped to `Symbol of Unsummoning`, while establishing the reusable battlefield-to-hand sorcery path for future cards."
   - rule_key: flying_keyword_minimal
     source_rules:
       - "702.9"
@@ -206,7 +273,7 @@ rules:
     source_rules:
       - "704"
     status: implemented
-    scope: Only the subset required for lethal combat damage and creature death from explicitly marked creature damage.
+    scope: Only the subset required for lethal creature damage and creature death from explicitly marked combat or spell damage.
     engine_contracts:
       - docs/contracts/play-engine.md
       - docs/contracts/state-machine-transitions.md
@@ -214,7 +281,7 @@ rules:
     tests:
       - engine/tests/test_combat.py
       - engine/tests/test_replay_log.py
-    notes: "Implemented via explicit damage marking plus SBA checks. The current lethal-damage proof now uses real combat via Border Guard versus Muck Rats."
+    notes: "Implemented via explicit damage marking plus SBA checks for both combat and the currently supported direct-damage sorceries."
   - rule_key: keyword_abilities
     source_rules: []
     status: deferred

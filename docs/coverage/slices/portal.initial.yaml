@@ -13,6 +13,11 @@ card_keys:
   - "b7593cf8-4dcb-473b-a2ef-180fffe66738"
   - "6365aba1-78d3-416c-89cd-9449578eedbf"
   - "30cc8f7b-3c28-40f5-8f8f-157e8212280b"
+  - "98fa5a06-0553-40fd-999c-bc31c9b3f4db"
+  - "387b6b07-a283-412d-94c3-f7f1dc76e858"
+  - "ad44cf74-b717-48fb-9fa2-77512024d76a"
+  - "e9b8679d-52a9-4f0f-9365-f3e4b7a69805"
+  - "c44f1a81-269b-4f05-8ff2-e7ce19a93937"
   - "f097a059-5505-4c3c-b879-7853ab6972ed"
   - "8445094f-008b-491a-977c-e8582d5ab72c"
   - "56719f6a-1a6c-4c0a-8d21-18f7d7350b68"
@@ -31,6 +36,10 @@ rule_keys:
   - targeted_sorcery_spells_minimal
   - simple_card_draw_sorceries_minimal
   - targeted_battlefield_to_library_sorceries_minimal
+  - targeted_damage_sorceries_minimal
+  - targeted_discard_sorceries_minimal
+  - targeted_land_destruction_sorceries_minimal
+  - targeted_battlefield_to_hand_sorceries_minimal
   - flying_keyword_minimal
   - defender_keyword_minimal
   - combat_minimal

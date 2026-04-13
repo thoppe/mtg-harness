@@ -238,6 +238,11 @@ def _summarize_event(
         return f"{payload['from_step']} -> {payload['to_step']}"
     if event.event_type == "life_total_changed":
         return f"{payload['player_id']} goes to {payload['life_total']} life"
+    if event.event_type == "damage_applied":
+        if "target_player_id" in payload:
+            return f"{payload['target_player_id']} takes {payload['damage']} damage"
+        target_name = _event_card_name(card_repository, state, payload["target_instance_id"], payload)
+        return f"{target_name} takes {payload['damage']} damage"
     return str(payload)
 
 

@@ -223,7 +223,7 @@ def _legal_noncreature_spell_targets(
     state: GameState,
     card_repository: CardRepository,
     spell_instance_id: str,
-) -> tuple[str, ...]:
+) -> tuple[str | None, ...]:
     spell = state.objects[spell_instance_id]
     card_definition = card_repository.get(spell.oracle_id)
     effect = _supported_targeted_sorcery_effect(card_definition)
@@ -231,13 +231,30 @@ def _legal_noncreature_spell_targets(
         return (None,)
     if effect is None:
         return ()
+    if effect == "damage_target_player":
+        return tuple(state.players)
+    if effect == "target_player_discards_two":
+        return tuple(state.players)
 
     legal_targets: list[str] = []
+    if effect == "damage_any_target":
+        legal_targets.extend(state.players)
     for player in state.players.values():
         for instance_id in player.battlefield:
             permanent = state.objects[instance_id]
             permanent_definition = card_repository.get(permanent.oracle_id)
+            if effect == "destroy_target_land":
+                if permanent_definition.is_land:
+                    legal_targets.append(instance_id)
+                continue
+            if effect == "return_creature_to_hand_and_draw_one":
+                if permanent_definition.is_creature:
+                    legal_targets.append(instance_id)
+                continue
             if not permanent_definition.is_creature:
+                continue
+            if effect == "damage_any_target":
+                legal_targets.append(instance_id)
                 continue
             if effect == "destroy_tapped_creature" and not permanent.tapped:
                 continue
@@ -263,6 +280,16 @@ def _supported_targeted_sorcery_effect(card_definition) -> str | None:
         return "draw_two_cards"
     if card_definition.oracle_text == "Put target creature on top of its owner's library.":
         return "put_creature_on_top_of_library"
+    if card_definition.oracle_text == "Volcanic Hammer deals 3 damage to any target.":
+        return "damage_any_target"
+    if card_definition.oracle_text == "Lava Axe deals 5 damage to target player or planeswalker.":
+        return "damage_target_player"
+    if card_definition.oracle_text == "Target player discards two cards.":
+        return "target_player_discards_two"
+    if card_definition.oracle_text == "Destroy target land.":
+        return "destroy_target_land"
+    if card_definition.oracle_text == "Return target creature to its owner's hand.\nDraw a card.":
+        return "return_creature_to_hand_and_draw_one"
     return None
 
 

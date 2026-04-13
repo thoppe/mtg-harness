@@ -18,6 +18,11 @@ The initial playable universe contains only these legal card identities:
 - `Path of Peace` from `Portal`
 - `Touch of Brilliance` from `Portal`
 - `Time Ebb` from `Portal`
+- `Volcanic Hammer` from `Portal`
+- `Lava Axe` from `Portal`
+- `Mind Rot` from `Portal`
+- `Winter's Grasp` from `Portal`
+- `Symbol of Unsummoning` from `Portal`
 - `Armored Pegasus` from `Portal`
 - `Wall of Granite` from `Portal`
 - `Swamp` from `Portal`
@@ -26,7 +31,7 @@ The initial playable universe contains only these legal card identities:
 - `Mountain` from `Portal`
 - `Plains` from `Portal`
 
-This slice uses mostly vanilla `Portal` creatures plus the simple flyers `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`, the strict defender creature `Wall of Granite`, the sorceries `Vengeance`, `Path of Peace`, `Touch of Brilliance`, and `Time Ebb`, and all five `Portal` basic lands to widen the engine through a narrow keyword and sorcery-speed noncreature-spell path before broader mechanics are introduced.
+This slice uses mostly vanilla `Portal` creatures plus the simple flyers `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`, the strict defender creature `Wall of Granite`, the sorceries `Vengeance`, `Path of Peace`, `Touch of Brilliance`, `Time Ebb`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, and `Symbol of Unsummoning`, and all five `Portal` basic lands to widen the engine through a narrow keyword and sorcery-speed noncreature-spell path before broader mechanics are introduced.
 Multiplicity is allowed as normal so long as no card identity outside this universe is introduced.
 
 ## Play Mode
@@ -49,5 +54,5 @@ Multiplicity is allowed as normal so long as no card identity outside this unive
 
 ## Current Implementation Note
 
-- The currently implemented slice supports deterministic setup, first-turn progression, land play, basic-land mana generation, creature spell resolution including minimal flying for `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`, minimal defender for `Wall of Granite`, the narrow targeted-sorcery path required for `Vengeance` and `Path of Peace`, simple sorcery-driven card draw for `Touch of Brilliance`, and targeted battlefield-to-top-of-library movement for `Time Ebb`.
+- The currently implemented slice supports deterministic setup, first-turn progression, land play, basic-land mana generation, creature spell resolution including minimal flying for `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`, minimal defender for `Wall of Granite`, the narrow targeted-sorcery path required for `Vengeance`, `Path of Peace`, `Volcanic Hammer`, `Lava Axe`, and `Winter's Grasp`, simple sorcery-driven card draw for `Touch of Brilliance`, targeted battlefield-to-top-of-library movement for `Time Ebb`, targeted battlefield-to-hand movement plus draw for `Symbol of Unsummoning`, and deterministic targeted discard for `Mind Rot`.
 - Additional setup scenarios may use multiple copies of the declared basic lands and vanilla creatures without widening the universe.

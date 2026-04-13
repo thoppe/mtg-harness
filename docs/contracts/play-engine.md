@@ -43,6 +43,11 @@ Describe the responsibilities of the simulation core.
   - `Wall of Granite`
   - `Vengeance`
   - `Path of Peace`
+  - `Volcanic Hammer`
+  - `Lava Axe`
+  - `Mind Rot`
+  - `Winter's Grasp`
+  - `Symbol of Unsummoning`
   - `Touch of Brilliance`
   - `Time Ebb`
   - `Swamp`

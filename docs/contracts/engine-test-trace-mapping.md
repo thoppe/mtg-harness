@@ -110,6 +110,55 @@ Define how the current rule-family coverage should map to future engine tests an
   - `spell_resolved`
   - `object_moved_between_zones`
 
+### `targeted_damage_sorceries_minimal`
+
+- Planned tests:
+  - `engine/tests/test_spells.py`
+  - `engine/tests/test_priority.py`
+  - `engine/tests/test_replay_log.py`
+- Planned trace assertions:
+  - `spell_cast`
+  - `spell_resolved`
+  - `damage_applied`
+  - `life_total_changed`
+  - `state_based_actions_checked`
+  - `permanent_destroyed`
+  - `object_moved_between_zones`
+
+### `targeted_discard_sorceries_minimal`
+
+- Planned tests:
+  - `engine/tests/test_spells.py`
+  - `engine/tests/test_priority.py`
+  - `engine/tests/test_replay_log.py`
+- Planned trace assertions:
+  - `spell_cast`
+  - `spell_resolved`
+  - `object_moved_between_zones`
+
+### `targeted_land_destruction_sorceries_minimal`
+
+- Planned tests:
+  - `engine/tests/test_spells.py`
+  - `engine/tests/test_priority.py`
+  - `engine/tests/test_replay_log.py`
+- Planned trace assertions:
+  - `spell_cast`
+  - `spell_resolved`
+  - `permanent_destroyed`
+  - `object_moved_between_zones`
+
+### `targeted_battlefield_to_hand_sorceries_minimal`
+
+- Planned tests:
+  - `engine/tests/test_spells.py`
+  - `engine/tests/test_priority.py`
+  - `engine/tests/test_replay_log.py`
+- Planned trace assertions:
+  - `spell_cast`
+  - `spell_resolved`
+  - `object_moved_between_zones`
+
 ### `flying_keyword_minimal`
 
 - Planned tests:
@@ -171,6 +220,10 @@ Define how the current rule-family coverage should map to future engine tests an
   - `targeted_sorcery_spells_minimal` now has engine coverage for `Vengeance` and `Path of Peace`.
   - `simple_card_draw_sorceries_minimal` now has engine coverage for `Touch of Brilliance`.
   - `targeted_battlefield_to_library_sorceries_minimal` now has engine coverage for `Time Ebb`.
+  - `targeted_damage_sorceries_minimal` now has engine coverage for `Volcanic Hammer` and `Lava Axe`.
+  - `targeted_discard_sorceries_minimal` now has engine coverage for `Mind Rot`.
+  - `targeted_land_destruction_sorceries_minimal` now has engine coverage for `Winter's Grasp`.
+  - `targeted_battlefield_to_hand_sorceries_minimal` now has engine coverage for `Symbol of Unsummoning`.
   - `flying_keyword_minimal` now has engine coverage for `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`.
   - `defender_keyword_minimal` now has engine coverage for `Wall of Granite`.
   - The current slice now has a real lethal-damage proof via `Border Guard` versus `Muck Rats`, so the earlier synthetic SBA shortcut is no longer needed.

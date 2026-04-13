@@ -1,0 +1,138 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "387b6b07-a283-412d-94c3-f7f1dc76e858",
+  "name": "Lava Axe",
+  "provenance": {
+    "collector_number": "137",
+    "fetched_at": "2026-04-13T16:28:48Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/f/2/f2bebbad-76aa-4388-891a-583e8af9509d.jpg?1562448334",
+    "oracle_id": "387b6b07-a283-412d-94c3-f7f1dc76e858",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor%20%28oracleid%3A1ef5003c-f540-4cdc-913f-7d5280ad9f62%20or%20oracleid%3Aa768ba13-4d1c-4dce-a4a6-86a39c069c3f%20or%20oracleid%3Abca13a12-6723-4a5e-8f1b-21646a8b3e7e%20or%20oracleid%3Ad6ffdaf0-ac08-4de9-bbce-2eab2f86bcca%20or%20oracleid%3A45b94e3c-a905-435b-aee5-bec9239fd24c%20or%20oracleid%3A000d5588-5a4c-434e-988d-396632ade42c%20or%20oracleid%3A1d001145-5d14-43a9-bf3b-3ce5c20b2a46%20or%20oracleid%3Ab7593cf8-4dcb-473b-a2ef-180fffe66738%20or%20oracleid%3A6365aba1-78d3-416c-89cd-9449578eedbf%20or%20oracleid%3A30cc8f7b-3c28-40f5-8f8f-157e8212280b%20or%20oracleid%3A98fa5a06-0553-40fd-999c-bc31c9b3f4db%20or%20oracleid%3A387b6b07-a283-412d-94c3-f7f1dc76e858%20or%20oracleid%3Aad44cf74-b717-48fb-9fa2-77512024d76a%20or%20oracleid%3Af097a059-5505-4c3c-b879-7853ab6972ed%20or%20oracleid%3A8445094f-008b-491a-977c-e8582d5ab72c%20or%20oracleid%3A56719f6a-1a6c-4c0a-8d21-18f7d7350b68%20or%20oracleid%3Ab34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6%20or%20oracleid%3Ab2c6aa39-2d2a-459c-a555-fb48ba993373%20or%20oracleid%3Aa3fb7228-e76b-4e96-a40e-20b5fed75685%20or%20oracleid%3Abc71ebf6-2056-41f7-be35-b2e5c34afa99%29",
+    "requested_set_code": "por",
+    "scryfall_id": "f2bebbad-76aa-4388-891a-583e8af9509d",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/f2bebbad-76aa-4388-891a-583e8af9509d"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Adrian Smith",
+    "artist_ids": [
+      "be42f6f3-66d4-4957-9f1e-0591f8b95364"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10127,
+    "cmc": 5.0,
+    "collector_number": "137",
+    "color_identity": [
+      "R"
+    ],
+    "colors": [
+      "R"
+    ],
+    "digital": false,
+    "edhrec_rank": 17636,
+    "finishes": [
+      "nonfoil"
+    ],
+    "flavor_text": "Swing your axe as a broom, to sweep away the foe.",
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "f2bebbad-76aa-4388-891a-583e8af9509d",
+    "illustration_id": "470a2b6f-8565-4a17-b4e7-05a5a0e0566f",
+    "image_status": "highres_scan",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/f/2/f2bebbad-76aa-4388-891a-583e8af9509d.jpg?1562448334",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/f/2/f2bebbad-76aa-4388-891a-583e8af9509d.jpg?1562448334",
+      "large": "https://cards.scryfall.io/large/front/f/2/f2bebbad-76aa-4388-891a-583e8af9509d.jpg?1562448334",
+      "normal": "https://cards.scryfall.io/normal/front/f/2/f2bebbad-76aa-4388-891a-583e8af9509d.jpg?1562448334",
+      "png": "https://cards.scryfall.io/png/front/f/2/f2bebbad-76aa-4388-891a-583e8af9509d.png?1562448334",
+      "small": "https://cards.scryfall.io/small/front/f/2/f2bebbad-76aa-4388-891a-583e8af9509d.jpg?1562448334"
+    },
+    "keywords": [],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "legal",
+      "commander": "legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "legal",
+      "historic": "legal",
+      "legacy": "legal",
+      "modern": "legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "legal",
+      "paupercommander": "legal",
+      "penny": "legal",
+      "pioneer": "legal",
+      "predh": "legal",
+      "premodern": "legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{4}{R}",
+    "multiverse_ids": [
+      4348
+    ],
+    "name": "Lava Axe",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "387b6b07-a283-412d-94c3-f7f1dc76e858",
+    "oracle_text": "Lava Axe deals 5 damage to target player or planeswalker.",
+    "oversized": false,
+    "penny_rank": 11928,
+    "prices": {
+      "eur": "0.09",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "0.11",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A387b6b07-a283-412d-94c3-f7f1dc76e858&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Lava+Axe&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10127&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F710%3Fpage%3D1"
+    },
+    "rarity": "common",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Lava+Axe",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4348&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DLava%2BAxe",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DLava%2BAxe"
+    },
+    "released_at": "1997-05-01",
+    "reprint": false,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/f2bebbad-76aa-4388-891a-583e8af9509d/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/137/lava-axe?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 710,
+    "textless": false,
+    "type_line": "Sorcery",
+    "uri": "https://api.scryfall.com/cards/f2bebbad-76aa-4388-891a-583e8af9509d",
+    "variation": false
+  }
+}

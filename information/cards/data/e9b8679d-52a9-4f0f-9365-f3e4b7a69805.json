@@ -1,0 +1,138 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "e9b8679d-52a9-4f0f-9365-f3e4b7a69805",
+  "name": "Winter's Grasp",
+  "provenance": {
+    "collector_number": "194",
+    "fetched_at": "2026-04-13T17:30:35Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/b/2/b2215de4-da49-4270-aec7-5e16a938bae4.jpg?1562447368",
+    "oracle_id": "e9b8679d-52a9-4f0f-9365-f3e4b7a69805",
+    "request_url": "https://api.scryfall.com/cards/search?q=%21%22Winter%27s+Grasp%22+set%3Apor",
+    "requested_set_code": "por",
+    "scryfall_id": "b2215de4-da49-4270-aec7-5e16a938bae4",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/b2215de4-da49-4270-aec7-5e16a938bae4"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Paolo Parente",
+    "artist_ids": [
+      "d48dd097-720d-476a-8722-6a02854ae28b"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10105,
+    "cmc": 3.0,
+    "collector_number": "194",
+    "color_identity": [
+      "G"
+    ],
+    "colors": [
+      "G"
+    ],
+    "digital": false,
+    "edhrec_rank": 21763,
+    "finishes": [
+      "nonfoil"
+    ],
+    "flavor_text": "Winter settles on the land, and the land prays it will wake.",
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "b2215de4-da49-4270-aec7-5e16a938bae4",
+    "illustration_id": "61eb6aa7-0603-4564-bdce-28433838f4d1",
+    "image_status": "highres_scan",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/b/2/b2215de4-da49-4270-aec7-5e16a938bae4.jpg?1562447368",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/b/2/b2215de4-da49-4270-aec7-5e16a938bae4.jpg?1562447368",
+      "large": "https://cards.scryfall.io/large/front/b/2/b2215de4-da49-4270-aec7-5e16a938bae4.jpg?1562447368",
+      "normal": "https://cards.scryfall.io/normal/front/b/2/b2215de4-da49-4270-aec7-5e16a938bae4.jpg?1562447368",
+      "png": "https://cards.scryfall.io/png/front/b/2/b2215de4-da49-4270-aec7-5e16a938bae4.png?1562447368",
+      "small": "https://cards.scryfall.io/small/front/b/2/b2215de4-da49-4270-aec7-5e16a938bae4.jpg?1562447368"
+    },
+    "keywords": [],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "not_legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "not_legal",
+      "paupercommander": "not_legal",
+      "penny": "not_legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{1}{G}{G}",
+    "multiverse_ids": [
+      4326
+    ],
+    "name": "Winter's Grasp",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "e9b8679d-52a9-4f0f-9365-f3e4b7a69805",
+    "oracle_text": "Destroy target land.",
+    "oversized": false,
+    "penny_rank": 619,
+    "prices": {
+      "eur": "5.23",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "2.05",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3Ae9b8679d-52a9-4f0f-9365-f3e4b7a69805&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Winter%27s+Grasp&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10105&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F823%3Fpage%3D1"
+    },
+    "rarity": "uncommon",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Winter%27s+Grasp",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4326&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DWinter%2527s%2BGrasp",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DWinter%2527s%2BGrasp"
+    },
+    "released_at": "1997-05-01",
+    "reprint": false,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/b2215de4-da49-4270-aec7-5e16a938bae4/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/194/winters-grasp?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 823,
+    "textless": false,
+    "type_line": "Sorcery",
+    "uri": "https://api.scryfall.com/cards/b2215de4-da49-4270-aec7-5e16a938bae4",
+    "variation": false
+  }
+}

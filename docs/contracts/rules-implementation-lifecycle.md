@@ -18,6 +18,8 @@ Define how official raw rules text becomes simulator-supported engine behavior.
 - Implemented rule support must name the relevant comprehensive-rules sections it covers.
 - Deferred or unsupported rules must be machine-discoverable so agents and humans do not assume silent support.
 - Engine contracts may simplify the official rules, but every simplification must be documented.
+- When a new card fits an existing mechanic family, implementation should prefer extending the shared rule family rather than adding a card-specific rules path.
+- When a new card introduces a mechanic not yet covered, agents should look for the smallest reusable rule-family abstraction that can honestly support the current card and likely near neighbors.
 
 ## Contract Boundary
 

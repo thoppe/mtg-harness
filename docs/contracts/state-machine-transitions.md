@@ -58,6 +58,7 @@ Define the minimum legal progression points for the first deterministic engine s
 - The currently implemented turn flow reaches cleanup, emits `turn_ended`, and can hand off into the next active player's precombat main.
 - Full long-run game-loop completion beyond the supported subset still remains future work.
 - The currently implemented combat model supports multiple blockers per attacker, but attacker-side damage assignment still follows the listed blocker order without a separate player choice action.
+- The current targeted-discard slice may resolve `Mind Rot` by discarding the first two cards in the target player's hand order rather than introducing a separate player-choice action.
 
 ## Expansion Guardrails
 

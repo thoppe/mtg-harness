@@ -19,7 +19,7 @@ from mtg_engine.cards.repository import CardRepository
 from mtg_engine.events.log import EventLog
 from mtg_engine.state.models import GameState, TurnState
 from mtg_engine.state.zones import move_object, move_object_to_top_of_library, update_object, update_player
-from mtg_engine.rules.combat import apply_combat_damage, tap_attackers, with_combat_state
+from mtg_engine.rules.combat import apply_combat_damage, apply_state_based_actions, tap_attackers, with_combat_state
 
 from .priority import can_block_attacker, enumerate_legal_actions
 from .setup import GameBootstrap
@@ -336,7 +336,7 @@ def cast_noncreature_spell(
         },
     )
     resolved_state = casting_state
-    if effect in {"destroy_tapped_creature", "destroy_creature_owner_gains_4_life"}:
+    if effect in {"destroy_tapped_creature", "destroy_creature_owner_gains_4_life", "destroy_target_land"}:
         if action.target_instance_id is None:
             raise ValueError("targeted sorcery requires a target")
         target = casting_state.objects[action.target_instance_id]
@@ -407,6 +407,57 @@ def cast_noncreature_spell(
                 "to_zone": "library",
                 "library_position": "top",
             },
+        )
+    elif effect == "return_creature_to_hand_and_draw_one":
+        if action.target_instance_id is None:
+            raise ValueError("targeted sorcery requires a target")
+        target = casting_state.objects[action.target_instance_id]
+        resolved_state = move_object(
+            casting_state,
+            instance_id=action.target_instance_id,
+            from_zone="battlefield",
+            to_zone="hand",
+            player_id=target.owner_id,
+        )
+        event_log.append(
+            event_type="object_moved_between_zones",
+            active_player=action.player_id,
+            payload={
+                "player_id": target.owner_id,
+                "card_instance_id": action.target_instance_id,
+                "oracle_id": target.oracle_id,
+                "from_zone": "battlefield",
+                "to_zone": "hand",
+            },
+        )
+        resolved_state = _draw_one_card_for_player_if_available(
+            resolved_state,
+            event_log,
+            player_id=action.player_id,
+        )
+    elif effect in {"damage_any_target", "damage_target_player"}:
+        resolved_state, damage_events = _resolve_direct_damage_sorcery(
+            casting_state,
+            card_repository,
+            action.target_instance_id,
+            effect=effect,
+            active_player=action.player_id,
+        )
+        for damage_event in damage_events:
+            event_log.append(
+                event_type=damage_event["event_type"],
+                active_player=damage_event["active_player"],
+                payload=damage_event["payload"],
+            )
+    elif effect == "target_player_discards_two":
+        if action.target_instance_id is None:
+            raise ValueError("targeted sorcery requires a target")
+        resolved_state = _discard_first_cards_in_hand_order(
+            casting_state,
+            event_log,
+            player_id=action.target_instance_id,
+            count=2,
+            active_player=action.player_id,
         )
     resolved_state = move_object(
         resolved_state,
@@ -834,6 +885,46 @@ def _require_legal_noncreature_target(
         return
     if target_instance_id is None:
         raise ValueError("targeted sorcery requires a target")
+    if effect == "damage_target_player":
+        if target_instance_id not in state.players:
+            raise ValueError("target must be a player")
+        return
+    if effect == "target_player_discards_two":
+        if target_instance_id not in state.players:
+            raise ValueError("target must be a player")
+        return
+    if effect == "destroy_target_land":
+        if target_instance_id not in state.objects:
+            raise ValueError("target must exist")
+        target = state.objects[target_instance_id]
+        if target.zone != "battlefield":
+            raise ValueError("target must be on the battlefield")
+        target_definition = card_repository.get(target.oracle_id)
+        if not target_definition.is_land:
+            raise ValueError("target must be a land")
+        return
+    if effect == "return_creature_to_hand_and_draw_one":
+        if target_instance_id not in state.objects:
+            raise ValueError("target must exist")
+        target = state.objects[target_instance_id]
+        if target.zone != "battlefield":
+            raise ValueError("target must be on the battlefield")
+        target_definition = card_repository.get(target.oracle_id)
+        if not target_definition.is_creature:
+            raise ValueError("target must be a creature")
+        return
+    if effect == "damage_any_target":
+        if target_instance_id in state.players:
+            return
+        if target_instance_id not in state.objects:
+            raise ValueError("target must exist")
+        target = state.objects[target_instance_id]
+        if target.zone != "battlefield":
+            raise ValueError("target creature must be on the battlefield")
+        target_definition = card_repository.get(target.oracle_id)
+        if not target_definition.is_creature:
+            raise ValueError("target must be a creature or player")
+        return
     if target_instance_id not in state.objects:
         raise ValueError("target must exist")
     target = state.objects[target_instance_id]
@@ -857,7 +948,106 @@ def _supported_targeted_sorcery_effect(card_definition) -> str | None:
         return "draw_two_cards"
     if card_definition.oracle_text == "Put target creature on top of its owner's library.":
         return "put_creature_on_top_of_library"
+    if card_definition.oracle_text == "Volcanic Hammer deals 3 damage to any target.":
+        return "damage_any_target"
+    if card_definition.oracle_text == "Lava Axe deals 5 damage to target player or planeswalker.":
+        return "damage_target_player"
+    if card_definition.oracle_text == "Target player discards two cards.":
+        return "target_player_discards_two"
+    if card_definition.oracle_text == "Destroy target land.":
+        return "destroy_target_land"
+    if card_definition.oracle_text == "Return target creature to its owner's hand.\nDraw a card.":
+        return "return_creature_to_hand_and_draw_one"
     return None
+
+
+def _resolve_direct_damage_sorcery(
+    state: GameState,
+    card_repository: CardRepository,
+    target_id: str | None,
+    *,
+    effect: str,
+    active_player: str,
+) -> tuple[GameState, list[dict]]:
+    if target_id is None:
+        raise ValueError("targeted sorcery requires a target")
+
+    damage_amount = 3 if effect == "damage_any_target" else 5
+    if target_id in state.players:
+        target_player = state.players[target_id]
+        updated_player = replace(target_player, life_total=target_player.life_total - damage_amount)
+        next_state = update_player(state, updated_player)
+        return next_state, [
+            {
+                "event_type": "damage_applied",
+                "active_player": active_player,
+                "payload": {
+                    "target_player_id": target_id,
+                    "damage": damage_amount,
+                },
+            },
+            {
+                "event_type": "life_total_changed",
+                "active_player": active_player,
+                "payload": {
+                    "player_id": target_id,
+                    "life_total": updated_player.life_total,
+                },
+            },
+        ]
+
+    target = state.objects[target_id]
+    target_definition = card_repository.get(target.oracle_id)
+    next_state = update_object(state, replace(target, damage_marked=target.damage_marked + damage_amount))
+    events = [
+        {
+            "event_type": "damage_applied",
+            "active_player": active_player,
+            "payload": {
+                "target_instance_id": target_id,
+                "oracle_id": target.oracle_id,
+                "damage": damage_amount,
+                "new_damage_marked": target.damage_marked + damage_amount,
+                "toughness": int(target_definition.toughness or "0"),
+            },
+        }
+    ]
+    next_state, sba_events = apply_state_based_actions(next_state, card_repository, active_player=active_player)
+    events.extend(sba_events)
+    return next_state, events
+
+
+def _discard_first_cards_in_hand_order(
+    state: GameState,
+    event_log: EventLog,
+    *,
+    player_id: str,
+    count: int,
+    active_player: str,
+) -> GameState:
+    current_state = state
+    discard_ids = current_state.players[player_id].hand[:count]
+    for instance_id in discard_ids:
+        discarded = current_state.objects[instance_id]
+        current_state = move_object(
+            current_state,
+            instance_id=instance_id,
+            from_zone="hand",
+            to_zone="graveyard",
+            player_id=player_id,
+        )
+        event_log.append(
+            event_type="object_moved_between_zones",
+            active_player=active_player,
+            payload={
+                "player_id": player_id,
+                "card_instance_id": instance_id,
+                "oracle_id": discarded.oracle_id,
+                "from_zone": "hand",
+                "to_zone": "graveyard",
+            },
+        )
+    return current_state
 
 
 def _other_player(state: GameState, player_id: str) -> str:

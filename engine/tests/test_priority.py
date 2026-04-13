@@ -48,6 +48,12 @@ VENGEANCE = "1d001145-5d14-43a9-bf3b-3ce5c20b2a46"
 PATH_OF_PEACE = "b7593cf8-4dcb-473b-a2ef-180fffe66738"
 TOUCH_OF_BRILLIANCE = "6365aba1-78d3-416c-89cd-9449578eedbf"
 TIME_EBB = "30cc8f7b-3c28-40f5-8f8f-157e8212280b"
+VOLCANIC_HAMMER = "98fa5a06-0553-40fd-999c-bc31c9b3f4db"
+LAVA_AXE = "387b6b07-a283-412d-94c3-f7f1dc76e858"
+MIND_ROT = "ad44cf74-b717-48fb-9fa2-77512024d76a"
+FOREST = "b34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6"
+WINTERS_GRASP = "e9b8679d-52a9-4f0f-9365-f3e4b7a69805"
+SYMBOL_OF_UNSUMMONING = "c44f1a81-269b-4f05-8ff2-e7ce19a93937"
 ARMORED_PEGASUS = "f097a059-5505-4c3c-b879-7853ab6972ed"
 WALL_OF_GRANITE = "8445094f-008b-491a-977c-e8582d5ab72c"
 
@@ -177,6 +183,89 @@ class PriorityTests(unittest.TestCase):
     def test_precombat_main_enumerates_time_ebb_for_creature_target(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         session = _build_time_ebb_ready_session(repository)
+
+        actions = enumerate_legal_actions(session.state, repository)
+
+        self.assertIn(
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:4",
+                target_instance_id="bob:1",
+            ),
+            actions,
+        )
+
+    def test_precombat_main_enumerates_volcanic_hammer_for_creature_and_player_targets(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_volcanic_hammer_ready_session(repository)
+
+        actions = enumerate_legal_actions(session.state, repository)
+
+        self.assertIn(
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:3",
+                target_instance_id="bob:1",
+            ),
+            actions,
+        )
+        self.assertIn(
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:3",
+                target_instance_id="bob",
+            ),
+            actions,
+        )
+
+    def test_precombat_main_enumerates_lava_axe_for_player_target(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_lava_axe_ready_session(repository)
+
+        actions = enumerate_legal_actions(session.state, repository)
+
+        self.assertIn(
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:6",
+                target_instance_id="bob",
+            ),
+            actions,
+        )
+
+    def test_precombat_main_enumerates_mind_rot_for_player_target(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_mind_rot_ready_session(repository)
+
+        actions = enumerate_legal_actions(session.state, repository)
+
+        self.assertIn(
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:4",
+                target_instance_id="bob",
+            ),
+            actions,
+        )
+
+    def test_precombat_main_enumerates_winters_grasp_for_land_target(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_winters_grasp_ready_session(repository)
+
+        actions = enumerate_legal_actions(session.state, repository)
+
+        self.assertIn(
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:4",
+                target_instance_id="bob:1",
+            ),
+            actions,
+        )
+
+    def test_precombat_main_enumerates_symbol_of_unsummoning_for_creature_target(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_symbol_of_unsummoning_ready_session(repository)
 
         actions = enumerate_legal_actions(session.state, repository)
 
@@ -426,6 +515,212 @@ def _build_time_ebb_ready_session(repository: CardRepository):
             "bob": (MUCK_RATS,),
         },
         rng_seed=49,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    current_state = session.state
+
+    for land_id in ("alice:1", "alice:2", "alice:3"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
+    current_state = move_object(
+        current_state,
+        instance_id="bob:1",
+        from_zone="hand",
+        to_zone="battlefield",
+        player_id="bob",
+    )
+    session = replace(session, state=current_state)
+
+    for source_instance_id in session.state.players["alice"].battlefield:
+        session = activate_mana_ability(
+            session,
+            ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+            repository,
+        )
+    return session
+
+
+def _build_volcanic_hammer_ready_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="priority-volcanic-hammer",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (MOUNTAIN, MOUNTAIN, VOLCANIC_HAMMER),
+            "bob": (MUCK_RATS,),
+        },
+        opening_hands={
+            "alice": (MOUNTAIN, MOUNTAIN, VOLCANIC_HAMMER),
+            "bob": (MUCK_RATS,),
+        },
+        rng_seed=54,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    current_state = session.state
+
+    for land_id in ("alice:1", "alice:2"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
+    current_state = move_object(
+        current_state,
+        instance_id="bob:1",
+        from_zone="hand",
+        to_zone="battlefield",
+        player_id="bob",
+    )
+    session = replace(session, state=current_state)
+
+    for source_instance_id in session.state.players["alice"].battlefield:
+        session = activate_mana_ability(
+            session,
+            ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+            repository,
+        )
+    return session
+
+
+def _build_lava_axe_ready_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="priority-lava-axe",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (MOUNTAIN, MOUNTAIN, MOUNTAIN, MOUNTAIN, MOUNTAIN, LAVA_AXE),
+            "bob": (PLAINS,),
+        },
+        opening_hands={
+            "alice": (MOUNTAIN, MOUNTAIN, MOUNTAIN, MOUNTAIN, MOUNTAIN, LAVA_AXE),
+            "bob": (PLAINS,),
+        },
+        rng_seed=55,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    current_state = session.state
+
+    for land_id in ("alice:1", "alice:2", "alice:3", "alice:4", "alice:5"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
+    session = replace(session, state=current_state)
+
+    for source_instance_id in session.state.players["alice"].battlefield:
+        session = activate_mana_ability(
+            session,
+            ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+            repository,
+        )
+    return session
+
+
+def _build_mind_rot_ready_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="priority-mind-rot",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (SWAMP, SWAMP, SWAMP, MIND_ROT),
+            "bob": (PLAINS, MUCK_RATS, BORDER_GUARD),
+        },
+        opening_hands={
+            "alice": (SWAMP, SWAMP, SWAMP, MIND_ROT),
+            "bob": (PLAINS, MUCK_RATS, BORDER_GUARD),
+        },
+        rng_seed=56,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    current_state = session.state
+
+    for land_id in ("alice:1", "alice:2", "alice:3"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
+    session = replace(session, state=current_state)
+
+    for source_instance_id in session.state.players["alice"].battlefield:
+        session = activate_mana_ability(
+            session,
+            ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+            repository,
+        )
+    return session
+
+
+def _build_winters_grasp_ready_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="priority-winters-grasp",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (FOREST, FOREST, FOREST, WINTERS_GRASP),
+            "bob": (PLAINS,),
+        },
+        opening_hands={
+            "alice": (FOREST, FOREST, FOREST, WINTERS_GRASP),
+            "bob": (PLAINS,),
+        },
+        rng_seed=57,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    current_state = session.state
+
+    for land_id in ("alice:1", "alice:2", "alice:3"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
+    current_state = move_object(
+        current_state,
+        instance_id="bob:1",
+        from_zone="hand",
+        to_zone="battlefield",
+        player_id="bob",
+    )
+    session = replace(session, state=current_state)
+
+    for source_instance_id in session.state.players["alice"].battlefield:
+        session = activate_mana_ability(
+            session,
+            ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+            repository,
+        )
+    return session
+
+
+def _build_symbol_of_unsummoning_ready_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="priority-symbol-of-unsummoning",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (ISLAND, ISLAND, ISLAND, SYMBOL_OF_UNSUMMONING, PLAINS),
+            "bob": (MUCK_RATS,),
+        },
+        opening_hands={
+            "alice": (ISLAND, ISLAND, ISLAND, SYMBOL_OF_UNSUMMONING),
+            "bob": (MUCK_RATS,),
+        },
+        rng_seed=58,
     )
     session = start_first_turn(initialize_game(setup, repository))
     current_state = session.state
