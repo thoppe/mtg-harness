@@ -9,6 +9,7 @@ card_keys:
   - "1d001145-5d14-43a9-bf3b-3ce5c20b2a46"
   - "b7593cf8-4dcb-473b-a2ef-180fffe66738"
   - "6365aba1-78d3-416c-89cd-9449578eedbf"
+  - "30cc8f7b-3c28-40f5-8f8f-157e8212280b"
   - "56719f6a-1a6c-4c0a-8d21-18f7d7350b68"
   - "b34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6"
   - "b2c6aa39-2d2a-459c-a555-fb48ba993373"
@@ -24,6 +25,7 @@ rule_keys:
   - creature_spells_minimal
   - targeted_sorcery_spells_minimal
   - simple_card_draw_sorceries_minimal
+  - targeted_battlefield_to_library_sorceries_minimal
   - combat_minimal
   - zones_minimal
   - state_based_actions_minimal

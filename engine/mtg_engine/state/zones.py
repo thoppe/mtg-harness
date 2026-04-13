@@ -56,6 +56,37 @@ def move_object(
     return update_object(state, updated_object)
 
 
+def move_object_to_top_of_library(
+    state: GameState,
+    *,
+    instance_id: str,
+    from_zone: str,
+    player_id: str,
+) -> GameState:
+    object_record = state.objects[instance_id]
+
+    if from_zone == "stack":
+        state = replace(state, stack=tuple(value for value in state.stack if value != instance_id))
+    elif from_zone in ZONE_FIELDS:
+        player = state.players[player_id]
+        from_values = tuple(value for value in getattr(player, ZONE_FIELDS[from_zone]) if value != instance_id)
+        state = update_player(state, replace(player, **{ZONE_FIELDS[from_zone]: from_values}))
+    else:
+        raise ValueError(f"unsupported from_zone: {from_zone}")
+
+    player = state.players[player_id]
+    state = update_player(
+        state,
+        replace(player, library=(instance_id,) + player.library),
+    )
+    updated_object = replace(
+        object_record,
+        zone="library",
+        damage_marked=0,
+    )
+    return update_object(state, updated_object)
+
+
 def update_player(state: GameState, player: PlayerState) -> GameState:
     updated_players = dict(state.players)
     updated_players[player.player_id] = player

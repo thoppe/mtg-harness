@@ -18,7 +18,7 @@ from mtg_engine.actions.validation import require_active_player, require_step
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.events.log import EventLog
 from mtg_engine.state.models import GameState, TurnState
-from mtg_engine.state.zones import move_object, update_object, update_player
+from mtg_engine.state.zones import move_object, move_object_to_top_of_library, update_object, update_player
 from mtg_engine.rules.combat import apply_combat_damage, tap_attackers, with_combat_state
 
 from .priority import enumerate_legal_actions
@@ -386,6 +386,28 @@ def cast_noncreature_spell(
                 event_log,
                 player_id=action.player_id,
             )
+    elif effect == "put_creature_on_top_of_library":
+        if action.target_instance_id is None:
+            raise ValueError("targeted sorcery requires a target")
+        target = casting_state.objects[action.target_instance_id]
+        resolved_state = move_object_to_top_of_library(
+            casting_state,
+            instance_id=action.target_instance_id,
+            from_zone="battlefield",
+            player_id=target.owner_id,
+        )
+        event_log.append(
+            event_type="object_moved_between_zones",
+            active_player=action.player_id,
+            payload={
+                "player_id": target.owner_id,
+                "card_instance_id": action.target_instance_id,
+                "oracle_id": target.oracle_id,
+                "from_zone": "battlefield",
+                "to_zone": "library",
+                "library_position": "top",
+            },
+        )
     resolved_state = move_object(
         resolved_state,
         instance_id=action.card_instance_id,
@@ -824,6 +846,8 @@ def _supported_targeted_sorcery_effect(card_definition) -> str | None:
         return "destroy_creature_owner_gains_4_life"
     if card_definition.oracle_text == "Draw two cards.":
         return "draw_two_cards"
+    if card_definition.oracle_text == "Put target creature on top of its owner's library.":
+        return "put_creature_on_top_of_library"
     return None
 
 

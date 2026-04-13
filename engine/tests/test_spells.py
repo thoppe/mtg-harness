@@ -44,6 +44,7 @@ VENGEANCE = "1d001145-5d14-43a9-bf3b-3ce5c20b2a46"
 PATH_OF_PEACE = "b7593cf8-4dcb-473b-a2ef-180fffe66738"
 ISLAND = "b2c6aa39-2d2a-459c-a555-fb48ba993373"
 TOUCH_OF_BRILLIANCE = "6365aba1-78d3-416c-89cd-9449578eedbf"
+TIME_EBB = "30cc8f7b-3c28-40f5-8f8f-157e8212280b"
 
 
 class SpellTests(unittest.TestCase):
@@ -237,6 +238,44 @@ class SpellTests(unittest.TestCase):
             ],
         )
 
+    def test_cast_time_ebb_moves_creature_to_top_of_library_and_spell_to_graveyard(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_time_ebb_session(repository)
+
+        for source_instance_id in session.state.players["alice"].battlefield:
+            session = activate_mana_ability(
+                session,
+                ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+                repository,
+            )
+
+        result = cast_noncreature_spell(
+            session,
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:4",
+                target_instance_id="bob:1",
+            ),
+            repository,
+        )
+
+        self.assertEqual(result.state.players["bob"].battlefield, ())
+        self.assertEqual(result.state.players["bob"].library[0], "bob:1")
+        self.assertEqual(result.state.players["alice"].graveyard, ("alice:4",))
+        self.assertEqual(result.state.objects["bob:1"].zone, "library")
+        self.assertEqual(result.state.objects["alice:4"].zone, "graveyard")
+        self.assertEqual(result.state.objects["alice:4"].oracle_id, TIME_EBB)
+        self.assertEqual(
+            [event.event_type for event in result.event_log[-5:]],
+            [
+                "spell_cast",
+                "object_moved_between_zones",
+                "spell_resolved",
+                "object_moved_between_zones",
+                "object_moved_between_zones",
+            ],
+        )
+
 
 def _build_castable_main_phase_session(repository: CardRepository):
     setup = SetupInput(
@@ -397,6 +436,43 @@ def _build_touch_of_brilliance_session(repository: CardRepository):
             player_id="alice",
         )
 
+    return replace(session, state=current_state)
+
+
+def _build_time_ebb_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="spell-cast-time-ebb",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (PLAINS, PLAINS, ISLAND, TIME_EBB),
+            "bob": (MUCK_RATS, PLAINS),
+        },
+        opening_hands={
+            "alice": (PLAINS, PLAINS, ISLAND, TIME_EBB),
+            "bob": (MUCK_RATS,),
+        },
+        rng_seed=35,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    current_state = session.state
+
+    for land_id in ("alice:1", "alice:2", "alice:3"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
+
+    current_state = move_object(
+        current_state,
+        instance_id="bob:1",
+        from_zone="hand",
+        to_zone="battlefield",
+        player_id="bob",
+    )
     return replace(session, state=current_state)
 
 

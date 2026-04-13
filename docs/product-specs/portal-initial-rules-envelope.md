@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define the smallest believable rules subset for the initial `Portal` support slice built from `Border Guard`, `Foot Soldiers`, `Muck Rats`, `Vengeance`, `Path of Peace`, `Touch of Brilliance`, and the five `Portal` basic lands.
+Define the smallest believable rules subset for the initial `Portal` support slice built from `Border Guard`, `Foot Soldiers`, `Muck Rats`, `Vengeance`, `Path of Peace`, `Touch of Brilliance`, `Time Ebb`, and the five `Portal` basic lands.
 
 ## In Scope
 
@@ -16,6 +16,7 @@ Define the smallest believable rules subset for the initial `Portal` support sli
 - Lethal damage and creature death as minimal state-based handling
 - Sorcery-speed targeted destruction limited to `Destroy target tapped creature.` and `Destroy target creature. Its owner gains 4 life.`
 - Sorcery-speed card draw limited to `Draw two cards.`
+- Sorcery-speed targeted creature repositioning limited to `Put target creature on top of its owner's library.`
 - Deterministic setup inputs and replay traces for the above behaviors
 
 ## Engine-Facing Interpretation
@@ -28,6 +29,7 @@ Define the smallest believable rules subset for the initial `Portal` support sli
 - `Vengeance` may reuse the existing tapped-state model from combat and mana activation rather than introducing a broader effect framework.
 - `Path of Peace` may reuse the same targeted-destruction path while adding only owner life gain, without introducing damage prevention, regeneration, or broader effect layering.
 - `Touch of Brilliance` may reuse existing library-to-hand zone movement from turn draws while resolving as a no-target sorcery for exactly two cards.
+- `Time Ebb` may reuse targeted sorcery selection while adding only battlefield-to-library-top movement for creatures, without introducing shuffle, reveal, or replacement-effect support.
 
 ## Out Of Scope
 

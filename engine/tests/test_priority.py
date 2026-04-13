@@ -46,6 +46,7 @@ MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
 VENGEANCE = "1d001145-5d14-43a9-bf3b-3ce5c20b2a46"
 PATH_OF_PEACE = "b7593cf8-4dcb-473b-a2ef-180fffe66738"
 TOUCH_OF_BRILLIANCE = "6365aba1-78d3-416c-89cd-9449578eedbf"
+TIME_EBB = "30cc8f7b-3c28-40f5-8f8f-157e8212280b"
 
 
 class PriorityTests(unittest.TestCase):
@@ -166,6 +167,21 @@ class PriorityTests(unittest.TestCase):
                 player_id="alice",
                 card_instance_id="alice:5",
                 target_instance_id=None,
+            ),
+            actions,
+        )
+
+    def test_precombat_main_enumerates_time_ebb_for_creature_target(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_time_ebb_ready_session(repository)
+
+        actions = enumerate_legal_actions(session.state, repository)
+
+        self.assertIn(
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:4",
+                target_instance_id="bob:1",
             ),
             actions,
         )
@@ -353,6 +369,50 @@ def _build_touch_of_brilliance_ready_session(repository: CardRepository):
             to_zone="battlefield",
             player_id="alice",
         )
+    session = replace(session, state=current_state)
+
+    for source_instance_id in session.state.players["alice"].battlefield:
+        session = activate_mana_ability(
+            session,
+            ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+            repository,
+        )
+    return session
+
+
+def _build_time_ebb_ready_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="priority-time-ebb",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (PLAINS, PLAINS, ISLAND, TIME_EBB),
+            "bob": (MUCK_RATS, PLAINS),
+        },
+        opening_hands={
+            "alice": (PLAINS, PLAINS, ISLAND, TIME_EBB),
+            "bob": (MUCK_RATS,),
+        },
+        rng_seed=49,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    current_state = session.state
+
+    for land_id in ("alice:1", "alice:2", "alice:3"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
+    current_state = move_object(
+        current_state,
+        instance_id="bob:1",
+        from_zone="hand",
+        to_zone="battlefield",
+        player_id="bob",
+    )
     session = replace(session, state=current_state)
 
     for source_instance_id in session.state.players["alice"].battlefield:

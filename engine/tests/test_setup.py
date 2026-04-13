@@ -27,6 +27,7 @@ class SetupTests(unittest.TestCase):
             "1ef5003c-f540-4cdc-913f-7d5280ad9f62",
             "b7593cf8-4dcb-473b-a2ef-180fffe66738",
             "6365aba1-78d3-416c-89cd-9449578eedbf",
+            "30cc8f7b-3c28-40f5-8f8f-157e8212280b",
             "a768ba13-4d1c-4dce-a4a6-86a39c069c3f",
             "a3fb7228-e76b-4e96-a40e-20b5fed75685",
             "b2c6aa39-2d2a-459c-a555-fb48ba993373",

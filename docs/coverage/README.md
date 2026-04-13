@@ -33,6 +33,7 @@ Current declared slice contents:
 - `Vengeance`
 - `Path of Peace`
 - `Touch of Brilliance`
+- `Time Ebb`
 - `Swamp`
 - `Forest`
 - `Island`

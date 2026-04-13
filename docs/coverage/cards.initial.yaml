@@ -3,7 +3,7 @@ slice: portal_initial_micro_universe
 set_summaries:
   - set_code: por
     status: partial
-    notes: "The declared support slice currently includes Border Guard, Foot Soldiers, Muck Rats, Vengeance, Path of Peace, Touch of Brilliance, and the five Portal basic lands."
+    notes: "The declared support slice currently includes Border Guard, Foot Soldiers, Muck Rats, Vengeance, Path of Peace, Touch of Brilliance, Time Ebb, and the five Portal basic lands."
 cards:
   - set_code: por
     card_key: "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
@@ -183,3 +183,19 @@ cards:
       - engine/tests/test_spells.py
       - engine/tests/test_turns.py
     notes: "Canonical card identity keyed by Scryfall oracle_id. Support is intentionally narrow and limited to the printed `Draw two cards.` effect."
+  - set_code: por
+    card_key: "30cc8f7b-3c28-40f5-8f8f-157e8212280b"
+    display_name: Time Ebb
+    card_instances: variable
+    status: implemented
+    engine_scope: Sorcery-speed noncreature spell support for casting `Time Ebb`, choosing any creature target, putting that creature on top of its owner's library, and moving Time Ebb from stack to graveyard.
+    required_rules:
+      - targeted_battlefield_to_library_sorceries_minimal
+      - precombat_priority_minimal
+      - turn_structure_minimal
+      - zones_minimal
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+      - engine/tests/test_replay_log.py
+    notes: "Canonical card identity keyed by Scryfall oracle_id. Support is intentionally narrow and limited to the printed `Put target creature on top of its owner's library.` effect."

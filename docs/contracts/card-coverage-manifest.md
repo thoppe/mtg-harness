@@ -28,6 +28,7 @@ Define the machine-readable inventory of card and set support claimed by the sim
   - `Vengeance`
   - `Path of Peace`
   - `Touch of Brilliance`
+  - `Time Ebb`
   - `Swamp`
   - `Forest`
   - `Island`

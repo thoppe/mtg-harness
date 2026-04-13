@@ -80,6 +80,12 @@ class PullSourcesTests(unittest.TestCase):
                 collector_number="76",
             ),
             sample_card(
+                name="Time Ebb",
+                oracle_id="30cc8f7b-3c28-40f5-8f8f-157e8212280b",
+                card_id="e5fd26ca-dc7d-453d-8653-7f967e8f6dc7",
+                collector_number="75",
+            ),
+            sample_card(
                 name="Swamp",
                 oracle_id="56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
                 card_id="ec0da69e-4ab6-4ef1-a7ae-4d6c47172c81",
@@ -184,6 +190,12 @@ class PullSourcesTests(unittest.TestCase):
                 oracle_id="6365aba1-78d3-416c-89cd-9449578eedbf",
                 card_id="196474ce-e28e-48f0-b407-dc5535adf1b6",
                 collector_number="76",
+            ),
+            sample_card(
+                name="Time Ebb",
+                oracle_id="30cc8f7b-3c28-40f5-8f8f-157e8212280b",
+                card_id="e5fd26ca-dc7d-453d-8653-7f967e8f6dc7",
+                collector_number="75",
             ),
             sample_card(
                 name="Swamp",

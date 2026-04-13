@@ -44,7 +44,7 @@ rules:
       - engine/tests/test_priority.py
       - engine/tests/test_turns.py
       - engine/tests/test_spells.py
-    notes: "Current support is intentionally narrow: play land, activate a declared basic land, cast a vanilla creature spell, cast the supported `Vengeance`, `Path of Peace`, or `Touch of Brilliance` sorcery, advance to combat, or pass priority."
+    notes: "Current support is intentionally narrow: play land, activate a declared basic land, cast a vanilla creature spell, cast the supported `Vengeance`, `Path of Peace`, `Touch of Brilliance`, or `Time Ebb` sorcery, advance to combat, or pass priority."
   - rule_key: combat_action_windows_minimal
     source_rules:
       - "508"
@@ -127,6 +127,22 @@ rules:
       - engine/tests/test_spells.py
       - engine/tests/test_turns.py
     notes: "Current support is intentionally narrow and name-scoped to `Touch of Brilliance` with oracle text `Draw two cards.`"
+  - rule_key: targeted_battlefield_to_library_sorceries_minimal
+    source_rules:
+      - "115"
+      - "601"
+      - "608"
+    status: implemented
+    scope: Casting and resolving the supported `Portal` sorcery `Time Ebb`, choosing a creature target, putting that creature on top of its owner's library, and moving the spell from stack to graveyard.
+    engine_contracts:
+      - docs/contracts/play-engine.md
+      - docs/contracts/state-machine-transitions.md
+      - docs/contracts/replay-event-log.md
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+      - engine/tests/test_replay_log.py
+    notes: "Current support is intentionally narrow and name-scoped to `Time Ebb` with oracle text `Put target creature on top of its owner's library.`"
   - rule_key: combat_minimal
     source_rules:
       - "506"
@@ -155,7 +171,7 @@ rules:
     tests:
       - engine/tests/test_setup.py
       - engine/tests/test_turns.py
-    notes: "Supported movement currently includes library-to-hand, hand-to-battlefield, hand-to-stack, stack-to-battlefield, stack-to-graveyard, and battlefield-to-graveyard."
+    notes: "Supported movement currently includes library-to-hand, hand-to-battlefield, hand-to-stack, stack-to-battlefield, stack-to-graveyard, battlefield-to-graveyard, and battlefield-to-library-top."
   - rule_key: state_based_actions_minimal
     source_rules:
       - "704"

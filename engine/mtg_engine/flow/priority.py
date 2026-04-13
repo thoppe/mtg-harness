@@ -227,6 +227,9 @@ def _legal_noncreature_spell_targets(
             if effect == "destroy_creature_owner_gains_4_life":
                 legal_targets.append(instance_id)
                 continue
+            if effect == "put_creature_on_top_of_library":
+                legal_targets.append(instance_id)
+                continue
             if effect == "destroy_tapped_creature":
                 legal_targets.append(instance_id)
     return tuple(legal_targets)
@@ -241,6 +244,8 @@ def _supported_targeted_sorcery_effect(card_definition) -> str | None:
         return "destroy_creature_owner_gains_4_life"
     if card_definition.oracle_text == "Draw two cards.":
         return "draw_two_cards"
+    if card_definition.oracle_text == "Put target creature on top of its owner's library.":
+        return "put_creature_on_top_of_library"
     return None
 
 

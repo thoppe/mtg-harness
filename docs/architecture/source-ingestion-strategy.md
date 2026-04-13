@@ -58,6 +58,7 @@ Current verified official entry points as of April 12, 2026:
   - `Vengeance`
   - `Path of Peace`
   - `Touch of Brilliance`
+  - `Time Ebb`
   - `Swamp`
   - `Forest`
   - `Island`

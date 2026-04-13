@@ -4,10 +4,10 @@
   "name": "Foot Soldiers",
   "provenance": {
     "collector_number": "16",
-    "fetched_at": "2026-04-13T00:02:11Z",
+    "fetched_at": "2026-04-13T00:18:43Z",
     "image_uri_normal": "https://cards.scryfall.io/normal/front/4/5/458ddb33-66c4-4753-b1eb-8937ab812a81.jpg?1562446622",
     "oracle_id": "a768ba13-4d1c-4dce-a4a6-86a39c069c3f",
-    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor%20%28oracleid%3A1ef5003c-f540-4cdc-913f-7d5280ad9f62%20or%20oracleid%3Aa768ba13-4d1c-4dce-a4a6-86a39c069c3f%20or%20oracleid%3Abca13a12-6723-4a5e-8f1b-21646a8b3e7e%20or%20oracleid%3A1d001145-5d14-43a9-bf3b-3ce5c20b2a46%20or%20oracleid%3Ab7593cf8-4dcb-473b-a2ef-180fffe66738%20or%20oracleid%3A6365aba1-78d3-416c-89cd-9449578eedbf%20or%20oracleid%3A56719f6a-1a6c-4c0a-8d21-18f7d7350b68%20or%20oracleid%3Ab34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6%20or%20oracleid%3Ab2c6aa39-2d2a-459c-a555-fb48ba993373%20or%20oracleid%3Aa3fb7228-e76b-4e96-a40e-20b5fed75685%20or%20oracleid%3Abc71ebf6-2056-41f7-be35-b2e5c34afa99%29",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor%20%28oracleid%3A1ef5003c-f540-4cdc-913f-7d5280ad9f62%20or%20oracleid%3Aa768ba13-4d1c-4dce-a4a6-86a39c069c3f%20or%20oracleid%3Abca13a12-6723-4a5e-8f1b-21646a8b3e7e%20or%20oracleid%3A1d001145-5d14-43a9-bf3b-3ce5c20b2a46%20or%20oracleid%3Ab7593cf8-4dcb-473b-a2ef-180fffe66738%20or%20oracleid%3A6365aba1-78d3-416c-89cd-9449578eedbf%20or%20oracleid%3A30cc8f7b-3c28-40f5-8f8f-157e8212280b%20or%20oracleid%3A56719f6a-1a6c-4c0a-8d21-18f7d7350b68%20or%20oracleid%3Ab34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6%20or%20oracleid%3Ab2c6aa39-2d2a-459c-a555-fb48ba993373%20or%20oracleid%3Aa3fb7228-e76b-4e96-a40e-20b5fed75685%20or%20oracleid%3Abc71ebf6-2056-41f7-be35-b2e5c34afa99%29",
     "requested_set_code": "por",
     "scryfall_id": "458ddb33-66c4-4753-b1eb-8937ab812a81",
     "set_code": "por",

@@ -28,6 +28,7 @@ Define the machine-readable inventory of rules support claimed by the simulator.
   - `Vengeance`
   - `Path of Peace`
   - `Touch of Brilliance`
+  - `Time Ebb`
   - `Swamp`
   - `Forest`
   - `Island`
