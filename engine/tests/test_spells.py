@@ -53,11 +53,13 @@ FOREST = "b34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6"
 WINTERS_GRASP = "e9b8679d-52a9-4f0f-9365-f3e4b7a69805"
 SYMBOL_OF_UNSUMMONING = "c44f1a81-269b-4f05-8ff2-e7ce19a93937"
 ARMAGEDDON = "c9ed8b01-959a-47d6-891e-0abbdccf6e4f"
+RAIN_OF_SALT = "1219e330-01ac-405a-b75a-dd4298598167"
 ARMORED_PEGASUS = "f097a059-5505-4c3c-b879-7853ab6972ed"
 WIND_DRAKE = "d6ffdaf0-ac08-4de9-bbce-2eab2f86bcca"
 BOG_IMP = "45b94e3c-a905-435b-aee5-bec9239fd24c"
 STORM_CROW = "000d5588-5a4c-434e-988d-396632ade42c"
 WALL_OF_GRANITE = "8445094f-008b-491a-977c-e8582d5ab72c"
+WRATH_OF_GOD = "34515b16-c9a4-4f98-8c77-416a7a523407"
 RAIN_OF_DAGGERS = "e2048201-6dc9-4cf5-916f-1d867ae8dbdd"
 
 
@@ -500,6 +502,59 @@ class SpellTests(unittest.TestCase):
         self.assertEqual(result.state.players["alice"].graveyard, ("alice:1", "alice:2", "alice:3", "alice:4", "alice:5"))
         self.assertEqual(result.state.players["bob"].graveyard, ("bob:1", "bob:2"))
         self.assertEqual(result.state.objects["alice:5"].oracle_id, ARMAGEDDON)
+
+    def test_cast_rain_of_salt_destroys_two_target_lands_and_moves_spell_to_graveyard(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_rain_of_salt_session(repository)
+
+        for source_instance_id in session.state.players["alice"].battlefield:
+            session = activate_mana_ability(
+                session,
+                ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+                repository,
+            )
+
+        result = cast_noncreature_spell(
+            session,
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:7",
+                target_instance_ids=("bob:1", "bob:2"),
+            ),
+            repository,
+        )
+
+        self.assertEqual(result.state.players["bob"].battlefield, ())
+        self.assertEqual(result.state.players["bob"].graveyard, ("bob:1", "bob:2"))
+        self.assertEqual(result.state.players["alice"].graveyard, ("alice:7",))
+        self.assertEqual(result.state.objects["alice:7"].oracle_id, RAIN_OF_SALT)
+
+    def test_cast_wrath_of_god_destroys_all_creatures_and_moves_spell_to_graveyard(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_wrath_of_god_session(repository)
+
+        for source_instance_id in session.state.players["alice"].battlefield:
+            session = activate_mana_ability(
+                session,
+                ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+                repository,
+            )
+
+        result = cast_noncreature_spell(
+            session,
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:5",
+                target_instance_ids=(),
+            ),
+            repository,
+        )
+
+        self.assertEqual(result.state.players["alice"].battlefield, ("alice:1", "alice:2", "alice:3", "alice:4"))
+        self.assertEqual(result.state.players["bob"].battlefield, ())
+        self.assertEqual(result.state.players["bob"].graveyard, ("bob:1", "bob:2"))
+        self.assertEqual(result.state.players["alice"].graveyard, ("alice:5",))
+        self.assertEqual(result.state.objects["alice:5"].oracle_id, WRATH_OF_GOD)
 
     def test_cast_rain_of_daggers_destroys_target_opponent_creatures_and_loses_life(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
@@ -1018,6 +1073,86 @@ def _build_armageddon_session(repository: CardRepository):
             to_zone="battlefield",
             player_id="bob",
         )
+    return replace(session, state=current_state)
+
+
+def _build_rain_of_salt_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="spell-cast-rain-of-salt",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (MOUNTAIN, MOUNTAIN, MOUNTAIN, MOUNTAIN, MOUNTAIN, MOUNTAIN, RAIN_OF_SALT),
+            "bob": (PLAINS, SWAMP),
+        },
+        opening_hands={
+            "alice": (MOUNTAIN, MOUNTAIN, MOUNTAIN, MOUNTAIN, MOUNTAIN, MOUNTAIN, RAIN_OF_SALT),
+            "bob": (PLAINS, SWAMP),
+        },
+        rng_seed=42,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    current_state = session.state
+
+    for land_id in ("alice:1", "alice:2", "alice:3", "alice:4", "alice:5", "alice:6"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
+    for land_id in ("bob:1", "bob:2"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="bob",
+        )
+    return replace(session, state=current_state)
+
+
+def _build_wrath_of_god_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="spell-cast-wrath-of-god",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (PLAINS, PLAINS, PLAINS, PLAINS, WRATH_OF_GOD),
+            "bob": (MUCK_RATS, BORDER_GUARD),
+        },
+        opening_hands={
+            "alice": (PLAINS, PLAINS, PLAINS, PLAINS, WRATH_OF_GOD),
+            "bob": (MUCK_RATS, BORDER_GUARD),
+        },
+        rng_seed=43,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    current_state = session.state
+
+    for land_id in ("alice:1", "alice:2", "alice:3", "alice:4"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
+    current_state = move_object(
+        current_state,
+        instance_id="bob:1",
+        from_zone="hand",
+        to_zone="battlefield",
+        player_id="bob",
+    )
+    current_state = move_object(
+        current_state,
+        instance_id="bob:2",
+        from_zone="hand",
+        to_zone="battlefield",
+        player_id="bob",
+    )
     return replace(session, state=current_state)
 
 

@@ -24,6 +24,8 @@ MIND_ROT = "ad44cf74-b717-48fb-9fa2-77512024d76a"
 WINTERS_GRASP = "e9b8679d-52a9-4f0f-9365-f3e4b7a69805"
 SYMBOL_OF_UNSUMMONING = "c44f1a81-269b-4f05-8ff2-e7ce19a93937"
 ARMAGEDDON = "c9ed8b01-959a-47d6-891e-0abbdccf6e4f"
+RAIN_OF_SALT = "1219e330-01ac-405a-b75a-dd4298598167"
+WRATH_OF_GOD = "34515b16-c9a4-4f98-8c77-416a7a523407"
 RAIN_OF_DAGGERS = "e2048201-6dc9-4cf5-916f-1d867ae8dbdd"
 
 
@@ -46,7 +48,9 @@ class SetupTests(unittest.TestCase):
             "e9b8679d-52a9-4f0f-9365-f3e4b7a69805",
             "c44f1a81-269b-4f05-8ff2-e7ce19a93937",
             "c9ed8b01-959a-47d6-891e-0abbdccf6e4f",
+            "1219e330-01ac-405a-b75a-dd4298598167",
             "f097a059-5505-4c3c-b879-7853ab6972ed",
+            "34515b16-c9a4-4f98-8c77-416a7a523407",
             "8445094f-008b-491a-977c-e8582d5ab72c",
             "e2048201-6dc9-4cf5-916f-1d867ae8dbdd",
             "d6ffdaf0-ac08-4de9-bbce-2eab2f86bcca",
@@ -78,8 +82,10 @@ class SetupTests(unittest.TestCase):
         self.assertIn("targeted_damage_sorceries_minimal", support_slice.rule_keys)
         self.assertIn("targeted_discard_sorceries_minimal", support_slice.rule_keys)
         self.assertIn("targeted_land_destruction_sorceries_minimal", support_slice.rule_keys)
+        self.assertIn("fixed_multi_target_land_destruction_sorceries_minimal", support_slice.rule_keys)
         self.assertIn("targeted_battlefield_to_hand_sorceries_minimal", support_slice.rule_keys)
         self.assertIn("global_land_destruction_sorceries_minimal", support_slice.rule_keys)
+        self.assertIn("global_creature_destruction_sorceries_minimal", support_slice.rule_keys)
         self.assertIn("opponent_mass_creature_destruction_sorceries_minimal", support_slice.rule_keys)
         self.assertIn("flying_keyword_minimal", support_slice.rule_keys)
         self.assertIn("defender_keyword_minimal", support_slice.rule_keys)
@@ -95,6 +101,8 @@ class SetupTests(unittest.TestCase):
         self.assertIn(WINTERS_GRASP, support_slice.card_keys)
         self.assertIn(SYMBOL_OF_UNSUMMONING, support_slice.card_keys)
         self.assertIn(ARMAGEDDON, support_slice.card_keys)
+        self.assertIn(RAIN_OF_SALT, support_slice.card_keys)
+        self.assertIn(WRATH_OF_GOD, support_slice.card_keys)
         self.assertIn(RAIN_OF_DAGGERS, support_slice.card_keys)
 
     def test_initialize_game_builds_reproducible_opening_state(self) -> None:

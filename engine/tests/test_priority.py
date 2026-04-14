@@ -55,7 +55,9 @@ FOREST = "b34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6"
 WINTERS_GRASP = "e9b8679d-52a9-4f0f-9365-f3e4b7a69805"
 SYMBOL_OF_UNSUMMONING = "c44f1a81-269b-4f05-8ff2-e7ce19a93937"
 ARMAGEDDON = "c9ed8b01-959a-47d6-891e-0abbdccf6e4f"
+RAIN_OF_SALT = "1219e330-01ac-405a-b75a-dd4298598167"
 ARMORED_PEGASUS = "f097a059-5505-4c3c-b879-7853ab6972ed"
+WRATH_OF_GOD = "34515b16-c9a4-4f98-8c77-416a7a523407"
 WALL_OF_GRANITE = "8445094f-008b-491a-977c-e8582d5ab72c"
 RAIN_OF_DAGGERS = "e2048201-6dc9-4cf5-916f-1d867ae8dbdd"
 
@@ -291,6 +293,44 @@ class PriorityTests(unittest.TestCase):
                 player_id="alice",
                 card_instance_id="alice:5",
                 target_instance_id=None,
+            ),
+            actions,
+        )
+
+    def test_precombat_main_enumerates_rain_of_salt_for_two_distinct_land_targets(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_rain_of_salt_ready_session(repository)
+
+        actions = enumerate_legal_actions(session.state, repository)
+
+        self.assertIn(
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:7",
+                target_instance_ids=("bob:1", "bob:2"),
+            ),
+            actions,
+        )
+        self.assertNotIn(
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:7",
+                target_instance_ids=("bob:1", "bob:1"),
+            ),
+            actions,
+        )
+
+    def test_precombat_main_enumerates_wrath_of_god_without_target(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_wrath_of_god_ready_session(repository)
+
+        actions = enumerate_legal_actions(session.state, repository)
+
+        self.assertIn(
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:5",
+                target_instance_ids=(),
             ),
             actions,
         )
@@ -820,6 +860,102 @@ def _build_armageddon_ready_session(repository: CardRepository):
     current_state = move_object(
         current_state,
         instance_id="bob:1",
+        from_zone="hand",
+        to_zone="battlefield",
+        player_id="bob",
+    )
+    session = replace(session, state=current_state)
+
+    for source_instance_id in session.state.players["alice"].battlefield:
+        session = activate_mana_ability(
+            session,
+            ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+            repository,
+        )
+    return session
+
+
+def _build_rain_of_salt_ready_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="priority-rain-of-salt",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (MOUNTAIN, MOUNTAIN, MOUNTAIN, MOUNTAIN, MOUNTAIN, MOUNTAIN, RAIN_OF_SALT),
+            "bob": (PLAINS, SWAMP),
+        },
+        opening_hands={
+            "alice": (MOUNTAIN, MOUNTAIN, MOUNTAIN, MOUNTAIN, MOUNTAIN, MOUNTAIN, RAIN_OF_SALT),
+            "bob": (PLAINS, SWAMP),
+        },
+        rng_seed=60,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    current_state = session.state
+
+    for land_id in ("alice:1", "alice:2", "alice:3", "alice:4", "alice:5", "alice:6"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
+    for land_id in ("bob:1", "bob:2"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="bob",
+        )
+    session = replace(session, state=current_state)
+
+    for source_instance_id in session.state.players["alice"].battlefield:
+        session = activate_mana_ability(
+            session,
+            ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+            repository,
+        )
+    return session
+
+
+def _build_wrath_of_god_ready_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="priority-wrath-of-god",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (PLAINS, PLAINS, PLAINS, PLAINS, WRATH_OF_GOD),
+            "bob": (MUCK_RATS, BORDER_GUARD),
+        },
+        opening_hands={
+            "alice": (PLAINS, PLAINS, PLAINS, PLAINS, WRATH_OF_GOD),
+            "bob": (MUCK_RATS, BORDER_GUARD),
+        },
+        rng_seed=61,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    current_state = session.state
+
+    for land_id in ("alice:1", "alice:2", "alice:3", "alice:4"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
+    current_state = move_object(
+        current_state,
+        instance_id="bob:1",
+        from_zone="hand",
+        to_zone="battlefield",
+        player_id="bob",
+    )
+    current_state = move_object(
+        current_state,
+        instance_id="bob:2",
         from_zone="hand",
         to_zone="battlefield",
         player_id="bob",

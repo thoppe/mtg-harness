@@ -84,21 +84,21 @@ def _enumerate_active_precombat_main_actions(
         if not _can_pay_mana_cost(player.mana_pool, requirements):
             continue
         legal_targets = _legal_noncreature_spell_targets(state, card_repository, instance_id)
-        if legal_targets == (None,):
+        if legal_targets == ((),):
             actions.append(
                 CastNonCreatureSpellAction(
                     player_id=state.turn.active_player,
                     card_instance_id=instance_id,
-                    target_instance_id=None,
+                    target_instance_ids=(),
                 )
             )
             continue
-        for target_instance_id in legal_targets:
+        for target_instance_ids in legal_targets:
             actions.append(
                 CastNonCreatureSpellAction(
                     player_id=state.turn.active_player,
                     card_instance_id=instance_id,
-                    target_instance_id=target_instance_id,
+                    target_instance_ids=target_instance_ids,
                 )
             )
 
@@ -223,57 +223,61 @@ def _legal_noncreature_spell_targets(
     state: GameState,
     card_repository: CardRepository,
     spell_instance_id: str,
-) -> tuple[str | None, ...]:
+) -> tuple[tuple[str, ...], ...]:
     spell = state.objects[spell_instance_id]
     card_definition = card_repository.get(spell.oracle_id)
     effect = _supported_targeted_sorcery_effect(card_definition)
-    if effect == "draw_two_cards":
-        return (None,)
-    if effect == "destroy_all_lands":
-        return (None,)
+    if effect in {"draw_two_cards", "destroy_all_lands", "destroy_all_creatures"}:
+        return ((),)
     if effect is None:
         return ()
     if effect == "damage_target_player":
-        return tuple(state.players)
+        return tuple((player_id,) for player_id in state.players)
     if effect == "target_player_discards_two":
-        return tuple(state.players)
+        return tuple((player_id,) for player_id in state.players)
     if effect == "destroy_all_creatures_target_opponent_you_lose_2_per_creature":
         return tuple(
-            player_id
+            (player_id,)
             for player_id in state.players
             if player_id != state.turn.active_player
         )
 
-    legal_targets: list[str] = []
+    legal_targets: list[tuple[str, ...]] = []
+    land_target_ids: list[str] = []
     if effect == "damage_any_target":
-        legal_targets.extend(state.players)
+        legal_targets.extend((player_id,) for player_id in state.players)
     for player in state.players.values():
         for instance_id in player.battlefield:
             permanent = state.objects[instance_id]
             permanent_definition = card_repository.get(permanent.oracle_id)
-            if effect == "destroy_target_land":
+            if effect in {"destroy_target_land", "destroy_two_target_lands"}:
                 if permanent_definition.is_land:
-                    legal_targets.append(instance_id)
+                    if effect == "destroy_target_land":
+                        legal_targets.append((instance_id,))
+                    else:
+                        land_target_ids.append(instance_id)
                 continue
             if effect == "return_creature_to_hand_and_draw_one":
                 if permanent_definition.is_creature:
-                    legal_targets.append(instance_id)
+                    legal_targets.append((instance_id,))
                 continue
             if not permanent_definition.is_creature:
                 continue
             if effect == "damage_any_target":
-                legal_targets.append(instance_id)
+                legal_targets.append((instance_id,))
                 continue
             if effect == "destroy_tapped_creature" and not permanent.tapped:
                 continue
             if effect == "destroy_creature_owner_gains_4_life":
-                legal_targets.append(instance_id)
+                legal_targets.append((instance_id,))
                 continue
             if effect == "put_creature_on_top_of_library":
-                legal_targets.append(instance_id)
+                legal_targets.append((instance_id,))
                 continue
             if effect == "destroy_tapped_creature":
-                legal_targets.append(instance_id)
+                legal_targets.append((instance_id,))
+    if effect == "destroy_two_target_lands":
+        legal_targets.extend(combinations(tuple(land_target_ids), 2))
     return tuple(legal_targets)
 
 
@@ -296,10 +300,14 @@ def _supported_targeted_sorcery_effect(card_definition) -> str | None:
         return "target_player_discards_two"
     if card_definition.oracle_text == "Destroy target land.":
         return "destroy_target_land"
+    if card_definition.oracle_text == "Destroy two target lands.":
+        return "destroy_two_target_lands"
     if card_definition.oracle_text == "Return target creature to its owner's hand.\nDraw a card.":
         return "return_creature_to_hand_and_draw_one"
     if card_definition.oracle_text == "Destroy all lands.":
         return "destroy_all_lands"
+    if card_definition.oracle_text == "Destroy all creatures. They can't be regenerated.":
+        return "destroy_all_creatures"
     if (
         card_definition.oracle_text
         == "Destroy all creatures target opponent controls. You lose 2 life for each creature destroyed this way."

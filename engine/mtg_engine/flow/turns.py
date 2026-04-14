@@ -284,7 +284,7 @@ def cast_noncreature_spell(
     _require_legal_noncreature_target(
         state,
         card_repository,
-        action.target_instance_id,
+        action.target_instance_ids,
         effect=effect,
     )
 
@@ -311,7 +311,7 @@ def cast_noncreature_spell(
             "card_instance_id": action.card_instance_id,
             "oracle_id": card.oracle_id,
             "mana_cost": card_definition.mana_cost,
-            "target_instance_ids": [] if action.target_instance_id is None else [action.target_instance_id],
+            "target_instance_ids": list(action.target_instance_ids),
         },
     )
     event_log.append(
@@ -332,7 +332,7 @@ def cast_noncreature_spell(
             "player_id": action.player_id,
             "card_instance_id": action.card_instance_id,
             "oracle_id": card.oracle_id,
-            "target_instance_ids": [] if action.target_instance_id is None else [action.target_instance_id],
+            "target_instance_ids": list(action.target_instance_ids),
         },
     )
     resolved_state = casting_state
@@ -361,6 +361,16 @@ def cast_noncreature_spell(
                     "life_total": updated_owner.life_total,
                 },
             )
+    elif effect == "destroy_two_target_lands":
+        resolved_state, destroyed_count = _destroy_permanents(
+            casting_state,
+            event_log,
+            instance_ids=action.target_instance_ids,
+            active_player=action.player_id,
+            reason=f"spell_effect:{card_definition.name}",
+        )
+        if destroyed_count != 2:
+            raise ValueError("expected exactly two permanents to be destroyed")
     elif effect == "draw_two_cards":
         for _ in range(2):
             resolved_state = _draw_one_card_for_player_if_available(
@@ -427,6 +437,19 @@ def cast_noncreature_spell(
             casting_state,
             event_log,
             instance_ids=land_ids,
+            active_player=action.player_id,
+            reason=f"spell_effect:{card_definition.name}",
+        )
+    elif effect == "destroy_all_creatures":
+        creature_ids = _battlefield_permanents_matching(
+            casting_state,
+            card_repository,
+            predicate=lambda definition: definition.is_creature,
+        )
+        resolved_state, _ = _destroy_permanents(
+            casting_state,
+            event_log,
+            instance_ids=creature_ids,
             active_player=action.player_id,
             reason=f"spell_effect:{card_definition.name}",
         )
@@ -900,16 +923,34 @@ def _pay_mana_cost(mana_pool: tuple[str, ...], requirements: dict[str, int]) -> 
 def _require_legal_noncreature_target(
     state: GameState,
     card_repository: CardRepository,
-    target_instance_id: str | None,
+    target_instance_ids: tuple[str, ...],
     *,
     effect: str,
 ) -> None:
-    if effect in {"draw_two_cards", "destroy_all_lands"}:
-        if target_instance_id is not None:
+    if effect in {"draw_two_cards", "destroy_all_lands", "destroy_all_creatures"}:
+        if target_instance_ids:
             raise ValueError("sorcery does not take a target")
         return
-    if target_instance_id is None:
+    if not target_instance_ids:
         raise ValueError("targeted sorcery requires a target")
+    if effect == "destroy_two_target_lands":
+        if len(target_instance_ids) != 2:
+            raise ValueError("spell requires exactly two targets")
+        if len(set(target_instance_ids)) != 2:
+            raise ValueError("spell requires distinct targets")
+        for target_instance_id in target_instance_ids:
+            if target_instance_id not in state.objects:
+                raise ValueError("target must exist")
+            target = state.objects[target_instance_id]
+            if target.zone != "battlefield":
+                raise ValueError("target must be on the battlefield")
+            target_definition = card_repository.get(target.oracle_id)
+            if not target_definition.is_land:
+                raise ValueError("target must be a land")
+        return
+    if len(target_instance_ids) != 1:
+        raise ValueError("spell requires exactly one target")
+    target_instance_id = target_instance_ids[0]
     if effect == "damage_target_player":
         if target_instance_id not in state.players:
             raise ValueError("target must be a player")
@@ -987,10 +1028,14 @@ def _supported_targeted_sorcery_effect(card_definition) -> str | None:
         return "target_player_discards_two"
     if card_definition.oracle_text == "Destroy target land.":
         return "destroy_target_land"
+    if card_definition.oracle_text == "Destroy two target lands.":
+        return "destroy_two_target_lands"
     if card_definition.oracle_text == "Return target creature to its owner's hand.\nDraw a card.":
         return "return_creature_to_hand_and_draw_one"
     if card_definition.oracle_text == "Destroy all lands.":
         return "destroy_all_lands"
+    if card_definition.oracle_text == "Destroy all creatures. They can't be regenerated.":
+        return "destroy_all_creatures"
     if (
         card_definition.oracle_text
         == "Destroy all creatures target opponent controls. You lose 2 life for each creature destroyed this way."
