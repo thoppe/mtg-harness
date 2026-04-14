@@ -50,3 +50,7 @@ class CardDefinition:
     @property
     def has_defender(self) -> bool:
         return self.has_keyword("Defender")
+
+    @property
+    def has_swampwalk(self) -> bool:
+        return self.has_keyword("Swampwalk")

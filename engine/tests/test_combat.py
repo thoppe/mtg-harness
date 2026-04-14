@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 import unittest
 from pathlib import Path
 import sys
@@ -29,10 +30,12 @@ from mtg_engine.flow.turns import (
     start_first_turn,
     start_next_turn,
 )
+from mtg_engine.state.zones import move_object
 
 
 INFORMATION_DIR = Path(__file__).resolve().parents[2] / "information"
 SWAMP = "56719f6a-1a6c-4c0a-8d21-18f7d7350b68"
+FOREST = "b34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6"
 PLAINS = "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
 ISLAND = "b2c6aa39-2d2a-459c-a555-fb48ba993373"
 MOUNTAIN = "a3fb7228-e76b-4e96-a40e-20b5fed75685"
@@ -42,6 +45,7 @@ MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
 ARMORED_PEGASUS = "f097a059-5505-4c3c-b879-7853ab6972ed"
 WIND_DRAKE = "d6ffdaf0-ac08-4de9-bbce-2eab2f86bcca"
 KEEN_EYED_ARCHERS = "0ace32d6-7261-447c-9ee2-e03febaab91b"
+ANACONDA = "3eff03f1-2c5f-4c59-b465-a8c4cd05e1ba"
 WALL_OF_GRANITE = "8445094f-008b-491a-977c-e8582d5ab72c"
 
 
@@ -232,6 +236,49 @@ class CombatTests(unittest.TestCase):
         self.assertEqual(result.state.objects["bob:4"].zone, "battlefield")
         self.assertEqual(result.state.objects["bob:4"].damage_marked, 1)
 
+    def test_anaconda_cannot_be_blocked_when_defending_player_controls_swamp(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _state_with_anaconda_swampwalk_locked(repository)
+
+        session = advance_to_begin_combat(session)
+        session = declare_attackers(
+            session,
+            DeclareAttackersAction(player_id="alice", attacker_ids=("alice:5",)),
+            repository,
+        )
+        session = declare_blockers(
+            session,
+            DeclareBlockersAction(player_id="bob", blockers={}),
+            repository,
+        )
+        result = resolve_combat_damage(session, repository)
+
+        self.assertEqual(result.state.players["bob"].life_total, 17)
+        self.assertEqual(result.state.objects["alice:5"].zone, "battlefield")
+        self.assertEqual(result.state.objects["bob:2"].zone, "battlefield")
+
+    def test_anaconda_can_be_blocked_when_defending_player_lacks_swamp(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _state_with_anaconda_blockable(repository)
+
+        session = advance_to_begin_combat(session)
+        session = declare_attackers(
+            session,
+            DeclareAttackersAction(player_id="alice", attacker_ids=("alice:5",)),
+            repository,
+        )
+        session = declare_blockers(
+            session,
+            DeclareBlockersAction(player_id="bob", blockers={"alice:5": ("bob:2",)}),
+            repository,
+        )
+        result = resolve_combat_damage(session, repository)
+
+        self.assertEqual(result.state.players["bob"].life_total, 20)
+        self.assertEqual(result.state.objects["alice:5"].zone, "battlefield")
+        self.assertEqual(result.state.objects["bob:2"].zone, "battlefield")
+        self.assertEqual(result.state.objects["bob:2"].damage_marked, 3)
+
     def test_wall_of_granite_cannot_attack(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         session = _state_with_wall_of_granite_ready(repository)
@@ -409,6 +456,68 @@ def _state_with_reach_block_ready(repository: CardRepository):
     session = _develop_creature_through_normal_turns(session, repository, "alice", "alice:3")
     session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "bob")
     session = _develop_creature_through_normal_turns(session, repository, "bob", "bob:4")
+    return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
+
+
+def _state_with_anaconda_swampwalk_locked(repository: CardRepository):
+    setup = SetupInput(
+        game_id="combat-anaconda-swampwalk-locked",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (FOREST, PLAINS, PLAINS, PLAINS, ANACONDA),
+            "bob": (SWAMP, BORDER_GUARD),
+        },
+        opening_hands={
+            "alice": (FOREST, PLAINS, PLAINS, PLAINS, ANACONDA),
+            "bob": (SWAMP, BORDER_GUARD),
+        },
+        rng_seed=53,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    session = _develop_creature_through_normal_turns(session, repository, "alice", "alice:5")
+    session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "bob")
+    session = play_land(session, PlayLandAction(player_id="bob", card_instance_id="bob:1"), repository)
+    session = _advance_to_next_turn(session, repository)
+    current_state = move_object(
+        session.state,
+        instance_id="bob:2",
+        from_zone="hand",
+        to_zone="battlefield",
+        player_id="bob",
+    )
+    session = replace(session, state=current_state)
+    return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
+
+
+def _state_with_anaconda_blockable(repository: CardRepository):
+    setup = SetupInput(
+        game_id="combat-anaconda-swampwalk-open",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (FOREST, PLAINS, PLAINS, PLAINS, ANACONDA),
+            "bob": (PLAINS, BORDER_GUARD),
+        },
+        opening_hands={
+            "alice": (FOREST, PLAINS, PLAINS, PLAINS, ANACONDA),
+            "bob": (PLAINS, BORDER_GUARD),
+        },
+        rng_seed=54,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    session = _develop_creature_through_normal_turns(session, repository, "alice", "alice:5")
+    session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "bob")
+    session = play_land(session, PlayLandAction(player_id="bob", card_instance_id="bob:1"), repository)
+    session = _advance_to_next_turn(session, repository)
+    current_state = move_object(
+        session.state,
+        instance_id="bob:2",
+        from_zone="hand",
+        to_zone="battlefield",
+        player_id="bob",
+    )
+    session = replace(session, state=current_state)
     return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
 
 

@@ -18,6 +18,7 @@ WIND_DRAKE = "d6ffdaf0-ac08-4de9-bbce-2eab2f86bcca"
 BOG_IMP = "45b94e3c-a905-435b-aee5-bec9239fd24c"
 STORM_CROW = "000d5588-5a4c-434e-988d-396632ade42c"
 KEEN_EYED_ARCHERS = "0ace32d6-7261-447c-9ee2-e03febaab91b"
+ANACONDA = "3eff03f1-2c5f-4c59-b465-a8c4cd05e1ba"
 WALL_OF_GRANITE = "8445094f-008b-491a-977c-e8582d5ab72c"
 HAND_OF_DEATH = "dc45b2e3-272b-479b-8e3b-36eead606a3a"
 VOLCANIC_HAMMER = "98fa5a06-0553-40fd-999c-bc31c9b3f4db"
@@ -62,6 +63,7 @@ class SetupTests(unittest.TestCase):
             "45b94e3c-a905-435b-aee5-bec9239fd24c",
             "000d5588-5a4c-434e-988d-396632ade42c",
             "0ace32d6-7261-447c-9ee2-e03febaab91b",
+            "3eff03f1-2c5f-4c59-b465-a8c4cd05e1ba",
             "a768ba13-4d1c-4dce-a4a6-86a39c069c3f",
             "a3fb7228-e76b-4e96-a40e-20b5fed75685",
             "b2c6aa39-2d2a-459c-a555-fb48ba993373",
@@ -77,6 +79,7 @@ class SetupTests(unittest.TestCase):
         self.assertTrue(repository.get(BOG_IMP).has_flying)
         self.assertTrue(repository.get(STORM_CROW).has_flying)
         self.assertTrue(repository.get(KEEN_EYED_ARCHERS).has_reach)
+        self.assertTrue(repository.get(ANACONDA).has_swampwalk)
         self.assertTrue(repository.get(WALL_OF_GRANITE).has_defender)
         self.assertTrue(repository.get(HAND_OF_DEATH).is_black)
 
@@ -99,6 +102,7 @@ class SetupTests(unittest.TestCase):
         self.assertIn("opponent_mass_creature_destruction_sorceries_minimal", support_slice.rule_keys)
         self.assertIn("flying_keyword_minimal", support_slice.rule_keys)
         self.assertIn("reach_keyword_minimal", support_slice.rule_keys)
+        self.assertIn("swampwalk_keyword_minimal", support_slice.rule_keys)
         self.assertIn("defender_keyword_minimal", support_slice.rule_keys)
         self.assertIn("b7593cf8-4dcb-473b-a2ef-180fffe66738", support_slice.card_keys)
         self.assertIn(HAND_OF_DEATH, support_slice.card_keys)
@@ -107,6 +111,7 @@ class SetupTests(unittest.TestCase):
         self.assertIn(BOG_IMP, support_slice.card_keys)
         self.assertIn(STORM_CROW, support_slice.card_keys)
         self.assertIn(KEEN_EYED_ARCHERS, support_slice.card_keys)
+        self.assertIn(ANACONDA, support_slice.card_keys)
         self.assertIn(WALL_OF_GRANITE, support_slice.card_keys)
         self.assertIn(VOLCANIC_HAMMER, support_slice.card_keys)
         self.assertIn(LAVA_AXE, support_slice.card_keys)

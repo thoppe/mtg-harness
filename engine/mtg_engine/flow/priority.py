@@ -125,13 +125,11 @@ def _enumerate_declare_attackers_actions(
 
     legal_attackers = []
     for instance_id in state.players[state.turn.active_player].battlefield:
-        attacker = state.objects[instance_id]
-        attacker_card = card_repository.get(attacker.oracle_id)
-        if not attacker_card.is_creature or attacker.tapped:
-            continue
-        if attacker_card.has_defender:
-            continue
-        if attacker.entered_battlefield_turn == state.turn.turn_number:
+        if attacker_attack_rejection_reason(
+            state=state,
+            card_repository=card_repository,
+            attacker_id=instance_id,
+        ) is not None:
             continue
         legal_attackers.append(instance_id)
 
@@ -217,6 +215,27 @@ def _blocker_assignments(
 
     build(0, {attacker_id: () for attacker_id in attackers})
     return tuple(assignments)
+
+
+def attacker_attack_rejection_reason(
+    *,
+    state: GameState,
+    card_repository: CardRepository,
+    attacker_id: str,
+) -> str | None:
+    if attacker_id not in state.players[state.turn.active_player].battlefield:
+        return "attacker must be on the active player's battlefield"
+    attacker = state.objects[attacker_id]
+    attacker_card = card_repository.get(attacker.oracle_id)
+    if not attacker_card.is_creature:
+        return "only creatures can attack"
+    if attacker_card.has_defender:
+        return "creature with defender cannot attack"
+    if attacker.tapped:
+        return "attacker is already tapped"
+    if attacker.entered_battlefield_turn == state.turn.turn_number:
+        return "summoning-sick creature cannot attack in v0"
+    return None
 
 
 def _legal_noncreature_spell_targets(
@@ -330,16 +349,53 @@ def can_block_attacker(
     blocker_id: str,
     attacker_id: str,
 ) -> bool:
+    return blocker_attack_rejection_reason(
+        state=state,
+        card_repository=card_repository,
+        blocker_id=blocker_id,
+        attacker_id=attacker_id,
+    ) is None
+
+
+def blocker_attack_rejection_reason(
+    *,
+    state: GameState,
+    card_repository: CardRepository,
+    blocker_id: str,
+    attacker_id: str,
+) -> str | None:
     blocker = state.objects[blocker_id]
     attacker = state.objects[attacker_id]
     blocker_definition = card_repository.get(blocker.oracle_id)
     attacker_definition = card_repository.get(attacker.oracle_id)
 
+    if not blocker_definition.is_creature:
+        return "only creatures can block"
+    if blocker.tapped:
+        return "tapped creature cannot block"
+    if attacker_definition.has_swampwalk and _player_controls_swamp(
+        state,
+        card_repository,
+        player_id=blocker.owner_id,
+    ):
+        return "blocker cannot block the selected attacker"
     if attacker_definition.has_flying and not (
         blocker_definition.has_flying or blocker_definition.has_reach
     ):
-        return False
-    return True
+        return "blocker cannot block the selected attacker"
+    return None
+
+
+def _player_controls_swamp(
+    state: GameState,
+    card_repository: CardRepository,
+    *,
+    player_id: str,
+) -> bool:
+    return any(
+        card_repository.get(state.objects[instance_id].oracle_id).name == "Swamp"
+        for instance_id in state.players[player_id].battlefield
+    )
 
 
 def _parse_mana_cost(mana_cost: str) -> dict[str, int]:

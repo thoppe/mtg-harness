@@ -21,7 +21,7 @@ from mtg_engine.state.models import GameState, TurnState
 from mtg_engine.state.zones import move_object, move_object_to_top_of_library, update_object, update_player
 from mtg_engine.rules.combat import apply_combat_damage, apply_state_based_actions, tap_attackers, with_combat_state
 
-from .priority import can_block_attacker, enumerate_legal_actions
+from .priority import attacker_attack_rejection_reason, blocker_attack_rejection_reason, enumerate_legal_actions
 from .setup import GameBootstrap
 
 FIRST_TURN_STEP_SEQUENCE = (
@@ -634,18 +634,13 @@ def declare_attackers(
 
     defending_player = _other_player(state, action.player_id)
     for attacker_id in action.attacker_ids:
-        if attacker_id not in state.players[action.player_id].battlefield:
-            raise ValueError("attacker must be on the active player's battlefield")
-        attacker = state.objects[attacker_id]
-        attacker_card = card_repository.get(attacker.oracle_id)
-        if not attacker_card.is_creature:
-            raise ValueError("only creatures can attack")
-        if attacker_card.has_defender:
-            raise ValueError("creature with defender cannot attack")
-        if attacker.tapped:
-            raise ValueError("attacker is already tapped")
-        if attacker.entered_battlefield_turn == state.turn.turn_number:
-            raise ValueError("summoning-sick creature cannot attack in v0")
+        rejection_reason = attacker_attack_rejection_reason(
+            state=state,
+            card_repository=card_repository,
+            attacker_id=attacker_id,
+        )
+        if rejection_reason is not None:
+            raise ValueError(rejection_reason)
 
     next_state = tap_attackers(state, action.attacker_ids)
     next_state = with_combat_state(
@@ -708,18 +703,14 @@ def declare_blockers(
             if blocker_id not in state.players[action.player_id].battlefield:
                 raise ValueError("blocker must be on defending player's battlefield")
             blocker = state.objects[blocker_id]
-            blocker_card = card_repository.get(blocker.oracle_id)
-            if not blocker_card.is_creature:
-                raise ValueError("only creatures can block")
-            if blocker.tapped:
-                raise ValueError("tapped creature cannot block")
-            if not can_block_attacker(
+            rejection_reason = blocker_attack_rejection_reason(
                 state=state,
                 card_repository=card_repository,
                 blocker_id=blocker_id,
                 attacker_id=attacker_id,
-            ):
-                raise ValueError("blocker cannot block the selected attacker")
+            )
+            if rejection_reason is not None:
+                raise ValueError(rejection_reason)
             assigned_blockers.add(blocker_id)
 
     next_state = with_combat_state(
