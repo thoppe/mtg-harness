@@ -49,6 +49,8 @@ Describe the responsibilities of the simulation core.
   - `Winter's Grasp`
   - `Symbol of Unsummoning`
   - `Armageddon`
+  - `Rain of Salt`
+  - `Wrath of God`
   - `Rain of Daggers`
   - `Touch of Brilliance`
   - `Time Ebb`

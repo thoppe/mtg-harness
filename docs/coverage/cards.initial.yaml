@@ -3,7 +3,7 @@ slice: portal_initial_micro_universe
 set_summaries:
   - set_code: por
     status: partial
-    notes: "The declared support slice currently includes Border Guard, Foot Soldiers, Muck Rats, Wind Drake, Bog Imp, Storm Crow, Armored Pegasus, Wall of Granite, Vengeance, Path of Peace, Touch of Brilliance, Time Ebb, Volcanic Hammer, Lava Axe, Mind Rot, Winter's Grasp, Symbol of Unsummoning, Armageddon, and the five Portal basic lands."
+    notes: "The declared support slice currently includes Border Guard, Foot Soldiers, Muck Rats, Wind Drake, Bog Imp, Storm Crow, Armored Pegasus, Wall of Granite, Vengeance, Path of Peace, Touch of Brilliance, Time Ebb, Volcanic Hammer, Lava Axe, Mind Rot, Winter's Grasp, Symbol of Unsummoning, Armageddon, Rain of Salt, Wrath of God, and the five Portal basic lands."
   - set_code: me4
     status: partial
     notes: "The declared support slice currently includes Rain of Daggers as an explicit off-Portal source addition used to widen reusable mass-destruction support."
@@ -354,6 +354,22 @@ cards:
       - engine/tests/test_replay_log.py
     notes: "Canonical card identity keyed by Scryfall oracle_id. Support is intentionally narrow and limited to the printed `Destroy all lands.` effect."
   - set_code: por
+    card_key: "1219e330-01ac-405a-b75a-dd4298598167"
+    display_name: Rain of Salt
+    card_instances: variable
+    status: implemented
+    engine_scope: Sorcery-speed noncreature spell support for casting `Rain of Salt`, choosing exactly two distinct land targets on the battlefield, destroying those lands on resolution, and moving the spell from stack to graveyard.
+    required_rules:
+      - fixed_multi_target_land_destruction_sorceries_minimal
+      - precombat_priority_minimal
+      - turn_structure_minimal
+      - zones_minimal
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+      - engine/tests/test_replay_log.py
+    notes: "Canonical card identity keyed by Scryfall oracle_id. Support is intentionally narrow and limited to the printed `Destroy two target lands.` effect with exactly two distinct targets."
+  - set_code: por
     card_key: "f097a059-5505-4c3c-b879-7853ab6972ed"
     display_name: Armored Pegasus
     card_instances: variable
@@ -372,6 +388,22 @@ cards:
       - engine/tests/test_priority.py
       - engine/tests/test_combat.py
     notes: "Canonical card identity keyed by Scryfall oracle_id. Support is intentionally narrow and limited to the printed `Flying` keyword."
+  - set_code: por
+    card_key: "34515b16-c9a4-4f98-8c77-416a7a523407"
+    display_name: Wrath of God
+    card_instances: variable
+    status: implemented
+    engine_scope: Sorcery-speed noncreature spell support for casting `Wrath of God`, resolving it without targets, destroying all creatures on the battlefield, and moving the spell from stack to graveyard while ignoring the printed regeneration rider in the current slice.
+    required_rules:
+      - global_creature_destruction_sorceries_minimal
+      - precombat_priority_minimal
+      - turn_structure_minimal
+      - zones_minimal
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+      - engine/tests/test_replay_log.py
+    notes: "Canonical card identity keyed by Scryfall oracle_id. Current support intentionally ignores the printed `They can't be regenerated.` rider because regeneration is outside the current slice."
   - set_code: por
     card_key: "8445094f-008b-491a-977c-e8582d5ab72c"
     display_name: Wall of Granite

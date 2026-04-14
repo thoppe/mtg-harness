@@ -1,0 +1,138 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "1219e330-01ac-405a-b75a-dd4298598167",
+  "name": "Rain of Salt",
+  "provenance": {
+    "collector_number": "147",
+    "fetched_at": "2026-04-13T00:00:00Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/6/6/661ffab2-9cf5-492d-874f-de73d7a13e2b.jpg?1562446853",
+    "oracle_id": "1219e330-01ac-405a-b75a-dd4298598167",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor%20oracleid%3A1219e330-01ac-405a-b75a-dd4298598167",
+    "requested_set_code": "por",
+    "scryfall_id": "661ffab2-9cf5-492d-874f-de73d7a13e2b",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/661ffab2-9cf5-492d-874f-de73d7a13e2b"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Charles Gillespie",
+    "artist_ids": [
+      "ec2c14ea-79eb-4c55-963f-c46f7cef1c22"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10138,
+    "cmc": 6.0,
+    "collector_number": "147",
+    "color_identity": [
+      "R"
+    ],
+    "colors": [
+      "R"
+    ],
+    "digital": false,
+    "edhrec_rank": 24806,
+    "finishes": [
+      "nonfoil"
+    ],
+    "flavor_text": "It pelts the land with its fury, spoiling what was once sweet.",
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "661ffab2-9cf5-492d-874f-de73d7a13e2b",
+    "illustration_id": "b136ac91-2935-421c-a01e-25fea4269320",
+    "image_status": "highres_scan",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/6/6/661ffab2-9cf5-492d-874f-de73d7a13e2b.jpg?1562446853",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/6/6/661ffab2-9cf5-492d-874f-de73d7a13e2b.jpg?1562446853",
+      "large": "https://cards.scryfall.io/large/front/6/6/661ffab2-9cf5-492d-874f-de73d7a13e2b.jpg?1562446853",
+      "normal": "https://cards.scryfall.io/normal/front/6/6/661ffab2-9cf5-492d-874f-de73d7a13e2b.jpg?1562446853",
+      "png": "https://cards.scryfall.io/png/front/6/6/661ffab2-9cf5-492d-874f-de73d7a13e2b.png?1562446853",
+      "small": "https://cards.scryfall.io/small/front/6/6/661ffab2-9cf5-492d-874f-de73d7a13e2b.jpg?1562446853"
+    },
+    "keywords": [],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "not_legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "not_legal",
+      "paupercommander": "not_legal",
+      "penny": "not_legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{4}{R}{R}",
+    "multiverse_ids": [
+      4359
+    ],
+    "name": "Rain of Salt",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "1219e330-01ac-405a-b75a-dd4298598167",
+    "oracle_text": "Destroy two target lands.",
+    "oversized": false,
+    "penny_rank": 15561,
+    "prices": {
+      "eur": "0.46",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "0.60",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A1219e330-01ac-405a-b75a-dd4298598167&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Rain+of+Salt&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10138&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F757%3Fpage%3D1"
+    },
+    "rarity": "uncommon",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Rain+of+Salt",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4359&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DRain%2Bof%2BSalt",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DRain%2Bof%2BSalt"
+    },
+    "released_at": "1997-05-01",
+    "reprint": false,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/661ffab2-9cf5-492d-874f-de73d7a13e2b/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/147/rain-of-salt?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 757,
+    "textless": false,
+    "type_line": "Sorcery",
+    "uri": "https://api.scryfall.com/cards/661ffab2-9cf5-492d-874f-de73d7a13e2b",
+    "variation": false
+  }
+}
