@@ -59,6 +59,7 @@ ARMORED_PEGASUS = "f097a059-5505-4c3c-b879-7853ab6972ed"
 WIND_DRAKE = "d6ffdaf0-ac08-4de9-bbce-2eab2f86bcca"
 BOG_IMP = "45b94e3c-a905-435b-aee5-bec9239fd24c"
 STORM_CROW = "000d5588-5a4c-434e-988d-396632ade42c"
+KEEN_EYED_ARCHERS = "0ace32d6-7261-447c-9ee2-e03febaab91b"
 WALL_OF_GRANITE = "8445094f-008b-491a-977c-e8582d5ab72c"
 WRATH_OF_GOD = "34515b16-c9a4-4f98-8c77-416a7a523407"
 RAIN_OF_DAGGERS = "e2048201-6dc9-4cf5-916f-1d867ae8dbdd"
@@ -171,6 +172,16 @@ class SpellTests(unittest.TestCase):
         self.assertEqual(result.state.players["alice"].battlefield, ("alice:1", "alice:2", "alice:3"))
         self.assertEqual(result.state.objects["alice:3"].oracle_id, STORM_CROW)
         self.assertTrue(repository.get(STORM_CROW).has_flying)
+
+    def test_cast_keen_eyed_archers_with_two_plains_and_one_generic(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_keen_eyed_archers_session(repository)
+
+        result = _cast_creature_from_normal_turns(session, repository, "alice", "alice:4")
+
+        self.assertEqual(result.state.players["alice"].battlefield, ("alice:1", "alice:2", "alice:3", "alice:4"))
+        self.assertEqual(result.state.objects["alice:4"].oracle_id, KEEN_EYED_ARCHERS)
+        self.assertTrue(repository.get(KEEN_EYED_ARCHERS).has_reach)
 
     def test_cast_wall_of_granite_with_two_mountains_and_one_generic(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
@@ -803,6 +814,24 @@ def _build_vengeance_session(repository: CardRepository):
         replace(current_state.objects["bob:1"], tapped=True),
     )
     return replace(session, state=current_state)
+
+
+def _build_keen_eyed_archers_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="spell-cast-keen-eyed-archers",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (PLAINS, PLAINS, ISLAND, KEEN_EYED_ARCHERS),
+            "bob": (PLAINS,),
+        },
+        opening_hands={
+            "alice": (PLAINS, PLAINS, ISLAND, KEEN_EYED_ARCHERS),
+            "bob": (PLAINS,),
+        },
+        rng_seed=45,
+    )
+    return start_first_turn(initialize_game(setup, repository))
 
 
 def _build_path_of_peace_session(repository: CardRepository):

@@ -58,6 +58,7 @@ ARMAGEDDON = "c9ed8b01-959a-47d6-891e-0abbdccf6e4f"
 RAIN_OF_SALT = "1219e330-01ac-405a-b75a-dd4298598167"
 SACRED_NECTAR = "30870ee5-6ad7-48a9-983e-d3b018f2344f"
 ARMORED_PEGASUS = "f097a059-5505-4c3c-b879-7853ab6972ed"
+KEEN_EYED_ARCHERS = "0ace32d6-7261-447c-9ee2-e03febaab91b"
 WRATH_OF_GOD = "34515b16-c9a4-4f98-8c77-416a7a523407"
 WALL_OF_GRANITE = "8445094f-008b-491a-977c-e8582d5ab72c"
 RAIN_OF_DAGGERS = "e2048201-6dc9-4cf5-916f-1d867ae8dbdd"
@@ -389,6 +390,23 @@ class PriorityTests(unittest.TestCase):
         self.assertEqual(
             actions,
             (DeclareBlockersAction(player_id="bob", blockers={}),),
+        )
+
+    def test_declare_blockers_window_allows_reach_blocker_against_armored_pegasus(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_reach_block_ready_session(repository)
+        session = advance_to_begin_combat(session)
+        session = declare_attackers(
+            session,
+            DeclareAttackersAction(player_id="alice", attacker_ids=("alice:3",)),
+            repository,
+        )
+
+        actions = enumerate_legal_actions(session.state, repository)
+
+        self.assertIn(
+            DeclareBlockersAction(player_id="bob", blockers={"alice:3": ("bob:4",)}),
+            actions,
         )
 
     def test_declare_attackers_window_excludes_wall_of_granite_from_attack_subsets(self) -> None:
@@ -1022,6 +1040,28 @@ def _build_sacred_nectar_ready_session(repository: CardRepository):
             repository,
         )
     return session
+
+
+def _build_reach_block_ready_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="priority-reach-block",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (PLAINS, PLAINS, ARMORED_PEGASUS),
+            "bob": (PLAINS, PLAINS, ISLAND, KEEN_EYED_ARCHERS),
+        },
+        opening_hands={
+            "alice": (PLAINS, PLAINS, ARMORED_PEGASUS),
+            "bob": (PLAINS, PLAINS, ISLAND, KEEN_EYED_ARCHERS),
+        },
+        rng_seed=66,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    session = _cast_creature_from_normal_turns(session, repository, "alice", "alice:3")
+    session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "bob")
+    session = _cast_creature_from_normal_turns(session, repository, "bob", "bob:4")
+    return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
 
 
 def _build_rain_of_daggers_ready_session(repository: CardRepository):

@@ -41,6 +41,7 @@ FOOT_SOLDIERS = "a768ba13-4d1c-4dce-a4a6-86a39c069c3f"
 MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
 ARMORED_PEGASUS = "f097a059-5505-4c3c-b879-7853ab6972ed"
 WIND_DRAKE = "d6ffdaf0-ac08-4de9-bbce-2eab2f86bcca"
+KEEN_EYED_ARCHERS = "0ace32d6-7261-447c-9ee2-e03febaab91b"
 WALL_OF_GRANITE = "8445094f-008b-491a-977c-e8582d5ab72c"
 
 
@@ -209,6 +210,28 @@ class CombatTests(unittest.TestCase):
         self.assertEqual(result.state.objects["alice:4"].zone, "battlefield")
         self.assertEqual(result.state.objects["bob:2"].zone, "battlefield")
 
+    def test_keen_eyed_archers_can_block_armored_pegasus(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _state_with_reach_block_ready(repository)
+
+        session = advance_to_begin_combat(session)
+        session = declare_attackers(
+            session,
+            DeclareAttackersAction(player_id="alice", attacker_ids=("alice:3",)),
+            repository,
+        )
+        session = declare_blockers(
+            session,
+            DeclareBlockersAction(player_id="bob", blockers={"alice:3": ("bob:4",)}),
+            repository,
+        )
+        result = resolve_combat_damage(session, repository)
+
+        self.assertEqual(result.state.players["bob"].life_total, 20)
+        self.assertEqual(result.state.objects["alice:3"].zone, "graveyard")
+        self.assertEqual(result.state.objects["bob:4"].zone, "battlefield")
+        self.assertEqual(result.state.objects["bob:4"].damage_marked, 1)
+
     def test_wall_of_granite_cannot_attack(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         session = _state_with_wall_of_granite_ready(repository)
@@ -364,6 +387,28 @@ def _state_with_wind_drake_ready(repository: CardRepository):
     session = _develop_creature_through_normal_turns(session, repository, "alice", "alice:4")
     session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "bob")
     session = _develop_creature_through_normal_turns(session, repository, "bob", "bob:2")
+    return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
+
+
+def _state_with_reach_block_ready(repository: CardRepository):
+    setup = SetupInput(
+        game_id="combat-reach-block",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (PLAINS, PLAINS, ARMORED_PEGASUS),
+            "bob": (PLAINS, PLAINS, ISLAND, KEEN_EYED_ARCHERS),
+        },
+        opening_hands={
+            "alice": (PLAINS, PLAINS, ARMORED_PEGASUS),
+            "bob": (PLAINS, PLAINS, ISLAND, KEEN_EYED_ARCHERS),
+        },
+        rng_seed=52,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    session = _develop_creature_through_normal_turns(session, repository, "alice", "alice:3")
+    session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "bob")
+    session = _develop_creature_through_normal_turns(session, repository, "bob", "bob:4")
     return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
 
 

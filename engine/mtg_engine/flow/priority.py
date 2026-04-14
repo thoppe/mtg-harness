@@ -330,7 +330,9 @@ def can_block_attacker(
     blocker_definition = card_repository.get(blocker.oracle_id)
     attacker_definition = card_repository.get(attacker.oracle_id)
 
-    if attacker_definition.has_flying and not blocker_definition.has_flying:
+    if attacker_definition.has_flying and not (
+        blocker_definition.has_flying or blocker_definition.has_reach
+    ):
         return False
     return True
 

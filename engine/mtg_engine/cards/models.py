@@ -36,5 +36,9 @@ class CardDefinition:
         return self.has_keyword("Flying")
 
     @property
+    def has_reach(self) -> bool:
+        return self.has_keyword("Reach")
+
+    @property
     def has_defender(self) -> bool:
         return self.has_keyword("Defender")
