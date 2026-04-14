@@ -35,6 +35,8 @@ Current verified official entry points as of April 12, 2026:
 - Persist JPG images by default for the current plan.
 - Persist image provenance as `information/cards/images/<oracle_id>.jpg.provenance.json`.
 - Persist card metadata as a provenance wrapper around the fetched Scryfall source record, not as an engine-normalized card object.
+- When a new card from an actively tracked set becomes known, pull and commit its raw artifacts immediately, then let coverage mark it as future implementation work.
+- This keeps future implementation sessions from having to repeat source acquisition just to widen support by one declared card.
 
 ## Initial Coverage Target
 

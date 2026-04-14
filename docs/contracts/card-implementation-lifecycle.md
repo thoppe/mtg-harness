@@ -18,6 +18,8 @@ Define how raw card data becomes simulator-supported gameplay objects.
 - A set can be partially implemented only if the unsupported portion is explicitly marked.
 - Image availability does not imply gameplay support.
 - Card support status must be traceable to both a source snapshot and an implementation declaration.
+- Once a new card from an actively targeted set is identified, the repository should pull and retain its raw source artifacts instead of deferring the data pull until the implementation session that uses it.
+- Newly pulled cards that are not yet engine-supported should be marked `deferred` in coverage until a later change implements them.
 
 ## Contract Boundary
 

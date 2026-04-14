@@ -62,6 +62,8 @@ Define the on-disk shape and minimum provenance fields for downloaded external s
 - Raw artifact storage must preserve enough information to reproduce the pull without relying on chat history.
 - File naming must remain stable across reruns for the same canonical card identity and rules effective date.
 - Raw source artifacts must remain separate from any later normalized engine-facing model.
+- If a card from an actively tracked set becomes newly known to the repository, its raw metadata artifact and default image artifact should be persisted under the canonical paths instead of waiting for future implementation work.
+- Raw card artifacts may be committed independently of engine implementation, provided coverage and contracts keep the card marked as unimplemented work.
 
 ## Initial Scope
 

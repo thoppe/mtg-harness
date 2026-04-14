@@ -31,12 +31,15 @@ Define how external card and rules information enters the repository.
 - Canonical per-card image filenames must be `information/cards/images/<oracle_id>.<ext>`.
 - Default persisted card image asset type is JPG unless a later contract changes it.
 - Source artifact provenance must follow `docs/contracts/source-artifact-provenance.md`.
+- When the repository gains knowledge of a new card from a set the project is actively interested in, the raw card metadata and default image should be pulled once, saved in-repo, and allowed to be committed before gameplay support exists.
+- Those newly pulled cards must be marked in coverage as future work rather than implied engine support.
 
 ## Raw Vs Implemented Model
 
 - `raw` means an external source snapshot is archived and available for reference.
 - `implemented` means the engine and contracts explicitly support the corresponding semantics or card/set slice.
 - `not implemented` means the source material may exist locally, but the simulator must not claim behavior support.
+- `deferred` means the source material is intentionally present in-repo for a card the project plans to reach later, but the engine does not yet support that card.
 
 ## Unknowns
 
