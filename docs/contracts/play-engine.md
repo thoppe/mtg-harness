@@ -40,6 +40,7 @@ Describe the responsibilities of the simulation core.
   - `Bog Imp`
   - `Storm Crow`
   - `Armored Pegasus`
+  - `Keen-Eyed Archers`
   - `Wall of Granite`
   - `Vengeance`
   - `Path of Peace`

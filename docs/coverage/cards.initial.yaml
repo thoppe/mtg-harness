@@ -3,7 +3,7 @@ slice: portal_initial_micro_universe
 set_summaries:
   - set_code: por
     status: partial
-    notes: "The declared support slice currently includes Border Guard, Foot Soldiers, Muck Rats, Wind Drake, Bog Imp, Storm Crow, Armored Pegasus, Wall of Granite, Vengeance, Path of Peace, Touch of Brilliance, Time Ebb, Volcanic Hammer, Lava Axe, Mind Rot, Winter's Grasp, Symbol of Unsummoning, Armageddon, Rain of Salt, Sacred Nectar, Wrath of God, and the five Portal basic lands."
+    notes: "The declared support slice currently includes Border Guard, Foot Soldiers, Muck Rats, Wind Drake, Bog Imp, Storm Crow, Keen-Eyed Archers, Armored Pegasus, Wall of Granite, Vengeance, Path of Peace, Touch of Brilliance, Time Ebb, Volcanic Hammer, Lava Axe, Mind Rot, Winter's Grasp, Symbol of Unsummoning, Armageddon, Rain of Salt, Sacred Nectar, Wrath of God, and the five Portal basic lands."
   - set_code: me4
     status: partial
     notes: "The declared support slice currently includes Rain of Daggers as an explicit off-Portal source addition used to widen reusable mass-destruction support."
@@ -114,6 +114,25 @@ cards:
       - engine/tests/test_spells.py
       - engine/tests/test_combat.py
     notes: "Canonical card identity keyed by Scryfall oracle_id. Support is intentionally narrow and limited to the printed `Flying` keyword."
+  - set_code: por
+    card_key: "0ace32d6-7261-447c-9ee2-e03febaab91b"
+    display_name: Keen-Eyed Archers
+    card_instances: variable
+    status: implemented
+    engine_scope: Creature spell support for casting `Keen-Eyed Archers`, battlefield presence, blocking, and reach-based permission to block creatures with flying in combat.
+    required_rules:
+      - creature_spells_minimal
+      - reach_keyword_minimal
+      - precombat_priority_minimal
+      - combat_action_windows_minimal
+      - combat_minimal
+      - turn_structure_minimal
+      - zones_minimal
+    tests:
+      - engine/tests/test_spells.py
+      - engine/tests/test_priority.py
+      - engine/tests/test_combat.py
+    notes: "Canonical card identity keyed by Scryfall oracle_id. Support is intentionally narrow and limited to the printed `Reach` keyword."
   - set_code: por
     card_key: "1d001145-5d14-43a9-bf3b-3ce5c20b2a46"
     display_name: Vengeance

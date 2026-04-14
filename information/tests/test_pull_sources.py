@@ -42,6 +42,7 @@ class PullSourcesTests(unittest.TestCase):
         self.assertIn("d6ffdaf0-ac08-4de9-bbce-2eab2f86bcca", [target.oracle_id for target in targets])
         self.assertIn("45b94e3c-a905-435b-aee5-bec9239fd24c", [target.oracle_id for target in targets])
         self.assertIn("000d5588-5a4c-434e-988d-396632ade42c", [target.oracle_id for target in targets])
+        self.assertIn("0ace32d6-7261-447c-9ee2-e03febaab91b", [target.oracle_id for target in targets])
         self.assertIn("30870ee5-6ad7-48a9-983e-d3b018f2344f", [target.oracle_id for target in targets])
 
     def test_pull_cards_writes_canonical_paths_and_provenance(self) -> None:

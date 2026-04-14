@@ -48,7 +48,8 @@ The simulator should only claim support based on layer 3, never merely because l
 - Engine implementation now covers deterministic setup, turn progression through cleanup and next-turn handoff, precombat-main legal-action enumeration, combat declaration action windows, priority passing across the currently supported forced-pass branch, land play, five-basic-land mana production, creature spell casting, and minimal combat with multi-block support.
 - The first targeted-sorcery increment is now in place via `Vengeance`, the next destruction expansion was `Path of Peace`, the next narrow sorcery expansion was `Touch of Brilliance`, `Time Ebb` now covers targeted battlefield-to-library-top movement, `Armored Pegasus` established the first minimal flying-keyword card, and `Wall of Granite` now establishes the first strict `Defender` card.
 - The manifest-driven support-slice model is now in place and the active slice is loaded from `docs/coverage/slices/portal.initial.yaml` instead of a hardcoded card universe list.
-- `Rain of Salt` and `Wrath of God` now cover fixed multi-target land destruction and global creature destruction, so the next candidate should return to the smallest remaining nonkeyword Portal sorcery family.
+- `Rain of Salt` and `Wrath of God` now cover fixed multi-target land destruction and global creature destruction, while `Sacred Nectar` covers the smallest no-target life-gain sorcery family.
+- The next requested expansion is `Keen-Eyed Archers`, which should add only the minimal `Reach` combat-blocking exception required to block flying attackers.
 
 ## Workstreams
 
@@ -117,15 +118,15 @@ For cards:
 ## Immediate Next Actions
 
 1. Keep the support-slice manifest canonical as the engine-loadable source of active card scope.
-2. Continue widening the `Portal` engine slice only through narrow sorcery additions that fit the declared slice model.
+2. Continue widening the `Portal` engine slice in narrow increments, preferring sorceries by default but allowing isolated keyword cards when a human explicitly selects the next target.
 3. Update coverage manifests, contracts, and source artifacts in the same change that widens support.
-4. Avoid keywords, replacement effects, and triggered-ability families until the current nonkeyword sorcery runway is exhausted.
+4. Keep any keyword expansion name-scoped and minimal rather than introducing a general keyword framework prematurely.
 
 ## Resume Here
 
 The next session should continue from the manifest-backed slice now that the structural cleanup is complete.
 
 1. Keep `docs/coverage/slices/portal.initial.yaml` aligned with the declared active card universe and source pull scope.
-2. Widen the next `Portal` increment through the smallest no-keyword sorcery that adds the least new rules surface.
-3. Favor pure life-gain or similarly narrow no-target spell patterns before moving into temporary stat boosts, hand-reveal accounting, or untap-step modification.
+2. Widen the next `Portal` increment through the smallest requested rule family expansion, keeping the implementation explicitly name-scoped when a human picks the target card.
+3. `Keen-Eyed Archers` is the current next card, and it should introduce only the minimal `Reach` exception needed for blocking flyers.
 4. Update contracts and coverage first, then pull source artifacts, then implement engine behavior and tests.
