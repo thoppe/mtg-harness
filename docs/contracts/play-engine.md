@@ -50,6 +50,7 @@ Describe the responsibilities of the simulation core.
   - `Symbol of Unsummoning`
   - `Armageddon`
   - `Rain of Salt`
+  - `Sacred Nectar`
   - `Wrath of God`
   - `Rain of Daggers`
   - `Touch of Brilliance`

@@ -8,7 +8,7 @@ Turn the selected external authorities into a durable repository strategy for in
 
 - Phase: active
 - Acquisition scaffold: in place for the initial micro-universe and current rules snapshot
-- Remaining blocker type: engine-facing contract refinement before package scaffolding
+- Remaining blocker type: continue narrow Portal engine widening without outrunning declared coverage
 
 ## Why This Plan Exists
 
@@ -47,7 +47,8 @@ The simulator should only claim support based on layer 3, never merely because l
 - Narrative companion markdown should be added only when the supported rule surface grows beyond the current small slice.
 - Engine implementation now covers deterministic setup, turn progression through cleanup and next-turn handoff, precombat-main legal-action enumeration, combat declaration action windows, priority passing across the currently supported forced-pass branch, land play, five-basic-land mana production, creature spell casting, and minimal combat with multi-block support.
 - The first targeted-sorcery increment is now in place via `Vengeance`, the next destruction expansion was `Path of Peace`, the next narrow sorcery expansion was `Touch of Brilliance`, `Time Ebb` now covers targeted battlefield-to-library-top movement, `Armored Pegasus` established the first minimal flying-keyword card, and `Wall of Granite` now establishes the first strict `Defender` card.
-- The fixed micro-universe model is now showing strain; the next structural improvement should be a manifest-driven support-slice model rather than continued growth of hardcoded scope lists.
+- The manifest-driven support-slice model is now in place and the active slice is loaded from `docs/coverage/slices/portal.initial.yaml` instead of a hardcoded card universe list.
+- `Rain of Salt` and `Wrath of God` now cover fixed multi-target land destruction and global creature destruction, so the next candidate should return to the smallest remaining nonkeyword Portal sorcery family.
 
 ## Workstreams
 
@@ -115,16 +116,16 @@ For cards:
 
 ## Immediate Next Actions
 
-1. Draft the support-slice model that separates source scope, coverage declarations, and declared playable scope.
-2. Add a support-slice manifest contract and plan the migration away from hardcoded micro-universe lists.
-3. Keep card and rules coverage manifests canonical while support slices are introduced as the grouping layer above them.
-4. Only continue widening the `Portal` engine slice after that structural migration is at least planned in repo-local docs.
+1. Keep the support-slice manifest canonical as the engine-loadable source of active card scope.
+2. Continue widening the `Portal` engine slice only through narrow sorcery additions that fit the declared slice model.
+3. Update coverage manifests, contracts, and source artifacts in the same change that widens support.
+4. Avoid keywords, replacement effects, and triggered-ability families until the current nonkeyword sorcery runway is exhausted.
 
 ## Resume Here
 
-The next session should continue the engine-facing plan, but the immediate prerequisite is structural cleanup around support-scope declaration.
+The next session should continue from the manifest-backed slice now that the structural cleanup is complete.
 
-1. Add the first support-slice manifest representing the current `portal_initial_micro_universe`.
-2. Refactor repository and engine-loading assumptions so the active slice comes from manifest data instead of hardcoded oracle ID sets.
-3. Update tests and coverage docs to validate slice membership explicitly.
-4. After that migration lands, inspect `Portal` again for the next smallest non-keyword card group, with direct-damage or card-draw sorceries as likely next candidates.
+1. Keep `docs/coverage/slices/portal.initial.yaml` aligned with the declared active card universe and source pull scope.
+2. Widen the next `Portal` increment through the smallest no-keyword sorcery that adds the least new rules surface.
+3. Favor pure life-gain or similarly narrow no-target spell patterns before moving into temporary stat boosts, hand-reveal accounting, or untap-step modification.
+4. Update contracts and coverage first, then pull source artifacts, then implement engine behavior and tests.

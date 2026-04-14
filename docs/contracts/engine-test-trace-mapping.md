@@ -99,6 +99,18 @@ Define how the current rule-family coverage should map to future engine tests an
   - `spell_resolved`
   - `object_moved_between_zones`
 
+### `simple_life_gain_sorceries_minimal`
+
+- Planned tests:
+  - `engine/tests/test_spells.py`
+  - `engine/tests/test_priority.py`
+  - `engine/tests/test_replay_log.py`
+- Planned trace assertions:
+  - `spell_cast`
+  - `spell_resolved`
+  - `life_total_changed`
+  - `object_moved_between_zones`
+
 ### `targeted_battlefield_to_library_sorceries_minimal`
 
 - Planned tests:
@@ -279,4 +291,5 @@ Define how the current rule-family coverage should map to future engine tests an
   - `opponent_mass_creature_destruction_sorceries_minimal` now has engine coverage for `Rain of Daggers`.
   - `flying_keyword_minimal` now has engine coverage for `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`.
   - `defender_keyword_minimal` now has engine coverage for `Wall of Granite`.
+  - `simple_life_gain_sorceries_minimal` is the next declared candidate, with `Sacred Nectar` as the intended first card.
   - The current slice now has a real lethal-damage proof via `Border Guard` versus `Muck Rats`, so the earlier synthetic SBA shortcut is no longer needed.

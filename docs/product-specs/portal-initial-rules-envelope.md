@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define the smallest believable rules subset for the initial `Portal` support slice built from `Border Guard`, `Foot Soldiers`, `Muck Rats`, `Armored Pegasus`, `Wind Drake`, `Bog Imp`, `Storm Crow`, `Wall of Granite`, `Vengeance`, `Path of Peace`, `Touch of Brilliance`, `Time Ebb`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, `Symbol of Unsummoning`, `Armageddon`, `Rain of Salt`, `Wrath of God`, `Rain of Daggers`, and the five `Portal` basic lands.
+Define the smallest believable rules subset for the initial `Portal` support slice built from `Border Guard`, `Foot Soldiers`, `Muck Rats`, `Armored Pegasus`, `Wind Drake`, `Bog Imp`, `Storm Crow`, `Wall of Granite`, `Vengeance`, `Path of Peace`, `Touch of Brilliance`, `Time Ebb`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, `Symbol of Unsummoning`, `Armageddon`, `Rain of Salt`, `Sacred Nectar`, `Wrath of God`, `Rain of Daggers`, and the five `Portal` basic lands.
 
 ## In Scope
 
@@ -21,6 +21,7 @@ Define the smallest believable rules subset for the initial `Portal` support sli
 - Sorcery-speed targeted creature repositioning limited to `Put target creature on top of its owner's library.`
 - Sorcery-speed targeted creature bounce limited to `Return target creature to its owner's hand.` plus draw-one follow-up for `Symbol of Unsummoning`
 - Sorcery-speed direct damage limited to `Volcanic Hammer deals 3 damage to any target.` and `Lava Axe deals 5 damage to target player or planeswalker.` with planeswalker targeting omitted in the current slice
+- Sorcery-speed no-target life gain limited to `You gain 4 life.`
 - Sorcery-speed targeted discard limited to `Target player discards two cards.` using deterministic hand-order selection in the current slice
 - Sorcery-speed targeted land destruction limited to `Destroy target land.`
 - Sorcery-speed fixed multi-target land destruction limited to `Destroy two target lands.`
@@ -41,6 +42,7 @@ Define the smallest believable rules subset for the initial `Portal` support sli
 - `Touch of Brilliance` may reuse existing library-to-hand zone movement from turn draws while resolving as a no-target sorcery for exactly two cards.
 - `Time Ebb` may reuse targeted sorcery selection while adding only battlefield-to-library-top movement for creatures, without introducing shuffle, reveal, or replacement-effect support.
 - `Volcanic Hammer` and `Lava Axe` may introduce only the minimal direct-damage path required to mark damage on creatures, reduce player life totals, and run the existing lethal-damage SBA check, without introducing prevention, redirection, or planeswalker support.
+- `Sacred Nectar` may introduce only the minimal no-target life-gain path required to increase the caster's life total by 4 and emit the corresponding life-total-change event, without introducing prevention, replacement effects, or generalized life-setting support.
 - `Mind Rot` may introduce only the minimal targeted-discard path required for a player to discard exactly two cards, with the current deterministic implementation using the target player's hand order rather than a separate choice action.
 - `Winter's Grasp` may introduce only the minimal targeted land-destruction path required to choose a land on the battlefield, move it to its owner's graveyard, and emit the matching destruction and zone-move events, without introducing mana burn, land animation, or broader permanent-destruction generalization.
 - `Rain of Salt` may introduce only the minimal fixed multi-target land-destruction path required to choose exactly two distinct land targets on the battlefield, destroy those lands on resolution, and emit the matching destruction and zone-move events, without introducing generalized arbitrary target counts or retargeting support.
