@@ -15,6 +15,7 @@ The initial playable universe contains only these legal card identities:
 - `Bog Imp` from `Portal`
 - `Storm Crow` from `Portal`
 - `Keen-Eyed Archers` from `Portal`
+- `Anaconda` from `Portal`
 - `Vengeance` from `Portal`
 - `Path of Peace` from `Portal`
 - `Hand of Death` from `Portal`
@@ -38,7 +39,7 @@ The initial playable universe contains only these legal card identities:
 - `Mountain` from `Portal`
 - `Plains` from `Portal`
 
-This slice uses mostly vanilla `Portal` creatures plus the simple flyers `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`, the reach creature `Keen-Eyed Archers`, the strict defender creature `Wall of Granite`, the sorceries `Vengeance`, `Path of Peace`, `Hand of Death`, `Touch of Brilliance`, `Time Ebb`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, `Symbol of Unsummoning`, `Armageddon`, `Rain of Salt`, `Sacred Nectar`, and `Wrath of God`, the off-Portal testbed sorcery `Rain of Daggers`, and all five `Portal` basic lands to widen the engine through narrow keyword and sorcery-speed noncreature-spell rule families before broader mechanics are introduced.
+This slice uses mostly vanilla `Portal` creatures plus the simple flyers `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`, the reach creature `Keen-Eyed Archers`, the swampwalking creature `Anaconda`, the strict defender creature `Wall of Granite`, the sorceries `Vengeance`, `Path of Peace`, `Hand of Death`, `Touch of Brilliance`, `Time Ebb`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, `Symbol of Unsummoning`, `Armageddon`, `Rain of Salt`, `Sacred Nectar`, and `Wrath of God`, the off-Portal testbed sorcery `Rain of Daggers`, and all five `Portal` basic lands to widen the engine through narrow keyword and sorcery-speed noncreature-spell rule families before broader mechanics are introduced.
 Multiplicity is allowed as normal so long as no card identity outside this universe is introduced.
 
 ## Play Mode
@@ -55,11 +56,11 @@ Multiplicity is allowed as normal so long as no card identity outside this unive
 
 ## Initial Constraints
 
-- Keyword support stays minimal and only covers the printed `Flying` and `Defender` abilities required by the declared slice.
+- Keyword support stays minimal and only covers the printed `Flying`, `Reach`, `Swampwalk`, and `Defender` abilities required by the declared slice.
 - The first slice should implement only the rule families actually needed by this universe.
 - Any new card added beyond this universe should trigger a rules-gap review before implementation.
 
 ## Current Implementation Note
 
-- The currently implemented slice supports deterministic setup, first-turn progression, land play, basic-land mana generation, creature spell resolution including minimal flying for `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`, minimal reach for `Keen-Eyed Archers`, minimal defender for `Wall of Granite`, the narrow targeted-sorcery path required for `Vengeance`, `Path of Peace`, `Hand of Death`, `Volcanic Hammer`, `Lava Axe`, `Winter's Grasp`, and `Rain of Salt`, simple sorcery-driven card draw for `Touch of Brilliance`, targeted battlefield-to-top-of-library movement for `Time Ebb`, targeted battlefield-to-hand movement plus draw for `Symbol of Unsummoning`, deterministic targeted discard for `Mind Rot`, simple no-target life gain for `Sacred Nectar`, and global/per-opponent mass destruction for `Armageddon`, `Wrath of God`, and `Rain of Daggers`.
+- The currently implemented slice supports deterministic setup, first-turn progression, land play, basic-land mana generation, creature spell resolution including minimal flying for `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`, minimal reach for `Keen-Eyed Archers`, minimal swampwalk for `Anaconda`, minimal defender for `Wall of Granite`, the narrow targeted-sorcery path required for `Vengeance`, `Path of Peace`, `Hand of Death`, `Volcanic Hammer`, `Lava Axe`, `Winter's Grasp`, and `Rain of Salt`, simple sorcery-driven card draw for `Touch of Brilliance`, targeted battlefield-to-top-of-library movement for `Time Ebb`, targeted battlefield-to-hand movement plus draw for `Symbol of Unsummoning`, deterministic targeted discard for `Mind Rot`, simple no-target life gain for `Sacred Nectar`, and global/per-opponent mass destruction for `Armageddon`, `Wrath of God`, and `Rain of Daggers`.
 - Additional setup scenarios may use multiple copies of the declared basic lands and vanilla creatures without widening the universe.

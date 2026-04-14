@@ -50,7 +50,8 @@ The simulator should only claim support based on layer 3, never merely because l
 - The manifest-driven support-slice model is now in place and the active slice is loaded from `docs/coverage/slices/portal.initial.yaml` instead of a hardcoded card universe list.
 - `Rain of Salt` and `Wrath of God` now cover fixed multi-target land destruction and global creature destruction, while `Sacred Nectar` covers the smallest no-target life-gain sorcery family.
 - `Keen-Eyed Archers` now covers the minimal `Reach` combat-blocking exception required to block flying attackers.
-- The next requested expansion is `Hand of Death`, which should add only the minimal target-color restriction required for `Destroy target nonblack creature.`
+- `Hand of Death` now covers the minimal target-color restriction required for `Destroy target nonblack creature.`
+- The next requested expansion is `Anaconda`, which should add only the minimal `Swampwalk` attack-evasion restriction required when the defending player controls a `Swamp`, while consolidating combat legality checks into reusable helpers.
 
 ## Workstreams
 
@@ -129,5 +130,5 @@ The next session should continue from the manifest-backed slice now that the str
 
 1. Keep `docs/coverage/slices/portal.initial.yaml` aligned with the declared active card universe and source pull scope.
 2. Widen the next `Portal` increment through the smallest requested rule family expansion, keeping the implementation explicitly name-scoped when a human picks the target card.
-3. `Hand of Death` is the current next card, and it should introduce only the minimal nonblack-creature target restriction needed by its printed sorcery text.
-4. Update contracts and coverage first, then pull source artifacts, then implement engine behavior and tests.
+3. `Anaconda` is the current next card, and it should introduce only the minimal `Swampwalk` no-block restriction needed when the defending player controls a `Swamp`.
+4. As part of the `Anaconda` expansion, move combat legality into shared attacker/blocker helper functions so `Defender`, `Flying`, `Reach`, and `Swampwalk` all reuse the same validation surface.

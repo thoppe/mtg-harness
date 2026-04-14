@@ -18,6 +18,8 @@ card_entries:
   - set_code: por
     oracle_id: "0ace32d6-7261-447c-9ee2-e03febaab91b"
   - set_code: por
+    oracle_id: "3eff03f1-2c5f-4c59-b465-a8c4cd05e1ba"
+  - set_code: por
     oracle_id: "1d001145-5d14-43a9-bf3b-3ce5c20b2a46"
   - set_code: por
     oracle_id: "b7593cf8-4dcb-473b-a2ef-180fffe66738"
@@ -69,6 +71,7 @@ card_keys:
   - "45b94e3c-a905-435b-aee5-bec9239fd24c"
   - "000d5588-5a4c-434e-988d-396632ade42c"
   - "0ace32d6-7261-447c-9ee2-e03febaab91b"
+  - "3eff03f1-2c5f-4c59-b465-a8c4cd05e1ba"
   - "1d001145-5d14-43a9-bf3b-3ce5c20b2a46"
   - "b7593cf8-4dcb-473b-a2ef-180fffe66738"
   - "dc45b2e3-272b-479b-8e3b-36eead606a3a"
@@ -114,6 +117,7 @@ rule_keys:
   - opponent_mass_creature_destruction_sorceries_minimal
   - flying_keyword_minimal
   - reach_keyword_minimal
+  - swampwalk_keyword_minimal
   - defender_keyword_minimal
   - combat_minimal
   - zones_minimal

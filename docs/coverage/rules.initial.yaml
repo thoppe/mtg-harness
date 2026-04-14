@@ -44,7 +44,7 @@ rules:
       - engine/tests/test_priority.py
       - engine/tests/test_turns.py
       - engine/tests/test_spells.py
-    notes: "Current support is intentionally narrow: play land, activate a declared basic land, cast a supported creature spell including `Armored Pegasus`, `Wind Drake`, `Bog Imp`, `Storm Crow`, and `Keen-Eyed Archers`, cast the supported `Vengeance`, `Path of Peace`, `Hand of Death`, `Touch of Brilliance`, `Time Ebb`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, `Symbol of Unsummoning`, `Armageddon`, `Rain of Salt`, `Sacred Nectar`, `Wrath of God`, or `Rain of Daggers` sorcery, advance to combat, or pass priority."
+    notes: "Current support is intentionally narrow: play land, activate a declared basic land, cast a supported creature spell including `Armored Pegasus`, `Wind Drake`, `Bog Imp`, `Storm Crow`, `Keen-Eyed Archers`, and `Anaconda`, cast the supported `Vengeance`, `Path of Peace`, `Hand of Death`, `Touch of Brilliance`, `Time Ebb`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, `Symbol of Unsummoning`, `Armageddon`, `Rain of Salt`, `Sacred Nectar`, `Wrath of God`, or `Rain of Daggers` sorcery, advance to combat, or pass priority."
   - rule_key: combat_action_windows_minimal
     source_rules:
       - "508"
@@ -64,7 +64,7 @@ rules:
       - "702.3"
       - "508"
     status: implemented
-    scope: Only the subset of defender required for `Wall of Granite`, namely that a creature with defender cannot be declared as an attacker in the current support slice.
+    scope: Only the subset of defender required for `Wall of Granite`, namely that a creature with defender cannot be declared as an attacker in the current support slice via the shared combat-legality path.
     engine_contracts:
       - docs/contracts/play-engine.md
       - docs/contracts/state-machine-transitions.md
@@ -74,6 +74,21 @@ rules:
       - engine/tests/test_priority.py
       - engine/tests/test_spells.py
     notes: "Current support is intentionally narrow and limited to defender-based attack legality for the supported Portal card `Wall of Granite`."
+  - rule_key: swampwalk_keyword_minimal
+    source_rules:
+      - "702.14"
+      - "509"
+    status: implemented
+    scope: Only the subset of swampwalk required for `Anaconda`, namely that a creature with swampwalk cannot be blocked if the defending player controls a `Swamp` in the current support slice.
+    engine_contracts:
+      - docs/contracts/play-engine.md
+      - docs/contracts/state-machine-transitions.md
+      - docs/contracts/replay-event-log.md
+    tests:
+      - engine/tests/test_combat.py
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+    notes: "Current support is intentionally narrow and limited to `Anaconda`'s printed `Swampwalk` keyword using the shared combat-legality helpers and the existing `Swamp` permanent in the current slice."
   - rule_key: reach_keyword_minimal
     source_rules:
       - "702.17"
@@ -118,7 +133,7 @@ rules:
       - "601"
       - "608"
     status: implemented
-    scope: Casting and resolving creature spells from the declared support slice, currently proven for Border Guard, Foot Soldiers, Muck Rats, Armored Pegasus, Wind Drake, Bog Imp, Storm Crow, Keen-Eyed Archers, and Wall of Granite.
+    scope: Casting and resolving creature spells from the declared support slice, currently proven for Border Guard, Foot Soldiers, Muck Rats, Armored Pegasus, Wind Drake, Bog Imp, Storm Crow, Keen-Eyed Archers, Anaconda, and Wall of Granite.
     engine_contracts:
       - docs/contracts/play-engine.md
       - docs/contracts/replay-event-log.md
@@ -343,7 +358,7 @@ rules:
       - "702.9"
       - "509"
     status: implemented
-    scope: Only the subset of flying required for `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`, namely that creatures without flying cannot block those attackers in the current support slice.
+    scope: Only the subset of flying required for `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`, namely that creatures without flying cannot block those attackers in the current support slice via the shared combat-legality path.
     engine_contracts:
       - docs/contracts/play-engine.md
       - docs/contracts/state-machine-transitions.md

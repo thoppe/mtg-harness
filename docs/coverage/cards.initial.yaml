@@ -3,7 +3,7 @@ slice: portal_initial_micro_universe
 set_summaries:
   - set_code: por
     status: partial
-    notes: "The declared support slice currently includes Border Guard, Foot Soldiers, Muck Rats, Wind Drake, Bog Imp, Storm Crow, Keen-Eyed Archers, Armored Pegasus, Wall of Granite, Vengeance, Path of Peace, Hand of Death, Touch of Brilliance, Time Ebb, Volcanic Hammer, Lava Axe, Mind Rot, Winter's Grasp, Symbol of Unsummoning, Armageddon, Rain of Salt, Sacred Nectar, Wrath of God, and the five Portal basic lands."
+    notes: "The declared support slice currently includes Border Guard, Foot Soldiers, Muck Rats, Wind Drake, Bog Imp, Storm Crow, Keen-Eyed Archers, Anaconda, Armored Pegasus, Wall of Granite, Vengeance, Path of Peace, Hand of Death, Touch of Brilliance, Time Ebb, Volcanic Hammer, Lava Axe, Mind Rot, Winter's Grasp, Symbol of Unsummoning, Armageddon, Rain of Salt, Sacred Nectar, Wrath of God, and the five Portal basic lands."
   - set_code: me4
     status: partial
     notes: "The declared support slice currently includes Rain of Daggers as an explicit off-Portal source addition used to widen reusable mass-destruction support."
@@ -133,6 +133,25 @@ cards:
       - engine/tests/test_priority.py
       - engine/tests/test_combat.py
     notes: "Canonical card identity keyed by Scryfall oracle_id. Support is intentionally narrow and limited to the printed `Reach` keyword."
+  - set_code: por
+    card_key: "3eff03f1-2c5f-4c59-b465-a8c4cd05e1ba"
+    display_name: Anaconda
+    card_instances: variable
+    status: implemented
+    engine_scope: Creature spell support for casting `Anaconda`, battlefield presence, attacking, and swampwalk-based unblockability while the defending player controls a `Swamp`.
+    required_rules:
+      - creature_spells_minimal
+      - swampwalk_keyword_minimal
+      - precombat_priority_minimal
+      - combat_action_windows_minimal
+      - combat_minimal
+      - turn_structure_minimal
+      - zones_minimal
+    tests:
+      - engine/tests/test_spells.py
+      - engine/tests/test_priority.py
+      - engine/tests/test_combat.py
+    notes: "Canonical card identity keyed by Scryfall oracle_id. Support is intentionally narrow and limited to the printed `Swampwalk` keyword."
   - set_code: por
     card_key: "1d001145-5d14-43a9-bf3b-3ce5c20b2a46"
     display_name: Vengeance

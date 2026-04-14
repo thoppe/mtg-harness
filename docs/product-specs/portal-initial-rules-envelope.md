@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define the smallest believable rules subset for the initial `Portal` support slice built from `Border Guard`, `Foot Soldiers`, `Muck Rats`, `Armored Pegasus`, `Wind Drake`, `Bog Imp`, `Storm Crow`, `Keen-Eyed Archers`, `Wall of Granite`, `Vengeance`, `Path of Peace`, `Hand of Death`, `Touch of Brilliance`, `Time Ebb`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, `Symbol of Unsummoning`, `Armageddon`, `Rain of Salt`, `Sacred Nectar`, `Wrath of God`, `Rain of Daggers`, and the five `Portal` basic lands.
+Define the smallest believable rules subset for the initial `Portal` support slice built from `Border Guard`, `Foot Soldiers`, `Muck Rats`, `Armored Pegasus`, `Wind Drake`, `Bog Imp`, `Storm Crow`, `Keen-Eyed Archers`, `Anaconda`, `Wall of Granite`, `Vengeance`, `Path of Peace`, `Hand of Death`, `Touch of Brilliance`, `Time Ebb`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, `Symbol of Unsummoning`, `Armageddon`, `Rain of Salt`, `Sacred Nectar`, `Wrath of God`, `Rain of Daggers`, and the five `Portal` basic lands.
 
 ## In Scope
 
@@ -15,6 +15,7 @@ Define the smallest believable rules subset for the initial `Portal` support sli
 - Basic creature combat
 - Flying keyword support limited to the combat and blocking behavior required by `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`
 - Reach keyword support limited to the blocking behavior required by `Keen-Eyed Archers`
+- Swampwalk keyword support limited to the unblockability condition required by `Anaconda`
 - Defender keyword support limited to preventing `Wall of Granite` from attacking
 - Lethal damage and creature death as minimal state-based handling
 - Sorcery-speed targeted destruction limited to `Destroy target tapped creature.` and `Destroy target creature. Its owner gains 4 life.`
@@ -38,6 +39,7 @@ Define the smallest believable rules subset for the initial `Portal` support sli
 - Turn progression must move through named transition points rather than implicit control flow.
 - Accepted actions and automatic rules outcomes must emit replay events in execution order.
 - State-based actions for lethal damage must run at explicit checkpoints.
+- Combat legality should flow through shared helper functions so attacker and blocker validation, as well as action enumeration, use the same keyword-aware rules surface.
 - The first noncreature spell path may stay sorcery-speed only and may validate targets only against battlefield creatures in the declared micro-universe.
 - `Vengeance` may reuse the existing tapped-state model from combat and mana activation rather than introducing a broader effect framework.
 - `Path of Peace` may reuse the same targeted-destruction path while adding only owner life gain, without introducing damage prevention, regeneration, or broader effect layering.
@@ -55,11 +57,12 @@ Define the smallest believable rules subset for the initial `Portal` support sli
 - `Rain of Daggers` may introduce only the minimal opponent-targeted mass creature-destruction path required to target the opposing player in a two-player game, destroy all creatures that player controls, count how many were destroyed this way, and reduce the caster's life total by 2 for each, without introducing broader multiplayer opponent selection, regeneration, or generalized linked delayed accounting.
 - `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow` may introduce only the minimal flying restriction that nonflying creatures cannot block them; broader keyword handling remains out of scope until another card requires it.
 - `Keen-Eyed Archers` may introduce only the minimal reach exception that it can block creatures with flying, without introducing broader anti-air combat text, continuous-effect layering, or generalized keyword interaction beyond the currently supported flying cards.
+- `Anaconda` may introduce only the minimal swampwalk restriction that it cannot be blocked while the defending player controls a `Swamp`, without introducing generalized landwalk handling beyond the printed `Swampwalk` keyword or continuous land-type modification.
 - `Wall of Granite` may introduce only the minimal defender restriction that it cannot be declared as an attacker; broader static-ability handling remains out of scope until another card requires it.
 
 ## Out Of Scope
 
-- Keyword abilities beyond the currently supported `Flying`, `Reach`, and `Defender`
+- Keyword abilities beyond the currently supported `Flying`, `Reach`, `Swampwalk`, and `Defender`
 - Triggered abilities not required by the initial cards
 - Replacement effects
 - Continuous effects beyond what the initial cards require

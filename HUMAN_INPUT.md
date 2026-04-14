@@ -46,7 +46,7 @@ This file captures decisions, constraints, and open questions that are explicitl
 - Multiplicity within the initial micro-universe follows normal game rules and scenario setup needs
 - Initial play mode is two-player normal play structure only
 - For this initial slice, oracle text is the only gameplay text authority; flavor text is never used for implementation
-- Only the minimal `Flying` and `Reach` support required by `Armored Pegasus`, `Wind Drake`, `Bog Imp`, `Storm Crow`, and `Keen-Eyed Archers` is in scope for the current support slice; broader keyword support remains deferred
+- Only the minimal `Flying`, `Reach`, and `Swampwalk` support required by `Armored Pegasus`, `Wind Drake`, `Bog Imp`, `Storm Crow`, `Keen-Eyed Archers`, and `Anaconda` is in scope for the current support slice; broader keyword support remains deferred
 - Default persisted card image asset type: JPG
 - Deterministic simulation and replayability are first-class requirements in v0, especially for tests
 - The first engine architecture pattern is a deterministic state machine with an append-only event log

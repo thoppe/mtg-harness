@@ -41,6 +41,7 @@ Describe the responsibilities of the simulation core.
   - `Storm Crow`
   - `Armored Pegasus`
   - `Keen-Eyed Archers`
+  - `Anaconda`
   - `Wall of Granite`
   - `Vengeance`
   - `Path of Peace`
