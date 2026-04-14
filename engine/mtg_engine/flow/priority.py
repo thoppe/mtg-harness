@@ -227,7 +227,7 @@ def _legal_noncreature_spell_targets(
     spell = state.objects[spell_instance_id]
     card_definition = card_repository.get(spell.oracle_id)
     effect = _supported_targeted_sorcery_effect(card_definition)
-    if effect in {"draw_two_cards", "destroy_all_lands", "destroy_all_creatures"}:
+    if effect in {"draw_two_cards", "gain_4_life", "destroy_all_lands", "destroy_all_creatures"}:
         return ((),)
     if effect is None:
         return ()
@@ -290,6 +290,8 @@ def _supported_targeted_sorcery_effect(card_definition) -> str | None:
         return "destroy_creature_owner_gains_4_life"
     if card_definition.oracle_text == "Draw two cards.":
         return "draw_two_cards"
+    if card_definition.oracle_text == "You gain 4 life.":
+        return "gain_4_life"
     if card_definition.oracle_text == "Put target creature on top of its owner's library.":
         return "put_creature_on_top_of_library"
     if card_definition.oracle_text == "Volcanic Hammer deals 3 damage to any target.":

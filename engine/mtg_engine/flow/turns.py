@@ -378,6 +378,18 @@ def cast_noncreature_spell(
                 event_log,
                 player_id=action.player_id,
             )
+    elif effect == "gain_4_life":
+        acting_player = resolved_state.players[action.player_id]
+        updated_player = replace(acting_player, life_total=acting_player.life_total + 4)
+        resolved_state = update_player(resolved_state, updated_player)
+        event_log.append(
+            event_type="life_total_changed",
+            active_player=action.player_id,
+            payload={
+                "player_id": action.player_id,
+                "life_total": updated_player.life_total,
+            },
+        )
     elif effect == "put_creature_on_top_of_library":
         if action.target_instance_id is None:
             raise ValueError("targeted sorcery requires a target")
@@ -927,7 +939,7 @@ def _require_legal_noncreature_target(
     *,
     effect: str,
 ) -> None:
-    if effect in {"draw_two_cards", "destroy_all_lands", "destroy_all_creatures"}:
+    if effect in {"draw_two_cards", "gain_4_life", "destroy_all_lands", "destroy_all_creatures"}:
         if target_instance_ids:
             raise ValueError("sorcery does not take a target")
         return
@@ -1018,6 +1030,8 @@ def _supported_targeted_sorcery_effect(card_definition) -> str | None:
         return "destroy_creature_owner_gains_4_life"
     if card_definition.oracle_text == "Draw two cards.":
         return "draw_two_cards"
+    if card_definition.oracle_text == "You gain 4 life.":
+        return "gain_4_life"
     if card_definition.oracle_text == "Put target creature on top of its owner's library.":
         return "put_creature_on_top_of_library"
     if card_definition.oracle_text == "Volcanic Hammer deals 3 damage to any target.":

@@ -29,6 +29,7 @@ WINTERS_GRASP = "e9b8679d-52a9-4f0f-9365-f3e4b7a69805"
 SYMBOL_OF_UNSUMMONING = "c44f1a81-269b-4f05-8ff2-e7ce19a93937"
 ARMAGEDDON = "c9ed8b01-959a-47d6-891e-0abbdccf6e4f"
 RAIN_OF_SALT = "1219e330-01ac-405a-b75a-dd4298598167"
+SACRED_NECTAR = "30870ee5-6ad7-48a9-983e-d3b018f2344f"
 WRATH_OF_GOD = "34515b16-c9a4-4f98-8c77-416a7a523407"
 RAIN_OF_DAGGERS = "e2048201-6dc9-4cf5-916f-1d867ae8dbdd"
 
@@ -609,6 +610,63 @@ class ReplayLogTests(unittest.TestCase):
                 "object_moved_between_zones",
                 "permanent_destroyed",
                 "object_moved_between_zones",
+                "object_moved_between_zones",
+            ],
+        )
+
+    def test_sacred_nectar_replay_trace_includes_life_gain(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        setup = SetupInput(
+            game_id="replay-sacred-nectar",
+            players=("alice", "bob"),
+            starting_player="alice",
+            libraries={
+                "alice": (PLAINS, PLAINS, SACRED_NECTAR),
+                "bob": (PLAINS,),
+            },
+            opening_hands={
+                "alice": (PLAINS, PLAINS, SACRED_NECTAR),
+                "bob": (PLAINS,),
+            },
+            rng_seed=65,
+        )
+
+        session = start_first_turn(initialize_game(setup, repository))
+        current_state = session.state
+        for land_id in ("alice:1", "alice:2"):
+            current_state = move_object(
+                current_state,
+                instance_id=land_id,
+                from_zone="hand",
+                to_zone="battlefield",
+                player_id="alice",
+            )
+        session = type(session)(state=current_state, event_log=session.event_log)
+
+        for source_instance_id in session.state.players["alice"].battlefield:
+            session = activate_mana_ability(
+                session,
+                ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+                repository,
+            )
+
+        result = cast_noncreature_spell(
+            session,
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:3",
+                target_instance_ids=(),
+            ),
+            repository,
+        )
+
+        self.assertEqual(
+            [event.event_type for event in result.event_log[-5:]],
+            [
+                "spell_cast",
+                "object_moved_between_zones",
+                "spell_resolved",
+                "life_total_changed",
                 "object_moved_between_zones",
             ],
         )

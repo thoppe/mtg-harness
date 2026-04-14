@@ -54,6 +54,7 @@ WINTERS_GRASP = "e9b8679d-52a9-4f0f-9365-f3e4b7a69805"
 SYMBOL_OF_UNSUMMONING = "c44f1a81-269b-4f05-8ff2-e7ce19a93937"
 ARMAGEDDON = "c9ed8b01-959a-47d6-891e-0abbdccf6e4f"
 RAIN_OF_SALT = "1219e330-01ac-405a-b75a-dd4298598167"
+SACRED_NECTAR = "30870ee5-6ad7-48a9-983e-d3b018f2344f"
 ARMORED_PEGASUS = "f097a059-5505-4c3c-b879-7853ab6972ed"
 WIND_DRAKE = "d6ffdaf0-ac08-4de9-bbce-2eab2f86bcca"
 BOG_IMP = "45b94e3c-a905-435b-aee5-bec9239fd24c"
@@ -528,6 +529,41 @@ class SpellTests(unittest.TestCase):
         self.assertEqual(result.state.players["bob"].graveyard, ("bob:1", "bob:2"))
         self.assertEqual(result.state.players["alice"].graveyard, ("alice:7",))
         self.assertEqual(result.state.objects["alice:7"].oracle_id, RAIN_OF_SALT)
+
+    def test_cast_sacred_nectar_gains_4_life_and_moves_spell_to_graveyard(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_sacred_nectar_session(repository)
+
+        for source_instance_id in session.state.players["alice"].battlefield:
+            session = activate_mana_ability(
+                session,
+                ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+                repository,
+            )
+
+        result = cast_noncreature_spell(
+            session,
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:3",
+                target_instance_ids=(),
+            ),
+            repository,
+        )
+
+        self.assertEqual(result.state.players["alice"].life_total, 24)
+        self.assertEqual(result.state.players["alice"].graveyard, ("alice:3",))
+        self.assertEqual(result.state.objects["alice:3"].oracle_id, SACRED_NECTAR)
+        self.assertEqual(
+            [event.event_type for event in result.event_log[-5:]],
+            [
+                "spell_cast",
+                "object_moved_between_zones",
+                "spell_resolved",
+                "life_total_changed",
+                "object_moved_between_zones",
+            ],
+        )
 
     def test_cast_wrath_of_god_destroys_all_creatures_and_moves_spell_to_graveyard(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
@@ -1153,6 +1189,35 @@ def _build_wrath_of_god_session(repository: CardRepository):
         to_zone="battlefield",
         player_id="bob",
     )
+    return replace(session, state=current_state)
+
+
+def _build_sacred_nectar_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="spell-cast-sacred-nectar",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (PLAINS, PLAINS, SACRED_NECTAR),
+            "bob": (PLAINS,),
+        },
+        opening_hands={
+            "alice": (PLAINS, PLAINS, SACRED_NECTAR),
+            "bob": (PLAINS,),
+        },
+        rng_seed=44,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    current_state = session.state
+
+    for land_id in ("alice:1", "alice:2"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
     return replace(session, state=current_state)
 
 

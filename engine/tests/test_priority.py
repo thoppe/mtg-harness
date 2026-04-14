@@ -56,6 +56,7 @@ WINTERS_GRASP = "e9b8679d-52a9-4f0f-9365-f3e4b7a69805"
 SYMBOL_OF_UNSUMMONING = "c44f1a81-269b-4f05-8ff2-e7ce19a93937"
 ARMAGEDDON = "c9ed8b01-959a-47d6-891e-0abbdccf6e4f"
 RAIN_OF_SALT = "1219e330-01ac-405a-b75a-dd4298598167"
+SACRED_NECTAR = "30870ee5-6ad7-48a9-983e-d3b018f2344f"
 ARMORED_PEGASUS = "f097a059-5505-4c3c-b879-7853ab6972ed"
 WRATH_OF_GOD = "34515b16-c9a4-4f98-8c77-416a7a523407"
 WALL_OF_GRANITE = "8445094f-008b-491a-977c-e8582d5ab72c"
@@ -330,6 +331,21 @@ class PriorityTests(unittest.TestCase):
             CastNonCreatureSpellAction(
                 player_id="alice",
                 card_instance_id="alice:5",
+                target_instance_ids=(),
+            ),
+            actions,
+        )
+
+    def test_precombat_main_enumerates_sacred_nectar_without_target(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_sacred_nectar_ready_session(repository)
+
+        actions = enumerate_legal_actions(session.state, repository)
+
+        self.assertIn(
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:3",
                 target_instance_ids=(),
             ),
             actions,
@@ -960,6 +976,43 @@ def _build_wrath_of_god_ready_session(repository: CardRepository):
         to_zone="battlefield",
         player_id="bob",
     )
+    session = replace(session, state=current_state)
+
+    for source_instance_id in session.state.players["alice"].battlefield:
+        session = activate_mana_ability(
+            session,
+            ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+            repository,
+        )
+    return session
+
+
+def _build_sacred_nectar_ready_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="priority-sacred-nectar",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (PLAINS, PLAINS, SACRED_NECTAR),
+            "bob": (PLAINS,),
+        },
+        opening_hands={
+            "alice": (PLAINS, PLAINS, SACRED_NECTAR),
+            "bob": (PLAINS,),
+        },
+        rng_seed=64,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    current_state = session.state
+
+    for land_id in ("alice:1", "alice:2"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
     session = replace(session, state=current_state)
 
     for source_instance_id in session.state.players["alice"].battlefield:
