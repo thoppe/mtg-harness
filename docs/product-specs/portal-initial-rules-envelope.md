@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define the smallest believable rules subset for the initial `Portal` support slice built from `Border Guard`, `Foot Soldiers`, `Muck Rats`, `Armored Pegasus`, `Wind Drake`, `Bog Imp`, `Storm Crow`, `Keen-Eyed Archers`, `Wall of Granite`, `Vengeance`, `Path of Peace`, `Touch of Brilliance`, `Time Ebb`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, `Symbol of Unsummoning`, `Armageddon`, `Rain of Salt`, `Sacred Nectar`, `Wrath of God`, `Rain of Daggers`, and the five `Portal` basic lands.
+Define the smallest believable rules subset for the initial `Portal` support slice built from `Border Guard`, `Foot Soldiers`, `Muck Rats`, `Armored Pegasus`, `Wind Drake`, `Bog Imp`, `Storm Crow`, `Keen-Eyed Archers`, `Wall of Granite`, `Vengeance`, `Path of Peace`, `Hand of Death`, `Touch of Brilliance`, `Time Ebb`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, `Symbol of Unsummoning`, `Armageddon`, `Rain of Salt`, `Sacred Nectar`, `Wrath of God`, `Rain of Daggers`, and the five `Portal` basic lands.
 
 ## In Scope
 
@@ -18,6 +18,7 @@ Define the smallest believable rules subset for the initial `Portal` support sli
 - Defender keyword support limited to preventing `Wall of Granite` from attacking
 - Lethal damage and creature death as minimal state-based handling
 - Sorcery-speed targeted destruction limited to `Destroy target tapped creature.` and `Destroy target creature. Its owner gains 4 life.`
+- Sorcery-speed targeted destruction limited to the printed nonblack-creature restriction required by `Hand of Death`
 - Sorcery-speed card draw limited to `Draw two cards.`
 - Sorcery-speed targeted creature repositioning limited to `Put target creature on top of its owner's library.`
 - Sorcery-speed targeted creature bounce limited to `Return target creature to its owner's hand.` plus draw-one follow-up for `Symbol of Unsummoning`
@@ -40,6 +41,7 @@ Define the smallest believable rules subset for the initial `Portal` support sli
 - The first noncreature spell path may stay sorcery-speed only and may validate targets only against battlefield creatures in the declared micro-universe.
 - `Vengeance` may reuse the existing tapped-state model from combat and mana activation rather than introducing a broader effect framework.
 - `Path of Peace` may reuse the same targeted-destruction path while adding only owner life gain, without introducing damage prevention, regeneration, or broader effect layering.
+- `Hand of Death` may reuse the existing targeted-destruction path while adding only the minimal printed-color target check needed to reject black creatures, without introducing color-changing effects, continuous color layers, or generalized protection-style filtering.
 - `Touch of Brilliance` may reuse existing library-to-hand zone movement from turn draws while resolving as a no-target sorcery for exactly two cards.
 - `Time Ebb` may reuse targeted sorcery selection while adding only battlefield-to-library-top movement for creatures, without introducing shuffle, reveal, or replacement-effect support.
 - `Volcanic Hammer` and `Lava Axe` may introduce only the minimal direct-damage path required to mark damage on creatures, reduce player life totals, and run the existing lethal-damage SBA check, without introducing prevention, redirection, or planeswalker support.
@@ -61,6 +63,7 @@ Define the smallest believable rules subset for the initial `Portal` support sli
 - Triggered abilities not required by the initial cards
 - Replacement effects
 - Continuous effects beyond what the initial cards require
+- Color-changing effects or generalized color-layer recalculation
 - Instants and modal spells
 - Multiplayer rules
 - Format-legality enforcement

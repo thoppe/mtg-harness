@@ -1,0 +1,137 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "schema_version": 1,
+  "canonical_card_id": "dc45b2e3-272b-479b-8e3b-36eead606a3a",
+  "name": "Hand of Death",
+  "provenance": {
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/27f136b8-52be-49b9-919b-2b9785254350",
+    "fetched_at": "2026-04-13T00:00:00Z",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor+oracleid%3Adc45b2e3-272b-479b-8e3b-36eead606a3a",
+    "requested_set_code": "por",
+    "scryfall_id": "27f136b8-52be-49b9-919b-2b9785254350",
+    "oracle_id": "dc45b2e3-272b-479b-8e3b-36eead606a3a",
+    "set_code": "por",
+    "collector_number": "96",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/2/7/27f136b8-52be-49b9-919b-2b9785254350.jpg?1546740328"
+  },
+  "source_record": {
+    "object": "card",
+    "id": "27f136b8-52be-49b9-919b-2b9785254350",
+    "oracle_id": "dc45b2e3-272b-479b-8e3b-36eead606a3a",
+    "multiverse_ids": [
+      4224
+    ],
+    "tcgplayer_id": 21587,
+    "cardmarket_id": 10004,
+    "name": "Hand of Death",
+    "lang": "en",
+    "released_at": "1997-05-01",
+    "uri": "https://api.scryfall.com/cards/27f136b8-52be-49b9-919b-2b9785254350",
+    "scryfall_uri": "https://scryfall.com/card/por/96/hand-of-death?utm_source=api",
+    "layout": "normal",
+    "highres_image": true,
+    "image_status": "highres_scan",
+    "image_uris": {
+      "small": "https://cards.scryfall.io/small/front/2/7/27f136b8-52be-49b9-919b-2b9785254350.jpg?1546740328",
+      "normal": "https://cards.scryfall.io/normal/front/2/7/27f136b8-52be-49b9-919b-2b9785254350.jpg?1546740328",
+      "large": "https://cards.scryfall.io/large/front/2/7/27f136b8-52be-49b9-919b-2b9785254350.jpg?1546740328",
+      "png": "https://cards.scryfall.io/png/front/2/7/27f136b8-52be-49b9-919b-2b9785254350.png?1546740328",
+      "art_crop": "https://cards.scryfall.io/art_crop/front/2/7/27f136b8-52be-49b9-919b-2b9785254350.jpg?1546740328",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/2/7/27f136b8-52be-49b9-919b-2b9785254350.jpg?1546740328"
+    },
+    "mana_cost": "{2}{B}",
+    "cmc": 3,
+    "type_line": "Sorcery",
+    "oracle_text": "Destroy target nonblack creature.",
+    "colors": [
+      "B"
+    ],
+    "color_identity": [
+      "B"
+    ],
+    "keywords": [],
+    "legalities": {
+      "standard": "not_legal",
+      "future": "not_legal",
+      "historic": "not_legal",
+      "timeless": "not_legal",
+      "gladiator": "not_legal",
+      "pioneer": "not_legal",
+      "modern": "not_legal",
+      "legacy": "legal",
+      "pauper": "legal",
+      "vintage": "legal",
+      "penny": "not_legal",
+      "commander": "legal",
+      "oathbreaker": "legal",
+      "standardbrawl": "not_legal",
+      "brawl": "not_legal",
+      "alchemy": "not_legal",
+      "paupercommander": "legal",
+      "duel": "legal",
+      "oldschool": "not_legal",
+      "premodern": "not_legal",
+      "predh": "legal"
+    },
+    "games": [
+      "paper"
+    ],
+    "reserved": false,
+    "game_changer": false,
+    "foil": false,
+    "nonfoil": true,
+    "finishes": [
+      "nonfoil"
+    ],
+    "oversized": false,
+    "promo": false,
+    "reprint": false,
+    "variation": false,
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set": "por",
+    "set_name": "Portal",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "rulings_uri": "https://api.scryfall.com/cards/27f136b8-52be-49b9-919b-2b9785254350/rulings",
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3Adc45b2e3-272b-479b-8e3b-36eead606a3a&unique=prints",
+    "collector_number": "96",
+    "digital": false,
+    "rarity": "common",
+    "flavor_text": "Death claims all but the darkest souls.",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "artist": "John Coulthart",
+    "artist_ids": [
+      "55e5567a-7673-418e-8ba2-aee7efd6f94b"
+    ],
+    "illustration_id": "af34a0c7-8351-4ec3-b7ab-3acfddaa49d8",
+    "border_color": "black",
+    "frame": "1997",
+    "full_art": false,
+    "textless": false,
+    "booster": true,
+    "story_spotlight": false,
+    "edhrec_rank": 26038,
+    "prices": {
+      "usd": "0.16",
+      "usd_foil": null,
+      "usd_etched": null,
+      "eur": "0.12",
+      "eur_foil": null,
+      "tix": null
+    },
+    "related_uris": {
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4224&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DHand%2Bof%2BDeath",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DHand%2Bof%2BDeath",
+      "edhrec": "https://edhrec.com/route/?cc=Hand+of+Death"
+    },
+    "purchase_uris": {
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F21587%3Fpage%3D1",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10004&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Hand+of+Death&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall"
+    }
+  }
+}

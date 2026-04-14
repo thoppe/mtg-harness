@@ -3,7 +3,7 @@ slice: portal_initial_micro_universe
 set_summaries:
   - set_code: por
     status: partial
-    notes: "The declared support slice currently includes Border Guard, Foot Soldiers, Muck Rats, Wind Drake, Bog Imp, Storm Crow, Keen-Eyed Archers, Armored Pegasus, Wall of Granite, Vengeance, Path of Peace, Touch of Brilliance, Time Ebb, Volcanic Hammer, Lava Axe, Mind Rot, Winter's Grasp, Symbol of Unsummoning, Armageddon, Rain of Salt, Sacred Nectar, Wrath of God, and the five Portal basic lands."
+    notes: "The declared support slice currently includes Border Guard, Foot Soldiers, Muck Rats, Wind Drake, Bog Imp, Storm Crow, Keen-Eyed Archers, Armored Pegasus, Wall of Granite, Vengeance, Path of Peace, Hand of Death, Touch of Brilliance, Time Ebb, Volcanic Hammer, Lava Axe, Mind Rot, Winter's Grasp, Symbol of Unsummoning, Armageddon, Rain of Salt, Sacred Nectar, Wrath of God, and the five Portal basic lands."
   - set_code: me4
     status: partial
     notes: "The declared support slice currently includes Rain of Daggers as an explicit off-Portal source addition used to widen reusable mass-destruction support."
@@ -164,6 +164,22 @@ cards:
       - engine/tests/test_spells.py
       - engine/tests/test_replay_log.py
     notes: "Canonical card identity keyed by Scryfall oracle_id. Support stays inside the narrow targeted-sorcery slice and does not yet imply broader life-gain or destruction generalization."
+  - set_code: por
+    card_key: "dc45b2e3-272b-479b-8e3b-36eead606a3a"
+    display_name: Hand of Death
+    card_instances: variable
+    status: implemented
+    engine_scope: Sorcery-speed noncreature spell support for casting `Hand of Death`, choosing a nonblack creature target, destroying that creature on resolution, and moving the spell from stack to graveyard.
+    required_rules:
+      - color_restricted_creature_destruction_sorceries_minimal
+      - precombat_priority_minimal
+      - turn_structure_minimal
+      - zones_minimal
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+      - engine/tests/test_replay_log.py
+    notes: "Canonical card identity keyed by Scryfall oracle_id. Support is intentionally narrow and limited to the printed `Destroy target nonblack creature.` text using only the card's source colors."
   - set_code: por
     card_key: "56719f6a-1a6c-4c0a-8d21-18f7d7350b68"
     display_name: Swamp

@@ -22,6 +22,8 @@ card_entries:
   - set_code: por
     oracle_id: "b7593cf8-4dcb-473b-a2ef-180fffe66738"
   - set_code: por
+    oracle_id: "dc45b2e3-272b-479b-8e3b-36eead606a3a"
+  - set_code: por
     oracle_id: "6365aba1-78d3-416c-89cd-9449578eedbf"
   - set_code: por
     oracle_id: "30cc8f7b-3c28-40f5-8f8f-157e8212280b"
@@ -69,6 +71,7 @@ card_keys:
   - "0ace32d6-7261-447c-9ee2-e03febaab91b"
   - "1d001145-5d14-43a9-bf3b-3ce5c20b2a46"
   - "b7593cf8-4dcb-473b-a2ef-180fffe66738"
+  - "dc45b2e3-272b-479b-8e3b-36eead606a3a"
   - "6365aba1-78d3-416c-89cd-9449578eedbf"
   - "30cc8f7b-3c28-40f5-8f8f-157e8212280b"
   - "98fa5a06-0553-40fd-999c-bc31c9b3f4db"
@@ -97,6 +100,7 @@ rule_keys:
   - mana_generation_basic
   - creature_spells_minimal
   - targeted_sorcery_spells_minimal
+  - color_restricted_creature_destruction_sorceries_minimal
   - simple_card_draw_sorceries_minimal
   - simple_life_gain_sorceries_minimal
   - targeted_battlefield_to_library_sorceries_minimal

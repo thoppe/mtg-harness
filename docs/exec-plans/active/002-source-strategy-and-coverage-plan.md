@@ -49,7 +49,8 @@ The simulator should only claim support based on layer 3, never merely because l
 - The first targeted-sorcery increment is now in place via `Vengeance`, the next destruction expansion was `Path of Peace`, the next narrow sorcery expansion was `Touch of Brilliance`, `Time Ebb` now covers targeted battlefield-to-library-top movement, `Armored Pegasus` established the first minimal flying-keyword card, and `Wall of Granite` now establishes the first strict `Defender` card.
 - The manifest-driven support-slice model is now in place and the active slice is loaded from `docs/coverage/slices/portal.initial.yaml` instead of a hardcoded card universe list.
 - `Rain of Salt` and `Wrath of God` now cover fixed multi-target land destruction and global creature destruction, while `Sacred Nectar` covers the smallest no-target life-gain sorcery family.
-- The next requested expansion is `Keen-Eyed Archers`, which should add only the minimal `Reach` combat-blocking exception required to block flying attackers.
+- `Keen-Eyed Archers` now covers the minimal `Reach` combat-blocking exception required to block flying attackers.
+- The next requested expansion is `Hand of Death`, which should add only the minimal target-color restriction required for `Destroy target nonblack creature.`
 
 ## Workstreams
 
@@ -128,5 +129,5 @@ The next session should continue from the manifest-backed slice now that the str
 
 1. Keep `docs/coverage/slices/portal.initial.yaml` aligned with the declared active card universe and source pull scope.
 2. Widen the next `Portal` increment through the smallest requested rule family expansion, keeping the implementation explicitly name-scoped when a human picks the target card.
-3. `Keen-Eyed Archers` is the current next card, and it should introduce only the minimal `Reach` exception needed for blocking flyers.
+3. `Hand of Death` is the current next card, and it should introduce only the minimal nonblack-creature target restriction needed by its printed sorcery text.
 4. Update contracts and coverage first, then pull source artifacts, then implement engine behavior and tests.

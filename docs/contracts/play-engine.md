@@ -44,6 +44,7 @@ Describe the responsibilities of the simulation core.
   - `Wall of Granite`
   - `Vengeance`
   - `Path of Peace`
+  - `Hand of Death`
   - `Volcanic Hammer`
   - `Lava Axe`
   - `Mind Rot`
