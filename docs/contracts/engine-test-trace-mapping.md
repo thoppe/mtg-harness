@@ -88,6 +88,18 @@ Define how the current rule-family coverage should map to future engine tests an
   - `permanent_destroyed`
   - `life_total_changed`
 
+### `color_restricted_creature_destruction_sorceries_minimal`
+
+- Planned tests:
+  - `engine/tests/test_spells.py`
+  - `engine/tests/test_priority.py`
+  - `engine/tests/test_replay_log.py`
+- Planned trace assertions:
+  - `spell_cast`
+  - `spell_resolved`
+  - `object_moved_between_zones`
+  - `permanent_destroyed`
+
 ### `simple_card_draw_sorceries_minimal`
 
 - Planned tests:
@@ -290,6 +302,7 @@ Define how the current rule-family coverage should map to future engine tests an
 - Current implementation note:
   - `game_setup_minimal`, `turn_structure_minimal`, `precombat_priority_minimal`, `combat_action_windows_minimal`, `land_playing_minimal`, `mana_generation_basic`, `creature_spells_minimal`, `combat_minimal`, and `state_based_actions_minimal` now have engine coverage.
   - `targeted_sorcery_spells_minimal` now has engine coverage for `Vengeance` and `Path of Peace`.
+  - `color_restricted_creature_destruction_sorceries_minimal` now has engine coverage for `Hand of Death`.
   - `simple_card_draw_sorceries_minimal` now has engine coverage for `Touch of Brilliance`.
   - `targeted_battlefield_to_library_sorceries_minimal` now has engine coverage for `Time Ebb`.
   - `targeted_damage_sorceries_minimal` now has engine coverage for `Volcanic Hammer` and `Lava Axe`.

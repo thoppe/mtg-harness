@@ -271,6 +271,9 @@ def _legal_noncreature_spell_targets(
             if effect == "destroy_creature_owner_gains_4_life":
                 legal_targets.append((instance_id,))
                 continue
+            if effect == "destroy_nonblack_creature" and not permanent_definition.is_black:
+                legal_targets.append((instance_id,))
+                continue
             if effect == "put_creature_on_top_of_library":
                 legal_targets.append((instance_id,))
                 continue
@@ -288,6 +291,8 @@ def _supported_targeted_sorcery_effect(card_definition) -> str | None:
         return "destroy_tapped_creature"
     if card_definition.oracle_text == "Destroy target creature. Its owner gains 4 life.":
         return "destroy_creature_owner_gains_4_life"
+    if card_definition.oracle_text == "Destroy target nonblack creature.":
+        return "destroy_nonblack_creature"
     if card_definition.oracle_text == "Draw two cards.":
         return "draw_two_cards"
     if card_definition.oracle_text == "You gain 4 life.":

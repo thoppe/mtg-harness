@@ -18,6 +18,7 @@ PLAINS = "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
 ISLAND = "b2c6aa39-2d2a-459c-a555-fb48ba993373"
 MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
 PATH_OF_PEACE = "b7593cf8-4dcb-473b-a2ef-180fffe66738"
+HAND_OF_DEATH = "dc45b2e3-272b-479b-8e3b-36eead606a3a"
 TIME_EBB = "30cc8f7b-3c28-40f5-8f8f-157e8212280b"
 MOUNTAIN = "a3fb7228-e76b-4e96-a40e-20b5fed75685"
 SWAMP = "56719f6a-1a6c-4c0a-8d21-18f7d7350b68"
@@ -200,6 +201,79 @@ class ReplayLogTests(unittest.TestCase):
         self.assertEqual(result.event_log[-2].payload["from_zone"], "battlefield")
         self.assertEqual(result.event_log[-2].payload["to_zone"], "library")
         self.assertEqual(result.event_log[-2].payload["library_position"], "top")
+
+    def test_hand_of_death_replay_trace_includes_target_destruction_events(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        setup = SetupInput(
+            game_id="replay-hand-of-death",
+            players=("alice", "bob"),
+            starting_player="alice",
+            libraries={
+                "alice": (SWAMP, SWAMP, SWAMP, HAND_OF_DEATH),
+                "bob": (BORDER_GUARD, MUCK_RATS),
+            },
+            opening_hands={
+                "alice": (SWAMP, SWAMP, SWAMP, HAND_OF_DEATH),
+                "bob": (BORDER_GUARD, MUCK_RATS),
+            },
+            rng_seed=63,
+        )
+
+        session = start_first_turn(initialize_game(setup, repository))
+        current_state = session.state
+        for land_id in ("alice:1", "alice:2", "alice:3"):
+            current_state = move_object(
+                current_state,
+                instance_id=land_id,
+                from_zone="hand",
+                to_zone="battlefield",
+                player_id="alice",
+            )
+        current_state = move_object(
+            current_state,
+            instance_id="bob:1",
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="bob",
+        )
+        current_state = move_object(
+            current_state,
+            instance_id="bob:2",
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="bob",
+        )
+        session = type(session)(state=current_state, event_log=session.event_log)
+
+        for source_instance_id in session.state.players["alice"].battlefield:
+            session = activate_mana_ability(
+                session,
+                ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+                repository,
+            )
+
+        result = cast_noncreature_spell(
+            session,
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:4",
+                target_instance_id="bob:1",
+            ),
+            repository,
+        )
+
+        self.assertEqual(
+            [event.event_type for event in result.event_log[-6:]],
+            [
+                "spell_cast",
+                "object_moved_between_zones",
+                "spell_resolved",
+                "permanent_destroyed",
+                "object_moved_between_zones",
+                "object_moved_between_zones",
+            ],
+        )
+        self.assertEqual(result.event_log[-3].payload["card_instance_id"], "bob:1")
 
     def test_volcanic_hammer_replay_trace_includes_damage_and_sba_events(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)

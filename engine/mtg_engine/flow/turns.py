@@ -336,7 +336,12 @@ def cast_noncreature_spell(
         },
     )
     resolved_state = casting_state
-    if effect in {"destroy_tapped_creature", "destroy_creature_owner_gains_4_life", "destroy_target_land"}:
+    if effect in {
+        "destroy_tapped_creature",
+        "destroy_creature_owner_gains_4_life",
+        "destroy_nonblack_creature",
+        "destroy_target_land",
+    }:
         if action.target_instance_id is None:
             raise ValueError("targeted sorcery requires a target")
         target = casting_state.objects[action.target_instance_id]
@@ -1019,6 +1024,8 @@ def _require_legal_noncreature_target(
         raise ValueError("target must be a creature")
     if effect == "destroy_tapped_creature" and not target.tapped:
         raise ValueError("target must be tapped")
+    if effect == "destroy_nonblack_creature" and target_definition.is_black:
+        raise ValueError("target must be nonblack creature")
 
 
 def _supported_targeted_sorcery_effect(card_definition) -> str | None:
@@ -1028,6 +1035,8 @@ def _supported_targeted_sorcery_effect(card_definition) -> str | None:
         return "destroy_tapped_creature"
     if card_definition.oracle_text == "Destroy target creature. Its owner gains 4 life.":
         return "destroy_creature_owner_gains_4_life"
+    if card_definition.oracle_text == "Destroy target nonblack creature.":
+        return "destroy_nonblack_creature"
     if card_definition.oracle_text == "Draw two cards.":
         return "draw_two_cards"
     if card_definition.oracle_text == "You gain 4 life.":

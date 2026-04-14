@@ -33,6 +33,7 @@ class CardRepository:
                 power=source.get("power"),
                 toughness=source.get("toughness"),
                 set_code=source["set"],
+                colors=tuple(source.get("colors", ())),
                 produced_mana=tuple(source.get("produced_mana", ())),
                 keywords=tuple(source.get("keywords", ())),
             )

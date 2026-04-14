@@ -43,6 +43,7 @@ FOOT_SOLDIERS = "a768ba13-4d1c-4dce-a4a6-86a39c069c3f"
 MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
 VENGEANCE = "1d001145-5d14-43a9-bf3b-3ce5c20b2a46"
 PATH_OF_PEACE = "b7593cf8-4dcb-473b-a2ef-180fffe66738"
+HAND_OF_DEATH = "dc45b2e3-272b-479b-8e3b-36eead606a3a"
 ISLAND = "b2c6aa39-2d2a-459c-a555-fb48ba993373"
 TOUCH_OF_BRILLIANCE = "6365aba1-78d3-416c-89cd-9449578eedbf"
 TIME_EBB = "30cc8f7b-3c28-40f5-8f8f-157e8212280b"
@@ -276,6 +277,67 @@ class SpellTests(unittest.TestCase):
                 "object_moved_between_zones",
             ],
         )
+
+    def test_cast_hand_of_death_destroys_nonblack_creature_and_moves_spell_to_graveyard(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_hand_of_death_session(repository)
+
+        for source_instance_id in session.state.players["alice"].battlefield:
+            session = activate_mana_ability(
+                session,
+                ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+                repository,
+            )
+
+        result = cast_noncreature_spell(
+            session,
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:4",
+                target_instance_id="bob:1",
+            ),
+            repository,
+        )
+
+        self.assertEqual(result.state.players["alice"].graveyard, ("alice:4",))
+        self.assertEqual(result.state.players["bob"].graveyard, ("bob:1",))
+        self.assertEqual(result.state.players["bob"].battlefield, ("bob:2",))
+        self.assertEqual(result.state.objects["alice:4"].oracle_id, HAND_OF_DEATH)
+        self.assertEqual(result.state.objects["bob:1"].zone, "graveyard")
+        self.assertEqual(result.state.objects["bob:2"].zone, "battlefield")
+        self.assertEqual(
+            [event.event_type for event in result.event_log[-6:]],
+            [
+                "spell_cast",
+                "object_moved_between_zones",
+                "spell_resolved",
+                "permanent_destroyed",
+                "object_moved_between_zones",
+                "object_moved_between_zones",
+            ],
+        )
+
+    def test_cast_hand_of_death_rejects_black_creature_target(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_hand_of_death_session(repository)
+
+        for source_instance_id in session.state.players["alice"].battlefield:
+            session = activate_mana_ability(
+                session,
+                ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+                repository,
+            )
+
+        with self.assertRaisesRegex(ValueError, "target must be nonblack creature"):
+            cast_noncreature_spell(
+                session,
+                CastNonCreatureSpellAction(
+                    player_id="alice",
+                    card_instance_id="alice:4",
+                    target_instance_id="bob:2",
+                ),
+                repository,
+            )
 
     def test_cast_touch_of_brilliance_draws_two_cards_and_moves_spell_to_graveyard(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
@@ -868,6 +930,44 @@ def _build_path_of_peace_session(repository: CardRepository):
         to_zone="battlefield",
         player_id="bob",
     )
+    return replace(session, state=current_state)
+
+
+def _build_hand_of_death_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="spell-cast-hand-of-death",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (SWAMP, SWAMP, SWAMP, HAND_OF_DEATH),
+            "bob": (BORDER_GUARD, MUCK_RATS),
+        },
+        opening_hands={
+            "alice": (SWAMP, SWAMP, SWAMP, HAND_OF_DEATH),
+            "bob": (BORDER_GUARD, MUCK_RATS),
+        },
+        rng_seed=32,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    current_state = session.state
+
+    for land_id in ("alice:1", "alice:2", "alice:3"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
+
+    for creature_id in ("bob:1", "bob:2"):
+        current_state = move_object(
+            current_state,
+            instance_id=creature_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="bob",
+        )
     return replace(session, state=current_state)
 
 

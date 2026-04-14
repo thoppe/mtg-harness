@@ -13,6 +13,7 @@ class CardDefinition:
     power: str | None
     toughness: str | None
     set_code: str
+    colors: tuple[str, ...] = ()
     produced_mana: tuple[str, ...] = ()
     keywords: tuple[str, ...] = ()
 
@@ -30,6 +31,13 @@ class CardDefinition:
 
     def has_keyword(self, keyword: str) -> bool:
         return keyword in self.keywords
+
+    def has_color(self, color: str) -> bool:
+        return color in self.colors
+
+    @property
+    def is_black(self) -> bool:
+        return self.has_color("B")
 
     @property
     def has_flying(self) -> bool:

@@ -46,6 +46,7 @@ FOOT_SOLDIERS = "a768ba13-4d1c-4dce-a4a6-86a39c069c3f"
 MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
 VENGEANCE = "1d001145-5d14-43a9-bf3b-3ce5c20b2a46"
 PATH_OF_PEACE = "b7593cf8-4dcb-473b-a2ef-180fffe66738"
+HAND_OF_DEATH = "dc45b2e3-272b-479b-8e3b-36eead606a3a"
 TOUCH_OF_BRILLIANCE = "6365aba1-78d3-416c-89cd-9449578eedbf"
 TIME_EBB = "30cc8f7b-3c28-40f5-8f8f-157e8212280b"
 VOLCANIC_HAMMER = "98fa5a06-0553-40fd-999c-bc31c9b3f4db"
@@ -167,6 +168,29 @@ class PriorityTests(unittest.TestCase):
                 player_id="alice",
                 card_instance_id="alice:5",
                 target_instance_id="bob:1",
+            ),
+            actions,
+        )
+
+    def test_precombat_main_enumerates_hand_of_death_for_nonblack_creature_only(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_hand_of_death_ready_session(repository)
+
+        actions = enumerate_legal_actions(session.state, repository)
+
+        self.assertIn(
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:4",
+                target_instance_id="bob:1",
+            ),
+            actions,
+        )
+        self.assertNotIn(
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:4",
+                target_instance_id="bob:2",
             ),
             actions,
         )
@@ -567,6 +591,52 @@ def _build_path_of_peace_ready_session(repository: CardRepository):
         to_zone="battlefield",
         player_id="bob",
     )
+    session = replace(session, state=current_state)
+
+    for source_instance_id in session.state.players["alice"].battlefield:
+        session = activate_mana_ability(
+            session,
+            ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+            repository,
+        )
+    return session
+
+
+def _build_hand_of_death_ready_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="priority-hand-of-death",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (SWAMP, SWAMP, SWAMP, HAND_OF_DEATH),
+            "bob": (BORDER_GUARD, MUCK_RATS),
+        },
+        opening_hands={
+            "alice": (SWAMP, SWAMP, SWAMP, HAND_OF_DEATH),
+            "bob": (BORDER_GUARD, MUCK_RATS),
+        },
+        rng_seed=68,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    current_state = session.state
+
+    for land_id in ("alice:1", "alice:2", "alice:3"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
+
+    for creature_id in ("bob:1", "bob:2"):
+        current_state = move_object(
+            current_state,
+            instance_id=creature_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="bob",
+        )
     session = replace(session, state=current_state)
 
     for source_instance_id in session.state.players["alice"].battlefield:

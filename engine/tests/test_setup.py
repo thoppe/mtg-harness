@@ -19,6 +19,7 @@ BOG_IMP = "45b94e3c-a905-435b-aee5-bec9239fd24c"
 STORM_CROW = "000d5588-5a4c-434e-988d-396632ade42c"
 KEEN_EYED_ARCHERS = "0ace32d6-7261-447c-9ee2-e03febaab91b"
 WALL_OF_GRANITE = "8445094f-008b-491a-977c-e8582d5ab72c"
+HAND_OF_DEATH = "dc45b2e3-272b-479b-8e3b-36eead606a3a"
 VOLCANIC_HAMMER = "98fa5a06-0553-40fd-999c-bc31c9b3f4db"
 LAVA_AXE = "387b6b07-a283-412d-94c3-f7f1dc76e858"
 MIND_ROT = "ad44cf74-b717-48fb-9fa2-77512024d76a"
@@ -42,6 +43,7 @@ class SetupTests(unittest.TestCase):
             "1d001145-5d14-43a9-bf3b-3ce5c20b2a46",
             "1ef5003c-f540-4cdc-913f-7d5280ad9f62",
             "b7593cf8-4dcb-473b-a2ef-180fffe66738",
+            "dc45b2e3-272b-479b-8e3b-36eead606a3a",
             "6365aba1-78d3-416c-89cd-9449578eedbf",
             "30cc8f7b-3c28-40f5-8f8f-157e8212280b",
             "98fa5a06-0553-40fd-999c-bc31c9b3f4db",
@@ -76,6 +78,7 @@ class SetupTests(unittest.TestCase):
         self.assertTrue(repository.get(STORM_CROW).has_flying)
         self.assertTrue(repository.get(KEEN_EYED_ARCHERS).has_reach)
         self.assertTrue(repository.get(WALL_OF_GRANITE).has_defender)
+        self.assertTrue(repository.get(HAND_OF_DEATH).is_black)
 
     def test_active_support_slice_manifest_is_unique_and_loadable(self) -> None:
         support_slice = load_active_support_slice(REPO_ROOT)
@@ -84,6 +87,7 @@ class SetupTests(unittest.TestCase):
         self.assertEqual(support_slice.status, "active")
         self.assertEqual(support_slice.set_code, "por")
         self.assertIn("targeted_sorcery_spells_minimal", support_slice.rule_keys)
+        self.assertIn("color_restricted_creature_destruction_sorceries_minimal", support_slice.rule_keys)
         self.assertIn("targeted_damage_sorceries_minimal", support_slice.rule_keys)
         self.assertIn("targeted_discard_sorceries_minimal", support_slice.rule_keys)
         self.assertIn("targeted_land_destruction_sorceries_minimal", support_slice.rule_keys)
@@ -97,6 +101,7 @@ class SetupTests(unittest.TestCase):
         self.assertIn("reach_keyword_minimal", support_slice.rule_keys)
         self.assertIn("defender_keyword_minimal", support_slice.rule_keys)
         self.assertIn("b7593cf8-4dcb-473b-a2ef-180fffe66738", support_slice.card_keys)
+        self.assertIn(HAND_OF_DEATH, support_slice.card_keys)
         self.assertIn(ARMORED_PEGASUS, support_slice.card_keys)
         self.assertIn(WIND_DRAKE, support_slice.card_keys)
         self.assertIn(BOG_IMP, support_slice.card_keys)
