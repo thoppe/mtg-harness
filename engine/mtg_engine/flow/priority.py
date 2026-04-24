@@ -265,6 +265,7 @@ def _legal_noncreature_spell_targets(
     land_target_ids: list[str] = []
     if effect == "damage_any_target":
         legal_targets.extend((player_id,) for player_id in state.players)
+    tap_target_ids: list[str] = []
     for player in state.players.values():
         for instance_id in player.battlefield:
             permanent = state.objects[instance_id]
@@ -279,6 +280,10 @@ def _legal_noncreature_spell_targets(
             if effect == "return_creature_to_hand_and_draw_one":
                 if permanent_definition.is_creature:
                     legal_targets.append((instance_id,))
+                continue
+            if effect == "tap_up_to_three_nonflying_creatures":
+                if permanent_definition.is_creature and not permanent_definition.has_flying:
+                    tap_target_ids.append(instance_id)
                 continue
             if not permanent_definition.is_creature:
                 continue
@@ -300,6 +305,10 @@ def _legal_noncreature_spell_targets(
                 legal_targets.append((instance_id,))
     if effect == "destroy_two_target_lands":
         legal_targets.extend(combinations(tuple(land_target_ids), 2))
+    if effect == "tap_up_to_three_nonflying_creatures":
+        legal_targets.append(())
+        for target_count in range(1, min(3, len(tap_target_ids)) + 1):
+            legal_targets.extend(combinations(tuple(tap_target_ids), target_count))
     return tuple(legal_targets)
 
 
@@ -330,6 +339,8 @@ def _supported_targeted_sorcery_effect(card_definition) -> str | None:
         return "destroy_two_target_lands"
     if card_definition.oracle_text == "Return target creature to its owner's hand.\nDraw a card.":
         return "return_creature_to_hand_and_draw_one"
+    if card_definition.oracle_text == "Tap up to three target creatures without flying.":
+        return "tap_up_to_three_nonflying_creatures"
     if card_definition.oracle_text == "Destroy all lands.":
         return "destroy_all_lands"
     if card_definition.oracle_text == "Destroy all creatures. They can't be regenerated.":

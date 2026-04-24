@@ -38,6 +38,7 @@ Define the minimum append-only event types required for deterministic replay and
 - `combat_damage_assigned`
 - `combat_damage_applied`
 - `life_total_changed`
+- `permanent_tapped`
 - `state_based_actions_checked`
 - `permanent_destroyed`
 - `turn_ended`
@@ -54,7 +55,7 @@ Define the minimum append-only event types required for deterministic replay and
 
 - The first slice does not need event families for triggered abilities, replacement effects, or continuous-effect recalculation.
 - The first slice may use a single zone-movement event type rather than highly specialized movement events.
-- The currently implemented event log covers setup, first-turn step progression, drawing, explicit action windows for precombat main and combat declarations, precombat priority passing through the currently supported forced-pass branch, land play, five-basic-land mana production, simple creature spell resolution, narrow targeted sorcery resolution for `Vengeance`, `Path of Peace`, `Hand of Death`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, and `Symbol of Unsummoning`, no-target sorcery resolution for `Touch of Brilliance`, `Armageddon`, `Wrath of God`, and `Sacred Nectar`, minimal combat and spell damage/state-based destruction, shared combat-legality checks for the supported `Defender`, `Flying`, `Reach`, and `Swampwalk` cards, and printed-color target filtering limited to `Hand of Death`'s nonblack-creature restriction.
+- The currently implemented event log covers setup, first-turn step progression, drawing, explicit action windows for precombat main and combat declarations, precombat priority passing through the currently supported forced-pass branch, land play, five-basic-land mana production, simple creature spell resolution, narrow targeted sorcery resolution for `Vengeance`, `Path of Peace`, `Hand of Death`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, `Symbol of Unsummoning`, and `Tidal Surge`, no-target sorcery resolution for `Touch of Brilliance`, `Armageddon`, `Wrath of God`, and `Sacred Nectar`, minimal combat and spell damage/state-based destruction, shared combat-legality checks for the supported `Defender`, `Flying`, `Reach`, and `Swampwalk` cards, and printed-color target filtering limited to `Hand of Death`'s nonblack-creature restriction.
 - The current SBA path emits `state_based_actions_checked` even when no permanents are destroyed.
 - The current turn-flow implementation also emits `turn_ended` after cleanup.
 - The current noncreature-spell implementation may emit repeated `permanent_destroyed` and `object_moved_between_zones` events when one spell destroys multiple permanents, including multi-target and global-destruction effects.

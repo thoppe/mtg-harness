@@ -232,6 +232,9 @@ def _summarize_event(
     if event.event_type == "permanent_destroyed":
         card_name = _card_name_from_oracle(card_repository, payload["oracle_id"])
         return f"{card_name} is destroyed for {_reason_text(payload)}"
+    if event.event_type == "permanent_tapped":
+        card_name = _card_name_from_oracle(card_repository, payload["oracle_id"])
+        return f"{card_name} becomes tapped"
     if event.event_type == "object_moved_between_zones":
         return f"{payload['card_instance_id']} moves {payload['from_zone']} -> {payload['to_zone']}"
     if event.event_type == "step_changed":

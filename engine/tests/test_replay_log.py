@@ -20,6 +20,7 @@ MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
 PATH_OF_PEACE = "b7593cf8-4dcb-473b-a2ef-180fffe66738"
 HAND_OF_DEATH = "dc45b2e3-272b-479b-8e3b-36eead606a3a"
 TIME_EBB = "30cc8f7b-3c28-40f5-8f8f-157e8212280b"
+TIDAL_SURGE = "be738992-77fe-498d-b219-e5da4ce5bf07"
 MOUNTAIN = "a3fb7228-e76b-4e96-a40e-20b5fed75685"
 SWAMP = "56719f6a-1a6c-4c0a-8d21-18f7d7350b68"
 BORDER_GUARD = "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
@@ -887,6 +888,74 @@ class ReplayLogTests(unittest.TestCase):
                 "object_moved_between_zones",
             ],
         )
+
+    def test_tidal_surge_replay_trace_includes_permanent_tapped_events(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        setup = SetupInput(
+            game_id="replay-tidal-surge",
+            players=("alice", "bob"),
+            starting_player="alice",
+            libraries={
+                "alice": (ISLAND, PLAINS, TIDAL_SURGE),
+                "bob": (MUCK_RATS, BORDER_GUARD),
+            },
+            opening_hands={
+                "alice": (ISLAND, PLAINS, TIDAL_SURGE),
+                "bob": (MUCK_RATS, BORDER_GUARD),
+            },
+            rng_seed=70,
+        )
+
+        session = start_first_turn(initialize_game(setup, repository))
+        current_state = session.state
+        for land_id in ("alice:1", "alice:2"):
+            current_state = move_object(
+                current_state,
+                instance_id=land_id,
+                from_zone="hand",
+                to_zone="battlefield",
+                player_id="alice",
+            )
+        for creature_id in ("bob:1", "bob:2"):
+            current_state = move_object(
+                current_state,
+                instance_id=creature_id,
+                from_zone="hand",
+                to_zone="battlefield",
+                player_id="bob",
+            )
+        session = type(session)(state=current_state, event_log=session.event_log)
+
+        for source_instance_id in session.state.players["alice"].battlefield:
+            session = activate_mana_ability(
+                session,
+                ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+                repository,
+            )
+
+        result = cast_noncreature_spell(
+            session,
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:3",
+                target_instance_ids=("bob:1", "bob:2"),
+            ),
+            repository,
+        )
+
+        self.assertEqual(
+            [event.event_type for event in result.event_log[-6:]],
+            [
+                "spell_cast",
+                "object_moved_between_zones",
+                "spell_resolved",
+                "permanent_tapped",
+                "permanent_tapped",
+                "object_moved_between_zones",
+            ],
+        )
+        self.assertEqual(result.event_log[-3].payload["card_instance_id"], "bob:1")
+        self.assertEqual(result.event_log[-2].payload["card_instance_id"], "bob:2")
 
 
 if __name__ == "__main__":

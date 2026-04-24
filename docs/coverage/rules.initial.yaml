@@ -44,7 +44,7 @@ rules:
       - engine/tests/test_priority.py
       - engine/tests/test_turns.py
       - engine/tests/test_spells.py
-    notes: "Current support is intentionally narrow: play land, activate a declared basic land, cast a supported creature spell including `Armored Pegasus`, `Wind Drake`, `Bog Imp`, `Storm Crow`, `Keen-Eyed Archers`, and `Anaconda`, cast the supported `Vengeance`, `Path of Peace`, `Hand of Death`, `Touch of Brilliance`, `Time Ebb`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, `Symbol of Unsummoning`, `Armageddon`, `Rain of Salt`, `Sacred Nectar`, `Wrath of God`, or `Rain of Daggers` sorcery, advance to combat, or pass priority."
+    notes: "Current support is intentionally narrow: play land, activate a declared basic land, cast a supported creature spell including `Armored Pegasus`, `Wind Drake`, `Bog Imp`, `Storm Crow`, `Keen-Eyed Archers`, and `Anaconda`, cast the supported `Vengeance`, `Path of Peace`, `Hand of Death`, `Touch of Brilliance`, `Time Ebb`, `Tidal Surge`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, `Symbol of Unsummoning`, `Armageddon`, `Rain of Salt`, `Sacred Nectar`, `Wrath of God`, or `Rain of Daggers` sorcery, advance to combat, or pass priority."
   - rule_key: combat_action_windows_minimal
     source_rules:
       - "508"
@@ -304,6 +304,23 @@ rules:
       - engine/tests/test_spells.py
       - engine/tests/test_replay_log.py
     notes: "Current support is intentionally narrow and name-scoped to `Symbol of Unsummoning`, while establishing the reusable battlefield-to-hand sorcery path for future cards."
+  - rule_key: targeted_creature_tapping_sorceries_minimal
+    source_rules:
+      - "115"
+      - "601"
+      - "608"
+      - "701.26"
+    status: implemented
+    scope: Casting and resolving the supported `Portal` sorcery `Tidal Surge`, choosing zero to three distinct nonflying creature targets, tapping those creatures on resolution, and moving the spell from stack to graveyard.
+    engine_contracts:
+      - docs/contracts/play-engine.md
+      - docs/contracts/state-machine-transitions.md
+      - docs/contracts/replay-event-log.md
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+      - engine/tests/test_replay_log.py
+    notes: "Current support is intentionally narrow and name-scoped to `Tidal Surge`, without introducing broader status-effect, untap-prevention, or tap-trigger support."
   - rule_key: global_land_destruction_sorceries_minimal
     source_rules:
       - "601"

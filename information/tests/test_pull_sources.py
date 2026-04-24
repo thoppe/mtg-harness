@@ -46,6 +46,7 @@ class PullSourcesTests(unittest.TestCase):
         self.assertIn("3eff03f1-2c5f-4c59-b465-a8c4cd05e1ba", [target.oracle_id for target in targets])
         self.assertIn("dc45b2e3-272b-479b-8e3b-36eead606a3a", [target.oracle_id for target in targets])
         self.assertIn("30870ee5-6ad7-48a9-983e-d3b018f2344f", [target.oracle_id for target in targets])
+        self.assertIn("be738992-77fe-498d-b219-e5da4ce5bf07", [target.oracle_id for target in targets])
 
     def test_pull_cards_writes_canonical_paths_and_provenance(self) -> None:
         cards = [
@@ -214,6 +215,45 @@ class PullSourcesTests(unittest.TestCase):
             self.assertEqual(image_path.read_bytes(), b"image:https://cards.scryfall.io/normal/front/985af775-2036-459d-83c6-31ac84a0ffb1.jpg")
             self.assertEqual(image_provenance["artifact_type"], "scryfall_card_image_snapshot")
             self.assertEqual(image_provenance["image_variant"], "normal")
+
+    def test_pull_cards_can_limit_to_single_active_oracle_id(self) -> None:
+        requested_oracle_id = "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
+        card = sample_card(
+            name="Border Guard",
+            oracle_id=requested_oracle_id,
+            card_id="985af775-2036-459d-83c6-31ac84a0ffb1",
+            collector_number="9",
+        )
+        requested_urls: list[str] = []
+
+        def json_fetcher(url: str, headers: dict[str, str]) -> dict:
+            requested_urls.append(unquote(url))
+            return {"data": [card]}
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            written = pull_sources.pull_cards(
+                root,
+                json_fetcher=json_fetcher,
+                bytes_fetcher=lambda url, headers: b"image",
+                sleep_seconds=0,
+                oracle_ids=(requested_oracle_id,),
+            )
+
+            self.assertEqual(len(written), 3)
+            self.assertEqual(len(requested_urls), 1)
+            self.assertIn(requested_oracle_id, requested_urls[0])
+
+    def test_pull_cards_rejects_unknown_oracle_id_filter(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with self.assertRaises(ValueError):
+                pull_sources.pull_cards(
+                    Path(tmpdir),
+                    json_fetcher=lambda url, headers: {"data": []},
+                    bytes_fetcher=lambda url, headers: b"unused",
+                    sleep_seconds=0,
+                    oracle_ids=("00000000-0000-0000-0000-000000000000",),
+                )
 
     def test_pull_cards_rejects_scope_mismatch(self) -> None:
         bad_cards = [

@@ -3,7 +3,7 @@ slice: portal_initial_micro_universe
 set_summaries:
   - set_code: por
     status: partial
-    notes: "The declared support slice currently includes Border Guard, Foot Soldiers, Muck Rats, Wind Drake, Bog Imp, Storm Crow, Keen-Eyed Archers, Anaconda, Armored Pegasus, Wall of Granite, Vengeance, Path of Peace, Hand of Death, Touch of Brilliance, Time Ebb, Volcanic Hammer, Lava Axe, Mind Rot, Winter's Grasp, Symbol of Unsummoning, Armageddon, Rain of Salt, Sacred Nectar, Wrath of God, and the five Portal basic lands."
+    notes: "The declared support slice currently includes Border Guard, Foot Soldiers, Muck Rats, Wind Drake, Bog Imp, Storm Crow, Keen-Eyed Archers, Anaconda, Armored Pegasus, Wall of Granite, Vengeance, Path of Peace, Hand of Death, Touch of Brilliance, Time Ebb, Tidal Surge, Volcanic Hammer, Lava Axe, Mind Rot, Winter's Grasp, Symbol of Unsummoning, Armageddon, Rain of Salt, Sacred Nectar, Wrath of God, and the five Portal basic lands."
   - set_code: me4
     status: partial
     notes: "The declared support slice currently includes Rain of Daggers as an explicit off-Portal source addition used to widen reusable mass-destruction support."
@@ -310,6 +310,22 @@ cards:
       - engine/tests/test_spells.py
       - engine/tests/test_replay_log.py
     notes: "Canonical card identity keyed by Scryfall oracle_id. Support is intentionally narrow and limited to the printed `Put target creature on top of its owner's library.` effect."
+  - set_code: por
+    card_key: "be738992-77fe-498d-b219-e5da4ce5bf07"
+    display_name: Tidal Surge
+    card_instances: variable
+    status: implemented
+    engine_scope: Sorcery-speed noncreature spell support for casting `Tidal Surge`, choosing zero to three distinct nonflying creature targets, tapping those creatures on resolution, and moving Tidal Surge from stack to graveyard.
+    required_rules:
+      - targeted_creature_tapping_sorceries_minimal
+      - precombat_priority_minimal
+      - turn_structure_minimal
+      - zones_minimal
+    tests:
+      - engine/tests/test_priority.py
+      - engine/tests/test_spells.py
+      - engine/tests/test_replay_log.py
+    notes: "Canonical card identity keyed by Scryfall oracle_id. Support is intentionally narrow and limited to the printed `Tap up to three target creatures without flying.` effect, with zero targets allowed by the current `up to three` interpretation."
   - set_code: por
     card_key: "98fa5a06-0553-40fd-999c-bc31c9b3f4db"
     display_name: Volcanic Hammer

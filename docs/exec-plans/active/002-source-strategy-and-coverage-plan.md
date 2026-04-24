@@ -32,16 +32,7 @@ The simulator should only claim support based on layer 3, never merely because l
 ## Progress Notes
 
 - Source artifact provenance contract now exists for card metadata, card images, and rules snapshots.
-- The repository now has a repeatable pull script under `information/` for:
-  - `Border Guard`
-  - `Foot Soldiers`
-  - `Muck Rats`
-  - `Swamp`
-  - `Forest`
-  - `Island`
-  - `Mountain`
-  - `Plains`
-  - the current official Wizards plain-text Comprehensive Rules snapshot
+- The repository now has a repeatable pull script under `information/` for active support-slice Scryfall card artifacts and the current official Wizards plain-text Comprehensive Rules snapshot.
 - Pulled artifacts now exist in-repo with stable filenames and sidecar provenance.
 - Coverage manifests remain YAML as the canonical support declaration for the current micro-universe.
 - Narrative companion markdown should be added only when the supported rule surface grows beyond the current small slice.
@@ -52,6 +43,7 @@ The simulator should only claim support based on layer 3, never merely because l
 - `Keen-Eyed Archers` now covers the minimal `Reach` combat-blocking exception required to block flying attackers.
 - `Hand of Death` now covers the minimal target-color restriction required for `Destroy target nonblack creature.`
 - `Anaconda` now covers the minimal `Swampwalk` attack-evasion restriction required when the defending player controls a `Swamp`, and combat legality now flows through the shared keyword-aware validation surface.
+- `Tidal Surge` now covers the minimal targeted creature-tapping sorcery path required for `Tap up to three target creatures without flying.`
 
 ## Workstreams
 
@@ -140,7 +132,7 @@ Prefer links to canonical manifests over duplicated card lists. If a copied list
 
 ## Resume Here
 
-The next session should continue from the manifest-backed slice after the `Anaconda`/`Swampwalk` increment.
+The next session should continue from the manifest-backed slice after the `Tidal Surge` targeted-tapping increment.
 
 1. Keep `docs/coverage/slices/portal.initial.yaml` aligned with the declared active card universe and source pull scope.
 2. Pick the next `Portal` card by first inspecting its oracle text for new rule families, activated or triggered abilities, keywords, unusual targeting or combat clauses, and replacement or prevention effects.

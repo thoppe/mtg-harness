@@ -37,6 +37,7 @@ This file captures decisions, constraints, and open questions that are explicitl
   - `Path of Peace`
   - `Touch of Brilliance`
   - `Time Ebb`
+  - `Tidal Surge`
   - `Armored Pegasus`
   - `Swamp`
   - `Forest`

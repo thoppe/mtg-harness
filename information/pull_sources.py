@@ -66,6 +66,20 @@ def load_active_support_slice_targets() -> tuple[CardTarget, ...]:
     return tuple(CardTarget(set_code=set_code, oracle_id=oracle_id) for oracle_id in card_keys)
 
 
+def filter_targets_by_oracle_ids(
+    targets: tuple[CardTarget, ...],
+    oracle_ids: tuple[str, ...],
+) -> tuple[CardTarget, ...]:
+    requested = set(oracle_ids)
+    filtered = tuple(target for target in targets if target.oracle_id in requested)
+    found = {target.oracle_id for target in filtered}
+    missing = requested - found
+    if missing:
+        missing_ids = ", ".join(sorted(missing))
+        raise ValueError(f"oracle_id not found in active support slice: {missing_ids}")
+    return filtered
+
+
 def utc_now_iso() -> str:
     return (
         datetime.now(timezone.utc)
@@ -234,8 +248,11 @@ def pull_cards(
     json_fetcher: Callable[[str, dict[str, str]], dict],
     bytes_fetcher: Callable[[str, dict[str, str]], bytes],
     sleep_seconds: float = 0.1,
+    oracle_ids: tuple[str, ...] = (),
 ) -> list[Path]:
     targets = load_active_support_slice_targets()
+    if oracle_ids:
+        targets = filter_targets_by_oracle_ids(targets, oracle_ids)
     fetched_at = utc_now_iso()
     written_paths: list[Path] = []
 
@@ -317,6 +334,12 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Pull only the current official rules text snapshot",
     )
+    parser.add_argument(
+        "--oracle-id",
+        action="append",
+        default=[],
+        help="When pulling cards, limit the pull to one active support-slice oracle_id. May be repeated.",
+    )
     return parser.parse_args()
 
 
@@ -335,6 +358,7 @@ def main() -> int:
                     root,
                     json_fetcher=lambda url, headers: fetch_json(url, headers=headers),
                     bytes_fetcher=lambda url, headers: fetch_bytes(url, headers=headers),
+                    oracle_ids=tuple(args.oracle_id),
                 )
             )
 

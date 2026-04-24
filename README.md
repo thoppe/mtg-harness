@@ -89,8 +89,7 @@ Define enough contracts and architecture to begin implementation of a Python-fir
 
 The next concrete work remains engine-facing:
 
-- land the declared `Path of Peace` expansion on top of the existing `Vengeance` slice
-- keep the rules envelope, source scope, and coverage manifests aligned before implementing the widened targeted-sorcery family
-- extend the engine through similarly narrow noncreature spell resolution before moving into broader mechanic families
+- keep the active support-slice manifest, rules envelope, source scope, and coverage manifests aligned before implementing each card increment
+- extend the engine through narrow, name-scoped noncreature spell resolution before moving into broader mechanic families
 - keep coverage manifests and contracts aligned with the implemented engine path
 - use `.codex/skills/card-source-sync/` whenever the declared source scope under `information/` changes

@@ -67,15 +67,5 @@ Define the on-disk shape and minimum provenance fields for downloaded external s
 
 ## Initial Scope
 
-- The first card pull scope is the currently declared narrow `Portal` slice, aligned with the active support slice:
-  - `Border Guard`
-  - `Foot Soldiers`
-  - `Muck Rats`
-  - `Vengeance`
-  - `Path of Peace`
-  - `Swamp`
-  - `Forest`
-  - `Island`
-  - `Mountain`
-  - `Plains`
+- The current card pull scope is aligned with the active support slice declared in `docs/coverage/slices/portal.initial.yaml`.
 - The first rules pull scope is the current official plain-text Comprehensive Rules snapshot linked from the Wizards rules page.

@@ -7,17 +7,7 @@ Define the explicit inputs required to create a reproducible initial game state 
 ## v0 Scope
 
 - Two players only
-- Active support slice only, currently:
-  - `Border Guard`
-  - `Foot Soldiers`
-  - `Muck Rats`
-  - `Vengeance`
-  - `Path of Peace`
-  - `Swamp`
-  - `Forest`
-  - `Island`
-  - `Mountain`
-  - `Plains`
+- Active support slice only, as declared in `docs/coverage/slices/portal.initial.yaml`
 - Setup may use any multiplicity of those card identities that the scenario requires
 
 ## Required Setup Inputs

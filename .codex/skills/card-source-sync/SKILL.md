@@ -57,17 +57,10 @@ When new cards are introduced, inspect their oracle text and structure for:
 
 If any appear, update planning docs and manifests before claiming implementation support.
 
-## Current Known Simplification
+## Current Scope Source
 
-The initial micro-universe contains:
+The active playable card universe is declared in `docs/coverage/slices/portal.initial.yaml`.
+Do not copy that card list into this skill; read the manifest before pulling or widening sources.
 
-- `Border Guard`
-- `Foot Soldiers`
-- `Muck Rats`
-- `Swamp`
-- `Forest`
-- `Island`
-- `Mountain`
-- `Plains`
-
-`Border Guard`, `Foot Soldiers`, and `Muck Rats` have empty oracle text in Scryfall, and the five basic lands only add intrinsic mana abilities, so the first rules slice can still avoid keywords and triggered abilities.
+Some source artifacts may exist outside the active support slice. Raw source presence is only acquisition state,
+not an implementation claim.

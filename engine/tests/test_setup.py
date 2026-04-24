@@ -31,6 +31,7 @@ RAIN_OF_SALT = "1219e330-01ac-405a-b75a-dd4298598167"
 SACRED_NECTAR = "30870ee5-6ad7-48a9-983e-d3b018f2344f"
 WRATH_OF_GOD = "34515b16-c9a4-4f98-8c77-416a7a523407"
 RAIN_OF_DAGGERS = "e2048201-6dc9-4cf5-916f-1d867ae8dbdd"
+TIDAL_SURGE = "be738992-77fe-498d-b219-e5da4ce5bf07"
 
 
 class SetupTests(unittest.TestCase):
@@ -40,40 +41,9 @@ class SetupTests(unittest.TestCase):
 
         self.assertEqual(repository.support_slice_key, "portal_initial_micro_universe")
         self.assertEqual(set(repository.cards_by_oracle_id.keys()), set(support_slice.card_keys))
-        self.assertEqual(set(repository.cards_by_oracle_id.keys()), {
-            "1d001145-5d14-43a9-bf3b-3ce5c20b2a46",
-            "1ef5003c-f540-4cdc-913f-7d5280ad9f62",
-            "b7593cf8-4dcb-473b-a2ef-180fffe66738",
-            "dc45b2e3-272b-479b-8e3b-36eead606a3a",
-            "6365aba1-78d3-416c-89cd-9449578eedbf",
-            "30cc8f7b-3c28-40f5-8f8f-157e8212280b",
-            "98fa5a06-0553-40fd-999c-bc31c9b3f4db",
-            "387b6b07-a283-412d-94c3-f7f1dc76e858",
-            "ad44cf74-b717-48fb-9fa2-77512024d76a",
-            "e9b8679d-52a9-4f0f-9365-f3e4b7a69805",
-            "c44f1a81-269b-4f05-8ff2-e7ce19a93937",
-            "c9ed8b01-959a-47d6-891e-0abbdccf6e4f",
-            "1219e330-01ac-405a-b75a-dd4298598167",
-            "30870ee5-6ad7-48a9-983e-d3b018f2344f",
-            "f097a059-5505-4c3c-b879-7853ab6972ed",
-            "34515b16-c9a4-4f98-8c77-416a7a523407",
-            "8445094f-008b-491a-977c-e8582d5ab72c",
-            "e2048201-6dc9-4cf5-916f-1d867ae8dbdd",
-            "d6ffdaf0-ac08-4de9-bbce-2eab2f86bcca",
-            "45b94e3c-a905-435b-aee5-bec9239fd24c",
-            "000d5588-5a4c-434e-988d-396632ade42c",
-            "0ace32d6-7261-447c-9ee2-e03febaab91b",
-            "3eff03f1-2c5f-4c59-b465-a8c4cd05e1ba",
-            "a768ba13-4d1c-4dce-a4a6-86a39c069c3f",
-            "a3fb7228-e76b-4e96-a40e-20b5fed75685",
-            "b2c6aa39-2d2a-459c-a555-fb48ba993373",
-            "b34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6",
-            "bca13a12-6723-4a5e-8f1b-21646a8b3e7e",
-            "bc71ebf6-2056-41f7-be35-b2e5c34afa99",
-            "56719f6a-1a6c-4c0a-8d21-18f7d7350b68",
-        })
         self.assertEqual(repository.get("bc71ebf6-2056-41f7-be35-b2e5c34afa99").name, "Plains")
         self.assertEqual(repository.get("bca13a12-6723-4a5e-8f1b-21646a8b3e7e").name, "Muck Rats")
+        self.assertEqual(repository.get(TIDAL_SURGE).name, "Tidal Surge")
         self.assertTrue(repository.get(ARMORED_PEGASUS).has_flying)
         self.assertTrue(repository.get(WIND_DRAKE).has_flying)
         self.assertTrue(repository.get(BOG_IMP).has_flying)
@@ -100,6 +70,7 @@ class SetupTests(unittest.TestCase):
         self.assertIn("global_land_destruction_sorceries_minimal", support_slice.rule_keys)
         self.assertIn("global_creature_destruction_sorceries_minimal", support_slice.rule_keys)
         self.assertIn("opponent_mass_creature_destruction_sorceries_minimal", support_slice.rule_keys)
+        self.assertIn("targeted_creature_tapping_sorceries_minimal", support_slice.rule_keys)
         self.assertIn("flying_keyword_minimal", support_slice.rule_keys)
         self.assertIn("reach_keyword_minimal", support_slice.rule_keys)
         self.assertIn("swampwalk_keyword_minimal", support_slice.rule_keys)
@@ -123,6 +94,7 @@ class SetupTests(unittest.TestCase):
         self.assertIn(SACRED_NECTAR, support_slice.card_keys)
         self.assertIn(WRATH_OF_GOD, support_slice.card_keys)
         self.assertIn(RAIN_OF_DAGGERS, support_slice.card_keys)
+        self.assertIn(TIDAL_SURGE, support_slice.card_keys)
 
     def test_initialize_game_builds_reproducible_opening_state(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)

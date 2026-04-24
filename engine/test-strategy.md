@@ -17,7 +17,8 @@ Define what the first engine tests need to prove before implementation begins.
 - mana tests
   - each declared basic land can produce its intrinsic color
 - spell-casting tests
-  - `Border Guard`, `Foot Soldiers`, and `Muck Rats` can be cast with the required mana
+  - declared creature and noncreature spells can be cast with the required mana
+  - each newly introduced spell text family has targeted legality, resolution, and replay-log coverage
 - combat tests
   - attackers and blockers can be declared legally
   - combat damage updates state correctly

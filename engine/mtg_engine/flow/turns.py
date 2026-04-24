@@ -444,6 +444,23 @@ def cast_noncreature_spell(
             event_log,
             player_id=action.player_id,
         )
+    elif effect == "tap_up_to_three_nonflying_creatures":
+        for target_instance_id in action.target_instance_ids:
+            target = resolved_state.objects[target_instance_id]
+            if target.tapped:
+                continue
+            resolved_state = update_object(resolved_state, replace(target, tapped=True))
+            event_log.append(
+                event_type="permanent_tapped",
+                active_player=action.player_id,
+                payload={
+                    "player_id": target.controller_id,
+                    "card_instance_id": target_instance_id,
+                    "oracle_id": target.oracle_id,
+                    "source_instance_id": action.card_instance_id,
+                    "reason": f"spell_effect:{card_definition.name}",
+                },
+            )
     elif effect == "destroy_all_lands":
         land_ids = _battlefield_permanents_matching(
             casting_state,
@@ -939,6 +956,23 @@ def _require_legal_noncreature_target(
         if target_instance_ids:
             raise ValueError("sorcery does not take a target")
         return
+    if effect == "tap_up_to_three_nonflying_creatures":
+        if len(target_instance_ids) > 3:
+            raise ValueError("spell targets up to three creatures")
+        if len(set(target_instance_ids)) != len(target_instance_ids):
+            raise ValueError("spell requires distinct targets")
+        for target_instance_id in target_instance_ids:
+            if target_instance_id not in state.objects:
+                raise ValueError("target must exist")
+            target = state.objects[target_instance_id]
+            if target.zone != "battlefield":
+                raise ValueError("target must be on the battlefield")
+            target_definition = card_repository.get(target.oracle_id)
+            if not target_definition.is_creature:
+                raise ValueError("target must be a creature")
+            if target_definition.has_flying:
+                raise ValueError("target must be a creature without flying")
+        return
     if not target_instance_ids:
         raise ValueError("targeted sorcery requires a target")
     if effect == "destroy_two_target_lands":
@@ -1046,6 +1080,8 @@ def _supported_targeted_sorcery_effect(card_definition) -> str | None:
         return "destroy_two_target_lands"
     if card_definition.oracle_text == "Return target creature to its owner's hand.\nDraw a card.":
         return "return_creature_to_hand_and_draw_one"
+    if card_definition.oracle_text == "Tap up to three target creatures without flying.":
+        return "tap_up_to_three_nonflying_creatures"
     if card_definition.oracle_text == "Destroy all lands.":
         return "destroy_all_lands"
     if card_definition.oracle_text == "Destroy all creatures. They can't be regenerated.":

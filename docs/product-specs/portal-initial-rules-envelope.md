@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define the smallest believable rules subset for the initial `Portal` support slice built from `Border Guard`, `Foot Soldiers`, `Muck Rats`, `Armored Pegasus`, `Wind Drake`, `Bog Imp`, `Storm Crow`, `Keen-Eyed Archers`, `Anaconda`, `Wall of Granite`, `Vengeance`, `Path of Peace`, `Hand of Death`, `Touch of Brilliance`, `Time Ebb`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, `Symbol of Unsummoning`, `Armageddon`, `Rain of Salt`, `Sacred Nectar`, `Wrath of God`, `Rain of Daggers`, and the five `Portal` basic lands.
+Define the smallest believable rules subset for the initial `Portal` support slice built from `Border Guard`, `Foot Soldiers`, `Muck Rats`, `Armored Pegasus`, `Wind Drake`, `Bog Imp`, `Storm Crow`, `Keen-Eyed Archers`, `Anaconda`, `Wall of Granite`, `Vengeance`, `Path of Peace`, `Hand of Death`, `Touch of Brilliance`, `Time Ebb`, `Tidal Surge`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, `Symbol of Unsummoning`, `Armageddon`, `Rain of Salt`, `Sacred Nectar`, `Wrath of God`, `Rain of Daggers`, and the five `Portal` basic lands.
 
 ## In Scope
 
@@ -23,6 +23,7 @@ Define the smallest believable rules subset for the initial `Portal` support sli
 - Sorcery-speed card draw limited to `Draw two cards.`
 - Sorcery-speed targeted creature repositioning limited to `Put target creature on top of its owner's library.`
 - Sorcery-speed targeted creature bounce limited to `Return target creature to its owner's hand.` plus draw-one follow-up for `Symbol of Unsummoning`
+- Sorcery-speed targeted creature tapping limited to `Tap up to three target creatures without flying.`
 - Sorcery-speed direct damage limited to `Volcanic Hammer deals 3 damage to any target.` and `Lava Axe deals 5 damage to target player or planeswalker.` with planeswalker targeting omitted in the current slice
 - Sorcery-speed no-target life gain limited to `You gain 4 life.`
 - Sorcery-speed targeted discard limited to `Target player discards two cards.` using deterministic hand-order selection in the current slice
@@ -52,6 +53,7 @@ Define the smallest believable rules subset for the initial `Portal` support sli
 - `Winter's Grasp` may introduce only the minimal targeted land-destruction path required to choose a land on the battlefield, move it to its owner's graveyard, and emit the matching destruction and zone-move events, without introducing mana burn, land animation, or broader permanent-destruction generalization.
 - `Rain of Salt` may introduce only the minimal fixed multi-target land-destruction path required to choose exactly two distinct land targets on the battlefield, destroy those lands on resolution, and emit the matching destruction and zone-move events, without introducing generalized arbitrary target counts or retargeting support.
 - `Symbol of Unsummoning` may introduce only the minimal targeted battlefield-to-hand path required to return a creature to its owner's hand and then draw one card for the caster, without introducing instant timing, save effects, or broader hand-size rules.
+- `Tidal Surge` may introduce only the minimal targeted creature-tapping path required to choose zero to three distinct nonflying creature targets and tap those creatures on resolution, without introducing tap triggers, untap prevention, or broader status-effect support.
 - `Armageddon` may introduce only the minimal global land-destruction path required to destroy all lands on the battlefield and emit the corresponding destruction and zone-move events, without introducing regeneration, replacement effects, or broader mass-destruction generalization.
 - `Wrath of God` may introduce only the minimal global creature-destruction path required to destroy all creatures on the battlefield and emit the corresponding destruction and zone-move events, with the printed regeneration rider explicitly ignored in the current slice because regeneration is otherwise unsupported.
 - `Rain of Daggers` may introduce only the minimal opponent-targeted mass creature-destruction path required to target the opposing player in a two-player game, destroy all creatures that player controls, count how many were destroyed this way, and reduce the caster's life total by 2 for each, without introducing broader multiplayer opponent selection, regeneration, or generalized linked delayed accounting.

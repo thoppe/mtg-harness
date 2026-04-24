@@ -32,38 +32,8 @@ Describe the responsibilities of the simulation core.
 
 - All engine implementation code and tests live under `engine/`.
 - The first playable slice is a two-player game only.
-- The first playable card universe contains only:
-  - `Border Guard`
-  - `Foot Soldiers`
-  - `Muck Rats`
-  - `Wind Drake`
-  - `Bog Imp`
-  - `Storm Crow`
-  - `Armored Pegasus`
-  - `Keen-Eyed Archers`
-  - `Anaconda`
-  - `Wall of Granite`
-  - `Vengeance`
-  - `Path of Peace`
-  - `Hand of Death`
-  - `Volcanic Hammer`
-  - `Lava Axe`
-  - `Mind Rot`
-  - `Winter's Grasp`
-  - `Symbol of Unsummoning`
-  - `Armageddon`
-  - `Rain of Salt`
-  - `Sacred Nectar`
-  - `Wrath of God`
-  - `Rain of Daggers`
-  - `Touch of Brilliance`
-  - `Time Ebb`
-  - `Swamp`
-  - `Forest`
-  - `Island`
-  - `Mountain`
-  - `Plains`
-- Setup scenarios may use multiple legal copies of those card identities.
+- The first playable card universe is the active support slice declared in `docs/coverage/slices/portal.initial.yaml`.
+- Setup scenarios may use multiple legal copies of card identities from the active support slice.
 - Oracle text is the gameplay authority for cards; flavor text is ignored.
 - The first slice should avoid keyword support unless a chosen initial card set requires it.
 

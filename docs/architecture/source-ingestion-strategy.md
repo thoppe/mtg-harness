@@ -53,24 +53,8 @@ Current verified official entry points as of April 12, 2026:
 ## Initial Card Universe
 
 - First implementation set remains `Portal` (`por`).
-- First playable micro-universe contains only:
-  - `Border Guard`
-  - `Foot Soldiers`
-  - `Muck Rats`
-  - `Wind Drake`
-  - `Bog Imp`
-  - `Storm Crow`
-  - `Vengeance`
-  - `Path of Peace`
-  - `Touch of Brilliance`
-  - `Time Ebb`
-  - `Armored Pegasus`
-  - `Swamp`
-  - `Forest`
-  - `Island`
-  - `Mountain`
-  - `Plains`
-- This micro-universe exists to constrain the first engine slice before broader `Portal` support.
+- The active playable universe is declared in `docs/coverage/slices/portal.initial.yaml`.
+- This support slice exists to constrain the first engine slice before broader `Portal` support.
 
 ## Raw Vs Implemented Separation
 

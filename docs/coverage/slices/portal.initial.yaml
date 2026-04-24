@@ -30,6 +30,8 @@ card_entries:
   - set_code: por
     oracle_id: "30cc8f7b-3c28-40f5-8f8f-157e8212280b"
   - set_code: por
+    oracle_id: "be738992-77fe-498d-b219-e5da4ce5bf07"
+  - set_code: por
     oracle_id: "98fa5a06-0553-40fd-999c-bc31c9b3f4db"
   - set_code: por
     oracle_id: "387b6b07-a283-412d-94c3-f7f1dc76e858"
@@ -77,6 +79,7 @@ card_keys:
   - "dc45b2e3-272b-479b-8e3b-36eead606a3a"
   - "6365aba1-78d3-416c-89cd-9449578eedbf"
   - "30cc8f7b-3c28-40f5-8f8f-157e8212280b"
+  - "be738992-77fe-498d-b219-e5da4ce5bf07"
   - "98fa5a06-0553-40fd-999c-bc31c9b3f4db"
   - "387b6b07-a283-412d-94c3-f7f1dc76e858"
   - "ad44cf74-b717-48fb-9fa2-77512024d76a"
@@ -112,6 +115,7 @@ rule_keys:
   - targeted_land_destruction_sorceries_minimal
   - fixed_multi_target_land_destruction_sorceries_minimal
   - targeted_battlefield_to_hand_sorceries_minimal
+  - targeted_creature_tapping_sorceries_minimal
   - global_land_destruction_sorceries_minimal
   - global_creature_destruction_sorceries_minimal
   - opponent_mass_creature_destruction_sorceries_minimal

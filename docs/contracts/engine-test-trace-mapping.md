@@ -183,6 +183,18 @@ Define how the current rule-family coverage should map to future engine tests an
   - `spell_resolved`
   - `object_moved_between_zones`
 
+### `targeted_creature_tapping_sorceries_minimal`
+
+- Planned tests:
+  - `engine/tests/test_spells.py`
+  - `engine/tests/test_priority.py`
+  - `engine/tests/test_replay_log.py`
+- Planned trace assertions:
+  - `spell_cast`
+  - `spell_resolved`
+  - `permanent_tapped`
+  - `object_moved_between_zones`
+
 ### `fixed_multi_target_land_destruction_sorceries_minimal`
 
 - Planned tests:
@@ -322,6 +334,7 @@ Define how the current rule-family coverage should map to future engine tests an
   - `targeted_land_destruction_sorceries_minimal` now has engine coverage for `Winter's Grasp`.
   - `fixed_multi_target_land_destruction_sorceries_minimal` now has engine coverage for `Rain of Salt`.
   - `targeted_battlefield_to_hand_sorceries_minimal` now has engine coverage for `Symbol of Unsummoning`.
+  - `targeted_creature_tapping_sorceries_minimal` now has engine coverage for `Tidal Surge`.
   - `global_land_destruction_sorceries_minimal` now has engine coverage for `Armageddon`.
   - `global_creature_destruction_sorceries_minimal` now has engine coverage for `Wrath of God`.
   - `opponent_mass_creature_destruction_sorceries_minimal` now has engine coverage for `Rain of Daggers`.

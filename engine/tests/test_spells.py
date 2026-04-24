@@ -47,6 +47,7 @@ HAND_OF_DEATH = "dc45b2e3-272b-479b-8e3b-36eead606a3a"
 ISLAND = "b2c6aa39-2d2a-459c-a555-fb48ba993373"
 TOUCH_OF_BRILLIANCE = "6365aba1-78d3-416c-89cd-9449578eedbf"
 TIME_EBB = "30cc8f7b-3c28-40f5-8f8f-157e8212280b"
+TIDAL_SURGE = "be738992-77fe-498d-b219-e5da4ce5bf07"
 VOLCANIC_HAMMER = "98fa5a06-0553-40fd-999c-bc31c9b3f4db"
 LAVA_AXE = "387b6b07-a283-412d-94c3-f7f1dc76e858"
 MIND_ROT = "ad44cf74-b717-48fb-9fa2-77512024d76a"
@@ -429,6 +430,100 @@ class SpellTests(unittest.TestCase):
                 "object_moved_between_zones",
             ],
         )
+
+    def test_cast_tidal_surge_taps_selected_nonflying_creatures(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_tidal_surge_session(repository)
+
+        for source_instance_id in session.state.players["alice"].battlefield:
+            session = activate_mana_ability(
+                session,
+                ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+                repository,
+            )
+
+        result = cast_noncreature_spell(
+            session,
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:3",
+                target_instance_ids=("bob:1", "bob:2"),
+            ),
+            repository,
+        )
+
+        self.assertTrue(result.state.objects["bob:1"].tapped)
+        self.assertTrue(result.state.objects["bob:2"].tapped)
+        self.assertFalse(result.state.objects["bob:3"].tapped)
+        self.assertEqual(result.state.players["alice"].graveyard, ("alice:3",))
+        self.assertEqual(result.state.objects["alice:3"].oracle_id, TIDAL_SURGE)
+        self.assertEqual(
+            [event.event_type for event in result.event_log[-6:]],
+            [
+                "spell_cast",
+                "object_moved_between_zones",
+                "spell_resolved",
+                "permanent_tapped",
+                "permanent_tapped",
+                "object_moved_between_zones",
+            ],
+        )
+
+    def test_cast_tidal_surge_allows_zero_targets(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_tidal_surge_session(repository)
+
+        for source_instance_id in session.state.players["alice"].battlefield:
+            session = activate_mana_ability(
+                session,
+                ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+                repository,
+            )
+
+        result = cast_noncreature_spell(
+            session,
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:3",
+                target_instance_ids=(),
+            ),
+            repository,
+        )
+
+        self.assertFalse(result.state.objects["bob:1"].tapped)
+        self.assertFalse(result.state.objects["bob:2"].tapped)
+        self.assertEqual(result.state.players["alice"].graveyard, ("alice:3",))
+        self.assertEqual(
+            [event.event_type for event in result.event_log[-4:]],
+            [
+                "spell_cast",
+                "object_moved_between_zones",
+                "spell_resolved",
+                "object_moved_between_zones",
+            ],
+        )
+
+    def test_cast_tidal_surge_rejects_flying_creature_target(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_tidal_surge_session(repository)
+
+        for source_instance_id in session.state.players["alice"].battlefield:
+            session = activate_mana_ability(
+                session,
+                ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+                repository,
+            )
+
+        with self.assertRaisesRegex(ValueError, "target must be a creature without flying"):
+            cast_noncreature_spell(
+                session,
+                CastNonCreatureSpellAction(
+                    player_id="alice",
+                    card_instance_id="alice:3",
+                    target_instance_ids=("bob:3",),
+                ),
+                repository,
+            )
 
     def test_cast_volcanic_hammer_kills_target_creature_and_moves_spell_to_graveyard(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
@@ -1064,6 +1159,44 @@ def _build_time_ebb_session(repository: CardRepository):
         to_zone="battlefield",
         player_id="bob",
     )
+    return replace(session, state=current_state)
+
+
+def _build_tidal_surge_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="spell-cast-tidal-surge",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (ISLAND, PLAINS, TIDAL_SURGE),
+            "bob": (MUCK_RATS, BORDER_GUARD, STORM_CROW),
+        },
+        opening_hands={
+            "alice": (ISLAND, PLAINS, TIDAL_SURGE),
+            "bob": (MUCK_RATS, BORDER_GUARD, STORM_CROW),
+        },
+        rng_seed=68,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    current_state = session.state
+
+    for land_id in ("alice:1", "alice:2"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
+
+    for creature_id in ("bob:1", "bob:2", "bob:3"):
+        current_state = move_object(
+            current_state,
+            instance_id=creature_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="bob",
+        )
     return replace(session, state=current_state)
 
 

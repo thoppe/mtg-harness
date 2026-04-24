@@ -49,6 +49,7 @@ PATH_OF_PEACE = "b7593cf8-4dcb-473b-a2ef-180fffe66738"
 HAND_OF_DEATH = "dc45b2e3-272b-479b-8e3b-36eead606a3a"
 TOUCH_OF_BRILLIANCE = "6365aba1-78d3-416c-89cd-9449578eedbf"
 TIME_EBB = "30cc8f7b-3c28-40f5-8f8f-157e8212280b"
+TIDAL_SURGE = "be738992-77fe-498d-b219-e5da4ce5bf07"
 VOLCANIC_HAMMER = "98fa5a06-0553-40fd-999c-bc31c9b3f4db"
 LAVA_AXE = "387b6b07-a283-412d-94c3-f7f1dc76e858"
 MIND_ROT = "ad44cf74-b717-48fb-9fa2-77512024d76a"
@@ -59,6 +60,7 @@ ARMAGEDDON = "c9ed8b01-959a-47d6-891e-0abbdccf6e4f"
 RAIN_OF_SALT = "1219e330-01ac-405a-b75a-dd4298598167"
 SACRED_NECTAR = "30870ee5-6ad7-48a9-983e-d3b018f2344f"
 ARMORED_PEGASUS = "f097a059-5505-4c3c-b879-7853ab6972ed"
+STORM_CROW = "000d5588-5a4c-434e-988d-396632ade42c"
 KEEN_EYED_ARCHERS = "0ace32d6-7261-447c-9ee2-e03febaab91b"
 ANACONDA = "3eff03f1-2c5f-4c59-b465-a8c4cd05e1ba"
 WRATH_OF_GOD = "34515b16-c9a4-4f98-8c77-416a7a523407"
@@ -222,6 +224,45 @@ class PriorityTests(unittest.TestCase):
                 player_id="alice",
                 card_instance_id="alice:4",
                 target_instance_id="bob:1",
+            ),
+            actions,
+        )
+
+    def test_precombat_main_enumerates_tidal_surge_for_up_to_three_nonflying_creatures(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_tidal_surge_ready_session(repository)
+
+        actions = enumerate_legal_actions(session.state, repository)
+
+        self.assertIn(
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:3",
+                target_instance_ids=(),
+            ),
+            actions,
+        )
+        self.assertIn(
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:3",
+                target_instance_ids=("bob:1",),
+            ),
+            actions,
+        )
+        self.assertIn(
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:3",
+                target_instance_ids=("bob:1", "bob:2"),
+            ),
+            actions,
+        )
+        self.assertNotIn(
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:3",
+                target_instance_ids=("bob:3",),
             ),
             actions,
         )
@@ -750,6 +791,51 @@ def _build_time_ebb_ready_session(repository: CardRepository):
         to_zone="battlefield",
         player_id="bob",
     )
+    session = replace(session, state=current_state)
+
+    for source_instance_id in session.state.players["alice"].battlefield:
+        session = activate_mana_ability(
+            session,
+            ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+            repository,
+        )
+    return session
+
+
+def _build_tidal_surge_ready_session(repository: CardRepository):
+    setup = SetupInput(
+        game_id="priority-tidal-surge",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (ISLAND, PLAINS, TIDAL_SURGE),
+            "bob": (MUCK_RATS, BORDER_GUARD, STORM_CROW),
+        },
+        opening_hands={
+            "alice": (ISLAND, PLAINS, TIDAL_SURGE),
+            "bob": (MUCK_RATS, BORDER_GUARD, STORM_CROW),
+        },
+        rng_seed=69,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    current_state = session.state
+
+    for land_id in ("alice:1", "alice:2"):
+        current_state = move_object(
+            current_state,
+            instance_id=land_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
+    for creature_id in ("bob:1", "bob:2", "bob:3"):
+        current_state = move_object(
+            current_state,
+            instance_id=creature_id,
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="bob",
+        )
     session = replace(session, state=current_state)
 
     for source_instance_id in session.state.players["alice"].battlefield:
