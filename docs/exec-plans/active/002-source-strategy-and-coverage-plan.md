@@ -51,7 +51,7 @@ The simulator should only claim support based on layer 3, never merely because l
 - `Rain of Salt` and `Wrath of God` now cover fixed multi-target land destruction and global creature destruction, while `Sacred Nectar` covers the smallest no-target life-gain sorcery family.
 - `Keen-Eyed Archers` now covers the minimal `Reach` combat-blocking exception required to block flying attackers.
 - `Hand of Death` now covers the minimal target-color restriction required for `Destroy target nonblack creature.`
-- The next requested expansion is `Anaconda`, which should add only the minimal `Swampwalk` attack-evasion restriction required when the defending player controls a `Swamp`, while consolidating combat legality checks into reusable helpers.
+- `Anaconda` now covers the minimal `Swampwalk` attack-evasion restriction required when the defending player controls a `Swamp`, and combat legality now flows through the shared keyword-aware validation surface.
 
 ## Workstreams
 
@@ -86,8 +86,8 @@ The simulator should only claim support based on layer 3, never merely because l
 
 ## Deferred Next Candidate
 
-- After `Wall of Granite`, the next candidate should return to the smallest nonkeyword `Portal` expansion rather than widening further keyword support.
-- Favor direct-damage or similarly narrow sorcery patterns before adding broader static-ability, replacement-effect, or triggered-ability families.
+- The next candidate should return to the smallest nonkeyword `Portal` expansion rather than widening further keyword support.
+- Favor sorceries that fit or minimally extend the current supported effect families before adding broader static-ability, replacement-effect, or triggered-ability families.
 
 For rules:
 
@@ -124,11 +124,26 @@ For cards:
 3. Update coverage manifests, contracts, and source artifacts in the same change that widens support.
 4. Keep any keyword expansion name-scoped and minimal rather than introducing a general keyword framework prematurely.
 
+## Card-Expansion Freshness Check
+
+Every change that adds, removes, or promotes a card must update or deliberately re-affirm these surfaces in the same change:
+
+1. Source artifacts under `information/cards/` and their provenance sidecars.
+2. The active support-slice manifest in `docs/coverage/slices/`.
+3. `docs/coverage/cards.initial.yaml` and `docs/coverage/rules.initial.yaml`.
+4. The relevant product spec and rules envelope under `docs/product-specs/`.
+5. Any contract whose expected scope would otherwise contain a copied card list or stale rule-family statement.
+6. This active execution plan's progress notes and `Resume Here` section.
+7. Root routing text in `AGENTS.md` only if its next-step guidance would otherwise name a completed card.
+
+Prefer links to canonical manifests over duplicated card lists. If a copied list is necessary, update it in the same change and run a text search for the old card name or old "next card" wording before finishing.
+
 ## Resume Here
 
-The next session should continue from the manifest-backed slice now that the structural cleanup is complete.
+The next session should continue from the manifest-backed slice after the `Anaconda`/`Swampwalk` increment.
 
 1. Keep `docs/coverage/slices/portal.initial.yaml` aligned with the declared active card universe and source pull scope.
-2. Widen the next `Portal` increment through the smallest requested rule family expansion, keeping the implementation explicitly name-scoped when a human picks the target card.
-3. `Anaconda` is the current next card, and it should introduce only the minimal `Swampwalk` no-block restriction needed when the defending player controls a `Swamp`.
-4. As part of the `Anaconda` expansion, move combat legality into shared attacker/blocker helper functions so `Defender`, `Flying`, `Reach`, and `Swampwalk` all reuse the same validation surface.
+2. Pick the next `Portal` card by first inspecting its oracle text for new rule families, activated or triggered abilities, keywords, unusual targeting or combat clauses, and replacement or prevention effects.
+3. Prefer a low-complexity nonkeyword sorcery that fits an existing spell-resolution family or adds only one narrow rule-family increment.
+4. Before implementation, update source artifacts, the support-slice manifest, card coverage, rules coverage, and the rules envelope so the declared support boundary matches the new card.
+5. Before finishing, run the card-expansion freshness check above.

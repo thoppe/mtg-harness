@@ -11,6 +11,7 @@ This repository follows a harness-engineering approach.
 - Prefer small, explicit contracts over vague architecture prose.
 - When assumptions are needed, write them into `HUMAN_INPUT.md` or the relevant plan before building on them.
 - Update plans and contracts as part of the same change that depends on them.
+- When adding cards, run the active plan's card-expansion freshness check so routing docs, manifests, contracts, and resume notes do not drift.
 
 ## First Stops
 
@@ -53,6 +54,6 @@ No frontend implementation should be introduced yet.
 The ingestion scaffold already exists under `information/`, so the next agent should continue the active engine plan.
 
 1. Read `docs/exec-plans/active/002-source-strategy-and-coverage-plan.md` first and follow its `Resume Here` section.
-2. Treat `Path of Peace` as the current next low-complexity `Portal` expansion on top of the existing `Vengeance` slice.
-3. Keep the rules envelope, coverage manifests, and source artifacts aligned with that declared micro-universe before implementation code.
-4. After `Path of Peace`, continue widening the engine through similarly narrow nonkeyword sorceries before adding keywords, replacement effects, or broader triggered-ability support.
+2. Treat the active support-slice manifest and coverage manifests as the current playable scope; do not infer support from source artifacts alone.
+3. Keep the rules envelope, coverage manifests, and source artifacts aligned before implementation code.
+4. Continue widening the engine through narrow, name-scoped `Portal` increments, preferring simple nonkeyword sorceries before adding keywords, replacement effects, or broader triggered-ability support.

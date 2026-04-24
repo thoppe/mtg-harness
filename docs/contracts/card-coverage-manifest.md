@@ -27,22 +27,13 @@ Define the machine-readable inventory of card and set support claimed by the sim
 - Newly pulled cards from an interested set should default to `deferred` until a narrower implementation change promotes them.
 - Raw source data may be committed ahead of implementation; that commit must not claim engine support.
 
+## Freshness Rule
+
+- Do not keep copied card lists in this contract as the active scope expands.
+- The active support-slice manifest is the canonical current card list.
+- When a card changes status, update this manifest and then check any narrative docs, active plans, and root routing text that might still name the old "next" card.
+
 ## Initial Expectation
 
-- The first manifest should include only:
-  - `Border Guard`
-  - `Foot Soldiers`
-  - `Muck Rats`
-  - `Wind Drake`
-  - `Bog Imp`
-  - `Storm Crow`
-  - `Vengeance`
-  - `Path of Peace`
-  - `Touch of Brilliance`
-  - `Time Ebb`
-  - `Armored Pegasus`
-  - `Swamp`
-  - `Forest`
-  - `Island`
-  - `Mountain`
-  - `Plains`
+- The first manifest was seeded from the initial narrow `Portal` slice.
+- Current expected membership must be read from `docs/coverage/slices/portal.initial.yaml`, not from this contract.

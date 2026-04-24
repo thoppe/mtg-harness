@@ -36,6 +36,13 @@ Define the manifest shape for named implementation slices that replace reliance 
 - The active slice must not imply broader set support than the manifest explicitly names.
 - When `card_entries` exists, raw-source provenance should come from those per-card set declarations rather than assuming the slice-level `set_code` applies to every card.
 
+## Freshness Rule
+
+- Treat the active support-slice manifest as the canonical current playable card list.
+- Prefer references to the active support-slice manifest over copied card lists in contracts, README files, and execution plans.
+- When a support-slice card entry changes, update card coverage, rules coverage, relevant product specs, and active-plan progress or resume notes in the same change.
+- If an execution plan names a specific "next card," replace or re-affirm that statement when the named card is implemented.
+
 ## Separation Rule
 
 - Raw source artifacts answer: "what external data is locally available?"

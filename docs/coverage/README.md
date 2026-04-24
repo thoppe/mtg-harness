@@ -25,21 +25,15 @@ These manifests are declarations of claimed support, not implementation.
 - YAML manifests are the canonical coverage declaration for the current repository phase.
 - Matching narrative markdown is optional and should be added only when the supported rule surface becomes too large for the manifests alone to stay legible.
 
-Current declared slice contents:
+## Current Declared Slice
 
-- `Border Guard`
-- `Foot Soldiers`
-- `Muck Rats`
-- `Wind Drake`
-- `Bog Imp`
-- `Storm Crow`
-- `Vengeance`
-- `Path of Peace`
-- `Touch of Brilliance`
-- `Time Ebb`
-- `Armored Pegasus`
-- `Swamp`
-- `Forest`
-- `Island`
-- `Mountain`
-- `Plains`
+The current declared playable scope is the active support-slice manifest:
+
+- `docs/coverage/slices/portal.initial.yaml`
+
+Use that manifest as the complete card and rule list. The companion manifests remain the status authority for individual entries:
+
+- `docs/coverage/cards.initial.yaml`
+- `docs/coverage/rules.initial.yaml`
+
+At the time of this README update, the active slice includes a narrow `Portal`-led card set covering vanilla creatures, basic lands, minimal `Flying`, `Reach`, `Swampwalk`, and `Defender`, plus name-scoped sorcery support for targeted destruction, color-restricted destruction, card draw, life gain, battlefield-to-library movement, battlefield-to-hand movement, direct damage, discard, targeted and multi-target land destruction, global land destruction, global creature destruction, and the explicit off-Portal `Rain of Daggers` mass-destruction testbed.
