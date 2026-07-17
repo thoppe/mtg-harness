@@ -42,6 +42,20 @@ Run the current lethal-damage walkthrough with:
 python3 demo.py
 ```
 
+## Verification
+
+Install the project dependencies, then run both test suites from the repository
+root:
+
+```bash
+python3 -m pip install .
+python3 -m unittest discover -s engine/tests -v
+python3 -m unittest discover -s information/tests -v
+```
+
+The GitHub Actions workflow runs those same commands on supported Python
+versions.
+
 <details>
 <summary>Example terminal output</summary>
 

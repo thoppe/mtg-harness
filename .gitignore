@@ -1,0 +1,8 @@
+# Python build and package metadata
+/build/
+*.egg-info/
+__pycache__/
+*.py[cod]
+
+# Test-tool state
+.pytest_cache/

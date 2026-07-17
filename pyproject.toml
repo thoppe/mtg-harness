@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mtg-harness"
+version = "0.1.0"
+description = "A contract-driven Python harness for a narrow Magic: The Gathering engine slice."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "PyYAML>=6.0,<7",
+    "rich>=13.0,<14",
+]
+
+[tool.setuptools]
+package-dir = {"" = "engine"}
+
+[tool.setuptools.packages.find]
+where = ["engine"]
