@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import replace
 
 from mtg_engine.cards.repository import CardRepository
-from mtg_engine.state.models import CombatState, GameState
+from mtg_engine.state.models import CombatState, GameOutcome, GameState
 from mtg_engine.state.zones import move_object, update_object, update_player
 
 
@@ -141,6 +141,7 @@ def apply_state_based_actions(
     active_player: str,
 ) -> tuple[GameState, list[dict]]:
     destroyed_objects: list[dict] = []
+    losing_players = tuple(player.player_id for player in state.players.values() if player.life_total <= 0)
     for instance_id in _battlefield_object_ids(state):
         obj = state.objects[instance_id]
         card = card_repository.get(obj.oracle_id)
@@ -169,6 +170,25 @@ def apply_state_based_actions(
         }
     ]
     current_state = state
+    if losing_players:
+        surviving_players = tuple(player_id for player_id in state.players if player_id not in losing_players)
+        winner_id = surviving_players[0] if len(surviving_players) == 1 else None
+        current_state = replace(
+            current_state,
+            outcome=GameOutcome(
+                status="completed",
+                winner_id=winner_id,
+                loser_ids=losing_players,
+                reason="life_total_zero_or_less",
+            ),
+        )
+        events.append(
+            {
+                "event_type": "game_ended",
+                "active_player": active_player,
+                "payload": {"winner_id": winner_id, "loser_ids": list(losing_players), "reason": "life_total_zero_or_less"},
+            }
+        )
     for destroyed in destroyed_objects:
         destroyed_id = destroyed["card_instance_id"]
         destroyed_object = current_state.objects[destroyed_id]

@@ -51,6 +51,14 @@ class StackEntry:
 
 
 @dataclass(frozen=True)
+class GameOutcome:
+    status: str = "in_progress"
+    winner_id: str | None = None
+    loser_ids: tuple[str, ...] = ()
+    reason: str | None = None
+
+
+@dataclass(frozen=True)
 class GameState:
     game_id: str
     rng_seed: int
@@ -61,3 +69,4 @@ class GameState:
     combat: CombatState | None = None
     stack_entries: tuple[StackEntry, ...] = ()
     consecutive_passes: int = 0
+    outcome: GameOutcome = GameOutcome()
