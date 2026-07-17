@@ -13,6 +13,7 @@ from mtg_engine.actions.models import (
     PlayLandAction,
 )
 from mtg_engine.cards.repository import CardRepository
+from mtg_engine.cards.implementations import effect_key_for
 from mtg_engine.state.models import GameState
 
 
@@ -313,44 +314,7 @@ def _legal_noncreature_spell_targets(
 
 
 def _supported_targeted_sorcery_effect(card_definition) -> str | None:
-    if not card_definition.is_sorcery:
-        return None
-    if card_definition.oracle_text == "Destroy target tapped creature.":
-        return "destroy_tapped_creature"
-    if card_definition.oracle_text == "Destroy target creature. Its owner gains 4 life.":
-        return "destroy_creature_owner_gains_4_life"
-    if card_definition.oracle_text == "Destroy target nonblack creature.":
-        return "destroy_nonblack_creature"
-    if card_definition.oracle_text == "Draw two cards.":
-        return "draw_two_cards"
-    if card_definition.oracle_text == "You gain 4 life.":
-        return "gain_4_life"
-    if card_definition.oracle_text == "Put target creature on top of its owner's library.":
-        return "put_creature_on_top_of_library"
-    if card_definition.oracle_text == "Volcanic Hammer deals 3 damage to any target.":
-        return "damage_any_target"
-    if card_definition.oracle_text == "Lava Axe deals 5 damage to target player or planeswalker.":
-        return "damage_target_player"
-    if card_definition.oracle_text == "Target player discards two cards.":
-        return "target_player_discards_two"
-    if card_definition.oracle_text == "Destroy target land.":
-        return "destroy_target_land"
-    if card_definition.oracle_text == "Destroy two target lands.":
-        return "destroy_two_target_lands"
-    if card_definition.oracle_text == "Return target creature to its owner's hand.\nDraw a card.":
-        return "return_creature_to_hand_and_draw_one"
-    if card_definition.oracle_text == "Tap up to three target creatures without flying.":
-        return "tap_up_to_three_nonflying_creatures"
-    if card_definition.oracle_text == "Destroy all lands.":
-        return "destroy_all_lands"
-    if card_definition.oracle_text == "Destroy all creatures. They can't be regenerated.":
-        return "destroy_all_creatures"
-    if (
-        card_definition.oracle_text
-        == "Destroy all creatures target opponent controls. You lose 2 life for each creature destroyed this way."
-    ):
-        return "destroy_all_creatures_target_opponent_you_lose_2_per_creature"
-    return None
+    return effect_key_for(card_definition.oracle_id) if card_definition.is_sorcery else None
 
 
 def can_block_attacker(
