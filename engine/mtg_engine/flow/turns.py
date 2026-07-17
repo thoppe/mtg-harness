@@ -76,7 +76,10 @@ def start_first_turn(session: GameBootstrap) -> TurnResult:
             },
         )
         current_step = next_step
-        if next_step == "draw_step":
+        # In a normal two-player game, the starting player skips their first
+        # draw step.  We still expose the step in the trace so turn structure
+        # remains explicit and deterministic.
+        if next_step == "draw_step" and current_state.turn.turn_number != 1:
             current_state = _draw_one_card_if_available(current_state, event_log)
 
     return TurnResult(state=current_state, event_log=event_log.events)

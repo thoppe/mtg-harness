@@ -47,7 +47,7 @@ TOUCH_OF_BRILLIANCE = "6365aba1-78d3-416c-89cd-9449578eedbf"
 
 
 class TurnTests(unittest.TestCase):
-    def test_start_first_turn_reaches_precombat_main_and_draws_card(self) -> None:
+    def test_start_first_turn_reaches_precombat_main_without_drawing_for_starting_player(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         setup = SetupInput(
             game_id="turn-001",
@@ -71,8 +71,8 @@ class TurnTests(unittest.TestCase):
         turn_state = start_first_turn(bootstrap)
 
         self.assertEqual(turn_state.state.turn.step, "precombat_main_step")
-        self.assertEqual(turn_state.state.players["alice"].hand, ("alice:1", "alice:2"))
-        self.assertEqual(turn_state.state.players["alice"].library, ())
+        self.assertEqual(turn_state.state.players["alice"].hand, ("alice:1",))
+        self.assertEqual(turn_state.state.players["alice"].library, ("alice:2",))
         self.assertEqual(
             [event.event_type for event in turn_state.event_log],
             [
@@ -84,10 +84,55 @@ class TurnTests(unittest.TestCase):
                 "step_changed",
                 "step_changed",
                 "step_changed",
-                "object_moved_between_zones",
                 "step_changed",
             ],
         )
+
+    def test_zone_change_resets_battlefield_only_state(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_main_phase_session(repository)
+        battlefield_state = move_object(
+            session.state,
+            instance_id="alice:1",
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
+        marked_state = replace(
+            battlefield_state,
+            objects={
+                **battlefield_state.objects,
+                "alice:1": replace(
+                    battlefield_state.objects["alice:1"],
+                    tapped=True,
+                    damage_marked=3,
+                ),
+            },
+        )
+
+        moved_state = move_object(
+            marked_state,
+            instance_id="alice:1",
+            from_zone="battlefield",
+            to_zone="hand",
+            player_id="alice",
+        )
+        returned_state = move_object(
+            moved_state,
+            instance_id="alice:1",
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="alice",
+        )
+
+        moved_object = moved_state.objects["alice:1"]
+        returned_object = returned_state.objects["alice:1"]
+        self.assertFalse(moved_object.tapped)
+        self.assertEqual(moved_object.damage_marked, 0)
+        self.assertIsNone(moved_object.entered_battlefield_turn)
+        self.assertFalse(returned_object.tapped)
+        self.assertEqual(returned_object.damage_marked, 0)
+        self.assertEqual(returned_object.entered_battlefield_turn, returned_state.turn.turn_number)
 
     def test_play_land_moves_plains_to_battlefield(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
@@ -95,7 +140,7 @@ class TurnTests(unittest.TestCase):
 
         result = play_land(session, PlayLandAction(player_id="alice", card_instance_id="alice:1"), repository)
 
-        self.assertEqual(result.state.players["alice"].hand, ("alice:2",))
+        self.assertEqual(result.state.players["alice"].hand, ())
         self.assertEqual(result.state.players["alice"].battlefield, ("alice:1",))
         self.assertEqual(result.state.objects["alice:1"].zone, "battlefield")
         self.assertEqual(result.state.players["alice"].lands_played_this_turn, 1)
@@ -183,8 +228,8 @@ class TurnTests(unittest.TestCase):
             repository,
         )
 
-        self.assertEqual(result.state.players["alice"].hand, ("alice:6", "alice:7", "alice:8"))
-        self.assertEqual(result.state.players["alice"].library, ())
+        self.assertEqual(result.state.players["alice"].hand, ("alice:6", "alice:7"))
+        self.assertEqual(result.state.players["alice"].library, ("alice:8",))
         move_events = [event for event in result.event_log if event.event_type == "object_moved_between_zones"]
         self.assertEqual(
             [event.payload["from_zone"] for event in move_events[-3:]],

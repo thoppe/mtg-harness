@@ -372,8 +372,8 @@ class SpellTests(unittest.TestCase):
             repository,
         )
 
-        self.assertEqual(result.state.players["alice"].hand, ("alice:6", "alice:7", "alice:8"))
-        self.assertEqual(result.state.players["alice"].library, ())
+        self.assertEqual(result.state.players["alice"].hand, ("alice:6", "alice:7"))
+        self.assertEqual(result.state.players["alice"].library, ("alice:8",))
         self.assertEqual(result.state.players["alice"].graveyard, ("alice:5",))
         self.assertEqual(result.state.players["alice"].mana_pool, ())
         self.assertEqual(result.state.stack, ())

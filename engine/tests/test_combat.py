@@ -125,11 +125,54 @@ class CombatTests(unittest.TestCase):
         self.assertEqual(result.state.objects["bob:4"].damage_marked, 1)
         self.assertEqual(result.state.objects["bob:6"].damage_marked, 0)
         self.assertEqual(result.state.turn.step, "end_combat_step")
+        combat_assignment = next(
+            event for event in result.event_log if event.event_type == "combat_damage_assigned"
+        )
         self.assertEqual(
-            result.event_log[-3].payload["assignments"],
+            combat_assignment.payload["assignments"],
             [
                 {"blocker_id": "bob:4", "attacker_damage": 1, "blocker_damage": 1},
                 {"blocker_id": "bob:6", "attacker_damage": 0, "blocker_damage": 1},
+            ],
+        )
+
+    def test_multiple_blockers_receive_lethal_damage_in_declared_order(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _state_with_anaconda_blockable(repository)
+        state_with_second_blocker = move_object(
+            session.state,
+            instance_id="bob:3",
+            from_zone="hand",
+            to_zone="battlefield",
+            player_id="bob",
+        )
+        muck_rat_blockers = {
+            **state_with_second_blocker.objects,
+            "bob:2": replace(state_with_second_blocker.objects["bob:2"], oracle_id=MUCK_RATS),
+            "bob:3": replace(state_with_second_blocker.objects["bob:3"], oracle_id=MUCK_RATS),
+        }
+        session = replace(session, state=replace(state_with_second_blocker, objects=muck_rat_blockers))
+        session = advance_to_begin_combat(session)
+        session = declare_attackers(
+            session,
+            DeclareAttackersAction(player_id="alice", attacker_ids=("alice:5",)),
+            repository,
+        )
+        session = declare_blockers(
+            session,
+            DeclareBlockersAction(player_id="bob", blockers={"alice:5": ("bob:2", "bob:3")}),
+            repository,
+        )
+        result = resolve_combat_damage(session, repository)
+
+        combat_assignment = next(
+            event for event in result.event_log if event.event_type == "combat_damage_assigned"
+        )
+        self.assertEqual(
+            combat_assignment.payload["assignments"],
+            [
+                {"blocker_id": "bob:2", "attacker_damage": 1, "blocker_damage": 1},
+                {"blocker_id": "bob:3", "attacker_damage": 1, "blocker_damage": 1},
             ],
         )
 
@@ -497,11 +540,11 @@ def _state_with_anaconda_blockable(repository: CardRepository):
         starting_player="alice",
         libraries={
             "alice": (FOREST, PLAINS, PLAINS, PLAINS, ANACONDA),
-            "bob": (PLAINS, BORDER_GUARD),
+            "bob": (PLAINS, BORDER_GUARD, BORDER_GUARD),
         },
         opening_hands={
             "alice": (FOREST, PLAINS, PLAINS, PLAINS, ANACONDA),
-            "bob": (PLAINS, BORDER_GUARD),
+            "bob": (PLAINS, BORDER_GUARD, BORDER_GUARD),
         },
         rng_seed=54,
     )

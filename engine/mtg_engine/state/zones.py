@@ -41,17 +41,17 @@ def move_object(
     else:
         raise ValueError(f"unsupported to_zone: {to_zone}")
 
-    entered_turn = object_record.entered_battlefield_turn
-    if to_zone == "battlefield":
-        entered_turn = state.turn.turn_number
-    damage_marked = object_record.damage_marked
-    if to_zone != "battlefield":
-        damage_marked = 0
+    # A zone change creates a fresh game object for the purposes of the
+    # battlefield-only state this v0 model tracks.  The stable instance id is
+    # retained for deterministic tracing, but tapping, marked damage, and the
+    # previous battlefield entry turn must not follow a card to a new zone.
+    entered_turn = state.turn.turn_number if to_zone == "battlefield" else None
     updated_object = replace(
         object_record,
         zone=to_zone,
+        tapped=False,
         entered_battlefield_turn=entered_turn,
-        damage_marked=damage_marked,
+        damage_marked=0,
     )
     return update_object(state, updated_object)
 
@@ -82,6 +82,8 @@ def move_object_to_top_of_library(
     updated_object = replace(
         object_record,
         zone="library",
+        tapped=False,
+        entered_battlefield_turn=None,
         damage_marked=0,
     )
     return update_object(state, updated_object)

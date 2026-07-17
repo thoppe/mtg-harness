@@ -886,6 +886,7 @@ class ReplayLogTests(unittest.TestCase):
                 "spell_resolved",
                 "object_moved_between_zones",
                 "object_moved_between_zones",
+                "object_moved_between_zones",
             ],
         )
 
