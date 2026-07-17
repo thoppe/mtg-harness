@@ -44,6 +44,13 @@ class CombatState:
 
 
 @dataclass(frozen=True)
+class StackEntry:
+    card_instance_id: str
+    controller_id: str
+    target_ids: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
 class GameState:
     game_id: str
     rng_seed: int
@@ -52,3 +59,5 @@ class GameState:
     stack: tuple[str, ...]
     turn: TurnState
     combat: CombatState | None = None
+    stack_entries: tuple[StackEntry, ...] = ()
+    consecutive_passes: int = 0
