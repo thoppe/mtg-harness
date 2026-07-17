@@ -21,6 +21,13 @@ Define how official raw rules text becomes simulator-supported engine behavior.
 - When a new card fits an existing mechanic family, implementation should prefer extending the shared rule family rather than adding a card-specific rules path.
 - When a new card introduces a mechanic not yet covered, agents should look for the smallest reusable rule-family abstraction that can honestly support the current card and likely near neighbors.
 
+## Workflow Requirements
+
+- Rule-support changes must follow the collaboration and autonomous staging
+  requirements in [Agent Workflow And Change Staging](agent-workflow.md).
+- A verified rule-family increment is a coherent commit stage when its contract,
+  declared coverage, implementation, and tests are aligned.
+
 ## Contract Boundary
 
 - Official Comprehensive Rules text remains the external authority.

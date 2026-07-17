@@ -4,6 +4,7 @@ Contracts define the interfaces and invariants that future code must satisfy.
 
 ## Current Contract Areas
 
+- `agent-workflow.md`
 - `knowledge-sources.md`
 - `source-artifact-provenance.md`
 - `support-slice-manifest.md`
@@ -13,11 +14,14 @@ Contracts define the interfaces and invariants that future code must satisfy.
 - `deterministic-game-setup.md`
 - `engine-test-trace-mapping.md`
 - `game-state.md`
+- `object-identity-and-zone-changes.md`
 - `play-engine.md`
 - `replay-event-log.md`
+- `replay-reduction.md`
 - `rules-coverage-manifest.md`
 - `rules-implementation-lifecycle.md`
 - `state-machine-transitions.md`
+- `stack-and-priority.md`
 - `surface-api.md`
 
 ## Contract Rule

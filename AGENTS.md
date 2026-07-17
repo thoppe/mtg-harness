@@ -12,6 +12,8 @@ This repository follows a harness-engineering approach.
 - When assumptions are needed, write them into `HUMAN_INPUT.md` or the relevant plan before building on them.
 - Update plans and contracts as part of the same change that depends on them.
 - When adding cards, run the active plan's card-expansion freshness check so routing docs, manifests, contracts, and resume notes do not drift.
+- Follow `docs/contracts/agent-workflow.md` for collaboration and verified
+  rule/card change staging.
 
 ## First Stops
 

@@ -21,6 +21,13 @@ Define how raw card data becomes simulator-supported gameplay objects.
 - Once a new card from an actively targeted set is identified, the repository should pull and retain its raw source artifacts instead of deferring the data pull until the implementation session that uses it.
 - Newly pulled cards that are not yet engine-supported should be marked `deferred` in coverage until a later change implements them.
 
+## Workflow Requirements
+
+- Card-support changes must follow the collaboration and autonomous staging
+  requirements in [Agent Workflow And Change Staging](agent-workflow.md).
+- A verified card-support increment is a coherent commit stage when it includes
+  every artifact required by the active plan's card-expansion freshness check.
+
 ## Contract Boundary
 
 - Scryfall provides raw source data and image references.

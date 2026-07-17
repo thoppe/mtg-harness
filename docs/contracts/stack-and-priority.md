@@ -1,0 +1,45 @@
+# Contract: Stack And Priority
+
+## Purpose
+
+Define the minimum stack lifecycle needed for rules-faithful, deterministic spell
+resolution without requiring instants or triggered abilities in the first pass.
+
+## Required Lifecycle
+
+1. A legal cast pays costs, records declared targets, and moves the spell to the
+   stack.
+2. The active player receives priority after casting; priority then passes in
+   turn order.
+3. When every player passes with a nonempty stack, the top object resolves.
+4. When every player passes with an empty stack, the current step may advance.
+
+## v0 Scope
+
+- Two players only.
+- Creature spells and the declared name-scoped sorcery implementations may use
+  this lifecycle.
+- Mana abilities resolve outside the stack.
+- No response spells are required yet, but both players' pass actions and the
+  automatic resolution transition must be visible in the event log.
+- Target legality is rechecked at resolution. A spell whose required targets are
+  all illegal on resolution does not apply its effect and moves to its normal
+  destination.
+
+## State Requirements
+
+- A stack entry must preserve the spell card instance, controller, paid costs,
+  and chosen targets independently from later state changes.
+- Priority state must record enough information to determine whether all players
+  have passed consecutively since the last stack-changing action.
+
+## Non-Goals
+
+- Instants, activated nonmana abilities, triggered abilities, copies, split
+  second, and multiplayer priority ordering remain separate increments.
+
+## Related Contracts
+
+- `docs/contracts/state-machine-transitions.md`
+- `docs/contracts/replay-event-log.md`
+- `docs/contracts/object-identity-and-zone-changes.md`

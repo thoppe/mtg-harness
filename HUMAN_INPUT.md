@@ -26,24 +26,9 @@ This file captures decisions, constraints, and open questions that are explicitl
 - Canonical card metadata filename convention: `information/cards/data/<oracle_id>.json`
 - Canonical card image filename convention: `information/cards/images/<oracle_id>.<ext>`
 - All engine implementation code and tests must live under `engine/`
-- Initial playable micro-universe contains only these legal card identities from `Portal`:
-  - `Border Guard`
-  - `Foot Soldiers`
-  - `Muck Rats`
-  - `Wind Drake`
-  - `Bog Imp`
-  - `Storm Crow`
-  - `Vengeance`
-  - `Path of Peace`
-  - `Touch of Brilliance`
-  - `Time Ebb`
-  - `Tidal Surge`
-  - `Armored Pegasus`
-  - `Swamp`
-  - `Forest`
-  - `Island`
-  - `Mountain`
-  - `Plains`
+- The active playable micro-universe is defined exclusively by
+  `docs/coverage/slices/portal.initial.yaml`; do not copy its card membership
+  into this human-input file.
 - Multiplicity within the initial micro-universe follows normal game rules and scenario setup needs
 - Initial play mode is two-player normal play structure only
 - For this initial slice, oracle text is the only gameplay text authority; flavor text is never used for implementation
