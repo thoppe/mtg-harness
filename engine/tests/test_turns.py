@@ -204,8 +204,9 @@ class TurnTests(unittest.TestCase):
         self.assertEqual(result.state.turn.turn_number, 2)
         self.assertEqual(result.state.turn.active_player, "bob")
         self.assertEqual(result.state.turn.step, "precombat_main_step")
-        self.assertEqual(result.event_log[-5].event_type, "turn_started")
-        self.assertEqual(result.event_log[-1].event_type, "step_changed")
+        self.assertEqual(result.event_log[-6].event_type, "turn_started")
+        self.assertIn("game_ended", [event.event_type for event in result.event_log])
+        self.assertEqual(result.state.outcome.reason, "draw_from_empty_library")
 
     def test_touch_of_brilliance_reuses_library_to_hand_draw_path(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)

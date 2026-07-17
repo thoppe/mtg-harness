@@ -18,7 +18,7 @@ from mtg_engine.actions.validation import require_active_player, require_step
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.cards.implementations import effect_key_for
 from mtg_engine.events.log import EventLog
-from mtg_engine.state.models import GameState, TurnState
+from mtg_engine.state.models import GameOutcome, GameState, TurnState
 from mtg_engine.state.zones import move_object, move_object_to_top_of_library, update_object, update_player
 from mtg_engine.rules.combat import apply_combat_damage, apply_state_based_actions, tap_attackers, with_combat_state
 
@@ -887,7 +887,22 @@ def _draw_one_card_for_player_if_available(
 ) -> GameState:
     player = state.players[player_id]
     if not player.library:
-        return state
+        winner_id = _other_player(state, player_id)
+        next_state = replace(
+            state,
+            outcome=GameOutcome(
+                status="completed",
+                winner_id=winner_id,
+                loser_ids=(player_id,),
+                reason="draw_from_empty_library",
+            ),
+        )
+        event_log.append(
+            event_type="game_ended",
+            active_player=state.turn.active_player,
+            payload={"winner_id": winner_id, "loser_ids": [player_id], "reason": "draw_from_empty_library"},
+        )
+        return next_state
 
     top_instance_id = player.library[0]
     card = state.objects[top_instance_id]
