@@ -14,14 +14,17 @@ resolution without requiring instants or triggered abilities in the first pass.
 3. When every player passes with a nonempty stack, the top object resolves.
 4. When every player passes with an empty stack, the current step may advance.
 
-## v0 Scope
+## Current Scope
 
 - Two players only.
 - Creature spells and the declared name-scoped sorcery implementations may use
   this lifecycle.
 - Mana abilities resolve outside the stack.
-- No response spells are required yet, but both players' pass actions and the
-  automatic resolution transition must be visible in the event log.
+- The declared attackers step opens a priority window when an instant is
+  available. The current narrow instant predicate is Treetop Defense: only
+  its controller, after being attacked in that combat, may cast it there.
+- Both players' pass actions and the automatic resolution transition are
+  visible in the event log.
 - Target legality is rechecked at resolution. A spell whose required targets are
   all illegal on resolution emits `spell_countered_on_resolution`, does not
   apply its effect, and moves to its normal destination.
@@ -38,8 +41,8 @@ resolution without requiring instants or triggered abilities in the first pass.
 
 ## Non-Goals
 
-- Instants, activated nonmana abilities, triggered abilities, copies, split
-  second, and multiplayer priority ordering remain separate increments.
+- Activated nonmana abilities, triggered abilities, copies, split second, and
+  multiplayer priority ordering remain separate increments.
 
 ## Related Contracts
 
