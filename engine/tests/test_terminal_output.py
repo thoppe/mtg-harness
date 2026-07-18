@@ -10,9 +10,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from rich.console import Console
 
-from mtg_engine.actions.models import DeclareAttackersAction, DeclareBlockersAction
+from mtg_engine.actions.models import DeclareAttackersAction, DeclareBlockersAction, PassPriorityAction
 from mtg_engine.cards.repository import CardRepository
-from mtg_engine.flow.turns import advance_to_begin_combat, declare_attackers, declare_blockers, resolve_combat_damage
+from mtg_engine.flow.turns import advance_to_begin_combat, declare_attackers, declare_blockers, pass_priority, resolve_combat_damage
 from mtg_engine.output.terminal import print_game_snapshot, print_recent_events
 
 from test_combat import INFORMATION_DIR, _state_with_muck_rats_blocker_ready
@@ -42,6 +42,8 @@ class TerminalOutputTests(unittest.TestCase):
             DeclareAttackersAction(player_id="alice", attacker_ids=("alice:4",)),
             repository,
         )
+        session = pass_priority(session, PassPriorityAction(player_id="alice"), repository)
+        session = pass_priority(session, PassPriorityAction(player_id="bob"), repository)
         session = declare_blockers(
             session,
             DeclareBlockersAction(player_id="bob", blockers={"alice:4": ("bob:2",)}),

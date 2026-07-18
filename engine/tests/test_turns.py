@@ -347,6 +347,8 @@ def _build_end_combat_session_with_marked_damage(repository: CardRepository):
         DeclareAttackersAction(player_id="alice", attacker_ids=("alice:4",)),
         repository,
     )
+    session = pass_priority(session, PassPriorityAction(player_id="alice"), repository)
+    session = pass_priority(session, PassPriorityAction(player_id="bob"), repository)
     session = declare_blockers(
         session,
         DeclareBlockersAction(player_id="bob", blockers={"alice:4": ("bob:2",)}),
@@ -431,6 +433,8 @@ def _advance_to_end_combat_step(session, repository: CardRepository):
         DeclareAttackersAction(player_id=active_player, attacker_ids=()),
         repository,
     )
+    session = pass_priority(session, PassPriorityAction(player_id=active_player), repository)
+    session = pass_priority(session, PassPriorityAction(player_id=defending_player), repository)
     session = declare_blockers(
         session,
         DeclareBlockersAction(player_id=defending_player, blockers={}),

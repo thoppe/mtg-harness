@@ -1721,6 +1721,8 @@ def _advance_to_next_turn(session, repository: CardRepository):
         DeclareAttackersAction(player_id=active_player, attacker_ids=()),
         repository,
     )
+    session = pass_priority(session, PassPriorityAction(player_id=active_player), repository)
+    session = pass_priority(session, PassPriorityAction(player_id=defending_player), repository)
     session = declare_blockers(
         session,
         DeclareBlockersAction(player_id=defending_player, blockers={}),

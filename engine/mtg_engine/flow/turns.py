@@ -26,7 +26,7 @@ from mtg_engine.state.models import TemporaryEffect
 from mtg_engine.state.zones import move_object, move_object_to_top_of_library, update_object, update_player, zone_change_identity_payload
 from mtg_engine.rules.combat import apply_combat_damage, apply_state_based_actions, tap_attackers, with_combat_state
 
-from .priority import attacker_attack_rejection_reason, blocker_attack_rejection_reason, enumerate_legal_actions
+from .priority import attacker_attack_rejection_reason, blocker_attack_rejection_reason, enumerate_legal_actions, instant_timing_is_legal
 from .setup import GameBootstrap
 
 FIRST_TURN_STEP_SEQUENCE = (
@@ -174,6 +174,7 @@ def activate_mana_ability(
     updated_player = replace(player, mana_pool=player.mana_pool + (mana_symbol,))
     next_state = update_player(state, updated_player)
     next_state = update_object(next_state, replace(source, tapped=True))
+    next_state = replace(next_state, consecutive_passes=0)
     event_log = EventLog.from_events(state.game_id, session.event_log)
     event_log.append(
         event_type="mana_added",
@@ -276,7 +277,7 @@ def cast_noncreature_spell(
         if state.stack_entries:
             raise ValueError("sorcery requires an empty stack")
     elif card_definition.is_instant:
-        if not _instant_timing_is_legal(state, card_definition, action.player_id):
+        if not instant_timing_is_legal(state, card_definition, action.player_id):
             raise ValueError("instant timing is not legal")
     else:
         raise ValueError("spell must be a supported noncreature spell")
@@ -993,15 +994,6 @@ def pass_priority(
             card_repository,
         )
 
-    if state.turn.step == "declare_attackers_step" and state.combat is not None and not any(
-        card_repository.get(state.objects[instance_id].oracle_id).is_instant
-        for player in state.players.values()
-        for instance_id in player.hand
-    ):
-        next_state = replace(passed_state, turn=replace(passed_state.turn, step="declare_blockers_step", priority_player=state.combat.defending_player), consecutive_passes=0)
-        event_log.append(event_type="step_changed", active_player=state.turn.active_player, payload={"turn_number": state.turn.turn_number, "from_step": "declare_attackers_step", "to_step": "declare_blockers_step"})
-        return TurnResult(state=next_state, event_log=event_log.events)
-
     if state.turn.step == "precombat_main_step":
         opposing_actions = enumerate_legal_actions(passed_state, card_repository)
         if any(not isinstance(candidate, PassPriorityAction) for candidate in opposing_actions):
@@ -1085,18 +1077,6 @@ def declare_attackers(
         blockers={},
     )
     next_state = replace(next_state, turn=replace(next_state.turn, priority_player=action.player_id))
-    # Preserve the established no-response fast path for slices that contain
-    # no instant in either hand.  Once an instant is present this is a real
-    # priority window and both players must pass before blockers.
-    if not any(
-        card_repository.get(next_state.objects[instance_id].oracle_id).is_instant
-        for player in next_state.players.values()
-        for instance_id in player.hand
-    ):
-        next_state = replace(
-            next_state,
-            turn=replace(next_state.turn, step="declare_blockers_step", priority_player=defending_player),
-        )
 
     event_log = EventLog.from_events(state.game_id, session.event_log)
     event_log.append(
@@ -1108,12 +1088,6 @@ def declare_attackers(
             "defending_player": defending_player,
         },
     )
-    if next_state.turn.step == "declare_blockers_step":
-        event_log.append(
-            event_type="step_changed",
-            active_player=action.player_id,
-            payload={"turn_number": state.turn.turn_number, "from_step": "declare_attackers_step", "to_step": "declare_blockers_step"},
-        )
     return TurnResult(state=next_state, event_log=event_log.events)
 
 
@@ -1544,16 +1518,6 @@ def _require_legal_noncreature_target(
 def _supported_targeted_sorcery_effect(card_definition) -> str | None:
     return effect_key_for(card_definition.oracle_id) if (card_definition.is_sorcery or card_definition.is_instant) else None
 
-
-def _instant_timing_is_legal(state: GameState, card_definition, player_id: str) -> bool:
-    if card_definition.name == "Treetop Defense":
-        return (
-            state.turn.step == "declare_attackers_step"
-            and state.combat is not None
-            and state.combat.defending_player == player_id
-            and state.combat.was_attacked
-        )
-    return False
 
 
 def _battlefield_permanents_matching(

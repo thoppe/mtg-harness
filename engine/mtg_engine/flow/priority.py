@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from itertools import combinations
-from dataclasses import replace
 
 from mtg_engine.actions.models import (
     ActivateManaAbilityAction,
@@ -45,9 +44,6 @@ def enumerate_legal_actions(state: GameState, card_repository: CardRepository) -
 
     if state.turn.step == "declare_attackers_step":
         if state.combat is not None:
-            if not _any_instant_available(state, card_repository):
-                blockers_state = replace(state, turn=replace(state.turn, step="declare_blockers_step", priority_player=state.combat.defending_player))
-                return _enumerate_declare_blockers_actions(blockers_state, card_repository)
             return _enumerate_instant_priority_actions(state, card_repository)
         return _enumerate_declare_attackers_actions(state, card_repository)
 
@@ -55,14 +51,6 @@ def enumerate_legal_actions(state: GameState, card_repository: CardRepository) -
         return _enumerate_declare_blockers_actions(state, card_repository)
 
     return ()
-
-
-def _any_instant_available(state: GameState, card_repository: CardRepository) -> bool:
-    return any(
-        card_repository.get(state.objects[instance_id].oracle_id).is_instant
-        for player in state.players.values()
-        for instance_id in player.hand
-    )
 
 
 def _enumerate_active_precombat_main_actions(
@@ -112,7 +100,7 @@ def _enumerate_active_precombat_main_actions(
     for instance_id in player.hand:
         card = state.objects[instance_id]
         card_definition = card_repository.get(card.oracle_id)
-        if card_definition.is_creature or card_definition.is_land:
+        if card_definition.is_creature or card_definition.is_land or card_definition.is_instant:
             continue
         requirements = _parse_mana_cost(card_definition.mana_cost)
         if not _can_pay_mana_cost(player.mana_pool, requirements):
@@ -164,7 +152,7 @@ def _enumerate_instant_priority_actions(state: GameState, card_repository: CardR
     for instance_id in player.hand:
         card = state.objects[instance_id]
         definition = card_repository.get(card.oracle_id)
-        if not definition.is_instant or not _can_pay_mana_cost(player.mana_pool, _parse_mana_cost(definition.mana_cost)):
+        if not definition.is_instant or not instant_timing_is_legal(state, definition, player.player_id) or not _can_pay_mana_cost(player.mana_pool, _parse_mana_cost(definition.mana_cost)):
             continue
         for target_ids in _legal_noncreature_spell_targets(state, card_repository, instance_id):
             actions.append(CastNonCreatureSpellAction(player_id=player.player_id, card_instance_id=instance_id, target_instance_ids=target_ids))
@@ -388,6 +376,10 @@ def _legal_noncreature_spell_targets(
 
 def _supported_targeted_sorcery_effect(card_definition) -> str | None:
     return effect_key_for(card_definition.oracle_id) if (card_definition.is_sorcery or card_definition.is_instant) else None
+
+
+def instant_timing_is_legal(state: GameState, card_definition, player_id: str) -> bool:
+    return card_definition.name == "Treetop Defense" and state.turn.step == "declare_attackers_step" and state.combat is not None and state.combat.defending_player == player_id and state.combat.was_attacked
 
 
 def can_block_attacker(

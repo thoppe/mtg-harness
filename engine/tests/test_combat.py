@@ -69,6 +69,7 @@ class CombatTests(unittest.TestCase):
             DeclareAttackersAction(player_id="alice", attacker_ids=("alice:4",)),
             repository,
         )
+        session = _pass_attackers_window(session, repository)
         session = declare_blockers(
             session,
             DeclareBlockersAction(player_id="bob", blockers={}),
@@ -92,6 +93,7 @@ class CombatTests(unittest.TestCase):
             DeclareAttackersAction(player_id="alice", attacker_ids=("alice:4",)),
             repository,
         )
+        session = _pass_attackers_window(session, repository)
         session = declare_blockers(
             session,
             DeclareBlockersAction(player_id="bob", blockers={}),
@@ -115,6 +117,7 @@ class CombatTests(unittest.TestCase):
             DeclareAttackersAction(player_id="alice", attacker_ids=("alice:4",)),
             repository,
         )
+        session = _pass_attackers_window(session, repository)
         session = declare_blockers(
             session,
             DeclareBlockersAction(player_id="bob", blockers={"alice:4": ("bob:4",)}),
@@ -146,6 +149,7 @@ class CombatTests(unittest.TestCase):
             DeclareAttackersAction(player_id="alice", attacker_ids=("alice:4",)),
             repository,
         )
+        session = _pass_attackers_window(session, repository)
         session = declare_blockers(
             session,
             DeclareBlockersAction(player_id="bob", blockers={"alice:4": ("bob:4", "bob:6")}),
@@ -190,6 +194,7 @@ class CombatTests(unittest.TestCase):
             DeclareAttackersAction(player_id="alice", attacker_ids=("alice:5",)),
             repository,
         )
+        session = _pass_attackers_window(session, repository)
         session = declare_blockers(
             session,
             DeclareBlockersAction(player_id="bob", blockers={"alice:5": ("bob:2", "bob:3")}),
@@ -218,6 +223,7 @@ class CombatTests(unittest.TestCase):
             DeclareAttackersAction(player_id="alice", attacker_ids=("alice:4",)),
             repository,
         )
+        session = _pass_attackers_window(session, repository)
         session = declare_blockers(
             session,
             DeclareBlockersAction(player_id="bob", blockers={"alice:4": ("bob:2",)}),
@@ -241,6 +247,7 @@ class CombatTests(unittest.TestCase):
             DeclareAttackersAction(player_id="alice", attacker_ids=("alice:3",)),
             repository,
         )
+        session = _pass_attackers_window(session, repository)
 
         with self.assertRaises(ValueError):
             declare_blockers(
@@ -270,6 +277,7 @@ class CombatTests(unittest.TestCase):
             DeclareAttackersAction(player_id="alice", attacker_ids=("alice:4",)),
             repository,
         )
+        session = _pass_attackers_window(session, repository)
 
         with self.assertRaises(ValueError):
             declare_blockers(
@@ -299,6 +307,7 @@ class CombatTests(unittest.TestCase):
             DeclareAttackersAction(player_id="alice", attacker_ids=("alice:3",)),
             repository,
         )
+        session = _pass_attackers_window(session, repository)
         session = declare_blockers(
             session,
             DeclareBlockersAction(player_id="bob", blockers={"alice:3": ("bob:4",)}),
@@ -321,6 +330,7 @@ class CombatTests(unittest.TestCase):
             DeclareAttackersAction(player_id="alice", attacker_ids=("alice:5",)),
             repository,
         )
+        session = _pass_attackers_window(session, repository)
         session = declare_blockers(
             session,
             DeclareBlockersAction(player_id="bob", blockers={}),
@@ -342,6 +352,7 @@ class CombatTests(unittest.TestCase):
             DeclareAttackersAction(player_id="alice", attacker_ids=("alice:5",)),
             repository,
         )
+        session = _pass_attackers_window(session, repository)
         session = declare_blockers(
             session,
             DeclareBlockersAction(player_id="bob", blockers={"alice:5": ("bob:2",)}),
@@ -377,6 +388,7 @@ class CombatTests(unittest.TestCase):
             DeclareAttackersAction(player_id="alice", attacker_ids=("alice:4",)),
             repository,
         )
+        session = _pass_attackers_window(session, repository)
         session = declare_blockers(
             session,
             DeclareBlockersAction(player_id="bob", blockers={"alice:4": ("bob:4",)}),
@@ -714,6 +726,8 @@ def _advance_to_next_turn(session, repository: CardRepository):
         DeclareAttackersAction(player_id=active_player, attacker_ids=()),
         repository,
     )
+    session = pass_priority(session, PassPriorityAction(player_id=active_player), repository)
+    session = pass_priority(session, PassPriorityAction(player_id=defending_player), repository)
     session = declare_blockers(
         session,
         DeclareBlockersAction(player_id=defending_player, blockers={}),
@@ -722,6 +736,13 @@ def _advance_to_next_turn(session, repository: CardRepository):
     session = resolve_combat_damage(session, repository)
     session = advance_to_cleanup(session)
     return start_next_turn(session)
+
+
+def _pass_attackers_window(session, repository: CardRepository):
+    active = session.state.turn.active_player
+    defender = "bob" if active == "alice" else "alice"
+    session = pass_priority(session, PassPriorityAction(player_id=active), repository)
+    return pass_priority(session, PassPriorityAction(player_id=defender), repository)
 
 
 def _advance_to_player_main_phase(session, repository: CardRepository, player_id: str):
