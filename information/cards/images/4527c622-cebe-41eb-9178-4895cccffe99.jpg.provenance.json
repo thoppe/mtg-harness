@@ -1,0 +1,13 @@
+{
+  "artifact_type": "scryfall_card_image_snapshot",
+  "canonical_card_id": "4527c622-cebe-41eb-9178-4895cccffe99",
+  "fetched_at": "2026-07-18T02:44:43Z",
+  "image_format": "jpg",
+  "image_variant": "normal",
+  "oracle_id": "4527c622-cebe-41eb-9178-4895cccffe99",
+  "schema_version": 1,
+  "scryfall_id": "e2b8f443-dba5-45a5-bb2e-f57b4fdd1d01",
+  "set_code": "por",
+  "source_name": "scryfall_image_host",
+  "source_url": "https://cards.scryfall.io/normal/front/e/2/e2b8f443-dba5-45a5-bb2e-f57b4fdd1d01.jpg?1783946818"
+}

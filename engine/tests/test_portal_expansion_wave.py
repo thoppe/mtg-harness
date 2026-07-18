@@ -66,3 +66,7 @@ class PortalExpansionWaveTests(unittest.TestCase):
         boosted = replace(state, objects={**state.objects, "alice:1": replace(state.objects["alice:1"], temporary_toughness_bonus=4)})
         self.assertEqual(_cleanup_end_of_turn_state(boosted).objects["alice:1"].temporary_toughness_bonus, 0)
         self.assertEqual(move_object(boosted, instance_id="alice:1", from_zone="battlefield", to_zone="graveyard", player_id="alice").objects["alice:1"].temporary_toughness_bonus, 0)
+
+    def test_temporary_creature_effects_require_battlefield_creatures(self) -> None:
+        with self.assertRaisesRegex(ValueError, "target must be a creature"):
+            _require_legal_noncreature_target(self.state, self.repo, ("alice:1",), effect="target_creature_gets_4_4_until_end_of_turn")

@@ -43,6 +43,8 @@ IMPLEMENTATIONS = {
     "2894ef5e-738b-4ece-b143-6662d9453295": "damage_nonblack_creature_3_gain_3",
     "b701378f-681b-4840-bd11-1a97c2a675f2": "damage_target_opponent_2_gain_2",
     "eda60752-d225-4fd0-9f0f-9b99e321b8fa": "target_creature_gets_4_power_until_end_of_turn",
+    "4527c622-cebe-41eb-9178-4895cccffe99": "target_creature_gets_2_power_and_takes_2",
+    "35a05836-38d7-45c7-ac9a-996a682c2129": "target_creature_gets_4_4_until_end_of_turn",
 }
 
 

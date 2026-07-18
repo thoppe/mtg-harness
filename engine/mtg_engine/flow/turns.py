@@ -541,6 +541,14 @@ def _resolve_noncreature_spell(
     elif effect == "target_creature_gets_4_power_until_end_of_turn":
         target = resolved_state.objects[action.target_instance_id]
         resolved_state = update_object(resolved_state, replace(target, temporary_power_bonus=target.temporary_power_bonus + 4))
+    elif effect == "target_creature_gets_4_4_until_end_of_turn":
+        target = resolved_state.objects[action.target_instance_id]
+        resolved_state = update_object(resolved_state, replace(target, temporary_power_bonus=target.temporary_power_bonus + 4, temporary_toughness_bonus=target.temporary_toughness_bonus + 4))
+    elif effect == "target_creature_gets_2_power_and_takes_2":
+        target = resolved_state.objects[action.target_instance_id]
+        resolved_state = update_object(resolved_state, replace(target, temporary_power_bonus=target.temporary_power_bonus + 2, damage_marked=target.damage_marked + 2))
+        resolved_state, sba_events = apply_state_based_actions(resolved_state, card_repository, active_player=action.player_id)
+        for event in sba_events: event_log.append(event_type=event["event_type"], active_player=event["active_player"], payload=event["payload"])
     elif effect == "target_player_discards_two":
         if action.target_instance_id is None:
             raise ValueError("targeted sorcery requires a target")
@@ -1229,7 +1237,7 @@ def _require_legal_noncreature_target(
         target = state.objects[target_instance_id]; definition = card_repository.get(target.oracle_id)
         if target.zone != "battlefield" or not definition.is_creature or definition.is_black: raise ValueError("target must be nonblack creature")
         return
-    if effect == "target_creature_gets_4_power_until_end_of_turn":
+    if effect in {"target_creature_gets_4_power_until_end_of_turn", "target_creature_gets_4_4_until_end_of_turn", "target_creature_gets_2_power_and_takes_2"}:
         if target_instance_id not in state.objects: raise ValueError("target must exist")
         target = state.objects[target_instance_id]
         if target.zone != "battlefield" or not card_repository.get(target.oracle_id).is_creature: raise ValueError("target must be a creature")
