@@ -1085,6 +1085,18 @@ def declare_attackers(
         blockers={},
     )
     next_state = replace(next_state, turn=replace(next_state.turn, priority_player=action.player_id))
+    # Preserve the established no-response fast path for slices that contain
+    # no instant in either hand.  Once an instant is present this is a real
+    # priority window and both players must pass before blockers.
+    if not any(
+        card_repository.get(next_state.objects[instance_id].oracle_id).is_instant
+        for player in next_state.players.values()
+        for instance_id in player.hand
+    ):
+        next_state = replace(
+            next_state,
+            turn=replace(next_state.turn, step="declare_blockers_step", priority_player=defending_player),
+        )
 
     event_log = EventLog.from_events(state.game_id, session.event_log)
     event_log.append(
@@ -1096,6 +1108,12 @@ def declare_attackers(
             "defending_player": defending_player,
         },
     )
+    if next_state.turn.step == "declare_blockers_step":
+        event_log.append(
+            event_type="step_changed",
+            active_player=action.player_id,
+            payload={"turn_number": state.turn.turn_number, "from_step": "declare_attackers_step", "to_step": "declare_blockers_step"},
+        )
     return TurnResult(state=next_state, event_log=event_log.events)
 
 
