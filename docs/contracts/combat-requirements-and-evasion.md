@@ -32,7 +32,6 @@ legal-action list only; submitted actions must reject the same illegal result.
 
 ## Wave 3 Boundary
 
-The rules above are the complete planned combat scope for Waves 3A--3D. They
-do not authorize triggered abilities, shuffle behavior, or a general static
-ability framework; Alabaster Dragon remains deferred until a separate trigger
-contract increment is accepted.
+The rules above are the complete combat scope for Waves 3A--3D. Wave 3E adds
+only Alabaster Dragon's separate, name-scoped death trigger; it does not widen
+combat handling, shuffle behavior generally, or static-ability support.

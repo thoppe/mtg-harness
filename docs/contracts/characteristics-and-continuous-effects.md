@@ -25,6 +25,7 @@ Define the bounded characteristics model used by the Portal expansion waves.
 
 Cards needing copy effects, base-setting P/T, dependency/layer ordering, or
 arbitrary characteristic-changing effects require a new contract increment.
-Triggered abilities and effects that shuffle a library, including Alabaster
-Dragon's death trigger, require their own contract increment and are not
-included in Wave 3's characteristics scope.
+Triggered abilities and effects that shuffle a library remain outside this
+characteristics contract. Alabaster Dragon's name-scoped death trigger is
+governed instead by the stack, identity, RNG, and replay contracts; it does
+not extend this into a general triggered-ability or layer system.

@@ -24,7 +24,7 @@ from mtg_engine.events.log import EventLog
 from mtg_engine.state.models import GameOutcome, GameState, PendingDecision, StackEntry, TurnState
 from mtg_engine.state.models import TemporaryEffect
 from mtg_engine.state.zones import move_object, move_object_to_top_of_library, update_object, update_player, zone_change_identity_payload
-from mtg_engine.rules.combat import apply_combat_damage, apply_state_based_actions, tap_attackers, with_combat_state
+from mtg_engine.rules.combat import apply_combat_damage, apply_state_based_actions, queue_death_triggers, tap_attackers, with_combat_state
 
 from .priority import attacker_attack_rejection_reason, blocker_attack_rejection_reason, enumerate_legal_actions, instant_timing_is_legal
 from .setup import GameBootstrap
@@ -881,61 +881,111 @@ def _put_spell_on_stack(
 def _resolve_top_stack_entry(session: TurnResult, card_repository: CardRepository) -> TurnResult:
     state = session.state
     entry = state.stack_entries[-1]
-    spell = state.objects[entry.card_instance_id]
-    definition = card_repository.get(spell.oracle_id)
     event_log = EventLog.from_events(state.game_id, session.event_log)
 
-    if definition.is_creature:
-        resolved_state = move_object(
-            state,
-            instance_id=entry.card_instance_id,
-            from_zone="stack",
-            to_zone="battlefield",
-            player_id=entry.controller_id,
-        )
-        event_log.append(
-            event_type="spell_resolved",
-            active_player=entry.controller_id,
-            payload={"player_id": entry.controller_id, "card_instance_id": entry.card_instance_id, "oracle_id": spell.oracle_id},
-        )
-        event_log.append(
-            event_type="object_moved_between_zones",
-            active_player=entry.controller_id,
-            payload={"player_id": entry.controller_id, "card_instance_id": entry.card_instance_id, "oracle_id": spell.oracle_id, "from_zone": "stack", "to_zone": "battlefield", **zone_change_identity_payload(resolved_state, entry.card_instance_id)},
-        )
-        result = TurnResult(state=resolved_state, event_log=event_log.events)
-    elif _stack_entry_targets_are_legal(state, entry, card_repository):
-        result = _resolve_noncreature_spell(
-            TurnResult(state=state, event_log=event_log.events), entry, card_repository
+    if entry.entry_kind == "alabaster_dragon_death_trigger":
+        result = _resolve_alabaster_dragon_death_trigger(
+            TurnResult(state=state, event_log=event_log.events), entry
         )
     else:
-        countered_state = move_object(
-            state,
-            instance_id=entry.card_instance_id,
-            from_zone="stack",
-            to_zone="graveyard",
-            player_id=entry.controller_id,
-        )
-        event_log.append(
-            event_type="spell_countered_on_resolution",
-            active_player=entry.controller_id,
-            payload={"player_id": entry.controller_id, "card_instance_id": entry.card_instance_id, "oracle_id": spell.oracle_id, "target_instance_ids": list(entry.target_ids)},
-        )
-        event_log.append(
-            event_type="object_moved_between_zones",
-            active_player=entry.controller_id,
-            payload={"player_id": entry.controller_id, "card_instance_id": entry.card_instance_id, "oracle_id": spell.oracle_id, "from_zone": "stack", "to_zone": "graveyard", **zone_change_identity_payload(countered_state, entry.card_instance_id)},
-        )
-        result = TurnResult(state=countered_state, event_log=event_log.events)
+        spell = state.objects[entry.card_instance_id]
+        definition = card_repository.get(spell.oracle_id)
+        if definition.is_creature:
+            resolved_state = move_object(
+                state,
+                instance_id=entry.card_instance_id,
+                from_zone="stack",
+                to_zone="battlefield",
+                player_id=entry.controller_id,
+            )
+            event_log.append(
+                event_type="spell_resolved",
+                active_player=entry.controller_id,
+                payload={"player_id": entry.controller_id, "card_instance_id": entry.card_instance_id, "oracle_id": spell.oracle_id},
+            )
+            event_log.append(
+                event_type="object_moved_between_zones",
+                active_player=entry.controller_id,
+                payload={"player_id": entry.controller_id, "card_instance_id": entry.card_instance_id, "oracle_id": spell.oracle_id, "from_zone": "stack", "to_zone": "battlefield", **zone_change_identity_payload(resolved_state, entry.card_instance_id)},
+            )
+            result = TurnResult(state=resolved_state, event_log=event_log.events)
+        elif _stack_entry_targets_are_legal(state, entry, card_repository):
+            result = _resolve_noncreature_spell(
+                TurnResult(state=state, event_log=event_log.events), entry, card_repository
+            )
+        else:
+            countered_state = move_object(
+                state,
+                instance_id=entry.card_instance_id,
+                from_zone="stack",
+                to_zone="graveyard",
+                player_id=entry.controller_id,
+            )
+            event_log.append(
+                event_type="spell_countered_on_resolution",
+                active_player=entry.controller_id,
+                payload={"player_id": entry.controller_id, "card_instance_id": entry.card_instance_id, "oracle_id": spell.oracle_id, "target_instance_ids": list(entry.target_ids)},
+            )
+            event_log.append(
+                event_type="object_moved_between_zones",
+                active_player=entry.controller_id,
+                payload={"player_id": entry.controller_id, "card_instance_id": entry.card_instance_id, "oracle_id": spell.oracle_id, "from_zone": "stack", "to_zone": "graveyard", **zone_change_identity_payload(countered_state, entry.card_instance_id)},
+            )
+            result = TurnResult(state=countered_state, event_log=event_log.events)
 
-    # The active player receives priority after a spell resolves or fizzles.
+    # Resolution can put triggered abilities above this entry.  Remove the
+    # entry that was selected at the start, while retaining those new entries.
+    original_entry_index = len(state.stack_entries) - 1
+    remaining_entries = (
+        result.state.stack_entries[:original_entry_index]
+        + result.state.stack_entries[original_entry_index + 1 :]
+    )
     final_state = replace(
         result.state,
-        stack_entries=result.state.stack_entries[:-1],
+        stack_entries=remaining_entries,
         consecutive_passes=0,
         turn=replace(result.state.turn, priority_player=result.state.turn.active_player),
     )
     return TurnResult(state=final_state, event_log=result.event_log)
+
+
+def _resolve_alabaster_dragon_death_trigger(session: TurnResult, entry: StackEntry) -> TurnResult:
+    state = session.state
+    event_log = EventLog.from_events(state.game_id, session.event_log)
+    owner_id = entry.owner_id or entry.controller_id
+    source = state.objects[entry.card_instance_id]
+    moved = source.zone == "graveyard" and source.owner_id == owner_id
+    resolved_state = state
+    if moved:
+        resolved_state = move_object(
+            state,
+            instance_id=entry.card_instance_id,
+            from_zone="graveyard",
+            to_zone="library",
+            player_id=owner_id,
+        )
+        event_log.append(
+            event_type="object_moved_between_zones",
+            active_player=owner_id,
+            payload={"player_id": owner_id, "card_instance_id": entry.card_instance_id, "oracle_id": source.oracle_id, "from_zone": "graveyard", "to_zone": "library", **zone_change_identity_payload(resolved_state, entry.card_instance_id)},
+        )
+        player = resolved_state.players[owner_id]
+        shuffled = list(player.library)
+        random.Random(resolved_state.rng_seed + resolved_state.rng_cursor).shuffle(shuffled)
+        resolved_state = update_player(resolved_state, replace(player, library=tuple(shuffled)))
+        next_cursor = resolved_state.rng_cursor + 1
+        resolved_state = replace(resolved_state, rng_cursor=next_cursor)
+        event_log.append(
+            event_type="library_shuffled",
+            active_player=owner_id,
+            payload={"player_id": owner_id, "algorithm": "python_random_mt19937_v1", "rng_cursor_before": state.rng_cursor, "rng_cursor_after": next_cursor, "count": len(shuffled)},
+        )
+    event_log.append(
+        event_type="triggered_ability_resolved",
+        active_player=owner_id,
+        payload={"ability_key": "alabaster_dragon_death_trigger", "card_instance_id": entry.card_instance_id, "oracle_id": entry.source_oracle_id, "owner_id": owner_id, "moved_to_library": moved},
+    )
+    return TurnResult(state=resolved_state, event_log=event_log.events)
 
 
 def _stack_entry_targets_are_legal(
@@ -1584,6 +1634,7 @@ def _destroy_permanents(
 ) -> tuple[GameState, int]:
     current_state = state
     destroyed_count = 0
+    destroyed_objects: list[dict] = []
     for instance_id in instance_ids:
         if instance_id not in current_state.objects:
             continue
@@ -1598,6 +1649,14 @@ def _destroy_permanents(
             player_id=permanent.owner_id,
         )
         destroyed_count += 1
+        destroyed_objects.append(
+            {
+                "card_instance_id": instance_id,
+                "source_object_id": permanent.object_id,
+                "owner_id": permanent.owner_id,
+                "oracle_id": permanent.oracle_id,
+            }
+        )
         event_log.append(
             event_type="permanent_destroyed",
             active_player=active_player,
@@ -1618,6 +1677,17 @@ def _destroy_permanents(
                 "to_zone": "graveyard",
                 **zone_change_identity_payload(current_state, instance_id),
             },
+        )
+    current_state, trigger_events = queue_death_triggers(
+        current_state,
+        destroyed_objects,
+        active_player=active_player,
+    )
+    for event in trigger_events:
+        event_log.append(
+            event_type=event["event_type"],
+            active_player=event["active_player"],
+            payload=event["payload"],
         )
     return current_state, destroyed_count
 

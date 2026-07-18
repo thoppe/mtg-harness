@@ -122,8 +122,8 @@ card_entries:
   - {set_code: por, oracle_id: "e5df4597-1647-4ac2-bdb3-a517598d1431"}
   - {set_code: por, oracle_id: "ad218276-a44b-4a61-8e42-26a27929bbbb"}
   # Wave 3: creature casting/combat reuse plus bounded Islandwalk, Vigilance,
-  # and flying-only blocker support. Alabaster Dragon remains deferred pending
-  # the separate triggered-ability foundation.
+  # flying-only blocker support, and Alabaster Dragon's name-scoped dies trigger.
+  - {set_code: por, oracle_id: "2392a41a-59d3-4749-be94-4d9df0af9c4c"}
   - {set_code: por, oracle_id: "9971697b-2acc-4bc2-a44e-074d03a51df7"}
   - {set_code: por, oracle_id: "23625877-b6db-480c-8885-a62b7d0457df"}
   - {set_code: por, oracle_id: "5edfe083-391b-41ae-ac4d-d648042cfa5e"}
@@ -237,6 +237,7 @@ card_keys:
   - "45b42694-9ee8-44f3-9de3-aa2c0f1b6a13"
   - "7fbb98cc-585c-4184-97f5-9b3d3ebdb1e5"
   - "3c46f309-69ae-43b1-adf6-bdb26599c1f4"
+  - "2392a41a-59d3-4749-be94-4d9df0af9c4c"
   - "9971697b-2acc-4bc2-a44e-074d03a51df7"
   - "23625877-b6db-480c-8885-a62b7d0457df"
   - "5edfe083-391b-41ae-ac4d-d648042cfa5e"
@@ -314,6 +315,7 @@ rule_keys:
   - combat_restrictions_minimal
   - islandwalk_keyword_minimal
   - vigilance_keyword_minimal
+  - alabaster_dragon_death_trigger_minimal
 source_artifacts:
   - information/cards/data/
   - information/cards/images/

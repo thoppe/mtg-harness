@@ -3,7 +3,7 @@
 ## Purpose
 
 Define the minimum stack lifecycle needed for rules-faithful, deterministic spell
-resolution without requiring instants or triggered abilities in the first pass.
+resolution, plus the one bounded triggered ability required by Alabaster Dragon.
 
 ## Required Lifecycle
 
@@ -13,6 +13,11 @@ resolution without requiring instants or triggered abilities in the first pass.
    turn order.
 3. When every player passes with a nonempty stack, the top object resolves.
 4. When every player passes with an empty stack, the current step may advance.
+5. When Alabaster Dragon (`2392a41a-59d3-4749-be94-4d9df0af9c4c`) dies, its
+   death trigger is created and put onto the stack after the destruction or
+   state-based-action operation completes. It is a stack entry, not a card
+   moved to the stack.
+6. That entry resolves through the same two-player priority cycle as a spell.
 
 ## Current Scope
 
@@ -28,11 +33,18 @@ resolution without requiring instants or triggered abilities in the first pass.
 - Target legality is rechecked at resolution. A spell whose required targets are
   all illegal on resolution emits `spell_countered_on_resolution`, does not
   apply its effect, and moves to its normal destination.
+- The Alabaster entry captures its source object's last-known identity and owner
+  when the Dragon dies. On resolution it shuffles that card instance into its
+  owner's library only if it is still in that owner's graveyard; otherwise the
+  entry resolves with no shuffle effect.
 
 ## State Requirements
 
 - A stack entry must preserve the spell card instance, controller, paid costs,
   and chosen targets independently from later state changes.
+- The bounded Alabaster trigger entry must additionally preserve its kind, source
+  `object_id`, source `card_instance_id`, and owner independently from the new
+  graveyard object created by the death zone change.
 - Priority state must record enough information to determine whether all players
   have passed consecutively since the last stack-changing action.
 - In the two-player v0 slice, the caster's pass gives priority to the opponent;
@@ -41,8 +53,9 @@ resolution without requiring instants or triggered abilities in the first pass.
 
 ## Non-Goals
 
-- Activated nonmana abilities, triggered abilities, copies, split second, and
-  multiplayer priority ordering remain separate increments.
+- Activated nonmana abilities, triggered abilities other than Alabaster
+  Dragon's name-scoped death trigger, copies, split second, and multiplayer
+  priority ordering remain separate increments.
 
 ## Related Contracts
 

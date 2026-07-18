@@ -34,6 +34,8 @@ Define the minimum append-only event types required for deterministic replay and
 - `object_moved_between_zones`
 - `spell_resolved`
 - `spell_countered_on_resolution`
+- `triggered_ability_put_on_stack`
+- `triggered_ability_resolved`
 - `damage_applied`
 - `attackers_declared`
 - `blockers_declared`
@@ -55,18 +57,26 @@ Define the minimum append-only event types required for deterministic replay and
 
 ## v0 Simplifications
 
-- The first slice does not need event families for triggered abilities, replacement effects, or continuous-effect recalculation.
+- The initial slice has two event types only for Alabaster Dragon's
+  name-scoped death trigger. It does not otherwise provide a generic triggered
+  ability event family, replacement effects, or continuous-effect recalculation.
 - The first slice may use a single zone-movement event type rather than highly specialized movement events.
-- The currently implemented event log covers setup, first-turn step progression, drawing, explicit action windows for precombat main and combat declarations, two-player priority passing for supported spells on the stack, land play, five-basic-land mana production, simple creature spell resolution, narrow targeted sorcery resolution for `Vengeance`, `Path of Peace`, `Hand of Death`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, `Symbol of Unsummoning`, and `Tidal Surge`, no-target sorcery resolution for `Touch of Brilliance`, `Armageddon`, `Wrath of God`, and `Sacred Nectar`, minimal combat and spell damage/state-based destruction, shared combat-legality checks for the supported `Defender`, `Flying`, `Reach`, and `Swampwalk` cards, and printed-color target filtering limited to `Hand of Death`'s nonblack-creature restriction. A spell whose only required targets are illegal when it resolves emits `spell_countered_on_resolution` and moves to its graveyard.
+- The currently implemented event log covers setup, first-turn step progression, drawing, explicit action windows for precombat main and combat declarations, two-player priority passing for supported spells and Alabaster Dragon's bounded trigger, land play, five-basic-land mana production, simple creature spell resolution, the declared sorcery families, minimal combat and spell damage/state-based destruction, shared combat-legality checks for the supported `Defender`, `Flying`, `Reach`, `Swampwalk`, `Forestwalk`, `Islandwalk`, and `Vigilance` cards, and printed-color target filtering limited to `Hand of Death`'s nonblack-creature restriction. A spell whose only required targets are illegal when it resolves emits `spell_countered_on_resolution` and moves to its graveyard.
 - The current SBA path emits `state_based_actions_checked` even when no permanents are destroyed.
 - The current turn-flow implementation also emits `turn_ended` after cleanup.
 - The current noncreature-spell implementation may emit repeated `permanent_destroyed` and `object_moved_between_zones` events when one spell destroys multiple permanents, including multi-target and global-destruction effects.
+- If Alabaster Dragon dies, its `permanent_destroyed` and battlefield-to-
+  graveyard zone event precede `triggered_ability_put_on_stack`. A successful
+  later resolution emits the graveyard-to-library zone event, `library_shuffled`,
+  and `triggered_ability_resolved`; an unsuccessful resolution emits only the
+  resolved event with its no-effect outcome. Trigger payloads retain the
+  source's last-known object identity and owner.
 
 ## Expansion Guardrails
 
 - Future effect systems must be able to add event types without invalidating the append-only model.
 - Event payloads should use stable object identifiers, not transient memory positions.
-- Replay design must allow future insertion of trigger, replacement, and continuous-effect evaluation events.
+- Replay design must allow future insertion of trigger, replacement, and continuous-effect evaluation events beyond the Alabaster-specific pair.
 
 ## Related Contracts
 

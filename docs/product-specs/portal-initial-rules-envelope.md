@@ -26,6 +26,10 @@ declared by `docs/coverage/slices/portal.initial.yaml`.
   Militia` untapped when declared as attackers
 - Flying-only blocker restriction limited to `Cloud Dragon`, `Cloud Pirates`,
   and `Cloud Spirit`
+- Alabaster Dragon's name-scoped death trigger: after it dies, put its trigger
+  on the stack; on successful resolution, shuffle that card instance from its
+  owner's graveyard into that owner's library using the deterministic shuffle
+  contract
 - Lethal damage and creature death as minimal state-based handling
 - Sorcery-speed targeted destruction limited to `Destroy target tapped creature.` and `Destroy target creature. Its owner gains 4 life.`
 - Sorcery-speed targeted destruction limited to the printed nonblack-creature restriction required by `Hand of Death`
@@ -92,14 +96,22 @@ declared by `docs/coverage/slices/portal.initial.yaml`.
 - Wave 3D may add only the Vigilance exception that an attacking Archangel or
   Ardent Militia does not tap. It introduces no broader static-ability or
   untap-effect system.
+- Wave 3E may add only Alabaster Dragon's death trigger, identified by oracle
+  ID `2392a41a-59d3-4749-be94-4d9df0af9c4c`. The trigger captures
+  last-known source identity and owner after the Dragon dies, is placed on the
+  stack after its destruction or state-based-action operation, and uses the existing deterministic shuffle
+  algorithm only if that instance remains in its owner's graveyard on
+  resolution. It introduces neither generic trigger dispatch nor replacement
+  effects.
 
 ## Out Of Scope
 
 - Keyword abilities beyond those declared by the active manifest and bounded
   contracts
-- Triggered abilities not required by the initial cards
-- Alabaster Dragon's death trigger, library shuffle, and all triggered-ability
-  queue behavior pending a separate contract increment
+- Triggered abilities other than Alabaster Dragon's explicitly bounded death
+  trigger
+- Generic library shuffle effects and triggered-ability queue behavior beyond
+  Alabaster Dragon
 - Replacement effects
 - Continuous effects beyond the object-bound additive and keyword-granting
   Wave 2 model

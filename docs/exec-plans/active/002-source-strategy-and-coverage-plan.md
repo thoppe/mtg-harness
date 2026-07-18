@@ -49,6 +49,11 @@ The simulator should only claim support based on layer 3, never merely because l
   legal-action enumeration, Valorous Charge affects every white creature as its
   oracle text requires, and focused coverage lives in
   `engine/tests/test_wave2.py`.
+- Wave 3 now covers its 26 non-Alabaster creature promotions plus Alabaster
+  Dragon's separately contracted, name-scoped death trigger. The latter
+  captures last-known identity, resolves through the existing priority stack,
+  and uses deterministic owner-library shuffling only on a successful
+  resolution.
 
 ## Workstreams
 
@@ -156,26 +161,16 @@ Prefer links to canonical manifests over duplicated card lists. If a copied list
 ## Resume Here
 
 The next session should continue from the manifest-backed slice after the
-completed Wave 2 temporary-characteristic and combat-restriction batch.
+completed Wave 3 creature and Alabaster Dragon trigger batch.
 
-1. Treat Wave 3 in `docs/contracts/portal-expansion-order.md` as five
-   dependency-ordered subwaves, not a printed-order batch: 3A existing
-   behavior, 3B shared flying-only blocker restriction, 3C Islandwalk, 3D
-   Vigilance, and 3E Alabaster Dragon's deferred triggered death ability.
-2. Promote Wave 3A's 21 cards first. Keep
-   `docs/coverage/slices/portal.initial.yaml` aligned with the declared active
-   card universe and source pull scope; source artifacts alone do not imply
-   support.
-3. For 3B, replace the Cloud Dragon name-only blocker test with the bounded
-   shared predicate and prove both enumeration and submitted-declaration
-   rejection for all three relevant cards.
-4. For 3C, add Bull Hippo by extending the explicit landwalk mapping only with
-   Islandwalk -> Island, and test both Island-present and Island-absent cases.
-5. For 3D, add Archangel and Ardent Militia through the minimal Vigilance
-   exception and prove they remain untapped after attacking and can block when
-   otherwise legal. Do not promote Alabaster Dragon: 3E needs a separate
-   triggered-ability, deterministic-shuffle, stack/priority, and replay-event
-   contract increment.
-6. Before each implementation subwave, update source artifacts, manifest,
+1. Treat the active support-slice manifest as the only playable card-universe
+   declaration; source artifacts alone do not imply support.
+2. Preserve Alabaster Dragon's trigger boundary: it is limited to oracle ID
+   `2392a41a-59d3-4749-be94-4d9df0af9c4c`, records last-known identity when it
+   dies, and shuffles only that card instance from its owner's graveyard on
+   successful trigger resolution.
+3. Do not use the Alabaster implementation to claim generic triggered
+   abilities, generic shuffle effects, replacement effects, or ordering logic.
+4. Before each implementation subwave, update source artifacts, manifest,
    coverage, rules envelope, registry, and edge-case tests together; before
    finishing, run the card-expansion freshness check above.

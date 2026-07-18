@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import replace
 
 from mtg_engine.cards.repository import CardRepository
-from mtg_engine.state.models import CombatState, GameOutcome, GameState
+from mtg_engine.state.models import CombatState, GameOutcome, GameState, StackEntry
 from mtg_engine.state.zones import move_object, update_object, update_player
 from mtg_engine.rules.characteristics import effective_power, effective_toughness, has_keyword
 
@@ -159,6 +159,8 @@ def apply_state_based_actions(
             destroyed_objects.append(
                 {
                     "card_instance_id": instance_id,
+                    "source_object_id": obj.object_id,
+                    "owner_id": obj.owner_id,
                     "oracle_id": obj.oracle_id,
                     "reason": "lethal_damage",
                     "damage_marked": obj.damage_marked,
@@ -232,7 +234,69 @@ def apply_state_based_actions(
                 },
             }
         )
+    current_state, trigger_events = queue_death_triggers(
+        current_state,
+        destroyed_objects,
+        active_player=active_player,
+    )
+    events.extend(trigger_events)
     return current_state, events
+
+
+ALABASTER_DRAGON_ORACLE_ID = "2392a41a-59d3-4749-be94-4d9df0af9c4c"
+
+
+def queue_death_triggers(
+    state: GameState,
+    destroyed_objects: list[dict],
+    *,
+    active_player: str,
+) -> tuple[GameState, list[dict]]:
+    """Put the currently supported dies triggers onto the stack.
+
+    This deliberately records the object's pre-zone-change identity, because
+    the source has already become a new object in its owner's graveyard when
+    the trigger is placed on the stack.
+    """
+    trigger_entries: list[StackEntry] = []
+    events: list[dict] = []
+    for destroyed in destroyed_objects:
+        if destroyed["oracle_id"] != ALABASTER_DRAGON_ORACLE_ID:
+            continue
+        trigger_entries.append(
+            StackEntry(
+                card_instance_id=destroyed["card_instance_id"],
+                controller_id=destroyed["owner_id"],
+                entry_kind="alabaster_dragon_death_trigger",
+                source_object_id=destroyed["source_object_id"],
+                source_oracle_id=destroyed["oracle_id"],
+                owner_id=destroyed["owner_id"],
+            )
+        )
+        events.append(
+            {
+                "event_type": "triggered_ability_put_on_stack",
+                "active_player": active_player,
+                "payload": {
+                    "ability_key": "alabaster_dragon_death_trigger",
+                    "card_instance_id": destroyed["card_instance_id"],
+                    "oracle_id": destroyed["oracle_id"],
+                    "owner_id": destroyed["owner_id"],
+                    "source_object_id": destroyed["source_object_id"],
+                },
+            }
+        )
+    if not trigger_entries:
+        return state, events
+    return (
+        replace(
+            state,
+            stack_entries=state.stack_entries + tuple(trigger_entries),
+            consecutive_passes=0,
+            turn=replace(state.turn, priority_player=active_player),
+        ),
+        events,
+    )
 
 
 def _battlefield_object_ids(state: GameState) -> tuple[str, ...]:

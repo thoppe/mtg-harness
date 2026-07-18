@@ -62,6 +62,10 @@ class StackEntry:
     controller_id: str
     target_ids: tuple[str, ...] = ()
     chosen_x: int = 0
+    entry_kind: str = "spell"
+    source_object_id: str | None = None
+    source_oracle_id: str | None = None
+    owner_id: str | None = None
 
 
 @dataclass(frozen=True)

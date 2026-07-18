@@ -10,6 +10,7 @@ set_summaries:
 cards:
   # Wave 3 keeps simple creatures compact; its focused casting and combat
   # coverage is centralized in engine/tests/test_wave3.py.
+  - {set_code: por, card_key: "2392a41a-59d3-4749-be94-4d9df0af9c4c", display_name: Alabaster Dragon, card_instances: variable, status: implemented, engine_scope: "Flying creature with a name-scoped dies trigger that shuffles it into its owner's library.", required_rules: [creature_spells_minimal, flying_keyword_minimal, alabaster_dragon_death_trigger_minimal], tests: [engine/tests/test_wave3.py]}
   - {set_code: por, card_key: "9971697b-2acc-4bc2-a44e-074d03a51df7", display_name: Archangel, card_instances: variable, status: implemented, engine_scope: "Flying vigilance creature.", required_rules: [creature_spells_minimal, flying_keyword_minimal, vigilance_keyword_minimal], tests: [engine/tests/test_wave3.py]}
   - {set_code: por, card_key: "23625877-b6db-480c-8885-a62b7d0457df", display_name: Ardent Militia, card_instances: variable, status: implemented, engine_scope: "Vigilance creature.", required_rules: [creature_spells_minimal, vigilance_keyword_minimal], tests: [engine/tests/test_wave3.py]}
   - {set_code: por, card_key: "5edfe083-391b-41ae-ac4d-d648042cfa5e", display_name: Arrogant Vampire, card_instances: variable, status: implemented, engine_scope: "Flying creature.", required_rules: [creature_spells_minimal, flying_keyword_minimal], tests: [engine/tests/test_wave3.py]}

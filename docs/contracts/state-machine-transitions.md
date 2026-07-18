@@ -29,6 +29,7 @@ Define the minimum legal progression points for the first deterministic engine s
 - `cleanup_step`
 - `priority_window`
 - `spell_on_stack`
+- `triggered_ability_on_stack`
 - `spell_resolving`
 - `state_based_actions_check`
 
@@ -54,6 +55,10 @@ Define the minimum legal progression points for the first deterministic engine s
 
 - The first slice currently enumerates `precombat_main_step`, `declare_attackers_step`, and `declare_blockers_step` actions for the currently relevant player. While the stack is nonempty, the sole legal v0 action is for the current priority player to pass; two consecutive passes resolve its top entry.
 - The first slice may limit stack interactions to creature spells, a narrow sorcery-speed noncreature spell path, and mana abilities required by the declared five basic lands.
+- The only triggered stack interaction in the slice is Alabaster Dragon's
+  name-scoped death trigger, created after the destruction or state-based-
+  action operation in which it dies and resolved through the normal priority
+  cycle.
 - The first slice may model combat with a single combat-damage checkpoint rather than broader combat variants.
 - The currently implemented turn flow reaches cleanup, emits `turn_ended`, and can hand off into the next active player's precombat main.
 - Full long-run game-loop completion beyond the supported subset still remains future work.

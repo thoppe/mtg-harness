@@ -79,14 +79,16 @@ Reason: Archangel and Ardent Militia require the attacker-declaration rule to
 leave a creature with Vigilance untapped. The increment is limited to that
 exception; it must preserve the creature's ability to block later in combat.
 
-#### Wave 3E: Triggered death ability (deferred)
+#### Wave 3E: Alabaster Dragon's bounded triggered death ability
 
-Alabaster Dragon is deliberately deferred beyond Waves 3A--3D. Its death
-trigger requires a separate triggered-ability foundation: death detection,
-trigger creation after state-based actions, deterministic stack and priority
-resolution, library shuffling, replay events, and the case where the Dragon
-leaves its graveyard before the trigger resolves. Do not special-case this
-ability in zone movement or state-based actions.
+Alabaster Dragon (`2392a41a-59d3-4749-be94-4d9df0af9c4c`) adds the one
+name-scoped trigger foundation required by its oracle text: detect its death
+after the destruction or state-based-action operation completes, capture last-known source identity and owner, put a
+trigger entry on the stack, then resolve it through the ordinary deterministic
+priority cycle. A successful resolution moves the same card instance from its
+owner's graveyard into that library and shuffles it; if it left the graveyard,
+the trigger has no effect and consumes no RNG cursor. This does not create a
+generic trigger dispatcher or special-case zone movement.
 
 ### Wave 4: Combat exceptions and haste
 

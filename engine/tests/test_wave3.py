@@ -7,12 +7,13 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from mtg_engine.actions.models import DeclareAttackersAction, DeclareBlockersAction
+from mtg_engine.actions.models import DeclareAttackersAction, DeclareBlockersAction, PassPriorityAction
 from mtg_engine.cards.repository import CardRepository
+from mtg_engine.events.log import EventLog
 from mtg_engine.flow.priority import blocker_attack_rejection_reason, enumerate_legal_actions
 from mtg_engine.flow.setup import SetupInput, initialize_game
-from mtg_engine.flow.turns import TurnResult, declare_attackers, declare_blockers
-from mtg_engine.rules.combat import with_combat_state
+from mtg_engine.flow.turns import TurnResult, _destroy_permanents, declare_attackers, declare_blockers, pass_priority
+from mtg_engine.rules.combat import apply_state_based_actions, with_combat_state
 from mtg_engine.state.models import TurnState
 from mtg_engine.state.zones import move_object
 
@@ -27,7 +28,9 @@ ARDENT_MILITIA = "23625877-b6db-480c-8885-a62b7d0457df"
 CLOUD_DRAGON = "3c46f309-69ae-43b1-adf6-bdb26599c1f4"
 CLOUD_PIRATES = "d334aa85-3470-4f5d-9cbc-b88bf991a5af"
 CLOUD_SPIRIT = "9e1a6481-f460-4551-96e8-30b289f2cb92"
+ALABASTER_DRAGON = "2392a41a-59d3-4749-be94-4d9df0af9c4c"
 WAVE_THREE_CARD_NAMES = {
+    "2392a41a-59d3-4749-be94-4d9df0af9c4c": "Alabaster Dragon",
     "9971697b-2acc-4bc2-a44e-074d03a51df7": "Archangel",
     "23625877-b6db-480c-8885-a62b7d0457df": "Ardent Militia",
     "5edfe083-391b-41ae-ac4d-d648042cfa5e": "Arrogant Vampire",
@@ -146,6 +149,97 @@ class Wave3CombatTests(unittest.TestCase):
                 self.assertIn(blocked_action, enumerate_legal_actions(flying_state, self.repository))
                 declare_blockers(TurnResult(flying_state, ()), blocked_action, self.repository)
 
+    def test_alabaster_dragon_death_trigger_uses_stack_priority_then_shuffles(self) -> None:
+        state = _alabaster_death_state(self.repository, seed=19)
+        destroyed_state, events = apply_state_based_actions(
+            state,
+            self.repository,
+            active_player="alice",
+        )
+
+        self.assertEqual(destroyed_state.objects["alice:1"].zone, "graveyard")
+        self.assertEqual(destroyed_state.stack_entries[0].entry_kind, "alabaster_dragon_death_trigger")
+        self.assertEqual(destroyed_state.stack_entries[0].source_object_id, "alice:1@1")
+        self.assertEqual(events[-1]["event_type"], "triggered_ability_put_on_stack")
+
+        pending = TurnResult(destroyed_state, ())
+        after_alice_passes = pass_priority(
+            pending,
+            PassPriorityAction(player_id="alice"),
+            self.repository,
+        )
+        self.assertEqual(after_alice_passes.state.turn.priority_player, "bob")
+        self.assertEqual(len(after_alice_passes.state.stack_entries), 1)
+
+        resolved = pass_priority(
+            after_alice_passes,
+            PassPriorityAction(player_id="bob"),
+            self.repository,
+        )
+        self.assertEqual(resolved.state.objects["alice:1"].zone, "library")
+        self.assertIn("alice:1", resolved.state.players["alice"].library)
+        self.assertEqual(resolved.state.rng_cursor, 1)
+        self.assertEqual(resolved.state.stack_entries, ())
+        self.assertEqual(
+            [event.event_type for event in resolved.event_log[-4:]],
+            [
+                "priority_passed",
+                "object_moved_between_zones",
+                "library_shuffled",
+                "triggered_ability_resolved",
+            ],
+        )
+
+    def test_alabaster_dragon_shuffle_is_seed_deterministic(self) -> None:
+        final_libraries = []
+        for _ in range(2):
+            state = _alabaster_death_state(self.repository, seed=23)
+            destroyed_state, _ = apply_state_based_actions(state, self.repository, active_player="alice")
+            pending = TurnResult(destroyed_state, ())
+            pending = pass_priority(pending, PassPriorityAction(player_id="alice"), self.repository)
+            resolved = pass_priority(pending, PassPriorityAction(player_id="bob"), self.repository)
+            final_libraries.append(resolved.state.players["alice"].library)
+        self.assertEqual(final_libraries[0], final_libraries[1])
+
+    def test_destroy_effect_path_enqueues_alabaster_trigger(self) -> None:
+        state = _alabaster_death_state(self.repository, seed=29)
+        dragon = replace(state.objects["alice:1"], damage_marked=0)
+        state = replace(state, objects={**state.objects, "alice:1": dragon})
+        event_log = EventLog(game_id=state.game_id)
+
+        destroyed_state, destroyed_count = _destroy_permanents(
+            state,
+            event_log,
+            instance_ids=("alice:1",),
+            active_player="bob",
+            reason="test_destroy",
+        )
+
+        self.assertEqual(destroyed_count, 1)
+        self.assertEqual(destroyed_state.objects["alice:1"].zone, "graveyard")
+        self.assertEqual(destroyed_state.stack_entries[0].entry_kind, "alabaster_dragon_death_trigger")
+        self.assertEqual(event_log.events[-1].event_type, "triggered_ability_put_on_stack")
+
+    def test_alabaster_trigger_is_a_no_op_if_source_left_graveyard(self) -> None:
+        state = _alabaster_death_state(self.repository, seed=31)
+        destroyed_state, _ = apply_state_based_actions(state, self.repository, active_player="alice")
+        moved_state = move_object(
+            destroyed_state,
+            instance_id="alice:1",
+            from_zone="graveyard",
+            to_zone="hand",
+            player_id="alice",
+        )
+
+        pending = TurnResult(moved_state, ())
+        pending = pass_priority(pending, PassPriorityAction(player_id="alice"), self.repository)
+        resolved = pass_priority(pending, PassPriorityAction(player_id="bob"), self.repository)
+
+        self.assertEqual(resolved.state.objects["alice:1"].zone, "hand")
+        self.assertEqual(resolved.state.rng_cursor, 0)
+        self.assertNotIn("library_shuffled", [event.event_type for event in resolved.event_log])
+        self.assertFalse(resolved.event_log[-1].payload["moved_to_library"])
+
 
 def _combat_state(
     repository: CardRepository,
@@ -179,3 +273,24 @@ def _attacker_declaration_state(repository: CardRepository, card_id: str):
     ).state
     state = move_object(state, instance_id="alice:1", from_zone="hand", to_zone="battlefield", player_id="alice")
     return replace(state, turn=TurnState(2, "alice", "alice", "declare_attackers_step"))
+
+
+def _alabaster_death_state(repository: CardRepository, *, seed: int):
+    state = initialize_game(
+        SetupInput(
+            "alabaster-death",
+            ("alice", "bob"),
+            "alice",
+            {"alice": (ALABASTER_DRAGON, MUCK_RATS, ISLAND), "bob": ()},
+            {"alice": (ALABASTER_DRAGON,), "bob": ()},
+            seed,
+        ),
+        repository,
+    ).state
+    state = move_object(state, instance_id="alice:1", from_zone="hand", to_zone="battlefield", player_id="alice")
+    damaged_dragon = replace(state.objects["alice:1"], damage_marked=4)
+    return replace(
+        state,
+        objects={**state.objects, "alice:1": damaged_dragon},
+        turn=TurnState(1, "alice", "alice", "precombat_main_step"),
+    )

@@ -26,6 +26,10 @@ through zone changes while retaining deterministic traceability.
   otherwise, and receives a new `entered_battlefield_turn` value.
 - Events must identify the moved card instance and include the pre- and
   post-change object identities when an object changes zone.
+- Alabaster Dragon's bounded death trigger uses last-known information from the
+  battlefield object that died. Its trigger entry must retain that old
+  `object_id`, card instance, and owner rather than treating the newly-created
+  graveyard object as the trigger source.
 
 ## v0 Migration
 

@@ -337,6 +337,19 @@ Define how the current rule-family coverage should map to future engine tests an
   - `attackers_declared`
   - `blockers_declared`
 
+### `alabaster_dragon_death_trigger_minimal`
+
+- Planned tests:
+  - `engine/tests/test_wave3.py`
+- Planned trace assertions:
+  - `state_based_actions_checked`
+  - `permanent_destroyed`
+  - `object_moved_between_zones`
+  - `triggered_ability_put_on_stack`
+  - `priority_passed`
+  - `library_shuffled`
+  - `triggered_ability_resolved`
+
 ### `defender_keyword_minimal`
 
 - Planned tests:
@@ -400,8 +413,11 @@ Define how the current rule-family coverage should map to future engine tests an
   - `reach_keyword_minimal` now has engine coverage for `Keen-Eyed Archers`.
   - `swampwalk_keyword_minimal` now has engine coverage for `Anaconda`.
   - `islandwalk_keyword_minimal`, `vigilance_keyword_minimal`, and
-    `flying_only_blocker_restriction_minimal` are planned Wave 3 mappings and
-    do not yet claim engine coverage.
+    `flying_only_blocker_restriction_minimal` now have focused Wave 3 engine
+    coverage in `engine/tests/test_wave3.py`.
+  - `alabaster_dragon_death_trigger_minimal` has focused Wave 3 coverage for
+    stack creation, successful deterministic shuffle, and no-effect resolution
+    after the Dragon leaves its graveyard.
   - `defender_keyword_minimal` now has engine coverage for `Wall of Granite`.
   - `simple_life_gain_sorceries_minimal` now has engine coverage for `Sacred Nectar`.
   - `instant_priority_minimal`, `temporary_characteristics_minimal`, and
