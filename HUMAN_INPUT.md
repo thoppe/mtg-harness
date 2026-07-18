@@ -45,6 +45,10 @@ This file captures decisions, constraints, and open questions that are explicitl
   name-scoped under `docs/contracts/wave5-hidden-zone-expansion.md`; hidden
   option identities and library ordering are never public replay data unless
   the oracle text explicitly reveals them
+- Wave 6 work, when promoted, must remain dependency ordered and name-scoped
+  under `docs/contracts/wave6-damage-and-turn-effects.md`; its X snapshots,
+  divided allocations, captured sacrifice power, next-turn markers, and Last
+  Chance extra turn must be explicit replayable state
 - Default persisted card image asset type: JPG
 - Deterministic simulation and replayability are first-class requirements in v0, especially for tests
 - The first engine architecture pattern is a deterministic state machine with an append-only event log

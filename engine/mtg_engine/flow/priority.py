@@ -150,17 +150,22 @@ def _enumerate_active_precombat_main_actions(
             continue
         legal_targets = _legal_noncreature_spell_targets(state, card_repository, instance_id)
         effect = _supported_targeted_sorcery_effect(card_definition)
-        x_values = range(len(player.mana_pool) + 1) if effect == "prosperity" else (None,)
+        x_values = range(len(player.mana_pool) + 1) if effect in {"prosperity", "blaze", "earthquake"} else (None,)
         sacrifice_ids = tuple(
             permanent_id for permanent_id in player.battlefield
             if (definition := card_repository.get(state.objects[permanent_id].oracle_id)).is_creature and definition.has_color("G")
-        ) if effect == "natural_order" else (None,)
+        ) if effect == "natural_order" else (
+            tuple(permanent_id for permanent_id in player.battlefield if card_repository.get(state.objects[permanent_id].oracle_id).is_creature)
+            if effect == "final_strike" else (None,)
+        )
         for chosen_x in x_values:
             if not _can_pay_mana_cost(player.mana_pool, _parse_mana_cost(card_definition.mana_cost, chosen_x=chosen_x or 0)):
                 continue
             for sacrifice_id in sacrifice_ids:
                 for target_instance_ids in legal_targets:
-                    actions.append(CastNonCreatureSpellAction(player_id=state.turn.active_player, card_instance_id=instance_id, target_instance_ids=target_instance_ids, chosen_x=chosen_x, additional_cost_instance_id=sacrifice_id))
+                    allocations = _forked_lightning_allocations(target_instance_ids) if effect == "forked_lightning" else ((),)
+                    for allocation in allocations:
+                        actions.append(CastNonCreatureSpellAction(player_id=state.turn.active_player, card_instance_id=instance_id, target_instance_ids=target_instance_ids, chosen_x=chosen_x, additional_cost_instance_id=sacrifice_id, damage_assignments=allocation))
 
     actions.append(
         AdvanceStepAction(
@@ -215,12 +220,18 @@ def _enumerate_declare_attackers_actions(
             continue
         legal_attackers.append(instance_id)
 
+    forced_attack = any(
+        effect.kind == "must_attack_source" and effect.player_id == state.turn.active_player
+        for effect in state.delayed_turn_effects
+    )
+
     actions = [
         DeclareAttackersAction(
             player_id=state.turn.active_player,
             attacker_ids=attacker_ids,
         )
         for attacker_ids in _ordered_subsets(tuple(legal_attackers))
+        if not forced_attack or set(attacker_ids) == set(legal_attackers)
     ]
     return tuple(actions)
 
@@ -348,7 +359,7 @@ def _legal_noncreature_spell_targets(
     spell = state.objects[spell_instance_id]
     card_definition = card_repository.get(spell.oracle_id)
     effect = _supported_targeted_sorcery_effect(card_definition)
-    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "additional_three_land_plays", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures", "controlled_creatures_get_0_3_until_end_of_turn", "controlled_creatures_get_1_1_until_end_of_turn", "white_creatures_get_2_0_until_end_of_turn", "green_controlled_creatures_gain_forestwalk_until_end_of_turn", "black_controlled_creatures_only_blockable_by_black_until_end_of_turn", "controlled_creatures_gain_reach_until_end_of_turn", "flux", "natural_order", "ancestral_memories", "prosperity", "temporary_truce", "winds_of_change", "untamed_wilds", "gift_of_estates", "cruel_bargain", "cruel_tutor", "natures_lore", "omen"}:
+    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "additional_three_land_plays", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures", "controlled_creatures_get_0_3_until_end_of_turn", "controlled_creatures_get_1_1_until_end_of_turn", "white_creatures_get_2_0_until_end_of_turn", "green_controlled_creatures_gain_forestwalk_until_end_of_turn", "black_controlled_creatures_only_blockable_by_black_until_end_of_turn", "controlled_creatures_gain_reach_until_end_of_turn", "flux", "natural_order", "ancestral_memories", "prosperity", "temporary_truce", "winds_of_change", "untamed_wilds", "gift_of_estates", "cruel_bargain", "cruel_tutor", "natures_lore", "omen", "earthquake", "devastation", "last_chance"}:
         return ((),)
     if effect is None:
         return ()
@@ -356,13 +367,15 @@ def _legal_noncreature_spell_targets(
         return tuple((player_id,) for player_id in state.players)
     if effect == "target_player_discards_two":
         return tuple((player_id,) for player_id in state.players)
+    if effect in {"false_peace", "taunt"}:
+        return tuple((player_id,) for player_id in state.players)
     if effect == "destroy_all_creatures_target_opponent_you_lose_2_per_creature":
         return tuple(
             (player_id,)
             for player_id in state.players
             if player_id != state.turn.active_player
         )
-    if effect in {"look_at_opponent_hand_draw_one", "balance_of_power", "withering_gaze", "mind_knives", "baleful_stare", "starlight", "cruel_fate"}:
+    if effect in {"look_at_opponent_hand_draw_one", "balance_of_power", "withering_gaze", "mind_knives", "baleful_stare", "starlight", "cruel_fate", "exhaustion"}:
         return tuple(
             (player_id,)
             for player_id in state.players
@@ -371,7 +384,7 @@ def _legal_noncreature_spell_targets(
 
     legal_targets: list[tuple[str, ...]] = []
     land_target_ids: list[str] = []
-    if effect == "damage_any_target":
+    if effect in {"damage_any_target", "blaze"}:
         legal_targets.extend((player_id,) for player_id in state.players)
     tap_target_ids: list[str] = []
     for player in state.players.values():
@@ -403,7 +416,7 @@ def _legal_noncreature_spell_targets(
                 continue
             if not permanent_definition.is_creature:
                 continue
-            if effect == "damage_any_target":
+            if effect in {"damage_any_target", "blaze"}:
                 legal_targets.append((instance_id,))
                 continue
             if effect == "destroy_tapped_creature" and not permanent.tapped:
@@ -411,7 +424,7 @@ def _legal_noncreature_spell_targets(
             if effect == "destroy_creature_owner_gains_4_life":
                 legal_targets.append((instance_id,))
                 continue
-            if effect == "destroy_nonblack_creature" and not permanent_definition.is_black:
+            if effect in {"destroy_nonblack_creature", "wicked_pact"} and not permanent_definition.is_black:
                 legal_targets.append((instance_id,))
                 continue
             if effect == "put_creature_on_top_of_library":
@@ -419,6 +432,11 @@ def _legal_noncreature_spell_targets(
                 continue
             if effect == "destroy_tapped_creature":
                 legal_targets.append((instance_id,))
+    if effect == "wicked_pact":
+        legal_targets = list(combinations(tuple(target_id[0] for target_id in legal_targets), 2))
+    if effect == "forked_lightning":
+        creature_ids = tuple(target_id[0] for target_id in legal_targets)
+        legal_targets = [targets for count in range(1, min(3, len(creature_ids)) + 1) for targets in combinations(creature_ids, count)]
     if effect == "destroy_two_target_lands":
         legal_targets.extend(combinations(tuple(land_target_ids), 2))
     if effect == "tap_up_to_three_nonflying_creatures":
@@ -426,6 +444,17 @@ def _legal_noncreature_spell_targets(
         for target_count in range(1, min(3, len(tap_target_ids)) + 1):
             legal_targets.extend(combinations(tuple(tap_target_ids), target_count))
     return tuple(legal_targets)
+
+
+def _forked_lightning_allocations(target_ids: tuple[str, ...]) -> tuple[tuple[tuple[str, int], ...], ...]:
+    """All positive integer allocations of four across the declared targets."""
+    if not target_ids:
+        return ()
+    def allocations(remaining: int, count: int) -> tuple[tuple[int, ...], ...]:
+        if count == 1:
+            return ((remaining,),)
+        return tuple((amount,) + tail for amount in range(1, remaining - count + 2) for tail in allocations(remaining - amount, count - 1))
+    return tuple(tuple(zip(target_ids, amounts)) for amounts in allocations(4, len(target_ids)))
 
 
 def _supported_targeted_sorcery_effect(card_definition) -> str | None:

@@ -39,6 +39,12 @@ Define the core state boundaries for simulation.
 - `land_play_limit_this_turn`: each player begins at one permitted land play;
   temporary effects may raise it and cleanup resets it to one
 - `outcome`: in-progress or completed game status, winner/loser IDs, and terminal reason
+- `next_turn_effects`: optional serializable, name-scoped markers for a named
+  player's next untap step, next combat, or next attacker declaration; Wave 6
+  defines Exhaustion, False Peace, and Taunt as the only permitted markers
+- `turn_queue`: the normal next-player turn plus an optional name-scoped queued
+  extra turn; Wave 6 permits only Last Chance's one caster-owned queued turn
+  and its terminal end-step marker
 
 ## v0 State Rules
 

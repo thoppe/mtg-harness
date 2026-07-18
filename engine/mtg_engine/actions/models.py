@@ -28,6 +28,7 @@ class CastNonCreatureSpellAction:
     target_instance_ids: tuple[str, ...] = field(default_factory=tuple)
     chosen_x: int | None = None
     additional_cost_instance_id: str | None = None
+    damage_assignments: tuple[tuple[str, int], ...] = field(default_factory=tuple)
 
     def __init__(
         self,
@@ -37,6 +38,7 @@ class CastNonCreatureSpellAction:
         target_instance_ids: tuple[str, ...] | None = None,
         chosen_x: int | None = None,
         additional_cost_instance_id: str | None = None,
+        damage_assignments: tuple[tuple[str, int], ...] = (),
     ) -> None:
         object.__setattr__(self, "player_id", player_id)
         object.__setattr__(self, "card_instance_id", card_instance_id)
@@ -51,6 +53,10 @@ class CastNonCreatureSpellAction:
             raise ValueError("chosen_x must not be negative")
         object.__setattr__(self, "chosen_x", chosen_x)
         object.__setattr__(self, "additional_cost_instance_id", additional_cost_instance_id)
+        normalized_assignments = tuple((target_id, int(amount)) for target_id, amount in damage_assignments)
+        if any(amount < 0 for _, amount in normalized_assignments):
+            raise ValueError("damage assignments must not be negative")
+        object.__setattr__(self, "damage_assignments", normalized_assignments)
 
     @property
     def target_instance_id(self) -> str | None:

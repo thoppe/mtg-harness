@@ -209,7 +209,36 @@ variable-cost or multi-targeting framework.
 
 ### Wave 6: Variable damage, multi-targeting, costs, and delayed turn rules
 
-Reason: require target allocation, X-cost payment, sacrifice costs, or derived values. Blaze, Earthquake, Forked Lightning, Wicked Pact, Final Strike, Devastation, Exhaustion, False Peace, Taunt, Last Chance.
+Wave 6 is dependency ordered. Its effects are bounded by
+`docs/contracts/wave6-damage-and-turn-effects.md`; source artifacts alone do
+not make any of these cards supported.
+
+#### Wave 6A: X damage and immutable divided allocations
+
+`Blaze`, `Earthquake`, and `Forked Lightning` extend the existing X snapshot
+only through X damage, a nonflying global-damage filter, and a one-to-three
+distinct-target positive allocation totaling four. A target becoming illegal
+does not redistribute declared Forked Lightning damage.
+
+#### Wave 6B: Snapshot sacrifice value and reuse-only destruction
+
+`Wicked Pact`, `Final Strike`, and `Devastation` add exactly two nonblack
+creature targets, Final Strike's required creature sacrifice and captured
+power, and combined global creature/land destruction. This is not generic
+additional-cost or multi-target support.
+
+#### Wave 6C: One-next-turn restriction markers
+
+`Exhaustion`, `False Peace`, and `Taunt` add serializable, consumable markers
+for one target player's next untap step, next turn's combat phases, and next
+attacker declaration respectively. They reuse current turn and combat
+validation rather than introduce generic continuous effects.
+
+#### Wave 6D: One queued extra turn with a terminal outcome
+
+`Last Chance` adds one caster-owned queued turn immediately after the current
+turn and a name-scoped loss at the beginning of that extra turn's end step.
+It must not be represented as generic triggered-ability or extra-turn support.
 
 ### Wave 7: Triggers, activated abilities, instants, and prevention
 

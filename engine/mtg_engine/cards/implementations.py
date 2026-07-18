@@ -91,6 +91,17 @@ IMPLEMENTATIONS = {
     "d9353eb6-c7e7-4d85-a0c2-32b1d091881a": "cruel_tutor",
     "78826359-fe63-44ad-adc4-a17ffcd710e4": "natures_lore",
     "9b8c44a0-82ef-4beb-a762-c2a2a21380f3": "omen",
+    # Wave 6: variable damage, costs, and bounded delayed turn rules.
+    "0596920f-9946-42f4-a03b-24aab67f9f1b": "blaze",
+    "9a40614b-50a3-422c-849e-53c8b7d3d204": "earthquake",
+    "66107cfd-4bdb-4266-a650-940743555ea4": "forked_lightning",
+    "39e21a5a-b278-478a-854c-17695c0f6246": "wicked_pact",
+    "4d98aea2-b4ff-4903-ba28-a53fbfaad6b1": "final_strike",
+    "052838cb-dcf0-46f5-82b1-c3ed863b42b7": "devastation",
+    "0e7b9caf-8285-4386-98bc-9a809827f447": "exhaustion",
+    "7962db58-dbd9-4b94-8a21-a1625da4c384": "false_peace",
+    "24cf7fad-233b-49fd-b2a1-a29e3e30041c": "taunt",
+    "360039a5-1cbd-4ee3-8f94-21b5348e106a": "last_chance",
 }
 
 

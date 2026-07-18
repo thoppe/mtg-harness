@@ -60,6 +60,11 @@ The simulator should only claim support based on layer 3, never merely because l
   hidden-zone, search, ordering, additional-cost, and X-cost candidates; it is
   not active support until its source, coverage, implementation, and tests
   land together.
+- Wave 5 is now active through its nineteen promoted cards and audited hidden
+  information, search, ordering, sacrifice, and X-cost behavior. Wave 6 has a
+  dependency-ordered contract for ten X/damage, multi-target, sacrifice,
+  next-turn, and extra-turn cards; it is not active support until coverage,
+  implementation, and tests land together.
 
 ## Workstreams
 
@@ -167,8 +172,8 @@ Prefer links to canonical manifests over duplicated card lists. If a copied list
 ## Resume Here
 
 The next session should continue from the manifest-backed slice after the
-completed Wave 4 creature, Mountainwalk, and Haste batch, using Wave 5's
-dependency-ordered contracts rather than promoting its raw sources as a group.
+completed Wave 5 hidden-zone batch, using Wave 6's dependency-ordered
+contracts rather than promoting its raw sources as a group.
 
 1. Treat the active support-slice manifest as the only playable card-universe
    declaration; source artifacts alone do not imply support.
@@ -187,7 +192,7 @@ dependency-ordered contracts rather than promoting its raw sources as a group.
 5. Before each implementation subwave, update source artifacts, manifest,
    coverage, rules envelope, registry, and edge-case tests together; before
    finishing, run the card-expansion freshness check above.
-6. Start Wave 5A only with its three fixed/public-derived cards, then advance
-   through Wave 5B–5I in `docs/contracts/portal-expansion-order.md`. Preserve
-   `docs/contracts/wave5-hidden-zone-expansion.md` as the authority for hidden
-   visibility, decision sequencing, and RNG cursor use.
+6. Start Wave 6A only with Blaze, Earthquake, and Forked Lightning, then
+   advance through Wave 6B–6D in `docs/contracts/portal-expansion-order.md`.
+   Preserve `docs/contracts/wave6-damage-and-turn-effects.md` as the authority
+   for allocation, target, marker, queue, and terminal-outcome behavior.

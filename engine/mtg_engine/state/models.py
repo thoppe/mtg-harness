@@ -68,6 +68,9 @@ class StackEntry:
     owner_id: str | None = None
     expected_graveyard_object_id: str | None = None
     additional_cost_instance_id: str | None = None
+    additional_cost_value: int | None = None
+    damage_assignments: tuple[tuple[str, int], ...] = ()
+    target_object_ids: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -109,6 +112,22 @@ class TemporaryEffect:
 
 
 @dataclass(frozen=True)
+class DelayedTurnEffect:
+    """A deliberately narrow, one-turn Portal effect scheduled by Wave 6."""
+
+    kind: str
+    player_id: str
+    turn_number: int
+    source_player_id: str | None = None
+
+
+@dataclass(frozen=True)
+class ExtraTurn:
+    player_id: str
+    lose_at_end_step: bool = False
+
+
+@dataclass(frozen=True)
 class GameOutcome:
     status: str = "in_progress"
     winner_id: str | None = None
@@ -132,3 +151,5 @@ class GameState:
     rng_cursor: int = 0
     forced_block_target_object_id: str | None = None
     temporary_effects: tuple[TemporaryEffect, ...] = ()
+    delayed_turn_effects: tuple[DelayedTurnEffect, ...] = ()
+    extra_turns: tuple[ExtraTurn, ...] = ()

@@ -24,6 +24,11 @@ evasion and requirement rules.
 - A requirement such as “all creatures able to block target creature do so” is
   represented in combat state, considered by legal-action enumeration, and
   revalidated on submitted blockers.
+- Wave 6's Taunt creates one name-scoped next-turn attacker requirement: each
+  creature controlled by the marked player that can legally attack Taunt's
+  caster must attack that caster. Enumeration and submitted attacker
+  declarations must use the same predicate, and the marker expires at that
+  turn's cleanup.
 
 ## Guardrail
 

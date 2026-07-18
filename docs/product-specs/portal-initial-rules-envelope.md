@@ -35,6 +35,9 @@ declared by `docs/coverage/slices/portal.initial.yaml`.
   decision, visibility, random-selection, search, prefix-ordering, additional
   cost, and Prosperity-X contracts in
   `docs/contracts/wave5-hidden-zone-expansion.md`
+- Wave 6 effects only when the named cards are promoted with the bounded X,
+  divided-damage, sacrifice-value, next-turn-marker, and Last Chance
+  contracts in `docs/contracts/wave6-damage-and-turn-effects.md`
 - Flying-only blocker restriction limited to `Cloud Dragon`, `Cloud Pirates`,
   and `Cloud Spirit`
 - Alabaster Dragon's name-scoped death trigger: after it dies, put its trigger
@@ -133,6 +136,13 @@ declared by `docs/coverage/slices/portal.initial.yaml`.
   public replay events; Mind Knives must use the deterministic RNG cursor; and
   Natural Order's sacrifice and Prosperity's X declaration remain restricted
   to those cards.
+- Wave 6 may add only the name-scoped subwaves in
+  `docs/contracts/portal-expansion-order.md` and
+  `docs/contracts/wave6-damage-and-turn-effects.md`. In particular, Forked
+  Lightning stores positive allocations totaling four without redistribution;
+  Final Strike captures its sacrifice's power while casting; next-turn
+  restrictions are consumable state markers; and Last Chance alone queues an
+  extra turn and loses at that turn's end step.
 
 ## Out Of Scope
 
@@ -144,6 +154,9 @@ declared by `docs/coverage/slices/portal.initial.yaml`.
   Alabaster Dragon
 - Generic hidden-information viewing, arbitrary search predicates, generic
   additional costs, generic X costs, and generic simultaneous-choice handling
+- Generic divided-target allocation, arbitrary additional sacrifice costs,
+  prevention, damage redirection, planeswalkers, generic next-turn effects,
+  generic delayed triggers, and arbitrary extra-turn scheduling
 - Replacement effects
 - Continuous effects beyond the object-bound additive and keyword-granting
   Wave 2 model

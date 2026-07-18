@@ -50,6 +50,8 @@ Define the minimum append-only event types required for deterministic replay and
 - `state_based_actions_checked`
 - `permanent_destroyed`
 - `turn_ended`
+- `extra_turn_queued`
+- `combat_skipped`
 
 ## Guarantees
 
@@ -85,6 +87,11 @@ Define the minimum append-only event types required for deterministic replay and
   defined in `docs/contracts/wave5-hidden-zone-expansion.md`; adding them must
   preserve the append-only replay model and must not expose nonrevealed hidden
   options.
+- Wave 6 event payloads must preserve declared X, target order and allocation,
+  Final Strike's captured sacrificed power, next-turn marker creation and
+  consumption, skipped combat, queued extra-turn identity, and Last Chance's
+  terminal end-step outcome. They may not infer any of those facts from
+  implicit control flow.
 
 ## Related Contracts
 
