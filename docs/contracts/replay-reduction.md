@@ -13,8 +13,9 @@ combat state, and stack state.
 
 ## Required Boundaries
 
-- Accepted player actions are recorded with stable action type and complete
-  payload before or alongside their resulting engine events.
+- Accepted player actions are represented by the immutable action models with
+  stable action type and complete payload before or alongside their resulting
+  engine events.
 - Automatic transitions remain events, but are recomputed by the reducer rather
   than treated as an unvalidated source of truth.
 - The reducer rejects malformed, out-of-order, or illegal actions rather than
@@ -25,8 +26,11 @@ combat state, and stack state.
 ## v0 Migration
 
 - Existing trace tests remain useful event-vocabulary checks.
-- Add reducer coverage first for setup, land play, mana abilities, casting,
-  priority passing, and the current combat declarations. Expand from there.
+- The reducer now covers setup, first-turn start, land play, mana abilities,
+  casting, priority passing, and the current combat declarations. Its first
+  equivalence test covers land play, mana production, creature casting, and
+  both stack passes; add equivalent tests as each remaining action family is
+  widened.
 
 ## Related Contracts
 
