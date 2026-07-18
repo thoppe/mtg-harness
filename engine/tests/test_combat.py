@@ -31,6 +31,7 @@ from mtg_engine.flow.turns import (
     start_next_turn,
 )
 from mtg_engine.state.zones import move_object
+from mtg_engine.state.models import GameOutcome
 
 
 INFORMATION_DIR = Path(__file__).resolve().parents[2] / "information"
@@ -50,6 +51,37 @@ WALL_OF_GRANITE = "8445094f-008b-491a-977c-e8582d5ab72c"
 
 
 class CombatTests(unittest.TestCase):
+    def test_life_zero_state_based_action_ends_game(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _state_with_creatures_ready_to_fight(repository, include_blocker=False)
+        low_life_state = replace(
+            session.state,
+            outcome=GameOutcome(),
+            players={
+                **session.state.players,
+                "bob": replace(session.state.players["bob"], life_total=1),
+            },
+        )
+        session = replace(session, state=low_life_state)
+        session = advance_to_begin_combat(session)
+        session = declare_attackers(
+            session,
+            DeclareAttackersAction(player_id="alice", attacker_ids=("alice:4",)),
+            repository,
+        )
+        session = declare_blockers(
+            session,
+            DeclareBlockersAction(player_id="bob", blockers={}),
+            repository,
+        )
+        result = resolve_combat_damage(session, repository)
+
+        self.assertEqual(result.state.outcome.status, "completed")
+        self.assertEqual(result.state.outcome.winner_id, "alice")
+        self.assertEqual(result.state.outcome.loser_ids, ("bob",))
+        self.assertEqual(result.state.outcome.reason, "life_total_zero_or_less")
+        self.assertIn("game_ended", [event.event_type for event in result.event_log])
+
     def test_unblocked_border_guard_deals_life_damage(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         session = _state_with_creatures_ready_to_fight(repository, include_blocker=False)

@@ -30,6 +30,7 @@ Define the core state boundaries for simulation.
 - `mana_pools`: at minimum the five basic colors needed for the current active support slice
 - `rng_state`: deterministic seed and any derived RNG cursor state
 - `damage_marks`: creature damage marked on objects until cleared by later turn handling
+- `outcome`: in-progress or completed game status, winner/loser IDs, and terminal reason
 
 ## v0 State Rules
 
@@ -39,6 +40,8 @@ Define the core state boundaries for simulation.
 - The engine may derive convenience views, but replay cannot depend on untracked derived state.
 - The first slice may omit counters, attachments, and status markers not required by the active support slice.
 - Damage marked on creatures must be represented explicitly rather than inferred only from event history.
+- A player at zero or less life, or attempting to draw from an empty library,
+  completes the game and emits a `game_ended` event with a deterministic reason.
 
 ## Open Questions
 

@@ -23,6 +23,7 @@ Define the minimum append-only event types required for deterministic replay and
 ## v0 Required Event Types
 
 - `game_initialized`
+- `game_ended`
 - `opening_hand_assigned`
 - `turn_started`
 - `step_changed`
