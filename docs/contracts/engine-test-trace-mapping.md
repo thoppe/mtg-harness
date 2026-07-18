@@ -51,6 +51,37 @@ Define how the current rule-family coverage should map to future engine tests an
   - `blockers_declared`
   - `step_changed`
 
+### `instant_priority_minimal`
+
+- Planned tests:
+  - `engine/tests/test_wave2.py`
+  - `engine/tests/test_priority.py`
+- Planned trace assertions:
+  - `spell_cast`
+  - `priority_passed`
+  - `spell_resolved`
+  - `step_changed`
+
+### `temporary_characteristics_minimal`
+
+- Planned tests:
+  - `engine/tests/test_wave2.py`
+  - `engine/tests/test_portal_expansion_wave.py`
+- Planned trace assertions:
+  - `spell_cast`
+  - `spell_resolved`
+  - `object_moved_between_zones`
+
+### `combat_restrictions_minimal`
+
+- Planned tests:
+  - `engine/tests/test_wave2.py`
+  - `engine/tests/test_portal_expansion_wave.py`
+  - `engine/tests/test_priority.py`
+- Planned trace assertions:
+  - `attackers_declared`
+  - `blockers_declared`
+
 ### `land_playing_minimal`
 
 - Planned tests:
@@ -343,4 +374,8 @@ Define how the current rule-family coverage should map to future engine tests an
   - `swampwalk_keyword_minimal` now has engine coverage for `Anaconda`.
   - `defender_keyword_minimal` now has engine coverage for `Wall of Granite`.
   - `simple_life_gain_sorceries_minimal` now has engine coverage for `Sacred Nectar`.
+  - `instant_priority_minimal`, `temporary_characteristics_minimal`, and
+    `combat_restrictions_minimal` now have focused Wave 2 engine coverage,
+    including targeted action enumeration and Valorous Charge's
+    all-battlefields white-creature modifier.
   - The current slice now has a real lethal-damage proof via `Border Guard` versus `Muck Rats`, so the earlier synthetic SBA shortcut is no longer needed.

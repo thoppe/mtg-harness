@@ -308,7 +308,7 @@ def _legal_noncreature_spell_targets(
     spell = state.objects[spell_instance_id]
     card_definition = card_repository.get(spell.oracle_id)
     effect = _supported_targeted_sorcery_effect(card_definition)
-    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "additional_three_land_plays", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures", "controlled_creatures_get_0_3_until_end_of_turn", "controlled_creatures_get_1_1_until_end_of_turn", "white_controlled_creatures_get_2_0_until_end_of_turn", "green_controlled_creatures_gain_forestwalk_until_end_of_turn", "black_controlled_creatures_only_blockable_by_black_until_end_of_turn", "controlled_creatures_gain_reach_until_end_of_turn"}:
+    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "additional_three_land_plays", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures", "controlled_creatures_get_0_3_until_end_of_turn", "controlled_creatures_get_1_1_until_end_of_turn", "white_creatures_get_2_0_until_end_of_turn", "green_controlled_creatures_gain_forestwalk_until_end_of_turn", "black_controlled_creatures_only_blockable_by_black_until_end_of_turn", "controlled_creatures_gain_reach_until_end_of_turn"}:
         return ((),)
     if effect is None:
         return ()
@@ -340,6 +340,14 @@ def _legal_noncreature_spell_targets(
                         land_target_ids.append(instance_id)
                 continue
             if effect == "return_creature_to_hand_and_draw_one":
+                if permanent_definition.is_creature:
+                    legal_targets.append((instance_id,))
+                continue
+            if effect in {
+                "all_able_creatures_block_target_this_turn",
+                "target_creature_gets_3_3_and_flying_until_end_of_turn",
+                "target_creature_gains_flying_and_draw_one",
+            }:
                 if permanent_definition.is_creature:
                     legal_targets.append((instance_id,))
                 continue

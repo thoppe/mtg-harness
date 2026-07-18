@@ -44,6 +44,11 @@ The simulator should only claim support based on layer 3, never merely because l
 - `Hand of Death` now covers the minimal target-color restriction required for `Destroy target nonblack creature.`
 - `Anaconda` now covers the minimal `Swampwalk` attack-evasion restriction required when the defending player controls a `Swamp`, and combat legality now flows through the shared keyword-aware validation surface.
 - `Tidal Surge` now covers the minimal targeted creature-tapping sorcery path required for `Tap up to three target creatures without flying.`
+- Wave 2 now covers its eight temporary-characteristic/evasion spells and twelve
+  simple combat-restriction creatures. Targeted Wave 2 spells participate in
+  legal-action enumeration, Valorous Charge affects every white creature as its
+  oracle text requires, and focused coverage lives in
+  `engine/tests/test_wave2.py`.
 
 ## Workstreams
 
@@ -150,11 +155,13 @@ Prefer links to canonical manifests over duplicated card lists. If a copied list
 
 ## Resume Here
 
-The next session should continue from the manifest-backed slice after the `Tidal Surge` targeted-tapping increment.
+The next session should continue from the manifest-backed slice after the
+completed Wave 2 temporary-characteristic and combat-restriction batch.
 
 1. Keep `docs/coverage/slices/portal.initial.yaml` aligned with the declared active card universe and source pull scope.
-2. Choose the next expansion only after inspecting the active fifteen-card
-   wave for the next genuinely missing rule family.
+2. Re-evaluate Wave 3 in `docs/contracts/portal-expansion-order.md` against the
+   current engine before promoting any of its cards; source artifacts alone do
+   not imply support.
 3. Before implementation, update source artifacts, manifest, coverage, rules
    envelope, registry, and edge-case tests together.
 4. Before finishing, run the card-expansion freshness check above.

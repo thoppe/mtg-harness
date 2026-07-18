@@ -3,7 +3,7 @@ slice: portal_initial_micro_universe
 set_summaries:
   - set_code: por
     status: partial
-    notes: "The declared support slice currently includes Border Guard, Foot Soldiers, Muck Rats, Wind Drake, Bog Imp, Storm Crow, Keen-Eyed Archers, Anaconda, Armored Pegasus, Wall of Granite, Vengeance, Path of Peace, Hand of Death, Touch of Brilliance, Time Ebb, Tidal Surge, Volcanic Hammer, Lava Axe, Mind Rot, Winter's Grasp, Symbol of Unsummoning, Armageddon, Rain of Salt, Sacred Nectar, Wrath of God, and the five Portal basic lands."
+    notes: "Portal support is the card set declared by docs/coverage/slices/portal.initial.yaml, including the completed Wave 2 temporary-characteristic and combat-restriction batch."
   - set_code: me4
     status: partial
     notes: "The declared support slice currently includes Rain of Daggers as an explicit off-Portal source addition used to widen reusable mass-destruction support."
@@ -14,7 +14,7 @@ cards:
   - {set_code: por, card_key: "cb4baf53-51ed-468b-a468-5d7d45a6dc26", display_name: Cloak of Feathers, card_instances: variable, status: implemented, engine_scope: "Target gains Flying until cleanup and caster draws.", required_rules: [temporary_characteristics_minimal], tests: [engine/tests/test_wave2.py]}
   - {set_code: por, card_key: "8f8dfc24-f466-4607-8991-acbcbb415db3", display_name: Steadfastness, card_instances: variable, status: implemented, engine_scope: "Controlled creatures get +0/+3 until cleanup.", required_rules: [temporary_characteristics_minimal], tests: [engine/tests/test_wave2.py]}
   - {set_code: por, card_key: "5cf28c04-76af-4eb8-9969-366dc8e04690", display_name: Warrior's Charge, card_instances: variable, status: implemented, engine_scope: "Controlled creatures get +1/+1 until cleanup.", required_rules: [temporary_characteristics_minimal], tests: [engine/tests/test_wave2.py]}
-  - {set_code: por, card_key: "1f51fea2-ce19-44ef-a330-65cc0fafcd64", display_name: Valorous Charge, card_instances: variable, status: implemented, engine_scope: "White controlled creatures get +2/+0 until cleanup.", required_rules: [temporary_characteristics_minimal], tests: [engine/tests/test_wave2.py]}
+  - {set_code: por, card_key: "1f51fea2-ce19-44ef-a330-65cc0fafcd64", display_name: Valorous Charge, card_instances: variable, status: implemented, engine_scope: "All white creatures get +2/+0 until cleanup.", required_rules: [temporary_characteristics_minimal], tests: [engine/tests/test_wave2.py]}
   - {set_code: por, card_key: "bb493c95-5f6d-405b-aac6-c56fe6b6f42f", display_name: Nature's Cloak, card_instances: variable, status: implemented, engine_scope: "Green controlled creatures gain Forestwalk until cleanup.", required_rules: [temporary_characteristics_minimal], tests: [engine/tests/test_wave2.py]}
   - {set_code: por, card_key: "6b7933b3-821a-4d64-9a10-af8a69fa008e", display_name: Dread Charge, card_instances: variable, status: implemented, engine_scope: "Black controlled creatures are blocked only by black creatures until cleanup.", required_rules: [temporary_characteristics_minimal], tests: [engine/tests/test_wave2.py]}
   - {set_code: por, card_key: "f215d0f9-a53e-431a-a70d-9dc4e3caa41e", display_name: Treetop Defense, card_instances: variable, status: implemented, engine_scope: "Attackers-step response granting controlled creatures Reach.", required_rules: [instant_priority_minimal, temporary_characteristics_minimal], tests: [engine/tests/test_wave2.py]}

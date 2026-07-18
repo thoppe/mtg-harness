@@ -2,7 +2,8 @@
 
 ## Purpose
 
-Define the smallest believable rules subset for the initial `Portal` support slice built from `Border Guard`, `Foot Soldiers`, `Muck Rats`, `Armored Pegasus`, `Wind Drake`, `Bog Imp`, `Storm Crow`, `Keen-Eyed Archers`, `Anaconda`, `Wall of Granite`, `Vengeance`, `Path of Peace`, `Hand of Death`, `Touch of Brilliance`, `Time Ebb`, `Tidal Surge`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, `Symbol of Unsummoning`, `Armageddon`, `Rain of Salt`, `Sacred Nectar`, `Wrath of God`, `Rain of Daggers`, and the five `Portal` basic lands.
+Define the smallest believable rules subset for the active card universe
+declared by `docs/coverage/slices/portal.initial.yaml`.
 
 ## In Scope
 
@@ -32,6 +33,10 @@ Define the smallest believable rules subset for the initial `Portal` support sli
 - Sorcery-speed global land destruction limited to `Destroy all lands.`
 - Sorcery-speed global creature destruction limited to `Destroy all creatures. They can't be regenerated.` with regeneration text ignored in the current slice
 - Sorcery-speed opponent-targeted mass creature destruction limited to `Destroy all creatures target opponent controls. You lose 2 life for each creature destroyed this way.` in the current two-player slice
+- Wave 2 temporary power/toughness and keyword effects represented by
+  object-bound records that expire at cleanup or zone change
+- The attacked-player instant response window required by `Treetop Defense`
+- Shared, name-scoped attack and block restrictions for the Wave 2 creatures
 - Deterministic setup inputs and replay traces for the above behaviors
 
 ## Engine-Facing Interpretation
@@ -58,6 +63,13 @@ Define the smallest believable rules subset for the initial `Portal` support sli
 - `Wrath of God` may introduce only the minimal global creature-destruction path required to destroy all creatures on the battlefield and emit the corresponding destruction and zone-move events, with the printed regeneration rider explicitly ignored in the current slice because regeneration is otherwise unsupported.
 - `Rain of Daggers` may introduce only the minimal opponent-targeted mass creature-destruction path required to target the opposing player in a two-player game, destroy all creatures that player controls, count how many were destroyed this way, and reduce the caster's life total by 2 for each, without introducing broader multiplayer opponent selection, regeneration, or generalized linked delayed accounting.
 - The fifteen-card sorcery expansion wave is limited to the named rule families in `docs/contracts/portal-sorcery-expansion-wave.md`: fixed reuse effects, player and graveyard targeting, mass status and damage, combined damage/life effects, and Howling Fury's explicit +4 power modifier through cleanup. It does not introduce generic effect parsing, prevention, choices, X costs, or broader continuous-effect layering.
+- Wave 2 is limited to the temporary characteristics, attacked-player instant
+  window, and shared combat legality described by
+  `docs/contracts/characteristics-and-continuous-effects.md`,
+  `docs/contracts/stack-and-priority.md`, and
+  `docs/contracts/combat-requirements-and-evasion.md`. Valorous Charge applies
+  to white creatures on both battlefields; the other controller-qualified mass
+  effects remain limited to the caster's creatures.
 - `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow` may introduce only the minimal flying restriction that nonflying creatures cannot block them; broader keyword handling remains out of scope until another card requires it.
 - `Keen-Eyed Archers` may introduce only the minimal reach exception that it can block creatures with flying, without introducing broader anti-air combat text, continuous-effect layering, or generalized keyword interaction beyond the currently supported flying cards.
 - `Anaconda` may introduce only the minimal swampwalk restriction that it cannot be blocked while the defending player controls a `Swamp`, without introducing generalized landwalk handling beyond the printed `Swampwalk` keyword or continuous land-type modification.
@@ -65,12 +77,15 @@ Define the smallest believable rules subset for the initial `Portal` support sli
 
 ## Out Of Scope
 
-- Keyword abilities beyond the currently supported `Flying`, `Reach`, `Swampwalk`, and `Defender`
+- Keyword abilities beyond those declared by the active manifest and bounded
+  contracts
 - Triggered abilities not required by the initial cards
 - Replacement effects
-- Continuous effects beyond Howling Fury's name-scoped temporary power modifier
+- Continuous effects beyond the object-bound additive and keyword-granting
+  Wave 2 model
 - Color-changing effects or generalized color-layer recalculation
-- Instants and modal spells
+- Instants beyond the name-scoped `Treetop Defense` response window, and modal
+  spells
 - Multiplayer rules
 - Format-legality enforcement
 - Any card text not present in the declared micro-universe

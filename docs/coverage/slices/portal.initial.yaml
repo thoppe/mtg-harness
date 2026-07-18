@@ -244,6 +244,18 @@ rule_keys:
   - graveyard_type_return_sorceries_minimal
   - tutor_search_shuffle_sorceries_minimal
   - additional_land_plays_minimal
+  - combat_requirements_minimal
+  - creature_or_land_destruction_sorceries_minimal
+  - filtered_mass_destruction_minimal
+  - graveyard_return_sorceries_minimal
+  - mass_creature_damage_sorceries_minimal
+  - mass_damage_players_minimal
+  - mass_status_sorceries_minimal
+  - targeted_player_life_gain_sorceries_minimal
+  - temporary_power_sorceries_minimal
+  - temporary_characteristics_minimal
+  - instant_priority_minimal
+  - combat_restrictions_minimal
 source_artifacts:
   - information/cards/data/
   - information/cards/images/

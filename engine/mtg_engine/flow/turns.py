@@ -688,24 +688,33 @@ def _resolve_noncreature_spell(
     elif effect == "target_creature_gains_flying_and_draw_one":
         resolved_state = _add_temporary_effect(resolved_state, source_object_id=card.object_id, target_ids=(action.target_instance_id,), keywords=("Flying",))
         resolved_state = _draw_one_card_for_player_if_available(resolved_state, event_log, player_id=action.player_id)
-    elif effect in {"controlled_creatures_get_0_3_until_end_of_turn", "controlled_creatures_get_1_1_until_end_of_turn", "white_controlled_creatures_get_2_0_until_end_of_turn", "green_controlled_creatures_gain_forestwalk_until_end_of_turn", "black_controlled_creatures_only_blockable_by_black_until_end_of_turn", "controlled_creatures_gain_reach_until_end_of_turn"}:
-        controlled_ids = tuple(
-            instance_id for instance_id in resolved_state.players[action.player_id].battlefield
+    elif effect in {"controlled_creatures_get_0_3_until_end_of_turn", "controlled_creatures_get_1_1_until_end_of_turn", "white_creatures_get_2_0_until_end_of_turn", "green_controlled_creatures_gain_forestwalk_until_end_of_turn", "black_controlled_creatures_only_blockable_by_black_until_end_of_turn", "controlled_creatures_gain_reach_until_end_of_turn"}:
+        candidate_ids = (
+            tuple(
+                instance_id
+                for player in resolved_state.players.values()
+                for instance_id in player.battlefield
+            )
+            if effect == "white_creatures_get_2_0_until_end_of_turn"
+            else resolved_state.players[action.player_id].battlefield
+        )
+        affected_ids = tuple(
+            instance_id for instance_id in candidate_ids
             if card_repository.get(resolved_state.objects[instance_id].oracle_id).is_creature
-            and (effect != "white_controlled_creatures_get_2_0_until_end_of_turn" or card_repository.get(resolved_state.objects[instance_id].oracle_id).has_color("W"))
+            and (effect != "white_creatures_get_2_0_until_end_of_turn" or card_repository.get(resolved_state.objects[instance_id].oracle_id).has_color("W"))
             and (effect != "green_controlled_creatures_gain_forestwalk_until_end_of_turn" or card_repository.get(resolved_state.objects[instance_id].oracle_id).has_color("G"))
             and (effect != "black_controlled_creatures_only_blockable_by_black_until_end_of_turn" or card_repository.get(resolved_state.objects[instance_id].oracle_id).has_color("B"))
         )
         modifiers = {
             "controlled_creatures_get_0_3_until_end_of_turn": (0, 3, (), ()),
             "controlled_creatures_get_1_1_until_end_of_turn": (1, 1, (), ()),
-            "white_controlled_creatures_get_2_0_until_end_of_turn": (2, 0, (), ()),
+            "white_creatures_get_2_0_until_end_of_turn": (2, 0, (), ()),
             "green_controlled_creatures_gain_forestwalk_until_end_of_turn": (0, 0, ("Forestwalk",), ()),
             "black_controlled_creatures_only_blockable_by_black_until_end_of_turn": (0, 0, (), ("B",)),
             "controlled_creatures_gain_reach_until_end_of_turn": (0, 0, ("Reach",), ()),
         }
         power, toughness, keywords, colors = modifiers[effect]
-        resolved_state = _add_temporary_effect(resolved_state, source_object_id=card.object_id, target_ids=controlled_ids, power_delta=power, toughness_delta=toughness, keywords=keywords, only_blockable_by_colors=colors)
+        resolved_state = _add_temporary_effect(resolved_state, source_object_id=card.object_id, target_ids=affected_ids, power_delta=power, toughness_delta=toughness, keywords=keywords, only_blockable_by_colors=colors)
     elif effect == "target_creature_gets_4_power_until_end_of_turn":
         target = resolved_state.objects[action.target_instance_id]
         resolved_state = update_object(resolved_state, replace(target, temporary_power_bonus=target.temporary_power_bonus + 4))
@@ -1373,7 +1382,7 @@ def _require_legal_noncreature_target(
     *,
     effect: str,
 ) -> None:
-    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "additional_three_land_plays", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures", "destroy_all_green_creatures", "destroy_all_white_creatures", "destroy_all_islands", "destroy_all_plains", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures", "damage_all_creatures_2", "damage_all_flying_creatures_4", "damage_all_creatures_and_players_1", "damage_all_creatures_and_players_6", "damage_all_flying_creatures_and_players_x", "controlled_creatures_get_0_3_until_end_of_turn", "controlled_creatures_get_1_1_until_end_of_turn", "white_controlled_creatures_get_2_0_until_end_of_turn", "green_controlled_creatures_gain_forestwalk_until_end_of_turn", "black_controlled_creatures_only_blockable_by_black_until_end_of_turn", "controlled_creatures_gain_reach_until_end_of_turn"}:
+    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "additional_three_land_plays", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures", "destroy_all_green_creatures", "destroy_all_white_creatures", "destroy_all_islands", "destroy_all_plains", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures", "damage_all_creatures_2", "damage_all_flying_creatures_4", "damage_all_creatures_and_players_1", "damage_all_creatures_and_players_6", "damage_all_flying_creatures_and_players_x", "controlled_creatures_get_0_3_until_end_of_turn", "controlled_creatures_get_1_1_until_end_of_turn", "white_creatures_get_2_0_until_end_of_turn", "green_controlled_creatures_gain_forestwalk_until_end_of_turn", "black_controlled_creatures_only_blockable_by_black_until_end_of_turn", "controlled_creatures_gain_reach_until_end_of_turn"}:
         if target_instance_ids:
             raise ValueError("sorcery does not take a target")
         return
