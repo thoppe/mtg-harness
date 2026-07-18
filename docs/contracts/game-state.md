@@ -29,6 +29,8 @@ Define the core state boundaries for simulation.
   carrying a monotonic zone-change counter and derived `object_id`
 - `mana_pools`: at minimum the five basic colors needed for the current active support slice
 - `rng_state`: deterministic seed and any derived RNG cursor state
+- `pending_decision`: an optional, serializable chooser-owned continuation for
+  an unresolved hidden-zone or modal choice
 - `damage_marks`: creature damage marked on objects until cleared by later turn handling
 - `temporary_power_modifiers`: explicit, turn-bounded power and toughness
   changes on objects when a supported card grants them
@@ -40,6 +42,8 @@ Define the core state boundaries for simulation.
 - Zone movement must preserve the persistent card instance while creating a
   fresh object identity by incrementing its zone-change counter.
 - The engine may derive convenience views, but replay cannot depend on untracked derived state.
+- A pending decision is authoritative state: only its chooser and matching
+  decision action may progress the game until it is consumed.
 - The first slice may omit counters, attachments, and status markers not required by the active support slice.
 - Damage marked on creatures must be represented explicitly rather than inferred only from event history.
 - A player at zero or less life, or attempting to draw from an empty library,

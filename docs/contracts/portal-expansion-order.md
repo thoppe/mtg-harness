@@ -8,6 +8,11 @@ Declare the implementation order for every Portal card outside the active suppor
 
 Within a numbered wave, implement cards in the printed order. Finish the wave's rule family and edge cases before entering the next wave.
 
+The final four entries of the next twenty are gated by shared foundations:
+choices/RNG before the tutors, a per-turn land-play allowance before Summer
+Bloom, and combat requirements before Alluring Scent. They must not be
+special-cased in the sorcery resolver.
+
 ## Next Twenty
 
 1. **Burning Cloak** — combines target damage with temporary power.

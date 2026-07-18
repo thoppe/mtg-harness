@@ -26,6 +26,8 @@ Contracts define the interfaces and invariants that future code must satisfy.
 - `characteristics-and-continuous-effects.md`
 - `combat-requirements-and-evasion.md`
 - `costs-and-x-values.md`
+- `deterministic-choices-and-hidden-zones.md`
+- `deterministic-rng-and-shuffle.md`
 - `surface-api.md`
 
 ## Contract Rule
