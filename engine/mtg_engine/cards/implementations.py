@@ -54,6 +54,9 @@ IMPLEMENTATIONS = {
     "9c021685-4017-49c7-9f58-2ae0243361a0": "damage_all_flying_creatures_and_players_x",
     "0c3bf4e1-d91e-4dd3-a800-e40971222c71": "damage_target_creature_per_mountain",
     "5f3ef680-90f4-487f-b44b-db25e29e57ce": "gain_life_per_forest",
+    "54ea46ea-7c83-44a9-85b0-eff9745c6ffa": "gain_life_per_opponent_mountain",
+    "008011e2-7b82-4962-af6e-be627112f37f": "draw_per_tapped_creature_target_opponent_controls",
+    "1980ca2e-a415-4de1-ac30-7055507e82a2": "damage_any_target_4_gain_4",
 }
 
 

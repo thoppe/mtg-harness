@@ -26,6 +26,10 @@ an implementation convenience, not a claim of general rules coverage.
   controls at resolution; `Fruition` counts every Forest on the battlefield.
 - Chosen X: `Hurricane` preserves its cast-time X through the stack and
   applies that amount to every player and each flying creature.
+- Target-derived values: `Renewing Dawn` counts Mountains controlled by its
+  target opponent; `Theft of Dreams` draws once per tapped creature that
+  opponent controls. `Vampiric Feast` reuses legal any-target damage plus
+  caster life gain.
 
 ## Required Boundaries
 

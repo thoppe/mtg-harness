@@ -9,7 +9,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
-from mtg_engine.flow.turns import _battlefield_land_subtype_count, _cleanup_end_of_turn_state, _controlled_land_subtype_count, _damage_creatures_once, _require_legal_noncreature_target, _resolve_direct_damage_sorcery
+from mtg_engine.flow.turns import TurnResult, _battlefield_land_subtype_count, _cleanup_end_of_turn_state, _controlled_land_subtype_count, _damage_creatures_once, _require_legal_noncreature_target, _resolve_direct_damage_sorcery, _resolve_noncreature_spell
+from mtg_engine.state.models import StackEntry
 from mtg_engine.state.zones import move_object
 from mtg_engine.actions.models import CastNonCreatureSpellAction
 
@@ -21,6 +22,9 @@ MOUNTAIN = "a3fb7228-e76b-4e96-a40e-20b5fed75685"
 RAIN = "72cecab3-519e-4a23-9623-b423a5c5a251"
 LAVA_FLOW = "91c0a76e-3992-437f-b85a-97b0b4adbb84"
 MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
+RENEWING_DAWN = "54ea46ea-7c83-44a9-85b0-eff9745c6ffa"
+THEFT_OF_DREAMS = "008011e2-7b82-4962-af6e-be627112f37f"
+VAMPIRIC_FEAST = "1980ca2e-a415-4de1-ac30-7055507e82a2"
 
 
 class PortalExpansionWaveTests(unittest.TestCase):
@@ -105,3 +109,30 @@ class PortalExpansionWaveTests(unittest.TestCase):
             state = move_object(state, instance_id=instance_id, from_zone="hand", to_zone="battlefield", player_id=owner_id)
         self.assertEqual(_battlefield_land_subtype_count(state, self.repo, "Forest"), 3)
         _require_legal_noncreature_target(state, self.repo, (), effect="gain_life_per_forest")
+
+    def test_renewing_dawn_counts_only_target_opponents_mountains(self) -> None:
+        state = initialize_game(
+            SetupInput("dawn", ("alice", "bob"), "alice", {"alice": (RENEWING_DAWN, MOUNTAIN), "bob": (MOUNTAIN, MOUNTAIN)}, {"alice": (RENEWING_DAWN, MOUNTAIN), "bob": (MOUNTAIN, MOUNTAIN)}, 5), self.repo
+        ).state
+        for instance_id in ("alice:2", "bob:1", "bob:2"):
+            state = move_object(state, instance_id=instance_id, from_zone="hand", to_zone="battlefield", player_id=instance_id.split(":")[0])
+        state = move_object(state, instance_id="alice:1", from_zone="hand", to_zone="stack", player_id="alice")
+        result = _resolve_noncreature_spell(TurnResult(state, ()), StackEntry("alice:1", "alice", ("bob",)), self.repo)
+        self.assertEqual(result.state.players["alice"].life_total, 24)
+        self.assertEqual(result.state.objects["alice:1"].zone, "graveyard")
+
+    def test_theft_of_dreams_draws_once_per_tapped_creature_and_feast_hits_any_target(self) -> None:
+        state = initialize_game(
+            SetupInput("theft", ("alice", "bob"), "alice", {"alice": (THEFT_OF_DREAMS, PLAINS), "bob": (MUCK_RATS, MUCK_RATS, PLAINS)}, {"alice": (THEFT_OF_DREAMS,), "bob": (MUCK_RATS, MUCK_RATS, PLAINS)}, 6), self.repo
+        ).state
+        state = move_object(state, instance_id="bob:1", from_zone="library", to_zone="battlefield", player_id="bob")
+        state = move_object(state, instance_id="bob:2", from_zone="library", to_zone="battlefield", player_id="bob")
+        state = replace(state, objects={**state.objects, "bob:1": replace(state.objects["bob:1"], tapped=True), "bob:2": replace(state.objects["bob:2"], tapped=True)})
+        state = move_object(state, instance_id="alice:1", from_zone="hand", to_zone="stack", player_id="alice")
+        result = _resolve_noncreature_spell(TurnResult(state, ()), StackEntry("alice:1", "alice", ("bob",)), self.repo)
+        self.assertEqual(len(result.state.players["alice"].hand), 1)
+        feast_state = initialize_game(SetupInput("feast", ("alice", "bob"), "alice", {"alice": (VAMPIRIC_FEAST,), "bob": (PLAINS,)}, {"alice": (VAMPIRIC_FEAST,), "bob": (PLAINS,)}, 7), self.repo).state
+        feast_state = move_object(feast_state, instance_id="alice:1", from_zone="hand", to_zone="stack", player_id="alice")
+        feast_result = _resolve_noncreature_spell(TurnResult(feast_state, ()), StackEntry("alice:1", "alice", ("bob",)), self.repo)
+        self.assertEqual(feast_result.state.players["alice"].life_total, 24)
+        self.assertEqual(feast_result.state.players["bob"].life_total, 16)

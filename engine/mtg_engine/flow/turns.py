@@ -566,6 +566,49 @@ def _resolve_noncreature_spell(
         total = player.life_total + forest_count
         resolved_state = update_player(resolved_state, replace(player, life_total=total))
         event_log.append(event_type="life_total_changed", active_player=action.player_id, payload={"player_id": action.player_id, "life_total": total})
+    elif effect == "gain_life_per_opponent_mountain":
+        target_player_id = action.target_instance_id
+        mountain_count = _controlled_land_subtype_count(
+            resolved_state,
+            card_repository,
+            target_player_id,
+            "Mountain",
+        )
+        player = resolved_state.players[action.player_id]
+        total = player.life_total + (mountain_count * 2)
+        resolved_state = update_player(resolved_state, replace(player, life_total=total))
+        event_log.append(event_type="life_total_changed", active_player=action.player_id, payload={"player_id": action.player_id, "life_total": total})
+    elif effect == "draw_per_tapped_creature_target_opponent_controls":
+        target_player_id = action.target_instance_id
+        draw_count = sum(
+            1
+            for instance_id in resolved_state.players[target_player_id].battlefield
+            if (
+                (definition := card_repository.get(resolved_state.objects[instance_id].oracle_id)).is_creature
+                and resolved_state.objects[instance_id].tapped
+            )
+        )
+        for _ in range(draw_count):
+            resolved_state = _draw_one_card_for_player_if_available(
+                resolved_state,
+                event_log,
+                player_id=action.player_id,
+            )
+    elif effect == "damage_any_target_4_gain_4":
+        resolved_state, events = _resolve_direct_damage_sorcery(
+            casting_state,
+            card_repository,
+            action.target_instance_id,
+            effect="damage_any_target_variable",
+            active_player=action.player_id,
+            damage_override=4,
+        )
+        for event in events:
+            event_log.append(event_type=event["event_type"], active_player=event["active_player"], payload=event["payload"])
+        player = resolved_state.players[action.player_id]
+        total = player.life_total + 4
+        resolved_state = update_player(resolved_state, replace(player, life_total=total))
+        event_log.append(event_type="life_total_changed", active_player=action.player_id, payload={"player_id": action.player_id, "life_total": total})
     elif effect == "target_creature_gets_4_power_until_end_of_turn":
         target = resolved_state.objects[action.target_instance_id]
         resolved_state = update_object(resolved_state, replace(target, temporary_power_bonus=target.temporary_power_bonus + 4))
@@ -1238,9 +1281,11 @@ def _require_legal_noncreature_target(
         if target_instance_id not in state.players:
             raise ValueError("target must be a player")
         return
-    if effect == "target_player_gains_8_life":
+    if effect in {"target_player_gains_8_life", "gain_life_per_opponent_mountain", "draw_per_tapped_creature_target_opponent_controls"}:
         if target_instance_id not in state.players:
             raise ValueError("target must be a player")
+        if effect != "target_player_gains_8_life" and target_instance_id == state.turn.active_player:
+            raise ValueError("target must be an opponent")
         return
     if effect == "target_player_discards_two":
         if target_instance_id not in state.players:
@@ -1304,7 +1349,7 @@ def _require_legal_noncreature_target(
         if not target_definition.is_creature:
             raise ValueError("target must be a creature")
         return
-    if effect in {"damage_any_target", "damage_any_target_1", "damage_any_target_2"}:
+    if effect in {"damage_any_target", "damage_any_target_1", "damage_any_target_2", "damage_any_target_4_gain_4"}:
         if target_instance_id in state.players:
             return
         if target_instance_id not in state.objects:
