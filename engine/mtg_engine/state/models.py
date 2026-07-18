@@ -33,6 +33,7 @@ class PlayerState:
     graveyard: tuple[str, ...]
     mana_pool: tuple[str, ...]
     lands_played_this_turn: int = 0
+    land_play_limit_this_turn: int = 1
 
 
 @dataclass(frozen=True)

@@ -57,7 +57,7 @@ def _enumerate_active_precombat_main_actions(
     player = state.players[state.turn.active_player]
     actions: list[object] = []
 
-    if player.lands_played_this_turn == 0:
+    if player.lands_played_this_turn < player.land_play_limit_this_turn:
         for instance_id in player.hand:
             card = state.objects[instance_id]
             card_definition = card_repository.get(card.oracle_id)
@@ -268,7 +268,7 @@ def _legal_noncreature_spell_targets(
     spell = state.objects[spell_instance_id]
     card_definition = card_repository.get(spell.oracle_id)
     effect = _supported_targeted_sorcery_effect(card_definition)
-    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures"}:
+    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "additional_three_land_plays", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures"}:
         return ((),)
     if effect is None:
         return ()

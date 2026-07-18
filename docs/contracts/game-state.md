@@ -34,6 +34,8 @@ Define the core state boundaries for simulation.
 - `damage_marks`: creature damage marked on objects until cleared by later turn handling
 - `temporary_power_modifiers`: explicit, turn-bounded power and toughness
   changes on objects when a supported card grants them
+- `land_play_limit_this_turn`: each player begins at one permitted land play;
+  temporary effects may raise it and cleanup resets it to one
 - `outcome`: in-progress or completed game status, winner/loser IDs, and terminal reason
 
 ## v0 State Rules

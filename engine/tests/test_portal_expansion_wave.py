@@ -9,10 +9,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
-from mtg_engine.flow.turns import TurnResult, _battlefield_land_subtype_count, _cleanup_end_of_turn_state, _controlled_land_subtype_count, _damage_creatures_once, _require_legal_noncreature_target, _resolve_direct_damage_sorcery, _resolve_noncreature_spell, resolve_pending_choice
+from mtg_engine.flow.turns import TurnResult, _battlefield_land_subtype_count, _cleanup_end_of_turn_state, _controlled_land_subtype_count, _damage_creatures_once, _require_legal_noncreature_target, _resolve_direct_damage_sorcery, _resolve_noncreature_spell, play_land, resolve_pending_choice
 from mtg_engine.state.models import StackEntry
 from mtg_engine.state.zones import move_object
-from mtg_engine.actions.models import CastNonCreatureSpellAction, ResolveChoiceAction
+from mtg_engine.actions.models import CastNonCreatureSpellAction, PlayLandAction, ResolveChoiceAction
 
 
 INFO = Path(__file__).resolve().parents[2] / "information"
@@ -29,6 +29,7 @@ BREATH_OF_LIFE = "30d9e200-b944-43ff-89b8-a550a788ae03"
 DEJA_VU = "7408b9c5-7266-4627-be4e-b691cf5c622c"
 PERSONAL_TUTOR = "90f54959-2c9b-4b8a-84c9-d6893eb43553"
 SYLVAN_TUTOR = "935e0cac-51ee-4cb7-a209-f085e0f099ed"
+SUMMER_BLOOM = "e5df4597-1647-4ac2-bdb3-a517598d1431"
 
 
 class PortalExpansionWaveTests(unittest.TestCase):
@@ -120,6 +121,7 @@ class PortalExpansionWaveTests(unittest.TestCase):
         ).state
         for instance_id in ("alice:2", "bob:1", "bob:2"):
             state = move_object(state, instance_id=instance_id, from_zone="hand", to_zone="battlefield", player_id=instance_id.split(":")[0])
+        state = replace(state, turn=replace(state.turn, step="precombat_main_step"))
         state = move_object(state, instance_id="alice:1", from_zone="hand", to_zone="stack", player_id="alice")
         result = _resolve_noncreature_spell(TurnResult(state, ()), StackEntry("alice:1", "alice", ("bob",)), self.repo)
         self.assertEqual(result.state.players["alice"].life_total, 24)
@@ -175,3 +177,17 @@ class PortalExpansionWaveTests(unittest.TestCase):
         self.assertEqual(sylvan_decision.option_ids, ("alice:4",))
         sylvan = resolve_pending_choice(sylvan_pending, ResolveChoiceAction("alice", sylvan_decision.decision_id, "alice:4"), self.repo)
         self.assertEqual(sylvan.state.players["alice"].library[0], "alice:4")
+
+    def test_summer_bloom_allows_exactly_three_additional_land_plays_then_resets(self) -> None:
+        state = initialize_game(SetupInput("bloom", ("alice", "bob"), "alice", {"alice": (SUMMER_BLOOM, PLAINS, PLAINS, PLAINS, PLAINS), "bob": (PLAINS,)}, {"alice": (SUMMER_BLOOM, PLAINS, PLAINS, PLAINS, PLAINS), "bob": (PLAINS,)}, 10), self.repo).state
+        state = replace(state, turn=replace(state.turn, step="precombat_main_step"))
+        state = move_object(state, instance_id="alice:1", from_zone="hand", to_zone="stack", player_id="alice")
+        resolved = _resolve_noncreature_spell(TurnResult(state, ()), StackEntry("alice:1", "alice"), self.repo)
+        self.assertEqual(resolved.state.players["alice"].land_play_limit_this_turn, 4)
+        session = resolved
+        for instance_id in ("alice:2", "alice:3", "alice:4", "alice:5"):
+            session = play_land(session, PlayLandAction("alice", instance_id), self.repo)
+        self.assertEqual(session.state.players["alice"].lands_played_this_turn, 4)
+        with self.assertRaisesRegex(ValueError, "already played"):
+            play_land(session, PlayLandAction("alice", "alice:5"), self.repo)
+        self.assertEqual(_cleanup_end_of_turn_state(session.state).players["alice"].land_play_limit_this_turn, 1)

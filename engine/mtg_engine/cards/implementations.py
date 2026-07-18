@@ -61,6 +61,7 @@ IMPLEMENTATIONS = {
     "7408b9c5-7266-4627-be4e-b691cf5c622c": "return_target_sorcery_card_from_your_graveyard",
     "90f54959-2c9b-4b8a-84c9-d6893eb43553": "tutor_sorcery_to_top",
     "935e0cac-51ee-4cb7-a209-f085e0f099ed": "tutor_creature_to_top",
+    "e5df4597-1647-4ac2-bdb3-a517598d1431": "additional_three_land_plays",
 }
 
 

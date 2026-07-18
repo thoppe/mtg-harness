@@ -98,6 +98,7 @@ card_entries:
   - {set_code: por, oracle_id: "7408b9c5-7266-4627-be4e-b691cf5c622c"}
   - {set_code: por, oracle_id: "90f54959-2c9b-4b8a-84c9-d6893eb43553"}
   - {set_code: por, oracle_id: "935e0cac-51ee-4cb7-a209-f085e0f099ed"}
+  - {set_code: por, oracle_id: "e5df4597-1647-4ac2-bdb3-a517598d1431"}
 card_keys:
   - "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
   - "a768ba13-4d1c-4dce-a4a6-86a39c069c3f"
@@ -163,6 +164,7 @@ card_keys:
   - "7408b9c5-7266-4627-be4e-b691cf5c622c"
   - "90f54959-2c9b-4b8a-84c9-d6893eb43553"
   - "935e0cac-51ee-4cb7-a209-f085e0f099ed"
+  - "e5df4597-1647-4ac2-bdb3-a517598d1431"
 rule_keys:
   - game_setup_minimal
   - turn_structure_minimal
@@ -198,6 +200,7 @@ rule_keys:
   - combined_damage_life_sorceries_minimal
   - graveyard_type_return_sorceries_minimal
   - tutor_search_shuffle_sorceries_minimal
+  - additional_land_plays_minimal
 source_artifacts:
   - information/cards/data/
   - information/cards/images/

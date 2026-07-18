@@ -99,7 +99,7 @@ def play_land(
     require_step(state, "precombat_main_step")
 
     player = state.players[action.player_id]
-    if player.lands_played_this_turn >= 1:
+    if player.lands_played_this_turn >= player.land_play_limit_this_turn:
         raise ValueError("player has already played a land this turn")
     if action.card_instance_id not in player.hand:
         raise ValueError("land must be in the active player's hand")
@@ -656,6 +656,13 @@ def _resolve_noncreature_spell(
             active_player=action.player_id,
             payload={"decision_id": f"{card.object_id}:tutor", "chooser_id": action.player_id, "kind": "tutor_to_top_after_shuffle", "option_count": len(options)},
         )
+    elif effect == "additional_three_land_plays":
+        player = resolved_state.players[action.player_id]
+        resolved_state = update_player(
+            resolved_state,
+            replace(player, land_play_limit_this_turn=player.land_play_limit_this_turn + 3),
+        )
+        event_log.append(event_type="land_play_allowance_changed", active_player=action.player_id, payload={"player_id": action.player_id, "land_play_limit_this_turn": player.land_play_limit_this_turn + 3})
     elif effect == "target_creature_gets_4_power_until_end_of_turn":
         target = resolved_state.objects[action.target_instance_id]
         resolved_state = update_object(resolved_state, replace(target, temporary_power_bonus=target.temporary_power_bonus + 4))
@@ -1321,7 +1328,7 @@ def _require_legal_noncreature_target(
     *,
     effect: str,
 ) -> None:
-    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures", "destroy_all_green_creatures", "destroy_all_white_creatures", "destroy_all_islands", "destroy_all_plains", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures", "damage_all_creatures_2", "damage_all_flying_creatures_4", "damage_all_creatures_and_players_1", "damage_all_creatures_and_players_6", "damage_all_flying_creatures_and_players_x"}:
+    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "additional_three_land_plays", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures", "destroy_all_green_creatures", "destroy_all_white_creatures", "destroy_all_islands", "destroy_all_plains", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures", "damage_all_creatures_2", "damage_all_flying_creatures_4", "damage_all_creatures_and_players_1", "damage_all_creatures_and_players_6", "damage_all_flying_creatures_and_players_x"}:
         if target_instance_ids:
             raise ValueError("sorcery does not take a target")
         return
@@ -1684,7 +1691,7 @@ def _other_player(state: GameState, player_id: str) -> str:
 
 def _cleanup_end_of_turn_state(state: GameState) -> GameState:
     updated_players = {
-        player_id: replace(player, mana_pool=(), lands_played_this_turn=0)
+        player_id: replace(player, mana_pool=(), lands_played_this_turn=0, land_play_limit_this_turn=1)
         for player_id, player in state.players.items()
     }
     updated_objects = {
