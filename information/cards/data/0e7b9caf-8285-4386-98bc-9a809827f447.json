@@ -1,0 +1,140 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "0e7b9caf-8285-4386-98bc-9a809827f447",
+  "name": "Exhaustion",
+  "provenance": {
+    "collector_number": "54",
+    "fetched_at": "2026-07-18T02:44:43Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/9/d/9d6a5c33-cf74-4cec-a4f4-1aac9e7b8f79.jpg?1783946840",
+    "oracle_id": "0e7b9caf-8285-4386-98bc-9a809827f447",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor&unique=cards",
+    "requested_set_code": "por",
+    "scryfall_id": "9d6a5c33-cf74-4cec-a4f4-1aac9e7b8f79",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/9d6a5c33-cf74-4cec-a4f4-1aac9e7b8f79"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "DiTerlizzi",
+    "artist_ids": [
+      "ed44dce4-30cf-4c2c-b2e1-a19ba2295690"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10040,
+    "cmc": 3.0,
+    "collector_number": "54",
+    "color_identity": [
+      "U"
+    ],
+    "colors": [
+      "U"
+    ],
+    "digital": false,
+    "edhrec_rank": 17230,
+    "finishes": [
+      "nonfoil"
+    ],
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "9d6a5c33-cf74-4cec-a4f4-1aac9e7b8f79",
+    "illustration_id": "7ff1ad3e-1f78-4dd9-9446-1d2c50417fc2",
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T12:47:20Z",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/9/d/9d6a5c33-cf74-4cec-a4f4-1aac9e7b8f79.jpg?1783946840",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/9/d/9d6a5c33-cf74-4cec-a4f4-1aac9e7b8f79.jpg?1783946840",
+      "large": "https://cards.scryfall.io/large/front/9/d/9d6a5c33-cf74-4cec-a4f4-1aac9e7b8f79.jpg?1783946840",
+      "normal": "https://cards.scryfall.io/normal/front/9/d/9d6a5c33-cf74-4cec-a4f4-1aac9e7b8f79.jpg?1783946840",
+      "png": "https://cards.scryfall.io/png/front/9/d/9d6a5c33-cf74-4cec-a4f4-1aac9e7b8f79.png?1783946840",
+      "small": "https://cards.scryfall.io/small/front/9/d/9d6a5c33-cf74-4cec-a4f4-1aac9e7b8f79.jpg?1783946840"
+    },
+    "keywords": [],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "competitivebrawl": "not_legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "not_legal",
+      "paupercommander": "not_legal",
+      "penny": "not_legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "tlr": "legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{2}{U}",
+    "multiverse_ids": [
+      4261
+    ],
+    "name": "Exhaustion",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "0e7b9caf-8285-4386-98bc-9a809827f447",
+    "oracle_text": "Creatures and lands target opponent controls don't untap during their next untap step.",
+    "oversized": false,
+    "penny_rank": 1711,
+    "prices": {
+      "eur": "1.32",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "2.18",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A0e7b9caf-8285-4386-98bc-9a809827f447&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Exhaustion&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10040&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F665%3Fpage%3D1"
+    },
+    "rarity": "rare",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Exhaustion",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4261&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DExhaustion",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DExhaustion"
+    },
+    "released_at": "1997-05-01",
+    "reprint": false,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/9d6a5c33-cf74-4cec-a4f4-1aac9e7b8f79/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/54/exhaustion?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 665,
+    "textless": false,
+    "type_line": "Sorcery",
+    "uri": "https://api.scryfall.com/cards/9d6a5c33-cf74-4cec-a4f4-1aac9e7b8f79",
+    "variation": false
+  }
+}

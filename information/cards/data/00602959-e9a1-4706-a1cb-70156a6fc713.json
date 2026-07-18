@@ -1,0 +1,141 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "00602959-e9a1-4706-a1cb-70156a6fc713",
+  "name": "Stern Marshal",
+  "provenance": {
+    "collector_number": "32",
+    "fetched_at": "2026-07-18T02:44:43Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/1/8/18fbfbc0-c55b-4e56-a3d2-5d09571c36c8.jpg?1783946846",
+    "oracle_id": "00602959-e9a1-4706-a1cb-70156a6fc713",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor&unique=cards",
+    "requested_set_code": "por",
+    "scryfall_id": "18fbfbc0-c55b-4e56-a3d2-5d09571c36c8",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/18fbfbc0-c55b-4e56-a3d2-5d09571c36c8"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "D. Alexander Gregory",
+    "artist_ids": [
+      "38433e15-f0f5-4223-a985-2d13c4aa0922"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10179,
+    "cmc": 3.0,
+    "collector_number": "32",
+    "color_identity": [
+      "W"
+    ],
+    "colors": [
+      "W"
+    ],
+    "digital": false,
+    "edhrec_rank": 31512,
+    "finishes": [
+      "nonfoil"
+    ],
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "18fbfbc0-c55b-4e56-a3d2-5d09571c36c8",
+    "illustration_id": "dc25f11a-3327-499d-baa0-2adf2af3137b",
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T12:47:26Z",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/1/8/18fbfbc0-c55b-4e56-a3d2-5d09571c36c8.jpg?1783946846",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/1/8/18fbfbc0-c55b-4e56-a3d2-5d09571c36c8.jpg?1783946846",
+      "large": "https://cards.scryfall.io/large/front/1/8/18fbfbc0-c55b-4e56-a3d2-5d09571c36c8.jpg?1783946846",
+      "normal": "https://cards.scryfall.io/normal/front/1/8/18fbfbc0-c55b-4e56-a3d2-5d09571c36c8.jpg?1783946846",
+      "png": "https://cards.scryfall.io/png/front/1/8/18fbfbc0-c55b-4e56-a3d2-5d09571c36c8.png?1783946846",
+      "small": "https://cards.scryfall.io/small/front/1/8/18fbfbc0-c55b-4e56-a3d2-5d09571c36c8.jpg?1783946846"
+    },
+    "keywords": [],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "competitivebrawl": "not_legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "not_legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "not_legal",
+      "paupercommander": "not_legal",
+      "penny": "not_legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "not_legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "tlr": "legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{2}{W}",
+    "multiverse_ids": [
+      4400
+    ],
+    "name": "Stern Marshal",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "00602959-e9a1-4706-a1cb-70156a6fc713",
+    "oracle_text": "{T}: Target creature gets +2/+2 until end of turn. Activate only during your turn, before attackers are declared.",
+    "oversized": false,
+    "power": "2",
+    "prices": {
+      "eur": "1.62",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "0.72",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A00602959-e9a1-4706-a1cb-70156a6fc713&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Stern+Marshal&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10179&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F784%3Fpage%3D1"
+    },
+    "rarity": "rare",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Stern+Marshal",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4400&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DStern%2BMarshal",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DStern%2BMarshal"
+    },
+    "released_at": "1997-05-01",
+    "reprint": false,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/18fbfbc0-c55b-4e56-a3d2-5d09571c36c8/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/32/stern-marshal?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 784,
+    "textless": false,
+    "toughness": "2",
+    "type_line": "Creature \u2014 Human Soldier",
+    "uri": "https://api.scryfall.com/cards/18fbfbc0-c55b-4e56-a3d2-5d09571c36c8",
+    "variation": false
+  }
+}

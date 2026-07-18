@@ -1,0 +1,143 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "bd73ab86-0ac9-4ce0-be41-f4ad257e74f6",
+  "name": "Dread Reaper",
+  "provenance": {
+    "collector_number": "89",
+    "fetched_at": "2026-07-18T02:44:43Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/e/b/eb25d674-11f3-42d2-ba2f-e9a5d55a7852.jpg?1783946829",
+    "oracle_id": "bd73ab86-0ac9-4ce0-be41-f4ad257e74f6",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor&unique=cards",
+    "requested_set_code": "por",
+    "scryfall_id": "eb25d674-11f3-42d2-ba2f-e9a5d55a7852",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/eb25d674-11f3-42d2-ba2f-e9a5d55a7852"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Christopher Rush",
+    "artist_ids": [
+      "c96773f0-346c-4f7d-9271-2d98cc5d86e1"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 9996,
+    "cmc": 6.0,
+    "collector_number": "89",
+    "color_identity": [
+      "B"
+    ],
+    "colors": [
+      "B"
+    ],
+    "digital": false,
+    "edhrec_rank": 30782,
+    "finishes": [
+      "nonfoil"
+    ],
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "eb25d674-11f3-42d2-ba2f-e9a5d55a7852",
+    "illustration_id": "30907f77-39a8-4f3d-bfcb-0c35b59d3248",
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T12:47:09Z",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/e/b/eb25d674-11f3-42d2-ba2f-e9a5d55a7852.jpg?1783946829",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/e/b/eb25d674-11f3-42d2-ba2f-e9a5d55a7852.jpg?1783946829",
+      "large": "https://cards.scryfall.io/large/front/e/b/eb25d674-11f3-42d2-ba2f-e9a5d55a7852.jpg?1783946829",
+      "normal": "https://cards.scryfall.io/normal/front/e/b/eb25d674-11f3-42d2-ba2f-e9a5d55a7852.jpg?1783946829",
+      "png": "https://cards.scryfall.io/png/front/e/b/eb25d674-11f3-42d2-ba2f-e9a5d55a7852.png?1783946829",
+      "small": "https://cards.scryfall.io/small/front/e/b/eb25d674-11f3-42d2-ba2f-e9a5d55a7852.jpg?1783946829"
+    },
+    "keywords": [
+      "Flying"
+    ],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "competitivebrawl": "not_legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "not_legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "not_legal",
+      "paupercommander": "not_legal",
+      "penny": "legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "not_legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "tlr": "not_legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{3}{B}{B}{B}",
+    "multiverse_ids": [
+      4217
+    ],
+    "name": "Dread Reaper",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "bd73ab86-0ac9-4ce0-be41-f4ad257e74f6",
+    "oracle_text": "Flying\nWhen this creature enters, you lose 5 life.",
+    "oversized": false,
+    "power": "6",
+    "prices": {
+      "eur": "0.80",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "0.74",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3Abd73ab86-0ac9-4ce0-be41-f4ad257e74f6&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Dread+Reaper&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=9996&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F656%3Fpage%3D1"
+    },
+    "rarity": "rare",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Dread+Reaper",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4217&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DDread%2BReaper",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DDread%2BReaper"
+    },
+    "released_at": "1997-05-01",
+    "reprint": false,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/eb25d674-11f3-42d2-ba2f-e9a5d55a7852/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/89/dread-reaper?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 656,
+    "textless": false,
+    "toughness": "5",
+    "type_line": "Creature \u2014 Horror",
+    "uri": "https://api.scryfall.com/cards/eb25d674-11f3-42d2-ba2f-e9a5d55a7852",
+    "variation": false
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "fd57dfa5-f29d-4b79-8748-c34a73efb7f0",
+  "name": "Command of Unsummoning",
+  "provenance": {
+    "collector_number": "48",
+    "fetched_at": "2026-07-18T02:44:43Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/e/6/e61b97fc-fa42-40a6-918e-e06383bfcae3.jpg?1783946841",
+    "oracle_id": "fd57dfa5-f29d-4b79-8748-c34a73efb7f0",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor&unique=cards",
+    "requested_set_code": "por",
+    "scryfall_id": "e61b97fc-fa42-40a6-918e-e06383bfcae3",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/e61b97fc-fa42-40a6-918e-e06383bfcae3"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Phil Foglio",
+    "artist_ids": [
+      "3bfc0fd7-f6ce-4c3f-a755-aaafc84ac704"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10034,
+    "cmc": 3.0,
+    "collector_number": "48",
+    "color_identity": [
+      "U"
+    ],
+    "colors": [
+      "U"
+    ],
+    "digital": false,
+    "edhrec_rank": 28239,
+    "finishes": [
+      "nonfoil"
+    ],
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "e61b97fc-fa42-40a6-918e-e06383bfcae3",
+    "illustration_id": "c53b0b9d-eca3-49e3-896f-c4b57067fa33",
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T12:47:21Z",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/e/6/e61b97fc-fa42-40a6-918e-e06383bfcae3.jpg?1783946841",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/e/6/e61b97fc-fa42-40a6-918e-e06383bfcae3.jpg?1783946841",
+      "large": "https://cards.scryfall.io/large/front/e/6/e61b97fc-fa42-40a6-918e-e06383bfcae3.jpg?1783946841",
+      "normal": "https://cards.scryfall.io/normal/front/e/6/e61b97fc-fa42-40a6-918e-e06383bfcae3.jpg?1783946841",
+      "png": "https://cards.scryfall.io/png/front/e/6/e61b97fc-fa42-40a6-918e-e06383bfcae3.png?1783946841",
+      "small": "https://cards.scryfall.io/small/front/e/6/e61b97fc-fa42-40a6-918e-e06383bfcae3.jpg?1783946841"
+    },
+    "keywords": [],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "competitivebrawl": "not_legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "not_legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "not_legal",
+      "paupercommander": "not_legal",
+      "penny": "not_legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "not_legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "tlr": "legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{2}{U}",
+    "multiverse_ids": [
+      4255
+    ],
+    "name": "Command of Unsummoning",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "fd57dfa5-f29d-4b79-8748-c34a73efb7f0",
+    "oracle_text": "Cast this spell only during the declare attackers step and only if you've been attacked this step.\nReturn one or two target attacking creatures to their owner's hand.",
+    "oversized": false,
+    "prices": {
+      "eur": "0.19",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "0.16",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3Afd57dfa5-f29d-4b79-8748-c34a73efb7f0&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Command+of+Unsummoning&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10034&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F640%3Fpage%3D1"
+    },
+    "rarity": "uncommon",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Command+of+Unsummoning",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4255&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DCommand%2Bof%2BUnsummoning",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DCommand%2Bof%2BUnsummoning"
+    },
+    "released_at": "1997-05-01",
+    "reprint": false,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/e61b97fc-fa42-40a6-918e-e06383bfcae3/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/48/command-of-unsummoning?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 640,
+    "textless": false,
+    "type_line": "Instant",
+    "uri": "https://api.scryfall.com/cards/e61b97fc-fa42-40a6-918e-e06383bfcae3",
+    "variation": false
+  }
+}

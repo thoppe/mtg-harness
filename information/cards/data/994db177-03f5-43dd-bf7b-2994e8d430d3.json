@@ -1,0 +1,145 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "994db177-03f5-43dd-bf7b-2994e8d430d3",
+  "name": "Volcanic Dragon",
+  "provenance": {
+    "collector_number": "153",
+    "fetched_at": "2026-07-18T02:44:43Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/d/9/d99c5c70-7568-42d3-939c-b6ee1ed94b9f.jpg?1783946811",
+    "oracle_id": "994db177-03f5-43dd-bf7b-2994e8d430d3",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor&unique=cards",
+    "requested_set_code": "por",
+    "scryfall_id": "d99c5c70-7568-42d3-939c-b6ee1ed94b9f",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/d99c5c70-7568-42d3-939c-b6ee1ed94b9f"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Tom W\u00e4nerstrand",
+    "artist_ids": [
+      "c4e0aa7c-a008-4d71-80ce-d5a1ca0b251b"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10144,
+    "cmc": 6.0,
+    "collector_number": "153",
+    "color_identity": [
+      "R"
+    ],
+    "colors": [
+      "R"
+    ],
+    "digital": false,
+    "edhrec_rank": 18666,
+    "finishes": [
+      "nonfoil"
+    ],
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "d99c5c70-7568-42d3-939c-b6ee1ed94b9f",
+    "illustration_id": "76186b0a-ba82-444f-bcda-a4ab99aeedcb",
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T12:46:51Z",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/d/9/d99c5c70-7568-42d3-939c-b6ee1ed94b9f.jpg?1783946811",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/d/9/d99c5c70-7568-42d3-939c-b6ee1ed94b9f.jpg?1783946811",
+      "large": "https://cards.scryfall.io/large/front/d/9/d99c5c70-7568-42d3-939c-b6ee1ed94b9f.jpg?1783946811",
+      "normal": "https://cards.scryfall.io/normal/front/d/9/d99c5c70-7568-42d3-939c-b6ee1ed94b9f.jpg?1783946811",
+      "png": "https://cards.scryfall.io/png/front/d/9/d99c5c70-7568-42d3-939c-b6ee1ed94b9f.png?1783946811",
+      "small": "https://cards.scryfall.io/small/front/d/9/d99c5c70-7568-42d3-939c-b6ee1ed94b9f.jpg?1783946811"
+    },
+    "keywords": [
+      "Flying",
+      "Haste"
+    ],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "legal",
+      "brawl": "legal",
+      "commander": "legal",
+      "competitivebrawl": "legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "legal",
+      "historic": "legal",
+      "legacy": "legal",
+      "modern": "legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "not_legal",
+      "paupercommander": "not_legal",
+      "penny": "legal",
+      "pioneer": "legal",
+      "predh": "legal",
+      "premodern": "legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "legal",
+      "tlr": "not_legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{4}{R}{R}",
+    "multiverse_ids": [
+      4365
+    ],
+    "name": "Volcanic Dragon",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "994db177-03f5-43dd-bf7b-2994e8d430d3",
+    "oracle_text": "Flying, haste",
+    "oversized": false,
+    "penny_rank": 16166,
+    "power": "4",
+    "prices": {
+      "eur": "1.69",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "2.39",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A994db177-03f5-43dd-bf7b-2994e8d430d3&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Volcanic+Dragon&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10144&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F812%3Fpage%3D1"
+    },
+    "rarity": "rare",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Volcanic+Dragon",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4365&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DVolcanic%2BDragon",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DVolcanic%2BDragon"
+    },
+    "released_at": "1997-05-01",
+    "reprint": true,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/d99c5c70-7568-42d3-939c-b6ee1ed94b9f/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/153/volcanic-dragon?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 812,
+    "textless": false,
+    "toughness": "4",
+    "type_line": "Creature \u2014 Dragon",
+    "uri": "https://api.scryfall.com/cards/d99c5c70-7568-42d3-939c-b6ee1ed94b9f",
+    "variation": false
+  }
+}

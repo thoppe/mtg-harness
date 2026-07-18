@@ -1,0 +1,145 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "031cd561-d9b1-4a0e-bc38-bc09e80563c3",
+  "name": "Mountain Goat",
+  "provenance": {
+    "collector_number": "141",
+    "fetched_at": "2026-07-18T02:44:43Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/3/2/325100f1-d424-4db0-bfa9-24877156c0ba.jpg?1783946813",
+    "oracle_id": "031cd561-d9b1-4a0e-bc38-bc09e80563c3",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor&unique=cards",
+    "requested_set_code": "por",
+    "scryfall_id": "325100f1-d424-4db0-bfa9-24877156c0ba",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/325100f1-d424-4db0-bfa9-24877156c0ba"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Una Fricker",
+    "artist_ids": [
+      "0471a371-1bf8-49f2-8e76-cbe3a0bfa7e8"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10131,
+    "cmc": 1.0,
+    "collector_number": "141",
+    "color_identity": [
+      "R"
+    ],
+    "colors": [
+      "R"
+    ],
+    "digital": false,
+    "edhrec_rank": 23076,
+    "finishes": [
+      "nonfoil"
+    ],
+    "flavor_text": "Only the heroic and the mad follow mountain goat trails.",
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "325100f1-d424-4db0-bfa9-24877156c0ba",
+    "illustration_id": "03bfdde2-0afd-4e5c-9c15-390efa04206e",
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T12:46:53Z",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/3/2/325100f1-d424-4db0-bfa9-24877156c0ba.jpg?1783946813",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/3/2/325100f1-d424-4db0-bfa9-24877156c0ba.jpg?1783946813",
+      "large": "https://cards.scryfall.io/large/front/3/2/325100f1-d424-4db0-bfa9-24877156c0ba.jpg?1783946813",
+      "normal": "https://cards.scryfall.io/normal/front/3/2/325100f1-d424-4db0-bfa9-24877156c0ba.jpg?1783946813",
+      "png": "https://cards.scryfall.io/png/front/3/2/325100f1-d424-4db0-bfa9-24877156c0ba.png?1783946813",
+      "small": "https://cards.scryfall.io/small/front/3/2/325100f1-d424-4db0-bfa9-24877156c0ba.jpg?1783946813"
+    },
+    "keywords": [
+      "Landwalk",
+      "Mountainwalk"
+    ],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "competitivebrawl": "not_legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "not_legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "legal",
+      "paupercommander": "legal",
+      "penny": "not_legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "tlr": "legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{R}",
+    "multiverse_ids": [
+      4352
+    ],
+    "name": "Mountain Goat",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "031cd561-d9b1-4a0e-bc38-bc09e80563c3",
+    "oracle_text": "Mountainwalk (This creature can't be blocked as long as defending player controls a Mountain.)",
+    "oversized": false,
+    "power": "1",
+    "prices": {
+      "eur": "0.24",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "0.44",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A031cd561-d9b1-4a0e-bc38-bc09e80563c3&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Mountain+Goat&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10131&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F727%3Fpage%3D1"
+    },
+    "rarity": "uncommon",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Mountain+Goat",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4352&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DMountain%2BGoat",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DMountain%2BGoat"
+    },
+    "released_at": "1997-05-01",
+    "reprint": true,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/325100f1-d424-4db0-bfa9-24877156c0ba/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/141/mountain-goat?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 727,
+    "textless": false,
+    "toughness": "1",
+    "type_line": "Creature \u2014 Goat",
+    "uri": "https://api.scryfall.com/cards/325100f1-d424-4db0-bfa9-24877156c0ba",
+    "variation": false
+  }
+}

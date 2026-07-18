@@ -1,0 +1,140 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "fe4bee2c-f03f-44a4-94a4-55a06bcd0ad8",
+  "name": "Harsh Justice",
+  "provenance": {
+    "collector_number": "18",
+    "fetched_at": "2026-07-18T02:44:43Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/3/6/3657001a-7f79-4d3f-9d35-462ecf684fa8.jpg?1783946849",
+    "oracle_id": "fe4bee2c-f03f-44a4-94a4-55a06bcd0ad8",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor&unique=cards",
+    "requested_set_code": "por",
+    "scryfall_id": "3657001a-7f79-4d3f-9d35-462ecf684fa8",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/3657001a-7f79-4d3f-9d35-462ecf684fa8"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "John Coulthart",
+    "artist_ids": [
+      "55e5567a-7673-418e-8ba2-aee7efd6f94b"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10165,
+    "cmc": 3.0,
+    "collector_number": "18",
+    "color_identity": [
+      "W"
+    ],
+    "colors": [
+      "W"
+    ],
+    "digital": false,
+    "edhrec_rank": 22811,
+    "finishes": [
+      "nonfoil"
+    ],
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "3657001a-7f79-4d3f-9d35-462ecf684fa8",
+    "illustration_id": "1e37e31d-5570-4ed2-9942-86aae30f0ee5",
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T12:47:29Z",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/3/6/3657001a-7f79-4d3f-9d35-462ecf684fa8.jpg?1783946849",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/3/6/3657001a-7f79-4d3f-9d35-462ecf684fa8.jpg?1783946849",
+      "large": "https://cards.scryfall.io/large/front/3/6/3657001a-7f79-4d3f-9d35-462ecf684fa8.jpg?1783946849",
+      "normal": "https://cards.scryfall.io/normal/front/3/6/3657001a-7f79-4d3f-9d35-462ecf684fa8.jpg?1783946849",
+      "png": "https://cards.scryfall.io/png/front/3/6/3657001a-7f79-4d3f-9d35-462ecf684fa8.png?1783946849",
+      "small": "https://cards.scryfall.io/small/front/3/6/3657001a-7f79-4d3f-9d35-462ecf684fa8.jpg?1783946849"
+    },
+    "keywords": [],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "competitivebrawl": "not_legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "not_legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "not_legal",
+      "paupercommander": "not_legal",
+      "penny": "legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "not_legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "tlr": "legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{2}{W}",
+    "multiverse_ids": [
+      4386
+    ],
+    "name": "Harsh Justice",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "fe4bee2c-f03f-44a4-94a4-55a06bcd0ad8",
+    "oracle_text": "Cast this spell only during the declare attackers step and only if you've been attacked this step.\nThis turn, whenever an attacking creature deals combat damage to you, it deals that much damage to its controller.",
+    "oversized": false,
+    "penny_rank": 15544,
+    "prices": {
+      "eur": "5.34",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "17.02",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3Afe4bee2c-f03f-44a4-94a4-55a06bcd0ad8&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Harsh+Justice&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10165&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F692%3Fpage%3D1"
+    },
+    "rarity": "rare",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Harsh+Justice",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4386&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DHarsh%2BJustice",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DHarsh%2BJustice"
+    },
+    "released_at": "1997-05-01",
+    "reprint": false,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/3657001a-7f79-4d3f-9d35-462ecf684fa8/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/18/harsh-justice?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 692,
+    "textless": false,
+    "type_line": "Instant",
+    "uri": "https://api.scryfall.com/cards/3657001a-7f79-4d3f-9d35-462ecf684fa8",
+    "variation": false
+  }
+}

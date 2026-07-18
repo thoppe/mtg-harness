@@ -1,0 +1,142 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "1a2030cc-d7ee-4059-b2d7-fb95ea8e267b",
+  "name": "Gravedigger",
+  "provenance": {
+    "collector_number": "95",
+    "fetched_at": "2026-07-18T02:44:43Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/b/9/b979d70e-d514-420f-886c-f60e2bb1861f.jpg?1783946827",
+    "oracle_id": "1a2030cc-d7ee-4059-b2d7-fb95ea8e267b",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor&unique=cards",
+    "requested_set_code": "por",
+    "scryfall_id": "b979d70e-d514-420f-886c-f60e2bb1861f",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/b979d70e-d514-420f-886c-f60e2bb1861f"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Scott M. Fischer",
+    "artist_ids": [
+      "23b0cf43-3e43-44c6-8329-96446eca5bce"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10002,
+    "cmc": 4.0,
+    "collector_number": "95",
+    "color_identity": [
+      "B"
+    ],
+    "colors": [
+      "B"
+    ],
+    "digital": false,
+    "edhrec_rank": 8820,
+    "finishes": [
+      "nonfoil"
+    ],
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "b979d70e-d514-420f-886c-f60e2bb1861f",
+    "illustration_id": "6723dfc4-3cfa-4643-b45d-8faf336b983c",
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T12:47:07Z",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/b/9/b979d70e-d514-420f-886c-f60e2bb1861f.jpg?1783946827",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/b/9/b979d70e-d514-420f-886c-f60e2bb1861f.jpg?1783946827",
+      "large": "https://cards.scryfall.io/large/front/b/9/b979d70e-d514-420f-886c-f60e2bb1861f.jpg?1783946827",
+      "normal": "https://cards.scryfall.io/normal/front/b/9/b979d70e-d514-420f-886c-f60e2bb1861f.jpg?1783946827",
+      "png": "https://cards.scryfall.io/png/front/b/9/b979d70e-d514-420f-886c-f60e2bb1861f.png?1783946827",
+      "small": "https://cards.scryfall.io/small/front/b/9/b979d70e-d514-420f-886c-f60e2bb1861f.jpg?1783946827"
+    },
+    "keywords": [],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "legal",
+      "commander": "legal",
+      "competitivebrawl": "legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "legal",
+      "historic": "legal",
+      "legacy": "legal",
+      "modern": "legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "legal",
+      "paupercommander": "legal",
+      "penny": "legal",
+      "pioneer": "legal",
+      "predh": "legal",
+      "premodern": "legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "legal",
+      "tlr": "not_legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{3}{B}",
+    "multiverse_ids": [
+      4223
+    ],
+    "name": "Gravedigger",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "1a2030cc-d7ee-4059-b2d7-fb95ea8e267b",
+    "oracle_text": "When this creature enters, you may return target creature card from your graveyard to your hand.",
+    "oversized": false,
+    "penny_rank": 10604,
+    "power": "2",
+    "prices": {
+      "eur": "0.18",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "0.21",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A1a2030cc-d7ee-4059-b2d7-fb95ea8e267b&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Gravedigger&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10002&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F688%3Fpage%3D1"
+    },
+    "rarity": "uncommon",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Gravedigger",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4223&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DGravedigger",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DGravedigger"
+    },
+    "released_at": "1997-05-01",
+    "reprint": false,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/b979d70e-d514-420f-886c-f60e2bb1861f/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/95/gravedigger?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 688,
+    "textless": false,
+    "toughness": "2",
+    "type_line": "Creature \u2014 Zombie",
+    "uri": "https://api.scryfall.com/cards/b979d70e-d514-420f-886c-f60e2bb1861f",
+    "variation": false
+  }
+}

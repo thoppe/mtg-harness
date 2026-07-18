@@ -1,0 +1,141 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "78826359-fe63-44ad-adc4-a17ffcd710e4",
+  "name": "Nature's Lore",
+  "provenance": {
+    "collector_number": "178",
+    "fetched_at": "2026-07-18T02:44:43Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/d/5/d5242227-d033-4e03-b1e6-b334b17bb158.jpg?1783946804",
+    "oracle_id": "78826359-fe63-44ad-adc4-a17ffcd710e4",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor&unique=cards",
+    "requested_set_code": "por",
+    "scryfall_id": "d5242227-d033-4e03-b1e6-b334b17bb158",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/d5242227-d033-4e03-b1e6-b334b17bb158"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Terese Nielsen",
+    "artist_ids": [
+      "eb55171c-2342-45f4-a503-2d5a75baf752"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10089,
+    "cmc": 2.0,
+    "collector_number": "178",
+    "color_identity": [
+      "G"
+    ],
+    "colors": [
+      "G"
+    ],
+    "digital": false,
+    "edhrec_rank": 29,
+    "finishes": [
+      "nonfoil"
+    ],
+    "flavor_text": "Nature's secrets can be read on every tree, every branch, every leaf.",
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "d5242227-d033-4e03-b1e6-b334b17bb158",
+    "illustration_id": "1c72c112-3363-4e49-aeff-0bdcbce942e8",
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T12:46:44Z",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/d/5/d5242227-d033-4e03-b1e6-b334b17bb158.jpg?1783946804",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/d/5/d5242227-d033-4e03-b1e6-b334b17bb158.jpg?1783946804",
+      "large": "https://cards.scryfall.io/large/front/d/5/d5242227-d033-4e03-b1e6-b334b17bb158.jpg?1783946804",
+      "normal": "https://cards.scryfall.io/normal/front/d/5/d5242227-d033-4e03-b1e6-b334b17bb158.jpg?1783946804",
+      "png": "https://cards.scryfall.io/png/front/d/5/d5242227-d033-4e03-b1e6-b334b17bb158.png?1783946804",
+      "small": "https://cards.scryfall.io/small/front/d/5/d5242227-d033-4e03-b1e6-b334b17bb158.jpg?1783946804"
+    },
+    "keywords": [],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "competitivebrawl": "not_legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "not_legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "legal",
+      "paupercommander": "legal",
+      "penny": "not_legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "tlr": "legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{1}{G}",
+    "multiverse_ids": [
+      4310
+    ],
+    "name": "Nature's Lore",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "78826359-fe63-44ad-adc4-a17ffcd710e4",
+    "oracle_text": "Search your library for a Forest card, put that card onto the battlefield, then shuffle.",
+    "oversized": false,
+    "penny_rank": 1635,
+    "prices": {
+      "eur": "3.38",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "7.88",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A78826359-fe63-44ad-adc4-a17ffcd710e4&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Nature%27s+Lore&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10089&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F733%3Fpage%3D1"
+    },
+    "rarity": "common",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Nature%27s+Lore",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4310&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DNature%2527s%2BLore",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DNature%2527s%2BLore"
+    },
+    "released_at": "1997-05-01",
+    "reprint": true,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/d5242227-d033-4e03-b1e6-b334b17bb158/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/178/natures-lore?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 733,
+    "textless": false,
+    "type_line": "Sorcery",
+    "uri": "https://api.scryfall.com/cards/d5242227-d033-4e03-b1e6-b334b17bb158",
+    "variation": false
+  }
+}

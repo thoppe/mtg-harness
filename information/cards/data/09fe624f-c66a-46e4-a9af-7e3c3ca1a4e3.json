@@ -1,0 +1,141 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "09fe624f-c66a-46e4-a9af-7e3c3ca1a4e3",
+  "name": "Capricious Sorcerer",
+  "provenance": {
+    "collector_number": "43",
+    "fetched_at": "2026-07-18T02:44:43Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/b/8/b8d5eec0-0afe-4af9-ba1b-70282df8cd0a.jpg?1783946843",
+    "oracle_id": "09fe624f-c66a-46e4-a9af-7e3c3ca1a4e3",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor&unique=cards",
+    "requested_set_code": "por",
+    "scryfall_id": "b8d5eec0-0afe-4af9-ba1b-70282df8cd0a",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/b8d5eec0-0afe-4af9-ba1b-70282df8cd0a"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Zina Saunders",
+    "artist_ids": [
+      "eff6a2bb-7ca1-432e-8af9-aa85ee2359a2"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10029,
+    "cmc": 3.0,
+    "collector_number": "43",
+    "color_identity": [
+      "U"
+    ],
+    "colors": [
+      "U"
+    ],
+    "digital": false,
+    "edhrec_rank": 26114,
+    "finishes": [
+      "nonfoil"
+    ],
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "b8d5eec0-0afe-4af9-ba1b-70282df8cd0a",
+    "illustration_id": "b0157041-f3dc-479b-8c66-5168cb12add2",
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T12:47:23Z",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/b/8/b8d5eec0-0afe-4af9-ba1b-70282df8cd0a.jpg?1783946843",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/b/8/b8d5eec0-0afe-4af9-ba1b-70282df8cd0a.jpg?1783946843",
+      "large": "https://cards.scryfall.io/large/front/b/8/b8d5eec0-0afe-4af9-ba1b-70282df8cd0a.jpg?1783946843",
+      "normal": "https://cards.scryfall.io/normal/front/b/8/b8d5eec0-0afe-4af9-ba1b-70282df8cd0a.jpg?1783946843",
+      "png": "https://cards.scryfall.io/png/front/b/8/b8d5eec0-0afe-4af9-ba1b-70282df8cd0a.png?1783946843",
+      "small": "https://cards.scryfall.io/small/front/b/8/b8d5eec0-0afe-4af9-ba1b-70282df8cd0a.jpg?1783946843"
+    },
+    "keywords": [],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "competitivebrawl": "not_legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "not_legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "not_legal",
+      "paupercommander": "not_legal",
+      "penny": "not_legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "not_legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "tlr": "legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{2}{U}",
+    "multiverse_ids": [
+      4250
+    ],
+    "name": "Capricious Sorcerer",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "09fe624f-c66a-46e4-a9af-7e3c3ca1a4e3",
+    "oracle_text": "{T}: This creature deals 1 damage to any target. Activate only during your turn, before attackers are declared.",
+    "oversized": false,
+    "power": "1",
+    "prices": {
+      "eur": "1.82",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "2.24",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A09fe624f-c66a-46e4-a9af-7e3c3ca1a4e3&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Capricious+Sorcerer&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10029&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F632%3Fpage%3D1"
+    },
+    "rarity": "rare",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Capricious+Sorcerer",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4250&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DCapricious%2BSorcerer",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DCapricious%2BSorcerer"
+    },
+    "released_at": "1997-05-01",
+    "reprint": false,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/b8d5eec0-0afe-4af9-ba1b-70282df8cd0a/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/43/capricious-sorcerer?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 632,
+    "textless": false,
+    "toughness": "1",
+    "type_line": "Creature \u2014 Human Wizard Sorcerer",
+    "uri": "https://api.scryfall.com/cards/b8d5eec0-0afe-4af9-ba1b-70282df8cd0a",
+    "variation": false
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "cdab50a8-1e02-4ba5-8c09-e2837e7652f7",
+  "name": "Thundering Wurm",
+  "provenance": {
+    "collector_number": "189",
+    "fetched_at": "2026-07-18T02:44:43Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/8/b/8b0ba623-d17f-4f0e-b914-da139a3971df.jpg?1783946801",
+    "oracle_id": "cdab50a8-1e02-4ba5-8c09-e2837e7652f7",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor&unique=cards",
+    "requested_set_code": "por",
+    "scryfall_id": "8b0ba623-d17f-4f0e-b914-da139a3971df",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/8b0ba623-d17f-4f0e-b914-da139a3971df"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Paolo Parente",
+    "artist_ids": [
+      "d48dd097-720d-476a-8722-6a02854ae28b"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10100,
+    "cmc": 3.0,
+    "collector_number": "189",
+    "color_identity": [
+      "G"
+    ],
+    "colors": [
+      "G"
+    ],
+    "digital": false,
+    "edhrec_rank": 30556,
+    "finishes": [
+      "nonfoil"
+    ],
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "8b0ba623-d17f-4f0e-b914-da139a3971df",
+    "illustration_id": "adcdf0c5-5e3e-4ad2-9ed6-6c89b3fc40ac",
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T12:46:41Z",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/8/b/8b0ba623-d17f-4f0e-b914-da139a3971df.jpg?1783946801",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/8/b/8b0ba623-d17f-4f0e-b914-da139a3971df.jpg?1783946801",
+      "large": "https://cards.scryfall.io/large/front/8/b/8b0ba623-d17f-4f0e-b914-da139a3971df.jpg?1783946801",
+      "normal": "https://cards.scryfall.io/normal/front/8/b/8b0ba623-d17f-4f0e-b914-da139a3971df.jpg?1783946801",
+      "png": "https://cards.scryfall.io/png/front/8/b/8b0ba623-d17f-4f0e-b914-da139a3971df.png?1783946801",
+      "small": "https://cards.scryfall.io/small/front/8/b/8b0ba623-d17f-4f0e-b914-da139a3971df.jpg?1783946801"
+    },
+    "keywords": [],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "competitivebrawl": "not_legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "not_legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "not_legal",
+      "paupercommander": "not_legal",
+      "penny": "not_legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "not_legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "tlr": "legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{2}{G}",
+    "multiverse_ids": [
+      4321
+    ],
+    "name": "Thundering Wurm",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "cdab50a8-1e02-4ba5-8c09-e2837e7652f7",
+    "oracle_text": "When this creature enters, sacrifice it unless you discard a land card.",
+    "oversized": false,
+    "power": "4",
+    "prices": {
+      "eur": "1.54",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "1.58",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3Acdab50a8-1e02-4ba5-8c09-e2837e7652f7&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Thundering+Wurm&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10100&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F798%3Fpage%3D1"
+    },
+    "rarity": "rare",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Thundering+Wurm",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4321&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DThundering%2BWurm",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DThundering%2BWurm"
+    },
+    "released_at": "1997-05-01",
+    "reprint": false,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/8b0ba623-d17f-4f0e-b914-da139a3971df/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/189/thundering-wurm?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 798,
+    "textless": false,
+    "toughness": "4",
+    "type_line": "Creature \u2014 Wurm",
+    "uri": "https://api.scryfall.com/cards/8b0ba623-d17f-4f0e-b914-da139a3971df",
+    "variation": false
+  }
+}

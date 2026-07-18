@@ -1,0 +1,142 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "6cccf44e-c05e-4239-b643-54b559c98552",
+  "name": "Charging Paladin",
+  "provenance": {
+    "collector_number": "11",
+    "fetched_at": "2026-07-18T02:44:43Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/2/9/29db1bbf-a6cf-460c-bec8-dbd682157af4.jpg?1783946853",
+    "oracle_id": "6cccf44e-c05e-4239-b643-54b559c98552",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor&unique=cards",
+    "requested_set_code": "por",
+    "scryfall_id": "29db1bbf-a6cf-460c-bec8-dbd682157af4",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/29db1bbf-a6cf-460c-bec8-dbd682157af4"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Kev Walker",
+    "artist_ids": [
+      "f366a0ee-a0cd-466d-ba6a-90058c7a31a6"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10158,
+    "cmc": 3.0,
+    "collector_number": "11",
+    "color_identity": [
+      "W"
+    ],
+    "colors": [
+      "W"
+    ],
+    "digital": false,
+    "edhrec_rank": 30122,
+    "finishes": [
+      "nonfoil"
+    ],
+    "flavor_text": "A true warrior's thoughts are of victory, not death.",
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "29db1bbf-a6cf-460c-bec8-dbd682157af4",
+    "illustration_id": "f0900b12-194a-4b87-a82a-282169366d20",
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T12:47:33Z",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/2/9/29db1bbf-a6cf-460c-bec8-dbd682157af4.jpg?1783946853",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/2/9/29db1bbf-a6cf-460c-bec8-dbd682157af4.jpg?1783946853",
+      "large": "https://cards.scryfall.io/large/front/2/9/29db1bbf-a6cf-460c-bec8-dbd682157af4.jpg?1783946853",
+      "normal": "https://cards.scryfall.io/normal/front/2/9/29db1bbf-a6cf-460c-bec8-dbd682157af4.jpg?1783946853",
+      "png": "https://cards.scryfall.io/png/front/2/9/29db1bbf-a6cf-460c-bec8-dbd682157af4.png?1783946853",
+      "small": "https://cards.scryfall.io/small/front/2/9/29db1bbf-a6cf-460c-bec8-dbd682157af4.jpg?1783946853"
+    },
+    "keywords": [],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "competitivebrawl": "not_legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "not_legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "legal",
+      "paupercommander": "legal",
+      "penny": "legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "tlr": "legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{2}{W}",
+    "multiverse_ids": [
+      4379
+    ],
+    "name": "Charging Paladin",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "6cccf44e-c05e-4239-b643-54b559c98552",
+    "oracle_text": "Whenever this creature attacks, it gets +0/+3 until end of turn.",
+    "oversized": false,
+    "power": "2",
+    "prices": {
+      "eur": "0.29",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "0.39",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A6cccf44e-c05e-4239-b643-54b559c98552&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Charging+Paladin&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10158&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F634%3Fpage%3D1"
+    },
+    "rarity": "uncommon",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Charging+Paladin",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4379&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DCharging%2BPaladin",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DCharging%2BPaladin"
+    },
+    "released_at": "1997-05-01",
+    "reprint": false,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/29db1bbf-a6cf-460c-bec8-dbd682157af4/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/11/charging-paladin?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 634,
+    "textless": false,
+    "toughness": "2",
+    "type_line": "Creature \u2014 Human Knight",
+    "uri": "https://api.scryfall.com/cards/29db1bbf-a6cf-460c-bec8-dbd682157af4",
+    "variation": false
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "ad07cb55-cc4f-40be-b16a-bd3d3ca94249",
+  "name": "Pillaging Horde",
+  "provenance": {
+    "collector_number": "142",
+    "fetched_at": "2026-07-18T02:44:43Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/1/d/1daad744-e6b2-4bd8-83df-2e97e9e60d16.jpg?1783946813",
+    "oracle_id": "ad07cb55-cc4f-40be-b16a-bd3d3ca94249",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor&unique=cards",
+    "requested_set_code": "por",
+    "scryfall_id": "1daad744-e6b2-4bd8-83df-2e97e9e60d16",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/1daad744-e6b2-4bd8-83df-2e97e9e60d16"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Kev Walker",
+    "artist_ids": [
+      "f366a0ee-a0cd-466d-ba6a-90058c7a31a6"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10132,
+    "cmc": 4.0,
+    "collector_number": "142",
+    "color_identity": [
+      "R"
+    ],
+    "colors": [
+      "R"
+    ],
+    "digital": false,
+    "edhrec_rank": 30546,
+    "finishes": [
+      "nonfoil"
+    ],
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "1daad744-e6b2-4bd8-83df-2e97e9e60d16",
+    "illustration_id": "327cd64e-7da2-45ff-83f5-5778d4ac14a1",
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T12:46:53Z",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/1/d/1daad744-e6b2-4bd8-83df-2e97e9e60d16.jpg?1783946813",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/1/d/1daad744-e6b2-4bd8-83df-2e97e9e60d16.jpg?1783946813",
+      "large": "https://cards.scryfall.io/large/front/1/d/1daad744-e6b2-4bd8-83df-2e97e9e60d16.jpg?1783946813",
+      "normal": "https://cards.scryfall.io/normal/front/1/d/1daad744-e6b2-4bd8-83df-2e97e9e60d16.jpg?1783946813",
+      "png": "https://cards.scryfall.io/png/front/1/d/1daad744-e6b2-4bd8-83df-2e97e9e60d16.png?1783946813",
+      "small": "https://cards.scryfall.io/small/front/1/d/1daad744-e6b2-4bd8-83df-2e97e9e60d16.jpg?1783946813"
+    },
+    "keywords": [],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "competitivebrawl": "not_legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "not_legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "not_legal",
+      "paupercommander": "not_legal",
+      "penny": "legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "not_legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "tlr": "not_legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{2}{R}{R}",
+    "multiverse_ids": [
+      4353
+    ],
+    "name": "Pillaging Horde",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "ad07cb55-cc4f-40be-b16a-bd3d3ca94249",
+    "oracle_text": "When this creature enters, sacrifice it unless you discard a card at random.",
+    "oversized": false,
+    "power": "5",
+    "prices": {
+      "eur": "0.63",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "0.57",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3Aad07cb55-cc4f-40be-b16a-bd3d3ca94249&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Pillaging+Horde&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10132&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F743%3Fpage%3D1"
+    },
+    "rarity": "rare",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Pillaging+Horde",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4353&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DPillaging%2BHorde",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DPillaging%2BHorde"
+    },
+    "released_at": "1997-05-01",
+    "reprint": false,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/1daad744-e6b2-4bd8-83df-2e97e9e60d16/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/142/pillaging-horde?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 743,
+    "textless": false,
+    "toughness": "5",
+    "type_line": "Creature \u2014 Human Barbarian",
+    "uri": "https://api.scryfall.com/cards/1daad744-e6b2-4bd8-83df-2e97e9e60d16",
+    "variation": false
+  }
+}

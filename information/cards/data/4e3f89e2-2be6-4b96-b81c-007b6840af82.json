@@ -1,0 +1,142 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "4e3f89e2-2be6-4b96-b81c-007b6840af82",
+  "name": "King's Assassin",
+  "provenance": {
+    "collector_number": "98",
+    "fetched_at": "2026-07-18T02:44:43Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/6/7/670a3149-54fb-4fd2-bc66-3ee9bcc3519d.jpg?1783946827",
+    "oracle_id": "4e3f89e2-2be6-4b96-b81c-007b6840af82",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor&unique=cards",
+    "requested_set_code": "por",
+    "scryfall_id": "670a3149-54fb-4fd2-bc66-3ee9bcc3519d",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/670a3149-54fb-4fd2-bc66-3ee9bcc3519d"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Zina Saunders",
+    "artist_ids": [
+      "eff6a2bb-7ca1-432e-8af9-aa85ee2359a2"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10006,
+    "cmc": 3.0,
+    "collector_number": "98",
+    "color_identity": [
+      "B"
+    ],
+    "colors": [
+      "B"
+    ],
+    "digital": false,
+    "edhrec_rank": 21003,
+    "finishes": [
+      "nonfoil"
+    ],
+    "flavor_text": "Fear is as effective a weapon as the blade.",
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "670a3149-54fb-4fd2-bc66-3ee9bcc3519d",
+    "illustration_id": "26628fb0-6a2a-4f0f-ad2a-d54a375d828b",
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T12:47:07Z",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/6/7/670a3149-54fb-4fd2-bc66-3ee9bcc3519d.jpg?1783946827",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/6/7/670a3149-54fb-4fd2-bc66-3ee9bcc3519d.jpg?1783946827",
+      "large": "https://cards.scryfall.io/large/front/6/7/670a3149-54fb-4fd2-bc66-3ee9bcc3519d.jpg?1783946827",
+      "normal": "https://cards.scryfall.io/normal/front/6/7/670a3149-54fb-4fd2-bc66-3ee9bcc3519d.jpg?1783946827",
+      "png": "https://cards.scryfall.io/png/front/6/7/670a3149-54fb-4fd2-bc66-3ee9bcc3519d.png?1783946827",
+      "small": "https://cards.scryfall.io/small/front/6/7/670a3149-54fb-4fd2-bc66-3ee9bcc3519d.jpg?1783946827"
+    },
+    "keywords": [],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "competitivebrawl": "not_legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "not_legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "not_legal",
+      "paupercommander": "not_legal",
+      "penny": "not_legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "not_legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "tlr": "legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{1}{B}{B}",
+    "multiverse_ids": [
+      4227
+    ],
+    "name": "King's Assassin",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "4e3f89e2-2be6-4b96-b81c-007b6840af82",
+    "oracle_text": "{T}: Destroy target tapped creature. Activate only during your turn, before attackers are declared.",
+    "oversized": false,
+    "power": "1",
+    "prices": {
+      "eur": "5.67",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "8.93",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A4e3f89e2-2be6-4b96-b81c-007b6840af82&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=King%27s+Assassin&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10006&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F707%3Fpage%3D1"
+    },
+    "rarity": "rare",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=King%27s+Assassin",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4227&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DKing%2527s%2BAssassin",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DKing%2527s%2BAssassin"
+    },
+    "released_at": "1997-05-01",
+    "reprint": false,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/670a3149-54fb-4fd2-bc66-3ee9bcc3519d/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/98/kings-assassin?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 707,
+    "textless": false,
+    "toughness": "1",
+    "type_line": "Creature \u2014 Human Assassin",
+    "uri": "https://api.scryfall.com/cards/670a3149-54fb-4fd2-bc66-3ee9bcc3519d",
+    "variation": false
+  }
+}
