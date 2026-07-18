@@ -50,6 +50,10 @@ class CombatState:
     defending_player: str
     attackers: tuple[str, ...]
     blockers: dict[str, tuple[str, ...]]
+    # This is deliberately a combat fact, rather than inferred from the
+    # current step, so timing predicates can ask whether an attack happened
+    # in this combat window without relying on a mutable declaration list.
+    was_attacked: bool = False
 
 
 @dataclass(frozen=True)
@@ -68,6 +72,18 @@ class PendingDecision:
     source_object_id: str
     option_ids: tuple[str, ...]
     selected_card_type: str
+
+
+@dataclass(frozen=True)
+class TemporaryEffect:
+    """An end-of-turn effect bound to the affected object's current identity."""
+
+    source_object_id: str
+    target_object_ids: tuple[str, ...]
+    power_delta: int = 0
+    toughness_delta: int = 0
+    granted_keywords: tuple[str, ...] = ()
+    only_blockable_by_colors: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -93,3 +109,4 @@ class GameState:
     pending_decision: PendingDecision | None = None
     rng_cursor: int = 0
     forced_block_target_object_id: str | None = None
+    temporary_effects: tuple[TemporaryEffect, ...] = ()

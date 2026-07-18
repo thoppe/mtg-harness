@@ -22,6 +22,7 @@ from mtg_engine.cards.repository import CardRepository
 from mtg_engine.cards.implementations import effect_key_for
 from mtg_engine.events.log import EventLog
 from mtg_engine.state.models import GameOutcome, GameState, PendingDecision, StackEntry, TurnState
+from mtg_engine.state.models import TemporaryEffect
 from mtg_engine.state.zones import move_object, move_object_to_top_of_library, update_object, update_player, zone_change_identity_payload
 from mtg_engine.rules.combat import apply_combat_damage, apply_state_based_actions, tap_attackers, with_combat_state
 
@@ -95,8 +96,8 @@ def play_land(
     card_repository: CardRepository,
 ) -> TurnResult:
     state = session.state
-    require_active_player(state, action.player_id)
-    require_step(state, "precombat_main_step")
+    if state.turn.priority_player != action.player_id:
+        raise ValueError("player does not have priority")
 
     player = state.players[action.player_id]
     if player.lands_played_this_turn >= player.land_play_limit_this_turn:
@@ -153,8 +154,10 @@ def activate_mana_ability(
     card_repository: CardRepository,
 ) -> TurnResult:
     state = session.state
-    require_active_player(state, action.player_id)
-    require_step(state, "precombat_main_step")
+    if state.turn.priority_player != action.player_id:
+        raise ValueError("player does not have priority")
+    if state.turn.step not in {"precombat_main_step", "declare_attackers_step"}:
+        raise ValueError("priority is not available in this step")
 
     player = state.players[action.player_id]
     if action.source_instance_id not in player.battlefield:
@@ -192,6 +195,8 @@ def cast_creature_spell(
     state = session.state
     require_active_player(state, action.player_id)
     require_step(state, "precombat_main_step")
+    if state.stack_entries:
+        raise ValueError("creature spell requires an empty stack")
 
     player = state.players[action.player_id]
     if action.card_instance_id not in player.hand:
@@ -254,8 +259,8 @@ def cast_noncreature_spell(
     card_repository: CardRepository,
 ) -> TurnResult:
     state = session.state
-    require_active_player(state, action.player_id)
-    require_step(state, "precombat_main_step")
+    if state.turn.priority_player != action.player_id:
+        raise ValueError("player does not have priority")
 
     player = state.players[action.player_id]
     if action.card_instance_id not in player.hand:
@@ -264,6 +269,16 @@ def cast_noncreature_spell(
     card = state.objects[action.card_instance_id]
     card_definition = card_repository.get(card.oracle_id)
     if card_definition.is_creature or card_definition.is_land:
+        raise ValueError("spell must be a supported noncreature spell")
+    if card_definition.is_sorcery:
+        require_active_player(state, action.player_id)
+        require_step(state, "precombat_main_step")
+        if state.stack_entries:
+            raise ValueError("sorcery requires an empty stack")
+    elif card_definition.is_instant:
+        if not _instant_timing_is_legal(state, card_definition, action.player_id):
+            raise ValueError("instant timing is not legal")
+    else:
         raise ValueError("spell must be a supported noncreature spell")
     effect = _supported_targeted_sorcery_effect(card_definition)
     if effect is None:
@@ -667,6 +682,29 @@ def _resolve_noncreature_spell(
         target = resolved_state.objects[action.target_instance_id]
         resolved_state = replace(resolved_state, forced_block_target_object_id=target.object_id)
         event_log.append(event_type="combat_requirement_created", active_player=action.player_id, payload={"target_object_id": target.object_id, "requirement": "all_able_creatures_block"})
+    elif effect == "target_creature_gets_3_3_and_flying_until_end_of_turn":
+        resolved_state = _add_temporary_effect(resolved_state, source_object_id=card.object_id, target_ids=(action.target_instance_id,), power_delta=3, toughness_delta=3, keywords=("Flying",))
+    elif effect == "target_creature_gains_flying_and_draw_one":
+        resolved_state = _add_temporary_effect(resolved_state, source_object_id=card.object_id, target_ids=(action.target_instance_id,), keywords=("Flying",))
+        resolved_state = _draw_one_card_for_player_if_available(resolved_state, event_log, player_id=action.player_id)
+    elif effect in {"controlled_creatures_get_0_3_until_end_of_turn", "controlled_creatures_get_1_1_until_end_of_turn", "white_controlled_creatures_get_2_0_until_end_of_turn", "green_controlled_creatures_gain_forestwalk_until_end_of_turn", "black_controlled_creatures_only_blockable_by_black_until_end_of_turn", "controlled_creatures_gain_reach_until_end_of_turn"}:
+        controlled_ids = tuple(
+            instance_id for instance_id in resolved_state.players[action.player_id].battlefield
+            if card_repository.get(resolved_state.objects[instance_id].oracle_id).is_creature
+            and (effect != "white_controlled_creatures_get_2_0_until_end_of_turn" or card_repository.get(resolved_state.objects[instance_id].oracle_id).has_color("W"))
+            and (effect != "green_controlled_creatures_gain_forestwalk_until_end_of_turn" or card_repository.get(resolved_state.objects[instance_id].oracle_id).has_color("G"))
+            and (effect != "black_controlled_creatures_only_blockable_by_black_until_end_of_turn" or card_repository.get(resolved_state.objects[instance_id].oracle_id).has_color("B"))
+        )
+        modifiers = {
+            "controlled_creatures_get_0_3_until_end_of_turn": (0, 3, (), ()),
+            "controlled_creatures_get_1_1_until_end_of_turn": (1, 1, (), ()),
+            "white_controlled_creatures_get_2_0_until_end_of_turn": (2, 0, (), ()),
+            "green_controlled_creatures_gain_forestwalk_until_end_of_turn": (0, 0, ("Forestwalk",), ()),
+            "black_controlled_creatures_only_blockable_by_black_until_end_of_turn": (0, 0, (), ("B",)),
+            "controlled_creatures_gain_reach_until_end_of_turn": (0, 0, ("Reach",), ()),
+        }
+        power, toughness, keywords, colors = modifiers[effect]
+        resolved_state = _add_temporary_effect(resolved_state, source_object_id=card.object_id, target_ids=controlled_ids, power_delta=power, toughness_delta=toughness, keywords=keywords, only_blockable_by_colors=colors)
     elif effect == "target_creature_gets_4_power_until_end_of_turn":
         target = resolved_state.objects[action.target_instance_id]
         resolved_state = update_object(resolved_state, replace(target, temporary_power_bonus=target.temporary_power_bonus + 4))
@@ -927,7 +965,8 @@ def pass_priority(
     state = session.state
     if state.turn.priority_player != action.player_id:
         raise ValueError("player does not have priority")
-    require_step(state, "precombat_main_step")
+    if state.turn.step not in {"precombat_main_step", "declare_attackers_step"}:
+        raise ValueError("priority is not available in this step")
 
     next_priority_player = _other_player(state, action.player_id)
     event_log = EventLog.from_events(state.game_id, session.event_log)
@@ -954,8 +993,20 @@ def pass_priority(
             card_repository,
         )
 
-    opposing_actions = enumerate_legal_actions(passed_state, card_repository)
-    if any(not isinstance(candidate, PassPriorityAction) for candidate in opposing_actions):
+    if state.turn.step == "declare_attackers_step" and state.combat is not None and not any(
+        card_repository.get(state.objects[instance_id].oracle_id).is_instant
+        for player in state.players.values()
+        for instance_id in player.hand
+    ):
+        next_state = replace(passed_state, turn=replace(passed_state.turn, step="declare_blockers_step", priority_player=state.combat.defending_player), consecutive_passes=0)
+        event_log.append(event_type="step_changed", active_player=state.turn.active_player, payload={"turn_number": state.turn.turn_number, "from_step": "declare_attackers_step", "to_step": "declare_blockers_step"})
+        return TurnResult(state=next_state, event_log=event_log.events)
+
+    if state.turn.step == "precombat_main_step":
+        opposing_actions = enumerate_legal_actions(passed_state, card_repository)
+        if any(not isinstance(candidate, PassPriorityAction) for candidate in opposing_actions):
+            return TurnResult(state=passed_state, event_log=event_log.events)
+    elif passed_state.consecutive_passes < 2:
         return TurnResult(state=passed_state, event_log=event_log.events)
 
     event_log.append(
@@ -972,6 +1023,10 @@ def pass_priority(
         turn=replace(passed_state.turn, priority_player=state.turn.active_player),
         consecutive_passes=0,
     )
+    if state.turn.step == "declare_attackers_step" and state.combat is not None:
+        next_state = replace(restored_state, turn=replace(restored_state.turn, step="declare_blockers_step", priority_player=state.combat.defending_player))
+        event_log.append(event_type="step_changed", active_player=state.turn.active_player, payload={"turn_number": state.turn.turn_number, "from_step": "declare_attackers_step", "to_step": "declare_blockers_step"})
+        return TurnResult(state=next_state, event_log=event_log.events)
     return advance_to_begin_combat(TurnResult(state=restored_state, event_log=event_log.events))
 
 
@@ -1029,14 +1084,7 @@ def declare_attackers(
         attackers=action.attacker_ids,
         blockers={},
     )
-    next_state = replace(
-        next_state,
-        turn=replace(
-            next_state.turn,
-            step="declare_blockers_step",
-            priority_player=defending_player,
-        ),
-    )
+    next_state = replace(next_state, turn=replace(next_state.turn, priority_player=action.player_id))
 
     event_log = EventLog.from_events(state.game_id, session.event_log)
     event_log.append(
@@ -1046,15 +1094,6 @@ def declare_attackers(
             "player_id": action.player_id,
             "attacker_ids": list(action.attacker_ids),
             "defending_player": defending_player,
-        },
-    )
-    event_log.append(
-        event_type="step_changed",
-        active_player=action.player_id,
-        payload={
-            "turn_number": state.turn.turn_number,
-            "from_step": "declare_attackers_step",
-            "to_step": "declare_blockers_step",
         },
     )
     return TurnResult(state=next_state, event_log=event_log.events)
@@ -1091,6 +1130,8 @@ def declare_blockers(
             if rejection_reason is not None:
                 raise ValueError(rejection_reason)
             assigned_blockers.add(blocker_id)
+        if card_repository.get(state.objects[attacker_id].oracle_id).name in {"Charging Rhino", "Stalking Tiger"} and len(blocker_ids) > 1:
+            raise ValueError("attacker cannot be blocked by more than one creature")
 
     forced_target = state.forced_block_target_object_id
     if forced_target is not None:
@@ -1340,7 +1381,7 @@ def _require_legal_noncreature_target(
     *,
     effect: str,
 ) -> None:
-    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "additional_three_land_plays", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures", "destroy_all_green_creatures", "destroy_all_white_creatures", "destroy_all_islands", "destroy_all_plains", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures", "damage_all_creatures_2", "damage_all_flying_creatures_4", "damage_all_creatures_and_players_1", "damage_all_creatures_and_players_6", "damage_all_flying_creatures_and_players_x"}:
+    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "additional_three_land_plays", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures", "destroy_all_green_creatures", "destroy_all_white_creatures", "destroy_all_islands", "destroy_all_plains", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures", "damage_all_creatures_2", "damage_all_flying_creatures_4", "damage_all_creatures_and_players_1", "damage_all_creatures_and_players_6", "damage_all_flying_creatures_and_players_x", "controlled_creatures_get_0_3_until_end_of_turn", "controlled_creatures_get_1_1_until_end_of_turn", "white_controlled_creatures_get_2_0_until_end_of_turn", "green_controlled_creatures_gain_forestwalk_until_end_of_turn", "black_controlled_creatures_only_blockable_by_black_until_end_of_turn", "controlled_creatures_gain_reach_until_end_of_turn"}:
         if target_instance_ids:
             raise ValueError("sorcery does not take a target")
         return
@@ -1429,7 +1470,7 @@ def _require_legal_noncreature_target(
         target = state.objects[target_instance_id]; definition = card_repository.get(target.oracle_id)
         if target.zone != "battlefield" or not definition.is_creature or definition.is_black: raise ValueError("target must be nonblack creature")
         return
-    if effect in {"target_creature_gets_4_power_until_end_of_turn", "target_creature_gets_4_4_until_end_of_turn", "target_creature_gets_2_power_and_takes_2", "damage_target_creature_per_mountain", "all_able_creatures_block_target_this_turn"}:
+    if effect in {"target_creature_gets_4_power_until_end_of_turn", "target_creature_gets_4_4_until_end_of_turn", "target_creature_gets_2_power_and_takes_2", "damage_target_creature_per_mountain", "all_able_creatures_block_target_this_turn", "target_creature_gets_3_3_and_flying_until_end_of_turn", "target_creature_gains_flying_and_draw_one"}:
         if target_instance_id not in state.objects: raise ValueError("target must exist")
         target = state.objects[target_instance_id]
         if target.zone != "battlefield" or not card_repository.get(target.oracle_id).is_creature: raise ValueError("target must be a creature")
@@ -1483,7 +1524,18 @@ def _require_legal_noncreature_target(
 
 
 def _supported_targeted_sorcery_effect(card_definition) -> str | None:
-    return effect_key_for(card_definition.oracle_id) if card_definition.is_sorcery else None
+    return effect_key_for(card_definition.oracle_id) if (card_definition.is_sorcery or card_definition.is_instant) else None
+
+
+def _instant_timing_is_legal(state: GameState, card_definition, player_id: str) -> bool:
+    if card_definition.name == "Treetop Defense":
+        return (
+            state.turn.step == "declare_attackers_step"
+            and state.combat is not None
+            and state.combat.defending_player == player_id
+            and state.combat.was_attacked
+        )
+    return False
 
 
 def _battlefield_permanents_matching(
@@ -1710,7 +1762,21 @@ def _cleanup_end_of_turn_state(state: GameState) -> GameState:
         instance_id: replace(card, damage_marked=0, temporary_power_bonus=0, temporary_toughness_bonus=0)
         for instance_id, card in state.objects.items()
     }
-    return replace(state, players=updated_players, objects=updated_objects, forced_block_target_object_id=None)
+    return replace(state, players=updated_players, objects=updated_objects, forced_block_target_object_id=None, temporary_effects=())
+
+
+def _add_temporary_effect(
+    state: GameState,
+    *,
+    source_object_id: str,
+    target_ids: tuple[str | None, ...],
+    power_delta: int = 0,
+    toughness_delta: int = 0,
+    keywords: tuple[str, ...] = (),
+    only_blockable_by_colors: tuple[str, ...] = (),
+) -> GameState:
+    target_object_ids = tuple(state.objects[instance_id].object_id for instance_id in target_ids if instance_id is not None)
+    return replace(state, temporary_effects=state.temporary_effects + (TemporaryEffect(source_object_id=source_object_id, target_object_ids=target_object_ids, power_delta=power_delta, toughness_delta=toughness_delta, granted_keywords=keywords, only_blockable_by_colors=only_blockable_by_colors),))
 
 
 def _untap_player_battlefield(state: GameState, player_id: str) -> GameState:

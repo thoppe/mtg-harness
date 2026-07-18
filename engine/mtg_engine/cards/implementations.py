@@ -63,6 +63,14 @@ IMPLEMENTATIONS = {
     "935e0cac-51ee-4cb7-a209-f085e0f099ed": "tutor_creature_to_top",
     "e5df4597-1647-4ac2-bdb3-a517598d1431": "additional_three_land_plays",
     "ad218276-a44b-4a61-8e42-26a27929bbbb": "all_able_creatures_block_target_this_turn",
+    "d3758fca-0522-4b5a-a1cc-3b2b3ab299ba": "target_creature_gets_3_3_and_flying_until_end_of_turn",
+    "cb4baf53-51ed-468b-a468-5d7d45a6dc26": "target_creature_gains_flying_and_draw_one",
+    "8f8dfc24-f466-4607-8991-acbcbb415db3": "controlled_creatures_get_0_3_until_end_of_turn",
+    "5cf28c04-76af-4eb8-9969-366dc8e04690": "controlled_creatures_get_1_1_until_end_of_turn",
+    "1f51fea2-ce19-44ef-a330-65cc0fafcd64": "white_controlled_creatures_get_2_0_until_end_of_turn",
+    "bb493c95-5f6d-405b-aac6-c56fe6b6f42f": "green_controlled_creatures_gain_forestwalk_until_end_of_turn",
+    "6b7933b3-821a-4d64-9a10-af8a69fa008e": "black_controlled_creatures_only_blockable_by_black_until_end_of_turn",
+    "f215d0f9-a53e-431a-a70d-9dc4e3caa41e": "controlled_creatures_gain_reach_until_end_of_turn",
 }
 
 

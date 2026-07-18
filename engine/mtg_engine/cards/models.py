@@ -32,6 +32,10 @@ class CardDefinition:
     def is_sorcery(self) -> bool:
         return "Sorcery" in self.type_line
 
+    @property
+    def is_instant(self) -> bool:
+        return "Instant" in self.type_line
+
     def has_keyword(self, keyword: str) -> bool:
         return keyword in self.keywords
 

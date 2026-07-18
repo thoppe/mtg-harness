@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from itertools import combinations
+from dataclasses import replace
 
 from mtg_engine.actions.models import (
     ActivateManaAbilityAction,
@@ -16,6 +17,7 @@ from mtg_engine.actions.models import (
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.cards.implementations import effect_key_for
 from mtg_engine.state.models import GameState
+from mtg_engine.rules.characteristics import effective_power, has_keyword, only_blockable_by_colors
 
 
 def enumerate_legal_actions(state: GameState, card_repository: CardRepository) -> tuple[object, ...]:
@@ -34,20 +36,33 @@ def enumerate_legal_actions(state: GameState, card_repository: CardRepository) -
                 selected_instance_id=None,
             ),
         )
+    if state.stack_entries:
+        return _enumerate_instant_priority_actions(state, card_repository)
     if state.turn.step == "precombat_main_step":
-        if state.stack_entries:
-            return (PassPriorityAction(player_id=state.turn.priority_player),)
         if state.turn.priority_player != state.turn.active_player:
             return _enumerate_non_active_priority_actions(state)
         return _enumerate_active_precombat_main_actions(state, card_repository)
 
     if state.turn.step == "declare_attackers_step":
+        if state.combat is not None:
+            if not _any_instant_available(state, card_repository):
+                blockers_state = replace(state, turn=replace(state.turn, step="declare_blockers_step", priority_player=state.combat.defending_player))
+                return _enumerate_declare_blockers_actions(blockers_state, card_repository)
+            return _enumerate_instant_priority_actions(state, card_repository)
         return _enumerate_declare_attackers_actions(state, card_repository)
 
     if state.turn.step == "declare_blockers_step":
         return _enumerate_declare_blockers_actions(state, card_repository)
 
     return ()
+
+
+def _any_instant_available(state: GameState, card_repository: CardRepository) -> bool:
+    return any(
+        card_repository.get(state.objects[instance_id].oracle_id).is_instant
+        for player in state.players.values()
+        for instance_id in player.hand
+    )
 
 
 def _enumerate_active_precombat_main_actions(
@@ -138,6 +153,25 @@ def _enumerate_non_active_priority_actions(state: GameState) -> tuple[object, ..
     return (PassPriorityAction(player_id=state.turn.priority_player),)
 
 
+def _enumerate_instant_priority_actions(state: GameState, card_repository: CardRepository) -> tuple[object, ...]:
+    player = state.players[state.turn.priority_player]
+    actions: list[object] = []
+    for instance_id in player.battlefield:
+        permanent = state.objects[instance_id]
+        definition = card_repository.get(permanent.oracle_id)
+        if len(definition.produced_mana) == 1 and not permanent.tapped:
+            actions.append(ActivateManaAbilityAction(player_id=player.player_id, source_instance_id=instance_id))
+    for instance_id in player.hand:
+        card = state.objects[instance_id]
+        definition = card_repository.get(card.oracle_id)
+        if not definition.is_instant or not _can_pay_mana_cost(player.mana_pool, _parse_mana_cost(definition.mana_cost)):
+            continue
+        for target_ids in _legal_noncreature_spell_targets(state, card_repository, instance_id):
+            actions.append(CastNonCreatureSpellAction(player_id=player.player_id, card_instance_id=instance_id, target_instance_ids=target_ids))
+    actions.append(PassPriorityAction(player_id=player.player_id))
+    return tuple(actions)
+
+
 def _enumerate_declare_attackers_actions(
     state: GameState,
     card_repository: CardRepository,
@@ -215,6 +249,12 @@ def _blocker_assignments(
     def build(index: int, current: dict[str, tuple[str, ...]]) -> None:
         if index == len(blockers):
             assignment = {attacker_id: current[attacker_id] for attacker_id in attackers if current[attacker_id]}
+            if any(
+                card_repository.get(state.objects[attacker_id].oracle_id).name in {"Charging Rhino", "Stalking Tiger"}
+                and len(blocker_ids) > 1
+                for attacker_id, blocker_ids in assignment.items()
+            ):
+                return
             forced_target = state.forced_block_target_object_id
             target_id = next((instance_id for instance_id in attackers if state.objects[instance_id].object_id == forced_target), None)
             if target_id is not None:
@@ -258,12 +298,17 @@ def attacker_attack_rejection_reason(
     attacker_card = card_repository.get(attacker.oracle_id)
     if not attacker_card.is_creature:
         return "only creatures can attack"
-    if attacker_card.has_defender:
+    if has_keyword(state, card_repository, attacker_id, "Defender"):
         return "creature with defender cannot attack"
     if attacker.tapped:
         return "attacker is already tapped"
     if attacker.entered_battlefield_turn == state.turn.turn_number:
         return "summoning-sick creature cannot attack in v0"
+    if attacker_card.name == "Deep-Sea Serpent" and not any(
+        card_repository.get(state.objects[land_id].oracle_id).has_subtype("Island")
+        for land_id in state.players[_other_player_id(state, state.turn.active_player)].battlefield
+    ):
+        return "Deep-Sea Serpent cannot attack unless defending player controls an Island"
     return None
 
 
@@ -275,7 +320,7 @@ def _legal_noncreature_spell_targets(
     spell = state.objects[spell_instance_id]
     card_definition = card_repository.get(spell.oracle_id)
     effect = _supported_targeted_sorcery_effect(card_definition)
-    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "additional_three_land_plays", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures"}:
+    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "additional_three_land_plays", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures", "controlled_creatures_get_0_3_until_end_of_turn", "controlled_creatures_get_1_1_until_end_of_turn", "white_controlled_creatures_get_2_0_until_end_of_turn", "green_controlled_creatures_gain_forestwalk_until_end_of_turn", "black_controlled_creatures_only_blockable_by_black_until_end_of_turn", "controlled_creatures_gain_reach_until_end_of_turn"}:
         return ((),)
     if effect is None:
         return ()
@@ -342,7 +387,7 @@ def _legal_noncreature_spell_targets(
 
 
 def _supported_targeted_sorcery_effect(card_definition) -> str | None:
-    return effect_key_for(card_definition.oracle_id) if card_definition.is_sorcery else None
+    return effect_key_for(card_definition.oracle_id) if (card_definition.is_sorcery or card_definition.is_instant) else None
 
 
 def can_block_attacker(
@@ -376,16 +421,33 @@ def blocker_attack_rejection_reason(
         return "only creatures can block"
     if blocker.tapped:
         return "tapped creature cannot block"
-    if attacker_definition.has_swampwalk and _player_controls_swamp(
+    if has_keyword(state, card_repository, attacker_id, "Swampwalk") and _player_controls_swamp(
         state,
         card_repository,
         player_id=blocker.owner_id,
     ):
         return "blocker cannot block the selected attacker"
-    if attacker_definition.has_flying and not (
-        blocker_definition.has_flying or blocker_definition.has_reach
+    if has_keyword(state, card_repository, attacker_id, "Forestwalk") and _player_controls_subtype(
+        state, card_repository, player_id=blocker.controller_id, subtype="Forest"
     ):
         return "blocker cannot block the selected attacker"
+    if has_keyword(state, card_repository, attacker_id, "Flying") and not (
+        has_keyword(state, card_repository, blocker_id, "Flying") or has_keyword(state, card_repository, blocker_id, "Reach")
+    ):
+        return "blocker cannot block the selected attacker"
+    allowed_colors = only_blockable_by_colors(state, attacker_id)
+    if allowed_colors and not any(blocker_definition.has_color(color) for color in allowed_colors):
+        return "blocker cannot block the selected attacker"
+    if attacker_definition.name in {"Phantom Warrior"}:
+        return "blocker cannot block the selected attacker"
+    if attacker_definition.name in {"Sacred Knight"} and (blocker_definition.has_color("B") or blocker_definition.has_color("R")):
+        return "blocker cannot block the selected attacker"
+    if attacker_definition.name == "Fleet-Footed Monk" and effective_power(state, card_repository, blocker_id) >= 2:
+        return "blocker cannot block the selected attacker"
+    if blocker_definition.name in {"Craven Giant", "Craven Knight", "Hulking Cyclops", "Hulking Goblin", "Jungle Lion"}:
+        return "creature cannot block"
+    if blocker_definition.name == "Cloud Dragon" and not has_keyword(state, card_repository, attacker_id, "Flying"):
+        return "Cloud Dragon can block only creatures with flying"
     return None
 
 
@@ -399,6 +461,17 @@ def _player_controls_swamp(
         card_repository.get(state.objects[instance_id].oracle_id).name == "Swamp"
         for instance_id in state.players[player_id].battlefield
     )
+
+
+def _player_controls_subtype(state: GameState, card_repository: CardRepository, *, player_id: str, subtype: str) -> bool:
+    return any(
+        card_repository.get(state.objects[instance_id].oracle_id).has_subtype(subtype)
+        for instance_id in state.players[player_id].battlefield
+    )
+
+
+def _other_player_id(state: GameState, player_id: str) -> str:
+    return next(candidate for candidate in state.players if candidate != player_id)
 
 
 def _parse_mana_cost(mana_cost: str) -> dict[str, int]:

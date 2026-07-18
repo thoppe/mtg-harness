@@ -5,6 +5,7 @@ from dataclasses import replace
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.state.models import CombatState, GameOutcome, GameState
 from mtg_engine.state.zones import move_object, update_object, update_player
+from mtg_engine.rules.characteristics import effective_power, effective_toughness
 
 
 def tap_attackers(state: GameState, attacker_ids: tuple[str, ...]) -> GameState:
@@ -30,6 +31,7 @@ def with_combat_state(
             defending_player=defending_player,
             attackers=attackers,
             blockers=blockers,
+            was_attacked=bool(attackers),
         ),
     )
 
@@ -49,8 +51,7 @@ def apply_combat_damage(state: GameState, card_repository: CardRepository) -> tu
     for attacker_id in combat.attackers:
         blockers = combat.blockers.get(attacker_id, ())
         attacker = current_state.objects[attacker_id]
-        attacker_card = card_repository.get(attacker.oracle_id)
-        attacker_power = int(attacker_card.power or "0") + attacker.temporary_power_bonus
+        attacker_power = effective_power(current_state, card_repository, attacker_id)
 
         if not blockers:
             defending_player = current_state.players[combat.defending_player]
@@ -86,8 +87,8 @@ def apply_combat_damage(state: GameState, card_repository: CardRepository) -> tu
         for blocker_id in blockers:
             blocker = current_state.objects[blocker_id]
             blocker_card = card_repository.get(blocker.oracle_id)
-            blocker_power = int(blocker_card.power or "0") + blocker.temporary_power_bonus
-            blocker_toughness = int(blocker_card.toughness or "0") + blocker.temporary_toughness_bonus
+            blocker_power = effective_power(current_state, card_repository, blocker_id)
+            blocker_toughness = effective_toughness(current_state, card_repository, blocker_id)
             lethal_damage = max(0, blocker_toughness - blocker.damage_marked)
             attacker_damage_to_blocker = min(remaining_attacker_damage, lethal_damage)
             remaining_attacker_damage -= attacker_damage_to_blocker
@@ -147,7 +148,7 @@ def apply_state_based_actions(
         card = card_repository.get(obj.oracle_id)
         if not card.is_creature:
             continue
-        toughness = int(card.toughness or "0") + obj.temporary_toughness_bonus
+        toughness = effective_toughness(state, card_repository, instance_id)
         if obj.damage_marked >= toughness:
             destroyed_objects.append(
                 {

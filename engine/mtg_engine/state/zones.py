@@ -56,7 +56,10 @@ def move_object(
         temporary_power_bonus=0,
         temporary_toughness_bonus=0,
     )
-    return update_object(state, updated_object)
+    state = update_object(state, updated_object)
+    return replace(state, temporary_effects=tuple(
+        effect for effect in state.temporary_effects if object_record.object_id not in effect.target_object_ids
+    ))
 
 
 def move_object_to_top_of_library(
@@ -92,7 +95,10 @@ def move_object_to_top_of_library(
         temporary_power_bonus=0,
         temporary_toughness_bonus=0,
     )
-    return update_object(state, updated_object)
+    state = update_object(state, updated_object)
+    return replace(state, temporary_effects=tuple(
+        effect for effect in state.temporary_effects if object_record.object_id not in effect.target_object_ids
+    ))
 
 
 def update_player(state: GameState, player: PlayerState) -> GameState:
