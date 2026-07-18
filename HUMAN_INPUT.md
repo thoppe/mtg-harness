@@ -34,8 +34,9 @@ This file captures decisions, constraints, and open questions that are explicitl
 - For this initial slice, oracle text is the only gameplay text authority; flavor text is never used for implementation
 - Keyword and combat-text support is limited to the active manifest and its
   bounded contracts, including the original `Flying`, `Reach`, `Swampwalk`,
-  and `Defender` support plus bounded `Forestwalk`, `Islandwalk`, `Vigilance`,
-  and name-scoped attack/block restrictions; broader keyword support remains
+  and `Defender` support plus bounded `Forestwalk`, `Islandwalk`,
+  `Mountainwalk`, `Vigilance`, and `Haste`, plus name-scoped attack/block
+  restrictions; broader keyword support remains
   deferred
 - Triggered-ability support is limited to Alabaster Dragon's name-scoped death
   trigger and its deterministic owner-library shuffle; broader trigger

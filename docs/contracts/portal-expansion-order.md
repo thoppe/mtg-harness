@@ -92,7 +92,32 @@ generic trigger dispatcher or special-case zone movement.
 
 ### Wave 4: Combat exceptions and haste
 
-Reason: extend shared combat-legality checks before triggered combat text. Minotaur Warrior, Moon Sprite, Mountain Goat, Panther Warriors, Python, Raging Cougar, Raging Goblin, Raging Minotaur, Redwood Treefolk, Regal Unicorn, Rowan Treefolk, Skeletal Crocodile, Skeletal Snake, Snapping Drake, Spined Wurm, Spotted Griffin, Starlit Angel, Volcanic Dragon, Wall of Swords, Whiptail Wurm, Willow Dryad.
+Wave 4 is dependency-ordered, rather than printed-order, so every card is
+promoted only through an existing combat predicate or one of its two narrow
+increments. It introduces no triggered text, general static-ability framework,
+or effect parsing.
+
+#### Wave 4A: Existing creature and combat behavior
+
+Minotaur Warrior, Moon Sprite, Panther Warriors, Python, Redwood Treefolk,
+Regal Unicorn, Rowan Treefolk, Skeletal Crocodile, Skeletal Snake, Snapping
+Drake, Spined Wurm, Spotted Griffin, Starlit Angel, and Whiptail Wurm reuse
+vanilla, Flying, and existing casting/combat behavior. Wall of Swords reuses
+the existing Defender plus Flying predicates; Willow Dryad reuses Forestwalk.
+
+#### Wave 4B: Mountainwalk
+
+Mountain Goat adds `Mountainwalk` -> `Mountain` to the explicit supported
+landwalk mapping. This is a narrow extension of the existing landwalk
+predicate, not support for land-type changes or arbitrary landwalk names.
+
+#### Wave 4C: Haste
+
+Raging Cougar, Raging Goblin, Raging Minotaur, and Volcanic Dragon add only
+the printed Haste exception to the entered-this-turn attack restriction.
+Volcanic Dragon combines that exception with existing Flying. This does not
+add triggered abilities, alternate combat timing, or a generic static-ability
+framework.
 
 ### Wave 5: Draw, discard, hidden zones, and deterministic ordering
 

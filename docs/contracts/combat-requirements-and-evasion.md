@@ -12,9 +12,9 @@ evasion and requirement rules.
 - Generic landwalk checks the defending player's battlefield for the named land
   subtype and prevents blocks when present.
 - The supported landwalk mapping is explicit: `Swampwalk` -> `Swamp`,
-  `Forestwalk` -> `Forest`, and the planned Wave 3 increment adds
-  `Islandwalk` -> `Island`. It does not model land-type-changing effects or
-  arbitrary landwalk names.
+  `Forestwalk` -> `Forest`, `Islandwalk` -> `Island`, and `Mountainwalk` ->
+  `Mountain`. It does not model land-type-changing effects or arbitrary
+  landwalk names.
 - A creature with Flying may be subject to the bounded static restriction
   “can block only creatures with flying.” This restriction applies to Cloud
   Dragon, Cloud Pirates, and Cloud Spirit through one shared predicate, and
@@ -30,8 +30,14 @@ evasion and requirement rules.
 Do not implement a card with a combat requirement by mutating one caller's
 legal-action list only; submitted actions must reject the same illegal result.
 
-## Wave 3 Boundary
+## Wave 3--4 Boundary
 
-The rules above are the complete combat scope for Waves 3A--3D. Wave 3E adds
+The rules above are the complete combat scope for Waves 3--4. Wave 3E adds
 only Alabaster Dragon's separate, name-scoped death trigger; it does not widen
-combat handling, shuffle behavior generally, or static-ability support.
+combat handling, shuffle behavior generally, or static-ability support. Wave 4
+adds `Mountainwalk` only for Mountain Goat and applies the already-required
+haste exception only to Raging Cougar, Raging Goblin, Raging Minotaur, and
+Volcanic Dragon.
+Those additions do not create arbitrary landwalk handling, a general
+summoning-sickness framework beyond combat legality, or triggered/static
+ability support.

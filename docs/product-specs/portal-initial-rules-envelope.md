@@ -24,6 +24,13 @@ declared by `docs/coverage/slices/portal.initial.yaml`.
   by `Bull Hippo`
 - Vigilance keyword support limited to leaving `Archangel` and `Ardent
   Militia` untapped when declared as attackers
+- Mountainwalk keyword support limited to the unblockability condition
+  required by `Mountain Goat`
+- Haste keyword support limited to permitting `Raging Cougar`, `Raging
+  Goblin`, `Raging Minotaur`, and `Volcanic Dragon` to attack during the turn
+  each entered its controller's battlefield
+- Wave 4 creature promotion limited to vanilla creatures plus reuse of the
+  existing Flying, Reach, Swampwalk, Forestwalk, and Defender combat behavior
 - Flying-only blocker restriction limited to `Cloud Dragon`, `Cloud Pirates`,
   and `Cloud Spirit`
 - Alabaster Dragon's name-scoped death trigger: after it dies, put its trigger
@@ -103,6 +110,18 @@ declared by `docs/coverage/slices/portal.initial.yaml`.
   algorithm only if that instance remains in its owner's graveyard on
   resolution. It introduces neither generic trigger dispatch nor replacement
   effects.
+- Wave 4A may promote the named reuse-only creatures through the existing
+  casting and combat predicates. `Wall of Swords` combines existing Defender
+  and Flying behavior, and `Willow Dryad` reuses Forestwalk. `Whiptail Wurm`
+  and `Skeletal Crocodile` are vanilla in their current Oracle text. It
+  introduces no new ability framework.
+- Wave 4B may extend the explicit landwalk mapping only with `Mountainwalk` ->
+  `Mountain` for Mountain Goat, preserving the supported Swampwalk,
+  Forestwalk, and Islandwalk behavior and excluding land-type changes.
+- Wave 4C may add only the printed Haste exception to the entered-this-turn
+  attack restriction for Raging Cougar, Raging Goblin, Raging Minotaur, and
+  Volcanic Dragon. It does not affect summoning-sickness restrictions outside
+  attacker declaration or introduce triggered/static-ability handling.
 
 ## Out Of Scope
 

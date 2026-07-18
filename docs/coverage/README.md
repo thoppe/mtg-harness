@@ -38,8 +38,8 @@ Use that manifest as the complete card and rule list. The companion manifests re
 
 At the time of this README update, the active slice includes a narrow
 `Portal`-led card set covering vanilla creatures, basic lands, minimal
-`Flying`, `Reach`, `Swampwalk`, `Forestwalk`, `Islandwalk`, `Defender`, and
-`Vigilance`, plus the bounded flying-only blocker restriction and name-scoped
+`Flying`, `Reach`, `Swampwalk`, `Forestwalk`, `Islandwalk`, `Mountainwalk`,
+`Defender`, `Vigilance`, and `Haste`, plus the bounded flying-only blocker restriction and name-scoped
 Alabaster Dragon dies-trigger shuffle, plus name-scoped
 sorcery support for targeted destruction, color-restricted destruction, card
 draw, life gain, battlefield-to-library movement, battlefield-to-hand movement,

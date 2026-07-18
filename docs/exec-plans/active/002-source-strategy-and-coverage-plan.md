@@ -161,16 +161,22 @@ Prefer links to canonical manifests over duplicated card lists. If a copied list
 ## Resume Here
 
 The next session should continue from the manifest-backed slice after the
-completed Wave 3 creature and Alabaster Dragon trigger batch.
+completed Wave 4 creature, Mountainwalk, and Haste batch.
 
 1. Treat the active support-slice manifest as the only playable card-universe
    declaration; source artifacts alone do not imply support.
-2. Preserve Alabaster Dragon's trigger boundary: it is limited to oracle ID
+2. Preserve the completed Wave 4 boundary: Mountain Goat extends only the
+   explicit landwalk mapping with `Mountainwalk` -> `Mountain`; Raging Cougar,
+   Raging Goblin, Raging Minotaur, and Volcanic Dragon have only the printed
+   Haste exception to entered-this-turn attacker legality. The other Wave 4
+   cards reuse the declared creature and combat predicates. Do not infer
+   generic static or triggered-ability support from this batch.
+3. Preserve Alabaster Dragon's trigger boundary: it is limited to oracle ID
    `2392a41a-59d3-4749-be94-4d9df0af9c4c`, records last-known identity when it
    dies, and shuffles only that card instance from its owner's graveyard on
    successful trigger resolution.
-3. Do not use the Alabaster implementation to claim generic triggered
+4. Do not use the Alabaster implementation to claim generic triggered
    abilities, generic shuffle effects, replacement effects, or ordering logic.
-4. Before each implementation subwave, update source artifacts, manifest,
+5. Before each implementation subwave, update source artifacts, manifest,
    coverage, rules envelope, registry, and edge-case tests together; before
    finishing, run the card-expansion freshness check above.

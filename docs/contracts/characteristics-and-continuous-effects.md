@@ -15,11 +15,12 @@ Define the bounded characteristics model used by the Portal expansion waves.
   zones; they never follow a persistent `card_instance_id` into a new object.
 - The initial model supports additive power/toughness bonuses and granted
   keywords only. It is not a general layer system.
-- Wave 3's printed static keywords may be read by the shared combat predicates
-  for `Islandwalk` and `Vigilance`; the latter changes only whether attacker
-  declaration taps that creature. The bounded flying-only blocker restriction
-  for Cloud Dragon, Cloud Pirates, and Cloud Spirit is likewise a combat
-  predicate, not a continuous-effect layer.
+- Wave 3--4 printed static keywords may be read by the shared combat predicates
+  for `Islandwalk`, `Mountainwalk`, `Vigilance`, and `Haste`; Vigilance changes
+  only whether attacker declaration taps that creature, while Haste is the
+  explicit exception to the entered-this-turn attack restriction. The bounded
+  flying-only blocker restriction for Cloud Dragon, Cloud Pirates, and Cloud
+  Spirit is likewise a combat predicate, not a continuous-effect layer.
 
 ## Expansion Guardrail
 

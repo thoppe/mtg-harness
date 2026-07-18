@@ -319,6 +319,25 @@ Define how the current rule-family coverage should map to future engine tests an
   - `attackers_declared`
   - `blockers_declared`
 
+### `mountainwalk_keyword_minimal`
+
+- Planned tests:
+  - `engine/tests/test_combat.py`
+  - `engine/tests/test_wave4.py`
+- Planned trace assertions:
+  - `attackers_declared`
+  - `blockers_declared`
+
+### `haste_keyword_minimal`
+
+- Planned tests:
+  - `engine/tests/test_combat.py`
+  - `engine/tests/test_wave4.py`
+- Planned trace assertions:
+  - `spell_cast`
+  - `spell_resolved`
+  - `attackers_declared`
+
 ### `vigilance_keyword_minimal`
 
 - Planned tests:
@@ -415,6 +434,10 @@ Define how the current rule-family coverage should map to future engine tests an
   - `islandwalk_keyword_minimal`, `vigilance_keyword_minimal`, and
     `flying_only_blocker_restriction_minimal` now have focused Wave 3 engine
     coverage in `engine/tests/test_wave3.py`.
+  - `mountainwalk_keyword_minimal` and `haste_keyword_minimal` have focused
+    Wave 4 engine coverage in `engine/tests/test_wave4.py`; the latter covers
+    same-turn attack legality, including Volcanic Dragon's combination with
+    existing Flying.
   - `alabaster_dragon_death_trigger_minimal` has focused Wave 3 coverage for
     stack creation, successful deterministic shuffle, and no-effect resolution
     after the Dragon leaves its graveyard.

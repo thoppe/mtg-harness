@@ -150,6 +150,28 @@ card_entries:
   - {set_code: por, oracle_id: "9e1a6481-f460-4551-96e8-30b289f2cb92"}
   - {set_code: por, oracle_id: "fff6f2d0-22b5-41d0-99dc-bc817c3bd166"}
   - {set_code: por, oracle_id: "9297e50f-f8a5-4793-b64d-a119404f94ce"}
+  # Wave 4: creature casting/combat reuse plus bounded Mountainwalk and Haste.
+  - {set_code: por, oracle_id: "53fb9a9b-1f5d-48c9-88c0-0864c187f15e"}
+  - {set_code: por, oracle_id: "1e41136b-afa7-45ee-8d04-d0c7514b5387"}
+  - {set_code: por, oracle_id: "031cd561-d9b1-4a0e-bc38-bc09e80563c3"}
+  - {set_code: por, oracle_id: "ef7788af-8edc-46df-a5b6-895c734ea423"}
+  - {set_code: por, oracle_id: "d8a0c3ff-7042-4b52-a216-15e170c8094f"}
+  - {set_code: por, oracle_id: "695ebb35-55fd-4ed1-8cbe-e3fc1223115b"}
+  - {set_code: por, oracle_id: "30997b43-fc13-41d3-8064-1ccc2cb6fd2b"}
+  - {set_code: por, oracle_id: "4cfd04b3-57bd-4860-8b47-57a0fd0a23fa"}
+  - {set_code: por, oracle_id: "2cdebbc2-2e0b-4d26-bb7f-4736f0318ca7"}
+  - {set_code: por, oracle_id: "2b856a43-ca6b-4f08-b610-9794ee6d7fcf"}
+  - {set_code: por, oracle_id: "ae37dd07-2926-4801-b89d-3ffad9f0f575"}
+  - {set_code: por, oracle_id: "90f9440a-0bf8-46eb-9cfa-16fb88a217d8"}
+  - {set_code: por, oracle_id: "7af786a0-0851-4f87-ad0d-36b40527700c"}
+  - {set_code: por, oracle_id: "e15060c3-3773-4548-8747-ff59dcf2b519"}
+  - {set_code: por, oracle_id: "05425f2f-7228-4bf5-8fe1-6fe99107e8e0"}
+  - {set_code: por, oracle_id: "4916773d-5ccb-48ff-8aa3-09771ae88e81"}
+  - {set_code: por, oracle_id: "e66e3450-bddb-46ac-bc7e-c7732e258374"}
+  - {set_code: por, oracle_id: "994db177-03f5-43dd-bf7b-2994e8d430d3"}
+  - {set_code: por, oracle_id: "eb098958-50d3-4476-ba74-382033703ff9"}
+  - {set_code: por, oracle_id: "50fa6a63-e031-47cb-8fd5-a6c235203722"}
+  - {set_code: por, oracle_id: "19d5eb29-2d35-44e7-afa1-3ba8d812ed41"}
 card_keys:
   - "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
   - "a768ba13-4d1c-4dce-a4a6-86a39c069c3f"
@@ -264,6 +286,27 @@ card_keys:
   - "9e1a6481-f460-4551-96e8-30b289f2cb92"
   - "fff6f2d0-22b5-41d0-99dc-bc817c3bd166"
   - "9297e50f-f8a5-4793-b64d-a119404f94ce"
+  - "53fb9a9b-1f5d-48c9-88c0-0864c187f15e"
+  - "1e41136b-afa7-45ee-8d04-d0c7514b5387"
+  - "031cd561-d9b1-4a0e-bc38-bc09e80563c3"
+  - "ef7788af-8edc-46df-a5b6-895c734ea423"
+  - "d8a0c3ff-7042-4b52-a216-15e170c8094f"
+  - "695ebb35-55fd-4ed1-8cbe-e3fc1223115b"
+  - "30997b43-fc13-41d3-8064-1ccc2cb6fd2b"
+  - "4cfd04b3-57bd-4860-8b47-57a0fd0a23fa"
+  - "2cdebbc2-2e0b-4d26-bb7f-4736f0318ca7"
+  - "2b856a43-ca6b-4f08-b610-9794ee6d7fcf"
+  - "ae37dd07-2926-4801-b89d-3ffad9f0f575"
+  - "90f9440a-0bf8-46eb-9cfa-16fb88a217d8"
+  - "7af786a0-0851-4f87-ad0d-36b40527700c"
+  - "e15060c3-3773-4548-8747-ff59dcf2b519"
+  - "05425f2f-7228-4bf5-8fe1-6fe99107e8e0"
+  - "4916773d-5ccb-48ff-8aa3-09771ae88e81"
+  - "e66e3450-bddb-46ac-bc7e-c7732e258374"
+  - "994db177-03f5-43dd-bf7b-2994e8d430d3"
+  - "eb098958-50d3-4476-ba74-382033703ff9"
+  - "50fa6a63-e031-47cb-8fd5-a6c235203722"
+  - "19d5eb29-2d35-44e7-afa1-3ba8d812ed41"
 rule_keys:
   - game_setup_minimal
   - turn_structure_minimal
@@ -316,6 +359,8 @@ rule_keys:
   - islandwalk_keyword_minimal
   - vigilance_keyword_minimal
   - alabaster_dragon_death_trigger_minimal
+  - mountainwalk_keyword_minimal
+  - haste_keyword_minimal
 source_artifacts:
   - information/cards/data/
   - information/cards/images/

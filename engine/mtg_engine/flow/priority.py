@@ -290,7 +290,9 @@ def attacker_attack_rejection_reason(
         return "creature with defender cannot attack"
     if attacker.tapped:
         return "attacker is already tapped"
-    if attacker.entered_battlefield_turn == state.turn.turn_number:
+    if attacker.entered_battlefield_turn == state.turn.turn_number and not has_keyword(
+        state, card_repository, attacker_id, "Haste"
+    ):
         return "summoning-sick creature cannot attack in v0"
     if attacker_card.name == "Deep-Sea Serpent" and not any(
         card_repository.get(state.objects[land_id].oracle_id).has_subtype("Island")
@@ -409,6 +411,7 @@ LANDWALK_KEYWORD_TO_SUBTYPE = {
     "Swampwalk": "Swamp",
     "Forestwalk": "Forest",
     "Islandwalk": "Island",
+    "Mountainwalk": "Mountain",
 }
 
 BLOCKS_ONLY_FLYING_CARD_NAMES = frozenset({"Cloud Dragon", "Cloud Pirates", "Cloud Spirit"})
