@@ -19,7 +19,7 @@ from mtg_engine.cards.repository import CardRepository
 from mtg_engine.cards.implementations import effect_key_for
 from mtg_engine.events.log import EventLog
 from mtg_engine.state.models import GameOutcome, GameState, StackEntry, TurnState
-from mtg_engine.state.zones import move_object, move_object_to_top_of_library, update_object, update_player
+from mtg_engine.state.zones import move_object, move_object_to_top_of_library, update_object, update_player, zone_change_identity_payload
 from mtg_engine.rules.combat import apply_combat_damage, apply_state_based_actions, tap_attackers, with_combat_state
 
 from .priority import attacker_attack_rejection_reason, blocker_attack_rejection_reason, enumerate_legal_actions
@@ -138,6 +138,7 @@ def play_land(
             "oracle_id": card.oracle_id,
             "from_zone": "hand",
             "to_zone": "battlefield",
+            **zone_change_identity_payload(next_state, action.card_instance_id),
         },
     )
     return TurnResult(state=next_state, event_log=event_log.events)
@@ -232,6 +233,7 @@ def cast_creature_spell(
             "oracle_id": card.oracle_id,
             "from_zone": "hand",
             "to_zone": "stack",
+            **zone_change_identity_payload(casting_state, action.card_instance_id),
         },
     )
 
@@ -305,6 +307,7 @@ def cast_noncreature_spell(
             "oracle_id": card.oracle_id,
             "from_zone": "hand",
             "to_zone": "stack",
+            **zone_change_identity_payload(casting_state, action.card_instance_id),
         },
     )
     stacked_state = _put_spell_on_stack(
@@ -429,6 +432,7 @@ def _resolve_noncreature_spell(
                 "from_zone": "battlefield",
                 "to_zone": "library",
                 "library_position": "top",
+                **zone_change_identity_payload(resolved_state, action.target_instance_id),
             },
         )
     elif effect == "return_creature_to_hand_and_draw_one":
@@ -451,6 +455,7 @@ def _resolve_noncreature_spell(
                 "oracle_id": target.oracle_id,
                 "from_zone": "battlefield",
                 "to_zone": "hand",
+                **zone_change_identity_payload(resolved_state, action.target_instance_id),
             },
         )
         resolved_state = _draw_one_card_for_player_if_available(
@@ -571,6 +576,7 @@ def _resolve_noncreature_spell(
             "oracle_id": card.oracle_id,
             "from_zone": "stack",
             "to_zone": "graveyard",
+            **zone_change_identity_payload(resolved_state, action.card_instance_id),
         },
     )
     return TurnResult(state=resolved_state, event_log=event_log.events)
@@ -616,7 +622,7 @@ def _resolve_top_stack_entry(session: TurnResult, card_repository: CardRepositor
         event_log.append(
             event_type="object_moved_between_zones",
             active_player=entry.controller_id,
-            payload={"player_id": entry.controller_id, "card_instance_id": entry.card_instance_id, "oracle_id": spell.oracle_id, "from_zone": "stack", "to_zone": "battlefield"},
+            payload={"player_id": entry.controller_id, "card_instance_id": entry.card_instance_id, "oracle_id": spell.oracle_id, "from_zone": "stack", "to_zone": "battlefield", **zone_change_identity_payload(resolved_state, entry.card_instance_id)},
         )
         result = TurnResult(state=resolved_state, event_log=event_log.events)
     elif _stack_entry_targets_are_legal(state, entry, card_repository):
@@ -639,7 +645,7 @@ def _resolve_top_stack_entry(session: TurnResult, card_repository: CardRepositor
         event_log.append(
             event_type="object_moved_between_zones",
             active_player=entry.controller_id,
-            payload={"player_id": entry.controller_id, "card_instance_id": entry.card_instance_id, "oracle_id": spell.oracle_id, "from_zone": "stack", "to_zone": "graveyard"},
+            payload={"player_id": entry.controller_id, "card_instance_id": entry.card_instance_id, "oracle_id": spell.oracle_id, "from_zone": "stack", "to_zone": "graveyard", **zone_change_identity_payload(countered_state, entry.card_instance_id)},
         )
         result = TurnResult(state=countered_state, event_log=event_log.events)
 
@@ -1043,6 +1049,7 @@ def _draw_one_card_for_player_if_available(
             "oracle_id": card.oracle_id,
             "from_zone": "library",
             "to_zone": "hand",
+            **zone_change_identity_payload(next_state, top_instance_id),
         },
     )
     return next_state
@@ -1254,6 +1261,7 @@ def _destroy_permanents(
                 "oracle_id": permanent.oracle_id,
                 "from_zone": "battlefield",
                 "to_zone": "graveyard",
+                **zone_change_identity_payload(current_state, instance_id),
             },
         )
     return current_state, destroyed_count
@@ -1343,6 +1351,7 @@ def _discard_first_cards_in_hand_order(
                 "oracle_id": discarded.oracle_id,
                 "from_zone": "hand",
                 "to_zone": "graveyard",
+                **zone_change_identity_payload(current_state, instance_id),
             },
         )
     return current_state

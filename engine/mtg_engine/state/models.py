@@ -10,9 +10,15 @@ class CardInstance:
     owner_id: str
     controller_id: str
     zone: str
+    zone_change_counter: int = 0
     tapped: bool = False
     entered_battlefield_turn: int | None = None
     damage_marked: int = 0
+
+    @property
+    def object_id(self) -> str:
+        """Stable identity for this particular zone incarnation."""
+        return f"{self.instance_id}@{self.zone_change_counter}"
 
 
 @dataclass(frozen=True)

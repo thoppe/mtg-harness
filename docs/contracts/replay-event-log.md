@@ -47,7 +47,7 @@ Define the minimum append-only event types required for deterministic replay and
 ## Guarantees
 
 - The event log must distinguish player-chosen actions from automatic engine progress.
-- Zone changes must be visible as events rather than inferred from unrelated records.
+- Zone changes must be visible as events rather than inferred from unrelated records, including `card_instance_id`, `from_object_id`, and `to_object_id`.
 - Replay tests must be able to assert exact event sequences for the initial slice.
 - The event vocabulary may grow, but existing event meanings should not drift silently.
 - Automatic-destruction events should record the engine reason for that destruction when the current rule family can identify it explicitly.

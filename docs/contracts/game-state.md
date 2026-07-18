@@ -25,7 +25,8 @@ Define the core state boundaries for simulation.
 - `players`: identifiers, life totals, and ownership relations
 - `turn_state`: active player, step, and priority holder
 - `zones`: library, hand, battlefield, graveyard, and stack
-- `objects`: stable object records keyed independently from their current zone
+- `objects`: card-instance records keyed by stable `card_instance_id`, each
+  carrying a monotonic zone-change counter and derived `object_id`
 - `mana_pools`: at minimum the five basic colors needed for the current active support slice
 - `rng_state`: deterministic seed and any derived RNG cursor state
 - `damage_marks`: creature damage marked on objects until cleared by later turn handling
@@ -33,7 +34,8 @@ Define the core state boundaries for simulation.
 ## v0 State Rules
 
 - Hidden-zone ordering must be stable and replayable.
-- Zone movement must preserve object identity across transitions.
+- Zone movement must preserve the persistent card instance while creating a
+  fresh object identity by incrementing its zone-change counter.
 - The engine may derive convenience views, but replay cannot depend on untracked derived state.
 - The first slice may omit counters, attachments, and status markers not required by the active support slice.
 - Damage marked on creatures must be represented explicitly rather than inferred only from event history.

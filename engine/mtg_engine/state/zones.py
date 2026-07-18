@@ -49,6 +49,7 @@ def move_object(
     updated_object = replace(
         object_record,
         zone=to_zone,
+        zone_change_counter=object_record.zone_change_counter + 1,
         tapped=False,
         entered_battlefield_turn=entered_turn,
         damage_marked=0,
@@ -82,6 +83,7 @@ def move_object_to_top_of_library(
     updated_object = replace(
         object_record,
         zone="library",
+        zone_change_counter=object_record.zone_change_counter + 1,
         tapped=False,
         entered_battlefield_turn=None,
         damage_marked=0,
@@ -99,3 +101,12 @@ def update_object(state: GameState, card_instance: CardInstance) -> GameState:
     updated_objects = dict(state.objects)
     updated_objects[card_instance.instance_id] = card_instance
     return replace(state, objects=updated_objects)
+
+
+def zone_change_identity_payload(state: GameState, instance_id: str) -> dict[str, str]:
+    """Return the old and new object identities after a zone transition."""
+    moved = state.objects[instance_id]
+    return {
+        "from_object_id": f"{instance_id}@{moved.zone_change_counter - 1}",
+        "to_object_id": moved.object_id,
+    }

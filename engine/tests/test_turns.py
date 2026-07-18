@@ -127,6 +127,9 @@ class TurnTests(unittest.TestCase):
 
         moved_object = moved_state.objects["alice:1"]
         returned_object = returned_state.objects["alice:1"]
+        self.assertEqual(battlefield_state.objects["alice:1"].object_id, "alice:1@1")
+        self.assertEqual(moved_object.object_id, "alice:1@2")
+        self.assertEqual(returned_object.object_id, "alice:1@3")
         self.assertFalse(moved_object.tapped)
         self.assertEqual(moved_object.damage_marked, 0)
         self.assertIsNone(moved_object.entered_battlefield_turn)
@@ -143,6 +146,9 @@ class TurnTests(unittest.TestCase):
         self.assertEqual(result.state.players["alice"].hand, ())
         self.assertEqual(result.state.players["alice"].battlefield, ("alice:1",))
         self.assertEqual(result.state.objects["alice:1"].zone, "battlefield")
+        zone_event = result.event_log[-1]
+        self.assertEqual(zone_event.payload["from_object_id"], "alice:1@0")
+        self.assertEqual(zone_event.payload["to_object_id"], "alice:1@1")
         self.assertEqual(result.state.players["alice"].lands_played_this_turn, 1)
         self.assertEqual([event.event_type for event in result.event_log[-2:]], ["land_played", "object_moved_between_zones"])
 
