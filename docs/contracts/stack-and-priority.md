@@ -28,23 +28,27 @@ resolution, plus the one bounded triggered ability required by Alabaster Dragon.
 - The declared attackers step opens a priority window when an instant is
   available. The current narrow instant predicate is Treetop Defense: only
   its controller, after being attacked in that combat, may cast it there.
+- If combat damage creates an Alabaster trigger, combat remains in the combat-
+  damage priority window until that trigger resolves and both players pass on
+  an empty stack; cleanup cannot bypass that stack entry.
 - Both players' pass actions and the automatic resolution transition are
   visible in the event log.
 - Target legality is rechecked at resolution. A spell whose required targets are
   all illegal on resolution emits `spell_countered_on_resolution`, does not
   apply its effect, and moves to its normal destination.
-- The Alabaster entry captures its source object's last-known identity and owner
-  when the Dragon dies. On resolution it shuffles that card instance into its
-  owner's library only if it is still in that owner's graveyard; otherwise the
-  entry resolves with no shuffle effect.
+- The Alabaster entry captures its source controller, owner, last-known
+  battlefield identity, and the newly created graveyard identity. On resolution
+  it shuffles that card instance into its owner's library only if that same
+  graveyard object still exists; otherwise the entry resolves with no shuffle
+  effect.
 
 ## State Requirements
 
 - A stack entry must preserve the spell card instance, controller, paid costs,
   and chosen targets independently from later state changes.
-- The bounded Alabaster trigger entry must additionally preserve its kind, source
-  `object_id`, source `card_instance_id`, and owner independently from the new
-  graveyard object created by the death zone change.
+- The bounded Alabaster trigger entry must additionally preserve its kind,
+  source controller, source `object_id`, source `card_instance_id`, owner, and
+  expected graveyard `object_id` independently from the death zone change.
 - Priority state must record enough information to determine whether all players
   have passed consecutively since the last stack-changing action.
 - In the two-player v0 slice, the caster's pass gives priority to the opponent;

@@ -22,8 +22,8 @@ implementation detail.
   before the shuffle event.
 - Alabaster Dragon's supported death trigger first moves the captured card
   instance from its owner's graveyard to that owner's library, then performs
-  exactly one library shuffle on resolution. If the card is no longer in that
-  graveyard, it performs no shuffle and consumes no cursor position.
+  exactly one library shuffle on resolution. If it is no longer the captured
+  graveyard object, it performs no shuffle and consumes no cursor position.
 
 ## Boundaries
 

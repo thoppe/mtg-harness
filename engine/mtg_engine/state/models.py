@@ -66,6 +66,7 @@ class StackEntry:
     source_object_id: str | None = None
     source_oracle_id: str | None = None
     owner_id: str | None = None
+    expected_graveyard_object_id: str | None = None
 
 
 @dataclass(frozen=True)

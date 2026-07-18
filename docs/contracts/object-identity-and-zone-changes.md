@@ -28,8 +28,9 @@ through zone changes while retaining deterministic traceability.
   post-change object identities when an object changes zone.
 - Alabaster Dragon's bounded death trigger uses last-known information from the
   battlefield object that died. Its trigger entry must retain that old
-  `object_id`, card instance, and owner rather than treating the newly-created
-  graveyard object as the trigger source.
+  `object_id`, card instance, controller, and owner, plus the expected new
+  graveyard `object_id`. It must not affect a later graveyard incarnation after
+  the card has left that graveyard and returned.
 
 ## v0 Migration
 

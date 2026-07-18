@@ -7,12 +7,12 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from mtg_engine.actions.models import DeclareAttackersAction, DeclareBlockersAction, PassPriorityAction
+from mtg_engine.actions.models import ActivateManaAbilityAction, CastCreatureSpellAction, DeclareAttackersAction, DeclareBlockersAction, PassPriorityAction
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.events.log import EventLog
 from mtg_engine.flow.priority import blocker_attack_rejection_reason, enumerate_legal_actions
 from mtg_engine.flow.setup import SetupInput, initialize_game
-from mtg_engine.flow.turns import TurnResult, _destroy_permanents, declare_attackers, declare_blockers, pass_priority
+from mtg_engine.flow.turns import TurnResult, _destroy_permanents, activate_mana_ability, advance_to_cleanup, cast_creature_spell, declare_attackers, declare_blockers, pass_priority, resolve_combat_damage
 from mtg_engine.rules.combat import apply_state_based_actions, with_combat_state
 from mtg_engine.state.models import TurnState
 from mtg_engine.state.zones import move_object
@@ -20,6 +20,7 @@ from mtg_engine.state.zones import move_object
 
 INFO = Path(__file__).resolve().parents[2] / "information"
 ISLAND = "b2c6aa39-2d2a-459c-a555-fb48ba993373"
+PLAINS = "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
 MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
 ARMORED_PEGASUS = "f097a059-5505-4c3c-b879-7853ab6972ed"
 BULL_HIPPO = "4d62a448-b6a5-43b1-a281-9e9361a5524a"
@@ -69,6 +70,54 @@ class Wave3CombatTests(unittest.TestCase):
         for oracle_id, name in WAVE_THREE_CARD_NAMES.items():
             with self.subTest(oracle_id=oracle_id):
                 self.assertEqual(self.repository.get(oracle_id).name, name)
+
+    def test_alabaster_dragon_casts_for_its_full_mana_cost_and_resolves(self) -> None:
+        lands = (PLAINS,) * 6
+        state = initialize_game(
+            SetupInput(
+                "alabaster-cast",
+                ("alice", "bob"),
+                "alice",
+                {"alice": lands + (ALABASTER_DRAGON,), "bob": ()},
+                {"alice": lands + (ALABASTER_DRAGON,), "bob": ()},
+                41,
+            ),
+            self.repository,
+        ).state
+        for instance_id in tuple(state.players["alice"].hand[:-1]):
+            state = move_object(state, instance_id=instance_id, from_zone="hand", to_zone="battlefield", player_id="alice")
+        session = TurnResult(replace(state, turn=TurnState(1, "alice", "alice", "precombat_main_step")), ())
+        for instance_id in session.state.players["alice"].battlefield:
+            session = activate_mana_ability(session, ActivateManaAbilityAction("alice", instance_id), self.repository)
+
+        stacked = cast_creature_spell(session, CastCreatureSpellAction("alice", "alice:7"), self.repository)
+        after_alice_passes = pass_priority(stacked, PassPriorityAction("alice"), self.repository)
+        resolved = pass_priority(after_alice_passes, PassPriorityAction("bob"), self.repository)
+
+        self.assertEqual(resolved.state.objects["alice:7"].zone, "battlefield")
+        self.assertEqual(self.repository.get(ALABASTER_DRAGON).mana_cost, "{4}{W}{W}")
+
+    def test_alabaster_dragon_flying_rejects_a_nonflying_blocker(self) -> None:
+        state = _combat_state(
+            self.repository,
+            alice_cards=(ALABASTER_DRAGON,),
+            bob_cards=(MUCK_RATS,),
+            attacker_id="alice:1",
+            blocker_id="bob:1",
+        )
+        blocked_action = DeclareBlockersAction(player_id="bob", blockers={"alice:1": ("bob:1",)})
+
+        self.assertEqual(
+            blocker_attack_rejection_reason(
+                state=state,
+                card_repository=self.repository,
+                blocker_id="bob:1",
+                attacker_id="alice:1",
+            ),
+            "blocker cannot block the selected attacker",
+        )
+        with self.assertRaisesRegex(ValueError, "blocker cannot block"):
+            declare_blockers(TurnResult(state, ()), blocked_action, self.repository)
 
     def test_bull_hippo_islandwalk_excludes_blocks_from_enumeration_and_submission(self) -> None:
         state = _combat_state(
@@ -160,7 +209,10 @@ class Wave3CombatTests(unittest.TestCase):
         self.assertEqual(destroyed_state.objects["alice:1"].zone, "graveyard")
         self.assertEqual(destroyed_state.stack_entries[0].entry_kind, "alabaster_dragon_death_trigger")
         self.assertEqual(destroyed_state.stack_entries[0].source_object_id, "alice:1@1")
+        self.assertEqual(destroyed_state.stack_entries[0].expected_graveyard_object_id, "alice:1@2")
         self.assertEqual(events[-1]["event_type"], "triggered_ability_put_on_stack")
+        self.assertEqual(events[-2]["payload"]["from_object_id"], "alice:1@1")
+        self.assertEqual(events[-2]["payload"]["to_object_id"], "alice:1@2")
 
         pending = TurnResult(destroyed_state, ())
         after_alice_passes = pass_priority(
@@ -201,6 +253,46 @@ class Wave3CombatTests(unittest.TestCase):
             final_libraries.append(resolved.state.players["alice"].library)
         self.assertEqual(final_libraries[0], final_libraries[1])
 
+    def test_simultaneous_alabaster_deaths_use_two_player_apnap_stack_order(self) -> None:
+        state = initialize_game(
+            SetupInput(
+                "alabaster-apnap",
+                ("alice", "bob"),
+                "alice",
+                {"alice": (ALABASTER_DRAGON,), "bob": (ALABASTER_DRAGON,)},
+                {"alice": (ALABASTER_DRAGON,), "bob": (ALABASTER_DRAGON,)},
+                43,
+            ),
+            self.repository,
+        ).state
+        for player_id in ("alice", "bob"):
+            state = move_object(state, instance_id=f"{player_id}:1", from_zone="hand", to_zone="battlefield", player_id=player_id)
+        state = replace(
+            state,
+            objects={
+                **state.objects,
+                "alice:1": replace(state.objects["alice:1"], damage_marked=4),
+                "bob:1": replace(state.objects["bob:1"], damage_marked=4),
+            },
+        )
+
+        destroyed_state, _ = apply_state_based_actions(state, self.repository, active_player="alice")
+
+        self.assertEqual([entry.controller_id for entry in destroyed_state.stack_entries], ["alice", "bob"])
+
+    def test_game_ending_sba_does_not_queue_alabaster_trigger(self) -> None:
+        state = _alabaster_death_state(self.repository, seed=47)
+        state = replace(
+            state,
+            players={**state.players, "bob": replace(state.players["bob"], life_total=0)},
+        )
+
+        destroyed_state, events = apply_state_based_actions(state, self.repository, active_player="alice")
+
+        self.assertEqual(destroyed_state.outcome.status, "completed")
+        self.assertEqual(destroyed_state.stack_entries, ())
+        self.assertNotIn("triggered_ability_put_on_stack", [event["event_type"] for event in events])
+
     def test_destroy_effect_path_enqueues_alabaster_trigger(self) -> None:
         state = _alabaster_death_state(self.repository, seed=29)
         dragon = replace(state.objects["alice:1"], damage_marked=0)
@@ -239,6 +331,61 @@ class Wave3CombatTests(unittest.TestCase):
         self.assertEqual(resolved.state.rng_cursor, 0)
         self.assertNotIn("library_shuffled", [event.event_type for event in resolved.event_log])
         self.assertFalse(resolved.event_log[-1].payload["moved_to_library"])
+
+    def test_alabaster_trigger_is_a_no_op_after_leaving_and_returning_to_graveyard(self) -> None:
+        state = _alabaster_death_state(self.repository, seed=37)
+        destroyed_state, _ = apply_state_based_actions(state, self.repository, active_player="alice")
+        moved_state = move_object(
+            destroyed_state,
+            instance_id="alice:1",
+            from_zone="graveyard",
+            to_zone="hand",
+            player_id="alice",
+        )
+        returned_state = move_object(
+            moved_state,
+            instance_id="alice:1",
+            from_zone="hand",
+            to_zone="graveyard",
+            player_id="alice",
+        )
+
+        pending = TurnResult(returned_state, ())
+        pending = pass_priority(pending, PassPriorityAction(player_id="alice"), self.repository)
+        resolved = pass_priority(pending, PassPriorityAction(player_id="bob"), self.repository)
+
+        self.assertEqual(resolved.state.objects["alice:1"].zone, "graveyard")
+        self.assertEqual(resolved.state.rng_cursor, 0)
+        self.assertFalse(resolved.event_log[-1].payload["moved_to_library"])
+
+    def test_alabaster_combat_death_resolves_before_combat_can_end(self) -> None:
+        state = _combat_state(
+            self.repository,
+            alice_cards=(ARCHANGEL,),
+            bob_cards=(ALABASTER_DRAGON,),
+            attacker_id="alice:1",
+            blocker_id="bob:1",
+        )
+        blocked = declare_blockers(
+            TurnResult(state, ()),
+            DeclareBlockersAction(player_id="bob", blockers={"alice:1": ("bob:1",)}),
+            self.repository,
+        )
+        damaged = resolve_combat_damage(blocked, self.repository)
+
+        self.assertEqual(damaged.state.turn.step, "combat_damage_step")
+        self.assertEqual(damaged.state.turn.priority_player, "alice")
+        self.assertEqual(len(damaged.state.stack_entries), 1)
+        with self.assertRaisesRegex(ValueError, "end_combat_step"):
+            advance_to_cleanup(damaged)
+
+        after_alice_passes = pass_priority(damaged, PassPriorityAction(player_id="alice"), self.repository)
+        resolved = pass_priority(after_alice_passes, PassPriorityAction(player_id="bob"), self.repository)
+        self.assertEqual(resolved.state.objects["bob:1"].zone, "library")
+        self.assertEqual(resolved.state.turn.step, "combat_damage_step")
+        passed_once = pass_priority(resolved, PassPriorityAction(player_id="alice"), self.repository)
+        ended = pass_priority(passed_once, PassPriorityAction(player_id="bob"), self.repository)
+        self.assertEqual(ended.state.turn.step, "end_combat_step")
 
 
 def _combat_state(

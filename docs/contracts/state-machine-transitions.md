@@ -58,7 +58,8 @@ Define the minimum legal progression points for the first deterministic engine s
 - The only triggered stack interaction in the slice is Alabaster Dragon's
   name-scoped death trigger, created after the destruction or state-based-
   action operation in which it dies and resolved through the normal priority
-  cycle.
+  cycle. A combat-damage death keeps the combat-damage priority window open
+  until the stack clears.
 - The first slice may model combat with a single combat-damage checkpoint rather than broader combat variants.
 - The currently implemented turn flow reaches cleanup, emits `turn_ended`, and can hand off into the next active player's precombat main.
 - Full long-run game-loop completion beyond the supported subset still remains future work.

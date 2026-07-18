@@ -954,7 +954,11 @@ def _resolve_alabaster_dragon_death_trigger(session: TurnResult, entry: StackEnt
     event_log = EventLog.from_events(state.game_id, session.event_log)
     owner_id = entry.owner_id or entry.controller_id
     source = state.objects[entry.card_instance_id]
-    moved = source.zone == "graveyard" and source.owner_id == owner_id
+    moved = (
+        source.zone == "graveyard"
+        and source.owner_id == owner_id
+        and source.object_id == entry.expected_graveyard_object_id
+    )
     resolved_state = state
     if moved:
         resolved_state = move_object(
@@ -1025,7 +1029,7 @@ def pass_priority(
     state = session.state
     if state.turn.priority_player != action.player_id:
         raise ValueError("player does not have priority")
-    if state.turn.step not in {"precombat_main_step", "declare_attackers_step"}:
+    if state.turn.step not in {"precombat_main_step", "declare_attackers_step", "combat_damage_step"}:
         raise ValueError("priority is not available in this step")
 
     next_priority_player = _other_player(state, action.player_id)
@@ -1077,6 +1081,10 @@ def pass_priority(
     if state.turn.step == "declare_attackers_step" and state.combat is not None:
         next_state = replace(restored_state, turn=replace(restored_state.turn, step="declare_blockers_step", priority_player=state.combat.defending_player))
         event_log.append(event_type="step_changed", active_player=state.turn.active_player, payload={"turn_number": state.turn.turn_number, "from_step": "declare_attackers_step", "to_step": "declare_blockers_step"})
+        return TurnResult(state=next_state, event_log=event_log.events)
+    if state.turn.step == "combat_damage_step":
+        next_state = replace(restored_state, turn=replace(restored_state.turn, step="end_combat_step"))
+        event_log.append(event_type="step_changed", active_player=state.turn.active_player, payload={"turn_number": state.turn.turn_number, "from_step": "combat_damage_step", "to_step": "end_combat_step"})
         return TurnResult(state=next_state, event_log=event_log.events)
     return advance_to_begin_combat(TurnResult(state=restored_state, event_log=event_log.events))
 
@@ -1230,7 +1238,12 @@ def resolve_combat_damage(
     require_step(state, "combat_damage_step")
 
     next_state, combat_events = apply_combat_damage(state, card_repository)
-    next_state = replace(next_state, turn=replace(next_state.turn, step="end_combat_step"))
+    next_step = "combat_damage_step" if next_state.stack_entries else "end_combat_step"
+    next_state = replace(
+        next_state,
+        turn=replace(next_state.turn, step=next_step, priority_player=state.turn.active_player),
+        consecutive_passes=0,
+    )
 
     event_log = EventLog.from_events(state.game_id, session.event_log)
     for event in combat_events:
@@ -1245,7 +1258,7 @@ def resolve_combat_damage(
         payload={
             "turn_number": state.turn.turn_number,
             "from_step": "combat_damage_step",
-            "to_step": "end_combat_step",
+            "to_step": next_step,
         },
     )
     return TurnResult(state=next_state, event_log=event_log.events)
@@ -1254,6 +1267,8 @@ def resolve_combat_damage(
 def advance_to_cleanup(session: TurnResult | GameBootstrap) -> TurnResult:
     state = session.state
     require_step(state, "end_combat_step")
+    if state.stack_entries:
+        raise ValueError("cleanup requires an empty stack")
 
     event_log = EventLog.from_events(state.game_id, session.event_log)
     current_state = state
@@ -1654,6 +1669,7 @@ def _destroy_permanents(
                 "card_instance_id": instance_id,
                 "source_object_id": permanent.object_id,
                 "owner_id": permanent.owner_id,
+                "controller_id": permanent.controller_id,
                 "oracle_id": permanent.oracle_id,
             }
         )

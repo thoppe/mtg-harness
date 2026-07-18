@@ -4,7 +4,7 @@ from dataclasses import replace
 
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.state.models import CombatState, GameOutcome, GameState, StackEntry
-from mtg_engine.state.zones import move_object, update_object, update_player
+from mtg_engine.state.zones import move_object, update_object, update_player, zone_change_identity_payload
 from mtg_engine.rules.characteristics import effective_power, effective_toughness, has_keyword
 
 
@@ -161,6 +161,7 @@ def apply_state_based_actions(
                     "card_instance_id": instance_id,
                     "source_object_id": obj.object_id,
                     "owner_id": obj.owner_id,
+                    "controller_id": obj.controller_id,
                     "oracle_id": obj.oracle_id,
                     "reason": "lethal_damage",
                     "damage_marked": obj.damage_marked,
@@ -231,15 +232,17 @@ def apply_state_based_actions(
                     "oracle_id": destroyed_object.oracle_id,
                     "from_zone": "battlefield",
                     "to_zone": "graveyard",
+                    **zone_change_identity_payload(current_state, destroyed_id),
                 },
             }
         )
-    current_state, trigger_events = queue_death_triggers(
-        current_state,
-        destroyed_objects,
-        active_player=active_player,
-    )
-    events.extend(trigger_events)
+    if current_state.outcome.status != "completed":
+        current_state, trigger_events = queue_death_triggers(
+            current_state,
+            destroyed_objects,
+            active_player=active_player,
+        )
+        events.extend(trigger_events)
     return current_state, events
 
 
@@ -260,17 +263,25 @@ def queue_death_triggers(
     """
     trigger_entries: list[StackEntry] = []
     events: list[dict] = []
-    for destroyed in destroyed_objects:
+    player_order = (active_player,) + tuple(
+        player_id for player_id in state.players if player_id != active_player
+    )
+    ordered_destroyed = sorted(
+        destroyed_objects,
+        key=lambda destroyed: player_order.index(destroyed["controller_id"]),
+    )
+    for destroyed in ordered_destroyed:
         if destroyed["oracle_id"] != ALABASTER_DRAGON_ORACLE_ID:
             continue
         trigger_entries.append(
             StackEntry(
                 card_instance_id=destroyed["card_instance_id"],
-                controller_id=destroyed["owner_id"],
+                controller_id=destroyed["controller_id"],
                 entry_kind="alabaster_dragon_death_trigger",
                 source_object_id=destroyed["source_object_id"],
                 source_oracle_id=destroyed["oracle_id"],
                 owner_id=destroyed["owner_id"],
+                expected_graveyard_object_id=state.objects[destroyed["card_instance_id"]].object_id,
             )
         )
         events.append(
@@ -282,7 +293,9 @@ def queue_death_triggers(
                     "card_instance_id": destroyed["card_instance_id"],
                     "oracle_id": destroyed["oracle_id"],
                     "owner_id": destroyed["owner_id"],
+                    "controller_id": destroyed["controller_id"],
                     "source_object_id": destroyed["source_object_id"],
+                    "expected_graveyard_object_id": state.objects[destroyed["card_instance_id"]].object_id,
                 },
             }
         )
