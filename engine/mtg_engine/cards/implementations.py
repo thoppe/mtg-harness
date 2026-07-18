@@ -34,6 +34,8 @@ IMPLEMENTATIONS = {
     "f637d525-2f29-488a-9269-8e5aa377fbb7": "damage_any_target_2",
     "f7571a2e-aaf3-4148-ab76-2a2e35273c70": "target_player_gains_8_life",
     "91c0a76e-3992-437f-b85a-97b0b4adbb84": "destroy_target_creature_or_land",
+    "cbc9c731-181a-4f00-a7b0-eb7e56eac2ea": "return_target_creature_card_from_your_graveyard",
+    "8a922366-ee2a-4ddb-a904-683dcf4f191a": "return_target_card_from_your_graveyard",
 }
 
 

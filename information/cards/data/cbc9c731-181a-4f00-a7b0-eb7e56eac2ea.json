@@ -1,0 +1,141 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "cbc9c731-181a-4f00-a7b0-eb7e56eac2ea",
+  "name": "Raise Dead",
+  "provenance": {
+    "collector_number": "107",
+    "fetched_at": "2026-07-18T00:18:08Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/e/0/e0584553-a25e-4030-ab39-53550cba3f0b.jpg?1783946824",
+    "oracle_id": "cbc9c731-181a-4f00-a7b0-eb7e56eac2ea",
+    "request_url": "https://api.scryfall.com/cards/search?q=%28set%3Apor%20%28oracleid%3Acbc9c731-181a-4f00-a7b0-eb7e56eac2ea%29%29",
+    "requested_set_code": "por",
+    "scryfall_id": "e0584553-a25e-4030-ab39-53550cba3f0b",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/e0584553-a25e-4030-ab39-53550cba3f0b"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Charles Gillespie",
+    "artist_ids": [
+      "ec2c14ea-79eb-4c55-963f-c46f7cef1c22"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10015,
+    "cmc": 1.0,
+    "collector_number": "107",
+    "color_identity": [
+      "B"
+    ],
+    "colors": [
+      "B"
+    ],
+    "digital": false,
+    "edhrec_rank": 9097,
+    "finishes": [
+      "nonfoil"
+    ],
+    "flavor_text": "The earth cannot hold that which magic commands.",
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "e0584553-a25e-4030-ab39-53550cba3f0b",
+    "illustration_id": "1965a912-5834-4627-8f86-55440f3365e7",
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T12:47:04Z",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/e/0/e0584553-a25e-4030-ab39-53550cba3f0b.jpg?1783946824",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/e/0/e0584553-a25e-4030-ab39-53550cba3f0b.jpg?1783946824",
+      "large": "https://cards.scryfall.io/large/front/e/0/e0584553-a25e-4030-ab39-53550cba3f0b.jpg?1783946824",
+      "normal": "https://cards.scryfall.io/normal/front/e/0/e0584553-a25e-4030-ab39-53550cba3f0b.jpg?1783946824",
+      "png": "https://cards.scryfall.io/png/front/e/0/e0584553-a25e-4030-ab39-53550cba3f0b.png?1783946824",
+      "small": "https://cards.scryfall.io/small/front/e/0/e0584553-a25e-4030-ab39-53550cba3f0b.jpg?1783946824"
+    },
+    "keywords": [],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "legal",
+      "brawl": "legal",
+      "commander": "legal",
+      "competitivebrawl": "legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "legal",
+      "historic": "legal",
+      "legacy": "legal",
+      "modern": "legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "legal",
+      "paupercommander": "legal",
+      "penny": "not_legal",
+      "pioneer": "legal",
+      "predh": "legal",
+      "premodern": "legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "legal",
+      "tlr": "legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{B}",
+    "multiverse_ids": [
+      4236
+    ],
+    "name": "Raise Dead",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "cbc9c731-181a-4f00-a7b0-eb7e56eac2ea",
+    "oracle_text": "Return target creature card from your graveyard to your hand.",
+    "oversized": false,
+    "penny_rank": 11074,
+    "prices": {
+      "eur": "0.21",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "0.16",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3Acbc9c731-181a-4f00-a7b0-eb7e56eac2ea&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Raise+Dead&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10015&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F759%3Fpage%3D1"
+    },
+    "rarity": "common",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Raise+Dead",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4236&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DRaise%2BDead",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DRaise%2BDead"
+    },
+    "released_at": "1997-05-01",
+    "reprint": true,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/e0584553-a25e-4030-ab39-53550cba3f0b/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/107/raise-dead?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 759,
+    "textless": false,
+    "type_line": "Sorcery",
+    "uri": "https://api.scryfall.com/cards/e0584553-a25e-4030-ab39-53550cba3f0b",
+    "variation": false
+  }
+}

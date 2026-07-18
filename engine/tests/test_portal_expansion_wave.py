@@ -37,3 +37,9 @@ class PortalExpansionWaveTests(unittest.TestCase):
         result, events = _resolve_direct_damage_sorcery(state, self.repo, "bob", effect="damage_any_target_1", active_player="alice")
         self.assertEqual(result.outcome.winner_id, "alice")
         self.assertIn("game_ended", [event["event_type"] for event in events])
+
+    def test_graveyard_return_requires_own_graveyard_and_creature_when_required(self) -> None:
+        graveyard_state = move_object(self.state, instance_id="alice:1", from_zone="hand", to_zone="graveyard", player_id="alice")
+        with self.assertRaisesRegex(ValueError, "creature card"):
+            _require_legal_noncreature_target(graveyard_state, self.repo, ("alice:1",), effect="return_target_creature_card_from_your_graveyard")
+        _require_legal_noncreature_target(graveyard_state, self.repo, ("alice:1",), effect="return_target_card_from_your_graveyard")
