@@ -22,6 +22,7 @@ from mtg_engine.flow.priority import enumerate_legal_actions
 from mtg_engine.flow.setup import SetupInput, initialize_game
 from mtg_engine.flow.turns import (
     TurnResult,
+    _cleanup_end_of_turn_state,
     activate_mana_ability,
     advance_to_begin_combat,
     advance_to_cleanup,
@@ -84,6 +85,11 @@ class PriorityTests(unittest.TestCase):
         self.assertEqual(actions, (DeclareBlockersAction(player_id="bob", blockers={"alice:4": ("bob:4", "bob:6")}),))
         with self.assertRaisesRegex(ValueError, "required target"):
             declare_blockers(TurnResult(state=state, event_log=()), DeclareBlockersAction(player_id="bob", blockers={}), repository)
+        self.assertIsNone(_cleanup_end_of_turn_state(state).forced_block_target_object_id)
+        moved = move_object(state, instance_id="alice:4", from_zone="battlefield", to_zone="graveyard", player_id="alice")
+        moved = move_object(moved, instance_id="alice:4", from_zone="graveyard", to_zone="battlefield", player_id="alice")
+        moved = replace(moved, turn=TurnState(moved.turn.turn_number, "alice", "bob", "declare_blockers_step"))
+        declare_blockers(TurnResult(state=moved, event_log=()), DeclareBlockersAction(player_id="bob", blockers={}), repository)
     def test_treetop_defense_casts_in_attacked_attackers_window_and_expires(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         setup = SetupInput(
