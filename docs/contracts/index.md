@@ -4,7 +4,7 @@ Contracts define the interfaces and invariants that future code must satisfy.
 
 ## Current Contract Areas
 
-- `agent-workflow.md`
+- `agent-workflow.md` — change staging, goal continuity, and blocker discipline
 - `knowledge-sources.md`
 - `source-artifact-provenance.md`
 - `support-slice-manifest.md`

@@ -46,3 +46,23 @@ expand or correct declared rules and card support.
   scope.
 - The active execution plan and the relevant domain contracts remain the source
   of truth for what a coherent stage must contain.
+
+## Goal Continuity And Blocked Status
+
+- An unfinished implementation plan is active work, not a blocker. Agents must
+  continue with the next safe, bounded stage rather than ending a task merely
+  because additional implementation, tests, or verification remain.
+- A repeated task-continuation prompt, a partial-progress handoff, or a need
+  for more time is never evidence that a goal is blocked.
+- Before reporting or recording a goal as blocked, an agent must identify a
+  concrete external dependency that prevents *all* meaningful progress (for
+  example: unavailable required credentials, missing user-owned source data,
+  or a required product decision with materially different outcomes).
+- When a real blocker exists, the handoff must name the exact dependency, the
+  safe checks already attempted, and the smallest decision or state change
+  needed to resume. Do not classify uncertainty, incomplete test coverage, or
+  a large remaining backlog as a blocker.
+- Partial updates belong in progress commentary. A final handoff is reserved
+  for a completed objective, a genuine external blocker, or an explicit user
+  request for status; it must not replace the next planned implementation
+  stage.
