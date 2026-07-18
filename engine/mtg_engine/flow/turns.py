@@ -1022,14 +1022,6 @@ def declare_attackers(
             raise ValueError(rejection_reason)
 
     next_state = tap_attackers(state, action.attacker_ids)
-    forced_target = state.forced_block_target_object_id
-    if forced_target is not None:
-        target_id = next((instance_id for instance_id in state.combat.attackers if state.objects[instance_id].object_id == forced_target), None)
-        if target_id is not None:
-            for blocker_id in state.players[action.player_id].battlefield:
-                if blocker_id not in assigned_blockers and blocker_attack_rejection_reason(state=state, card_repository=card_repository, blocker_id=blocker_id, attacker_id=target_id) is None:
-                    raise ValueError("creature able to block the required target must do so")
-
     next_state = with_combat_state(
         next_state,
         attacking_player=action.player_id,
@@ -1099,6 +1091,14 @@ def declare_blockers(
             if rejection_reason is not None:
                 raise ValueError(rejection_reason)
             assigned_blockers.add(blocker_id)
+
+    forced_target = state.forced_block_target_object_id
+    if forced_target is not None:
+        target_id = next((instance_id for instance_id in state.combat.attackers if state.objects[instance_id].object_id == forced_target), None)
+        if target_id is not None:
+            for blocker_id in state.players[action.player_id].battlefield:
+                if blocker_attack_rejection_reason(state=state, card_repository=card_repository, blocker_id=blocker_id, attacker_id=target_id) is None and blocker_id not in action.blockers.get(target_id, ()):
+                    raise ValueError("creature able to block the required target must do so")
 
     next_state = with_combat_state(
         state,
