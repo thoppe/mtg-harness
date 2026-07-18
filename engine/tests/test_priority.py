@@ -75,6 +75,15 @@ RAIN_OF_DAGGERS = "e2048201-6dc9-4cf5-916f-1d867ae8dbdd"
 
 
 class PriorityTests(unittest.TestCase):
+    def test_alluring_scent_forces_able_blockers_in_enumeration_and_submission(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_multi_block_ready_session(repository)
+        state = with_combat_state(session.state, attacking_player="alice", defending_player="bob", attackers=("alice:4",), blockers={})
+        state = replace(state, turn=TurnState(state.turn.turn_number, "alice", "bob", "declare_blockers_step"), forced_block_target_object_id=state.objects["alice:4"].object_id)
+        actions = enumerate_legal_actions(state, repository)
+        self.assertEqual(actions, (DeclareBlockersAction(player_id="bob", blockers={"alice:4": ("bob:4", "bob:6")}),))
+        with self.assertRaisesRegex(ValueError, "required target"):
+            declare_blockers(TurnResult(state=state, event_log=()), DeclareBlockersAction(player_id="bob", blockers={}), repository)
     def test_treetop_defense_casts_in_attacked_attackers_window_and_expires(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         setup = SetupInput(
