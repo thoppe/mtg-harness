@@ -1,0 +1,142 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "26966ecb-15d3-47e5-ab63-e38510c87ecc",
+  "name": "Charging Rhino",
+  "provenance": {
+    "collector_number": "161",
+    "fetched_at": "2026-07-18T02:44:43Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/4/9/49e47248-051c-4ee6-aad2-352ebd1f38ca.jpg?1783946808",
+    "oracle_id": "26966ecb-15d3-47e5-ab63-e38510c87ecc",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor&unique=cards",
+    "requested_set_code": "por",
+    "scryfall_id": "49e47248-051c-4ee6-aad2-352ebd1f38ca",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/49e47248-051c-4ee6-aad2-352ebd1f38ca"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Una Fricker",
+    "artist_ids": [
+      "0471a371-1bf8-49f2-8e76-cbe3a0bfa7e8"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10070,
+    "cmc": 5.0,
+    "collector_number": "161",
+    "color_identity": [
+      "G"
+    ],
+    "colors": [
+      "G"
+    ],
+    "digital": false,
+    "edhrec_rank": 27451,
+    "finishes": [
+      "nonfoil"
+    ],
+    "flavor_text": "A rhino rarely uses its horn to announce its charge, only to end it.",
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "49e47248-051c-4ee6-aad2-352ebd1f38ca",
+    "illustration_id": "9ad6eae1-63ee-48da-9eb9-75aba15a5e2f",
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T12:46:48Z",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/4/9/49e47248-051c-4ee6-aad2-352ebd1f38ca.jpg?1783946808",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/4/9/49e47248-051c-4ee6-aad2-352ebd1f38ca.jpg?1783946808",
+      "large": "https://cards.scryfall.io/large/front/4/9/49e47248-051c-4ee6-aad2-352ebd1f38ca.jpg?1783946808",
+      "normal": "https://cards.scryfall.io/normal/front/4/9/49e47248-051c-4ee6-aad2-352ebd1f38ca.jpg?1783946808",
+      "png": "https://cards.scryfall.io/png/front/4/9/49e47248-051c-4ee6-aad2-352ebd1f38ca.png?1783946808",
+      "small": "https://cards.scryfall.io/small/front/4/9/49e47248-051c-4ee6-aad2-352ebd1f38ca.jpg?1783946808"
+    },
+    "keywords": [],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "competitivebrawl": "not_legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "legal",
+      "paupercommander": "legal",
+      "penny": "legal",
+      "pioneer": "legal",
+      "predh": "legal",
+      "premodern": "legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "tlr": "not_legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{3}{G}{G}",
+    "multiverse_ids": [
+      4291
+    ],
+    "name": "Charging Rhino",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "26966ecb-15d3-47e5-ab63-e38510c87ecc",
+    "oracle_text": "This creature can't be blocked by more than one creature.",
+    "oversized": false,
+    "power": "4",
+    "prices": {
+      "eur": "0.85",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "0.67",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A26966ecb-15d3-47e5-ab63-e38510c87ecc&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Charging+Rhino&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10070&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F635%3Fpage%3D1"
+    },
+    "rarity": "rare",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Charging+Rhino",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4291&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DCharging%2BRhino",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DCharging%2BRhino"
+    },
+    "released_at": "1997-05-01",
+    "reprint": false,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/49e47248-051c-4ee6-aad2-352ebd1f38ca/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/161/charging-rhino?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 635,
+    "textless": false,
+    "toughness": "4",
+    "type_line": "Creature \u2014 Rhino",
+    "uri": "https://api.scryfall.com/cards/49e47248-051c-4ee6-aad2-352ebd1f38ca",
+    "variation": false
+  }
+}

@@ -7,7 +7,9 @@ Define the bounded characteristics model used by the Portal expansion waves.
 ## v0+ Guarantees
 
 - Effective power and toughness equal printed values plus explicit temporary
-  bonuses attached to the current `object_id`.
+  effect records attached to the current `object_id`.
+- Temporary effect records can grant the bounded Wave 2 keywords `Flying`,
+  `Reach`, and `Forestwalk`, plus a color-restricted blocking constraint.
 - Combat assignment and lethal-damage SBAs use effective characteristics.
 - Temporary bonuses expire at cleanup and immediately when their object changes
   zones; they never follow a persistent `card_instance_id` into a new object.
