@@ -77,6 +77,9 @@ card_entries:
   - {set_code: por, oracle_id: "6b315dc3-c330-4b30-b6ad-4da12ccf6ca3"}
   - {set_code: por, oracle_id: "e4bcd4ea-e7cd-4471-8f3b-18bb51d3d70c"}
   - {set_code: por, oracle_id: "1f513d1e-03ca-4e0f-af48-6490d71d5c41"}
+  - {set_code: por, oracle_id: "2894ef5e-738b-4ece-b143-6662d9453295"}
+  - {set_code: por, oracle_id: "b701378f-681b-4840-bd11-1a97c2a675f2"}
+  - {set_code: por, oracle_id: "eda60752-d225-4fd0-9f0f-9b99e321b8fa"}
 card_keys:
   - "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
   - "a768ba13-4d1c-4dce-a4a6-86a39c069c3f"
@@ -121,6 +124,9 @@ card_keys:
   - "6b315dc3-c330-4b30-b6ad-4da12ccf6ca3"
   - "e4bcd4ea-e7cd-4471-8f3b-18bb51d3d70c"
   - "1f513d1e-03ca-4e0f-af48-6490d71d5c41"
+  - "2894ef5e-738b-4ece-b143-6662d9453295"
+  - "b701378f-681b-4840-bd11-1a97c2a675f2"
+  - "eda60752-d225-4fd0-9f0f-9b99e321b8fa"
 rule_keys:
   - game_setup_minimal
   - turn_structure_minimal

@@ -40,6 +40,9 @@ IMPLEMENTATIONS = {
     "6b315dc3-c330-4b30-b6ad-4da12ccf6ca3": "tap_all_nonwhite_creatures",
     "e4bcd4ea-e7cd-4471-8f3b-18bb51d3d70c": "damage_all_creatures_2",
     "1f513d1e-03ca-4e0f-af48-6490d71d5c41": "damage_all_flying_creatures_4",
+    "2894ef5e-738b-4ece-b143-6662d9453295": "damage_nonblack_creature_3_gain_3",
+    "b701378f-681b-4840-bd11-1a97c2a675f2": "damage_target_opponent_2_gain_2",
+    "eda60752-d225-4fd0-9f0f-9b99e321b8fa": "target_creature_gets_4_power_until_end_of_turn",
 }
 
 

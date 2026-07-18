@@ -530,6 +530,17 @@ def _resolve_noncreature_spell(
                 active_player=damage_event["active_player"],
                 payload=damage_event["payload"],
             )
+    elif effect == "damage_nonblack_creature_3_gain_3":
+        resolved_state, events = _resolve_direct_damage_sorcery(casting_state, card_repository, action.target_instance_id, effect="damage_nonblack_creature_3", active_player=action.player_id)
+        for event in events: event_log.append(event_type=event["event_type"], active_player=event["active_player"], payload=event["payload"])
+        player = resolved_state.players[action.player_id]; resolved_state = update_player(resolved_state, replace(player, life_total=player.life_total + 3)); event_log.append(event_type="life_total_changed", active_player=action.player_id, payload={"player_id": action.player_id, "life_total": player.life_total + 3})
+    elif effect == "damage_target_opponent_2_gain_2":
+        resolved_state, events = _resolve_direct_damage_sorcery(casting_state, card_repository, action.target_instance_id, effect="damage_target_opponent_2", active_player=action.player_id)
+        for event in events: event_log.append(event_type=event["event_type"], active_player=event["active_player"], payload=event["payload"])
+        player = resolved_state.players[action.player_id]; resolved_state = update_player(resolved_state, replace(player, life_total=player.life_total + 2)); event_log.append(event_type="life_total_changed", active_player=action.player_id, payload={"player_id": action.player_id, "life_total": player.life_total + 2})
+    elif effect == "target_creature_gets_4_power_until_end_of_turn":
+        target = resolved_state.objects[action.target_instance_id]
+        resolved_state = update_object(resolved_state, replace(target, temporary_power_bonus=target.temporary_power_bonus + 4))
     elif effect == "target_player_discards_two":
         if action.target_instance_id is None:
             raise ValueError("targeted sorcery requires a target")
@@ -1210,6 +1221,19 @@ def _require_legal_noncreature_target(
         if not (definition.is_creature or definition.is_land):
             raise ValueError("target must be a creature or land")
         return
+    if effect == "damage_target_opponent_2_gain_2":
+        if target_instance_id not in state.players or target_instance_id == state.turn.active_player: raise ValueError("target must be an opponent")
+        return
+    if effect == "damage_nonblack_creature_3_gain_3":
+        if target_instance_id not in state.objects: raise ValueError("target must exist")
+        target = state.objects[target_instance_id]; definition = card_repository.get(target.oracle_id)
+        if target.zone != "battlefield" or not definition.is_creature or definition.is_black: raise ValueError("target must be nonblack creature")
+        return
+    if effect == "target_creature_gets_4_power_until_end_of_turn":
+        if target_instance_id not in state.objects: raise ValueError("target must exist")
+        target = state.objects[target_instance_id]
+        if target.zone != "battlefield" or not card_repository.get(target.oracle_id).is_creature: raise ValueError("target must be a creature")
+        return
     if effect in {"return_target_creature_card_from_your_graveyard", "return_target_card_from_your_graveyard"}:
         if target_instance_id not in state.objects:
             raise ValueError("target must exist")
@@ -1333,7 +1357,7 @@ def _resolve_direct_damage_sorcery(
     if target_id is None:
         raise ValueError("targeted sorcery requires a target")
 
-    damage_amount = {"damage_any_target": 3, "damage_target_player": 5, "damage_any_target_1": 1, "damage_any_target_2": 2}[effect]
+    damage_amount = {"damage_any_target": 3, "damage_target_player": 5, "damage_any_target_1": 1, "damage_any_target_2": 2, "damage_nonblack_creature_3": 3, "damage_target_opponent_2": 2}[effect]
     if target_id in state.players:
         target_player = state.players[target_id]
         updated_player = replace(target_player, life_total=target_player.life_total - damage_amount)
@@ -1441,7 +1465,7 @@ def _cleanup_end_of_turn_state(state: GameState) -> GameState:
         for player_id, player in state.players.items()
     }
     updated_objects = {
-        instance_id: replace(card, damage_marked=0)
+        instance_id: replace(card, damage_marked=0, temporary_power_bonus=0)
         for instance_id, card in state.objects.items()
     }
     return replace(state, players=updated_players, objects=updated_objects)

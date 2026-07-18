@@ -5,6 +5,8 @@ status_values:
   - deferred
   - not_started
 rules:
+  - {rule_key: combined_damage_life_sorceries_minimal, source_rules: ["115", "608", "704"], status: implemented, scope: "Soul Shred and Vampiric Touch combine legal damage targets with caster life gain.", engine_contracts: [docs/contracts/portal-sorcery-expansion-wave.md], tests: [engine/tests/test_portal_expansion_wave.py], notes: "Name-scoped."}
+  - {rule_key: temporary_power_sorceries_minimal, source_rules: ["611"], status: implemented, scope: "Howling Fury grants +4 power through cleanup or zone change.", engine_contracts: [docs/contracts/portal-sorcery-expansion-wave.md], tests: [engine/tests/test_portal_expansion_wave.py], notes: "Name-scoped."}
   - {rule_key: mass_creature_damage_sorceries_minimal, source_rules: ["608", "704"], status: implemented, scope: "Pyroclasm and Needle Storm batch creature damage then run one SBA check.", engine_contracts: [docs/contracts/portal-sorcery-expansion-wave.md], tests: [engine/tests/test_portal_expansion_wave.py], notes: "Needle Storm filters creatures with Flying."}
   - {rule_key: mass_status_sorceries_minimal, source_rules: ["608"], status: implemented, scope: "Mobilize untaps caster-controlled creatures; Blinding Light taps nonwhite creatures.", engine_contracts: [docs/contracts/portal-sorcery-expansion-wave.md], tests: [engine/tests/test_spells.py], notes: "Name-scoped."}
   - {rule_key: graveyard_return_sorceries_minimal, source_rules: ["115", "608"], status: implemented, scope: "Raise Dead and Elven Cache return a legal card from the caster's graveyard to hand.", engine_contracts: [docs/contracts/portal-sorcery-expansion-wave.md], tests: [engine/tests/test_portal_expansion_wave.py], notes: "Name-scoped."}

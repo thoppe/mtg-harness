@@ -50,7 +50,7 @@ def apply_combat_damage(state: GameState, card_repository: CardRepository) -> tu
         blockers = combat.blockers.get(attacker_id, ())
         attacker = current_state.objects[attacker_id]
         attacker_card = card_repository.get(attacker.oracle_id)
-        attacker_power = int(attacker_card.power or "0")
+        attacker_power = int(attacker_card.power or "0") + attacker.temporary_power_bonus
 
         if not blockers:
             defending_player = current_state.players[combat.defending_player]
@@ -86,7 +86,7 @@ def apply_combat_damage(state: GameState, card_repository: CardRepository) -> tu
         for blocker_id in blockers:
             blocker = current_state.objects[blocker_id]
             blocker_card = card_repository.get(blocker.oracle_id)
-            blocker_power = int(blocker_card.power or "0")
+            blocker_power = int(blocker_card.power or "0") + blocker.temporary_power_bonus
             blocker_toughness = int(blocker_card.toughness or "0")
             lethal_damage = max(0, blocker_toughness - blocker.damage_marked)
             attacker_damage_to_blocker = min(remaining_attacker_damage, lethal_damage)

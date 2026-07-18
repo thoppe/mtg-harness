@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
-from mtg_engine.flow.turns import _damage_creatures_once, _require_legal_noncreature_target, _resolve_direct_damage_sorcery
+from mtg_engine.flow.turns import _cleanup_end_of_turn_state, _damage_creatures_once, _require_legal_noncreature_target, _resolve_direct_damage_sorcery
 from mtg_engine.state.zones import move_object
 
 
@@ -53,3 +53,10 @@ class PortalExpansionWaveTests(unittest.TestCase):
         self.assertEqual(result.players["alice"].graveyard, ("alice:1",))
         self.assertEqual(result.players["bob"].graveyard, ("bob:1",))
         self.assertEqual([event["event_type"] for event in events].count("state_based_actions_checked"), 1)
+
+    def test_temporary_power_bonus_expires_at_cleanup_and_zone_change(self) -> None:
+        state = move_object(self.state, instance_id="alice:1", from_zone="hand", to_zone="battlefield", player_id="alice")
+        boosted = replace(state, objects={**state.objects, "alice:1": replace(state.objects["alice:1"], temporary_power_bonus=4)})
+        self.assertEqual(_cleanup_end_of_turn_state(boosted).objects["alice:1"].temporary_power_bonus, 0)
+        moved = move_object(boosted, instance_id="alice:1", from_zone="battlefield", to_zone="graveyard", player_id="alice")
+        self.assertEqual(moved.objects["alice:1"].temporary_power_bonus, 0)
