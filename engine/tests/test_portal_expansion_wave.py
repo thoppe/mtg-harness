@@ -9,7 +9,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
-from mtg_engine.flow.turns import TurnResult, _battlefield_land_subtype_count, _cleanup_end_of_turn_state, _controlled_land_subtype_count, _damage_creatures_once, _require_legal_noncreature_target, _resolve_direct_damage_sorcery, _resolve_noncreature_spell, play_land, resolve_pending_choice
+from mtg_engine.flow.turns import TurnResult, _add_temporary_effect, _battlefield_land_subtype_count, _cleanup_end_of_turn_state, _controlled_land_subtype_count, _damage_creatures_once, _require_legal_noncreature_target, _resolve_direct_damage_sorcery, _resolve_noncreature_spell, play_land, resolve_pending_choice
+from mtg_engine.rules.characteristics import effective_keywords, effective_power, effective_toughness
 from mtg_engine.state.models import StackEntry
 from mtg_engine.state.zones import move_object
 from mtg_engine.actions.models import CastNonCreatureSpellAction, PlayLandAction, ResolveChoiceAction
@@ -78,6 +79,19 @@ class PortalExpansionWaveTests(unittest.TestCase):
         boosted = replace(state, objects={**state.objects, "alice:1": replace(state.objects["alice:1"], temporary_toughness_bonus=4)})
         self.assertEqual(_cleanup_end_of_turn_state(boosted).objects["alice:1"].temporary_toughness_bonus, 0)
         self.assertEqual(move_object(boosted, instance_id="alice:1", from_zone="battlefield", to_zone="graveyard", player_id="alice").objects["alice:1"].temporary_toughness_bonus, 0)
+
+    def test_object_bound_effect_changes_characteristics_and_dies_on_zone_change(self) -> None:
+        state = move_object(self.state, instance_id="alice:1", from_zone="hand", to_zone="battlefield", player_id="alice")
+        affected = _add_temporary_effect(state, source_object_id="source@0", target_ids=("alice:1",), power_delta=3, toughness_delta=3, keywords=("Flying",))
+        self.assertEqual(effective_power(affected, self.repo, "alice:1"), 3)
+        self.assertEqual(effective_toughness(affected, self.repo, "alice:1"), 3)
+        self.assertIn("Flying", effective_keywords(affected, self.repo, "alice:1"))
+        moved = move_object(affected, instance_id="alice:1", from_zone="battlefield", to_zone="graveyard", player_id="alice")
+        self.assertEqual(moved.temporary_effects, ())
+
+    def test_wave_two_sources_load_from_active_slice(self) -> None:
+        self.assertTrue(self.repo.get("f215d0f9-a53e-431a-a70d-9dc4e3caa41e").is_instant)
+        self.assertEqual(self.repo.get("23745133-e5e2-4ce3-b94a-73d0d3d8a013").name, "Phantom Warrior")
 
     def test_temporary_creature_effects_require_battlefield_creatures(self) -> None:
         with self.assertRaisesRegex(ValueError, "target must be a creature"):
