@@ -57,6 +57,7 @@ Define the smallest believable rules subset for the initial `Portal` support sli
 - `Armageddon` may introduce only the minimal global land-destruction path required to destroy all lands on the battlefield and emit the corresponding destruction and zone-move events, without introducing regeneration, replacement effects, or broader mass-destruction generalization.
 - `Wrath of God` may introduce only the minimal global creature-destruction path required to destroy all creatures on the battlefield and emit the corresponding destruction and zone-move events, with the printed regeneration rider explicitly ignored in the current slice because regeneration is otherwise unsupported.
 - `Rain of Daggers` may introduce only the minimal opponent-targeted mass creature-destruction path required to target the opposing player in a two-player game, destroy all creatures that player controls, count how many were destroyed this way, and reduce the caster's life total by 2 for each, without introducing broader multiplayer opponent selection, regeneration, or generalized linked delayed accounting.
+- The fifteen-card sorcery expansion wave is limited to the named rule families in `docs/contracts/portal-sorcery-expansion-wave.md`: fixed reuse effects, player and graveyard targeting, mass status and damage, combined damage/life effects, and Howling Fury's explicit +4 power modifier through cleanup. It does not introduce generic effect parsing, prevention, choices, X costs, or broader continuous-effect layering.
 - `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow` may introduce only the minimal flying restriction that nonflying creatures cannot block them; broader keyword handling remains out of scope until another card requires it.
 - `Keen-Eyed Archers` may introduce only the minimal reach exception that it can block creatures with flying, without introducing broader anti-air combat text, continuous-effect layering, or generalized keyword interaction beyond the currently supported flying cards.
 - `Anaconda` may introduce only the minimal swampwalk restriction that it cannot be blocked while the defending player controls a `Swamp`, without introducing generalized landwalk handling beyond the printed `Swampwalk` keyword or continuous land-type modification.
@@ -67,7 +68,7 @@ Define the smallest believable rules subset for the initial `Portal` support sli
 - Keyword abilities beyond the currently supported `Flying`, `Reach`, `Swampwalk`, and `Defender`
 - Triggered abilities not required by the initial cards
 - Replacement effects
-- Continuous effects beyond what the initial cards require
+- Continuous effects beyond Howling Fury's name-scoped temporary power modifier
 - Color-changing effects or generalized color-layer recalculation
 - Instants and modal spells
 - Multiplayer rules

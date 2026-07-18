@@ -89,9 +89,8 @@ The simulator should only claim support based on layer 3, never merely because l
   destruction family (`Winter's Grasp`) while deliberately exercising a new
   black mana cost. It introduces no new target category, event family,
   replacement effect, trigger, or keyword.
-- This is a selection only. It is not yet in the active support manifest and
-  therefore is not engine-supported until its source artifacts, coverage
-  declarations, rule envelope, effect registration, and tests land together.
+- This selection is implemented and active; its fifteen-card completion note
+  below is the canonical record of the widened support boundary.
 
 ## Expansion Completion Note
 
