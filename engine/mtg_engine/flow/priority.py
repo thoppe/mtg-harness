@@ -148,27 +148,19 @@ def _enumerate_active_precombat_main_actions(
         card_definition = card_repository.get(card.oracle_id)
         if card_definition.is_creature or card_definition.is_land or card_definition.is_instant:
             continue
-        requirements = _parse_mana_cost(card_definition.mana_cost)
-        if not _can_pay_mana_cost(player.mana_pool, requirements):
-            continue
         legal_targets = _legal_noncreature_spell_targets(state, card_repository, instance_id)
-        if legal_targets == ((),):
-            actions.append(
-                CastNonCreatureSpellAction(
-                    player_id=state.turn.active_player,
-                    card_instance_id=instance_id,
-                    target_instance_ids=(),
-                )
-            )
-            continue
-        for target_instance_ids in legal_targets:
-            actions.append(
-                CastNonCreatureSpellAction(
-                    player_id=state.turn.active_player,
-                    card_instance_id=instance_id,
-                    target_instance_ids=target_instance_ids,
-                )
-            )
+        effect = _supported_targeted_sorcery_effect(card_definition)
+        x_values = range(len(player.mana_pool) + 1) if effect == "prosperity" else (None,)
+        sacrifice_ids = tuple(
+            permanent_id for permanent_id in player.battlefield
+            if (definition := card_repository.get(state.objects[permanent_id].oracle_id)).is_creature and definition.has_color("G")
+        ) if effect == "natural_order" else (None,)
+        for chosen_x in x_values:
+            if not _can_pay_mana_cost(player.mana_pool, _parse_mana_cost(card_definition.mana_cost, chosen_x=chosen_x or 0)):
+                continue
+            for sacrifice_id in sacrifice_ids:
+                for target_instance_ids in legal_targets:
+                    actions.append(CastNonCreatureSpellAction(player_id=state.turn.active_player, card_instance_id=instance_id, target_instance_ids=target_instance_ids, chosen_x=chosen_x, additional_cost_instance_id=sacrifice_id))
 
     actions.append(
         AdvanceStepAction(
@@ -523,7 +515,7 @@ def _other_player_id(state: GameState, player_id: str) -> str:
     return next(candidate for candidate in state.players if candidate != player_id)
 
 
-def _parse_mana_cost(mana_cost: str) -> dict[str, int]:
+def _parse_mana_cost(mana_cost: str, *, chosen_x: int = 0) -> dict[str, int]:
     requirements = {"W": 0, "U": 0, "B": 0, "R": 0, "G": 0, "generic": 0}
     if not mana_cost:
         return requirements
@@ -534,6 +526,8 @@ def _parse_mana_cost(mana_cost: str) -> dict[str, int]:
             requirements[symbol] += 1
         elif symbol.isdigit():
             requirements["generic"] += int(symbol)
+        elif symbol == "X":
+            requirements["generic"] += chosen_x
         else:
             raise ValueError(f"unsupported mana symbol in v0: {symbol}")
     return requirements

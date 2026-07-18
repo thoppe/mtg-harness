@@ -26,7 +26,7 @@ class CastNonCreatureSpellAction:
     player_id: str
     card_instance_id: str
     target_instance_ids: tuple[str, ...] = field(default_factory=tuple)
-    chosen_x: int = 0
+    chosen_x: int | None = None
     additional_cost_instance_id: str | None = None
 
     def __init__(
@@ -35,7 +35,7 @@ class CastNonCreatureSpellAction:
         card_instance_id: str,
         target_instance_id: str | None = None,
         target_instance_ids: tuple[str, ...] | None = None,
-        chosen_x: int = 0,
+        chosen_x: int | None = None,
         additional_cost_instance_id: str | None = None,
     ) -> None:
         object.__setattr__(self, "player_id", player_id)
@@ -47,7 +47,7 @@ class CastNonCreatureSpellAction:
         else:
             normalized = tuple(target_instance_ids)
         object.__setattr__(self, "target_instance_ids", normalized)
-        if chosen_x < 0:
+        if chosen_x is not None and chosen_x < 0:
             raise ValueError("chosen_x must not be negative")
         object.__setattr__(self, "chosen_x", chosen_x)
         object.__setattr__(self, "additional_cost_instance_id", additional_cost_instance_id)

@@ -18,9 +18,10 @@ promoted together with implementation and tests.
   chooser-owned decision at a time. Its affected players choose in active-
   player then nonactive-player order; no priority or unrelated action occurs
   between those choices.
-- An explicit empty selection is valid only where the card says "up to" or
-  "any number." A required selection uses all available legal candidates when
-  fewer than the stated count exist.
+- An explicit empty selection is valid where the card says "up to" or "any
+  number," and for the name-scoped hidden-library searches that may fail to
+  find a stated quality. Other required selections use all available legal
+  candidates when fewer than the stated count exist.
 
 ## Visibility And Events
 
@@ -42,8 +43,10 @@ promoted together with implementation and tests.
   the versioned RNG algorithm and advances the cursor once only when that hand
   is nonempty.
 - Each instructed library shuffle uses the existing versioned shuffle and
-  advances the cursor once, including a shuffle after an empty successful
-  search and Winds of Change's empty-hand shuffle.
+  advances the cursor once, including a shuffle after an empty search when
+  that search instruction applies and Winds of Change's empty-hand shuffle.
+  Gift of Estates does not search or shuffle when its land-count condition is
+  false.
 - When one spell shuffles multiple libraries, resolve and log them in
   active-player then nonactive-player order.
 

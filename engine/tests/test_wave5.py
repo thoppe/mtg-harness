@@ -31,6 +31,8 @@ WAVE_FIVE_IDS = {
     "9b8c44a0-82ef-4beb-a762-c2a2a21380f3",
 }
 ANCESTRAL = "95a2802a-2621-40c3-84f8-51e8aad7b6f0"
+FLUX = "b8cff5f1-6871-49d2-89a7-24870308aadb"
+GIFT_OF_ESTATES = "1bd70be6-752c-4ecb-a3e8-2bacec4b94fc"
 RAIN = "72cecab3-519e-4a23-9623-b423a5c5a251"
 SORCEROUS_SIGHT = "20370c3b-231f-4d9d-8b6e-f1eb25fa4b5d"
 
@@ -57,6 +59,9 @@ class WaveFiveTests(unittest.TestCase):
         resolved = resolve_pending_choice(pending, ResolveChoiceAction("alice", decision.decision_id, selected_instance_ids=("alice:2", "alice:3")), self.repo)
         self.assertEqual(resolved.state.players["alice"].hand, ("alice:2", "alice:3"))
         self.assertEqual(resolved.state.players["alice"].graveyard[-2:], ("alice:1", "alice:4"))
+        event = next(event for event in resolved.event_log if event.event_type == "choice_resolved")
+        self.assertNotIn("selected_instance_ids", event.payload)
+        self.assertEqual(event.payload["selected_count"], 2)
 
     def test_hidden_choice_rejects_cards_outside_its_snapshot(self) -> None:
         state = initialize_game(
@@ -80,3 +85,22 @@ class WaveFiveTests(unittest.TestCase):
             _legal_noncreature_spell_targets(state, self.repo, "alice:2"),
             ((),),
         )
+
+    def test_flux_draws_the_printed_extra_card_after_each_player_chooses(self) -> None:
+        state = initialize_game(
+            SetupInput("flux", ("alice", "bob"), "alice", {"alice": (FLUX, RAIN), "bob": (RAIN,)}, {"alice": (FLUX,), "bob": ()}, 4), self.repo
+        ).state
+        state = move_object(state, instance_id="alice:1", from_zone="hand", to_zone="stack", player_id="alice")
+        first = _resolve_noncreature_spell(TurnResult(state, ()), StackEntry(card_instance_id="alice:1", controller_id="alice"), self.repo)
+        second = resolve_pending_choice(first, ResolveChoiceAction("alice", first.state.pending_decision.decision_id), self.repo)
+        final = resolve_pending_choice(second, ResolveChoiceAction("bob", second.state.pending_decision.decision_id), self.repo)
+        self.assertEqual(final.state.players["alice"].hand, ("alice:2",))
+
+    def test_gift_of_estates_does_nothing_when_its_condition_is_false(self) -> None:
+        state = initialize_game(
+            SetupInput("gift", ("alice", "bob"), "alice", {"alice": (GIFT_OF_ESTATES, RAIN), "bob": (RAIN,)}, {"alice": (GIFT_OF_ESTATES,), "bob": ()}, 4), self.repo
+        ).state
+        state = move_object(state, instance_id="alice:1", from_zone="hand", to_zone="stack", player_id="alice")
+        result = _resolve_noncreature_spell(TurnResult(state, ()), StackEntry(card_instance_id="alice:1", controller_id="alice"), self.repo)
+        self.assertIsNone(result.state.pending_decision)
+        self.assertEqual(result.state.rng_cursor, 0)

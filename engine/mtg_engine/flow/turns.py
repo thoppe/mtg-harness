@@ -291,7 +291,11 @@ def cast_noncreature_spell(
         effect=effect,
     )
 
-    mana_requirements = _parse_mana_cost(card_definition.mana_cost, chosen_x=action.chosen_x)
+    if effect == "prosperity" and action.chosen_x is None:
+        raise ValueError("Prosperity requires an explicit X declaration")
+    if effect != "prosperity" and action.chosen_x not in (None, 0):
+        raise ValueError("spell has no supported X declaration")
+    mana_requirements = _parse_mana_cost(card_definition.mana_cost, chosen_x=action.chosen_x or 0)
     if not _can_pay_mana_cost(player.mana_pool, mana_requirements):
         raise ValueError("insufficient mana to cast noncreature spell")
 
@@ -315,7 +319,7 @@ def cast_noncreature_spell(
             instance_id=action.additional_cost_instance_id,
             from_zone="battlefield",
             to_zone="graveyard",
-            player_id=action.player_id,
+            player_id=sacrifice.owner_id,
         )
     casting_state = move_object(
         casting_state,
@@ -368,9 +372,17 @@ def cast_noncreature_spell(
         card_instance_id=action.card_instance_id,
         controller_id=action.player_id,
         target_ids=action.target_instance_ids,
-        chosen_x=action.chosen_x,
+        chosen_x=action.chosen_x or 0,
         additional_cost_instance_id=action.additional_cost_instance_id,
     )
+    if effect == "natural_order":
+        stacked_state, trigger_events = queue_death_triggers(
+            stacked_state,
+            [{"card_instance_id": sacrifice.instance_id, "source_object_id": sacrifice.object_id, "owner_id": sacrifice.owner_id, "controller_id": sacrifice.controller_id, "oracle_id": sacrifice.oracle_id}],
+            active_player=action.player_id,
+        )
+        for event in trigger_events:
+            event_log.append(event_type=event["event_type"], active_player=event["active_player"], payload=event["payload"])
     return TurnResult(state=stacked_state, event_log=event_log.events)
 
 
@@ -476,8 +488,9 @@ def _resolve_noncreature_spell(
         )
         subtype, color = ("Mountain", "R") if effect == "baleful_stare" else ("Forest", "G")
         draw_count = sum(
-            1 for instance_id in hand
-            if (definition := card_repository.get(resolved_state.objects[instance_id].oracle_id)).has_subtype(subtype) or definition.has_color(color)
+            int((definition := card_repository.get(resolved_state.objects[instance_id].oracle_id)).has_subtype(subtype))
+            + int(definition.has_color(color))
+            for instance_id in hand
         )
         for _ in range(draw_count):
             resolved_state = _draw_one_card_for_player_if_available(resolved_state, event_log, player_id=action.player_id)
@@ -503,6 +516,9 @@ def _resolve_noncreature_spell(
         updated = replace(player, life_total=player.life_total - ((player.life_total + 1) // 2))
         resolved_state = update_player(resolved_state, updated)
         event_log.append(event_type="life_total_changed", active_player=action.player_id, payload={"player_id": action.player_id, "life_total": updated.life_total})
+        resolved_state, sba_events = apply_state_based_actions(resolved_state, card_repository, active_player=action.player_id)
+        for event in sba_events:
+            event_log.append(event_type=event["event_type"], active_player=event["active_player"], payload=event["payload"])
     elif effect == "prosperity":
         for player_id in _resolution_player_order(resolved_state):
             for _ in range(action.chosen_x):
@@ -517,7 +533,7 @@ def _resolve_noncreature_spell(
             event_log.append(event_type="random_choice_resolved", active_player=action.player_id, payload={"player_id": target_player_id, "algorithm": "python_random_mt19937_v1", "rng_cursor_before": resolved_state.rng_cursor - 1, "rng_cursor_after": resolved_state.rng_cursor})
     elif effect == "flux":
         players = _resolution_player_order(resolved_state)
-        resolved_state = _queue_wave5_decision(resolved_state, event_log, chooser_id=players[0], source_object_id=card.object_id, kind="discard_any_number", option_ids=resolved_state.players[players[0]].hand, min_selections=0, max_selections=len(resolved_state.players[players[0]].hand), continuation_kind="wave5_discard_then_draw", continuation=(("remaining_players", players[1:]), ("draw_counts", ())))
+        resolved_state = _queue_wave5_decision(resolved_state, event_log, chooser_id=players[0], source_object_id=card.object_id, kind="discard_any_number", option_ids=resolved_state.players[players[0]].hand, min_selections=0, max_selections=len(resolved_state.players[players[0]].hand), continuation_kind="wave5_discard_then_draw", continuation=(("remaining_players", players[1:]), ("draw_counts", ()), ("caster_id", action.player_id)))
     elif effect == "temporary_truce":
         players = _resolution_player_order(resolved_state)
         resolved_state = _queue_wave5_decision(resolved_state, event_log, chooser_id=players[0], source_object_id=card.object_id, kind="draw_up_to_two", option_ids=(), min_selections=0, max_selections=0, continuation_kind="wave5_truce", continuation=(("remaining_players", players[1:]),))
@@ -541,18 +557,17 @@ def _resolve_noncreature_spell(
             "gift_of_estates": lambda definition: definition.is_land and definition.has_subtype("Plains"),
             "cruel_tutor": lambda definition: True,
         }[effect]
-        if effect == "gift_of_estates" and not any(
+        gift_condition_is_met = any(
             sum(1 for instance_id in player.battlefield if card_repository.get(resolved_state.objects[instance_id].oracle_id).is_land)
             > sum(1 for instance_id in resolved_state.players[action.player_id].battlefield if card_repository.get(resolved_state.objects[instance_id].oracle_id).is_land)
             for player_id, player in resolved_state.players.items() if player_id != action.player_id
-        ):
-            options = ()
-        else:
+        )
+        if effect != "gift_of_estates" or gift_condition_is_met:
             options = tuple(instance_id for instance_id in resolved_state.players[action.player_id].library if predicate(card_repository.get(resolved_state.objects[instance_id].oracle_id)))
-        max_count = 3 if effect == "gift_of_estates" else 1
-        min_count = 0 if effect == "gift_of_estates" or not options else 1
-        destination = "hand" if effect == "gift_of_estates" else ("battlefield" if effect != "cruel_tutor" else "library")
-        resolved_state = _queue_wave5_decision(resolved_state, event_log, chooser_id=action.player_id, source_object_id=card.object_id, kind=f"search_{effect}", option_ids=options, min_selections=min_count, max_selections=min(max_count, len(options)), continuation_kind=f"wave5_search_{effect}", continuation=(("destination", destination), ("shuffle", True), ("top_after_shuffle", effect == "cruel_tutor"), ("lose_life", 2 if effect == "cruel_tutor" else 0)))
+            max_count = 3 if effect == "gift_of_estates" else 1
+            min_count = 0 if effect != "cruel_tutor" or not options else 1
+            destination = "hand" if effect == "gift_of_estates" else ("battlefield" if effect != "cruel_tutor" else "library")
+            resolved_state = _queue_wave5_decision(resolved_state, event_log, chooser_id=action.player_id, source_object_id=card.object_id, kind=f"search_{effect}", option_ids=options, min_selections=min_count, max_selections=min(max_count, len(options)), continuation_kind=f"wave5_search_{effect}", continuation=(("destination", destination), ("shuffle", True), ("top_after_shuffle", effect == "cruel_tutor"), ("lose_life", 2 if effect == "cruel_tutor" else 0), ("reveal_selection", effect == "gift_of_estates")))
     elif effect == "winds_of_change":
         draw_counts = tuple((player_id, len(resolved_state.players[player_id].hand)) for player_id in _resolution_player_order(resolved_state))
         for player_id, _ in draw_counts:
@@ -984,10 +999,24 @@ def resolve_pending_choice(
         raise ValueError("selected cards must be distinct")
     if decision.selection_ordered and len(selected_ids) != len(decision.option_ids):
         raise ValueError("ordered choice must arrange every offered card")
+    if decision.allow_shuffle and action.shuffle_library is None:
+        raise ValueError("shuffle choice must be explicit")
+    if not decision.allow_shuffle and action.shuffle_library is not None:
+        raise ValueError("shuffle declaration is not legal for this choice")
 
     event_log = EventLog.from_events(state.game_id, session.event_log)
     next_state = replace(state, pending_decision=None)
-    event_log.append(event_type="choice_resolved", active_player=action.player_id, payload={"decision_id": decision.decision_id, "selected_instance_ids": list(action.selected_instance_ids), "ordered_instance_ids": list(action.ordered_instance_ids), "declared_count": action.declared_count, "choice_boolean": action.choice_boolean, "shuffle_library": action.shuffle_library})
+    choice_payload = {
+        "decision_id": decision.decision_id,
+        "selected_count": len(action.selected_instance_ids),
+        "ordered_count": len(action.ordered_instance_ids),
+        "declared_count": action.declared_count,
+        "choice_boolean": action.choice_boolean,
+        "shuffle_library": action.shuffle_library,
+    }
+    if decision.continuation_kind is None:
+        choice_payload["selected_instance_id"] = action.selected_instance_id
+    event_log.append(event_type="choice_resolved", active_player=action.player_id, payload=choice_payload)
     context = dict(decision.continuation)
 
     expected_zone = "hand" if decision.continuation_kind == "wave5_discard_then_draw" else "library"
@@ -1016,11 +1045,12 @@ def resolve_pending_choice(
         remaining = tuple(context["remaining_players"])
         counts = tuple(context.get("draw_counts", ())) + ((action.player_id, len(selected_ids)),)
         if remaining:
-            next_state = _queue_wave5_decision(next_state, event_log, chooser_id=remaining[0], source_object_id=decision.source_object_id, kind="discard_any_number", option_ids=next_state.players[remaining[0]].hand, min_selections=0, max_selections=len(next_state.players[remaining[0]].hand), continuation_kind=kind, continuation=(("remaining_players", remaining[1:]), ("draw_counts", counts)))
+            next_state = _queue_wave5_decision(next_state, event_log, chooser_id=remaining[0], source_object_id=decision.source_object_id, kind="discard_any_number", option_ids=next_state.players[remaining[0]].hand, min_selections=0, max_selections=len(next_state.players[remaining[0]].hand), continuation_kind=kind, continuation=(("remaining_players", remaining[1:]), ("draw_counts", counts), ("caster_id", context["caster_id"])))
         else:
             for player_id, count in counts:
                 for _ in range(count):
                     next_state = _draw_one_card_for_player_if_available(next_state, event_log, player_id=player_id)
+            next_state = _draw_one_card_for_player_if_available(next_state, event_log, player_id=context["caster_id"])
     elif kind == "wave5_truce":
         count = action.declared_count
         if count is None or count > 2:
@@ -1065,7 +1095,8 @@ def resolve_pending_choice(
         if destination != "library":
             for instance_id in selected_ids:
                 next_state = _move_with_event(next_state, event_log, instance_id=instance_id, from_zone="library", to_zone=destination, player_id=player_id, active_player=player_id)
-                event_log.append(event_type="card_revealed", active_player=player_id, payload={"player_id": player_id, "card_instance_id": instance_id, "oracle_id": next_state.objects[instance_id].oracle_id, "reason": "search"})
+                if context.get("reveal_selection"):
+                    event_log.append(event_type="card_revealed", active_player=player_id, payload={"player_id": player_id, "card_instance_id": instance_id, "oracle_id": next_state.objects[instance_id].oracle_id, "reason": "search"})
         if context.get("shuffle", True):
             next_state = _shuffle_library(next_state, event_log, player_id=player_id)
         if context.get("top_after_shuffle") and selected_id is not None:
@@ -1077,6 +1108,9 @@ def resolve_pending_choice(
             updated = replace(player, life_total=player.life_total - context["lose_life"])
             next_state = update_player(next_state, updated)
             event_log.append(event_type="life_total_changed", active_player=player_id, payload={"player_id": player_id, "life_total": updated.life_total})
+            next_state, sba_events = apply_state_based_actions(next_state, card_repository, active_player=player_id)
+            for event in sba_events:
+                event_log.append(event_type=event["event_type"], active_player=event["active_player"], payload=event["payload"])
     else:
         raise ValueError("unsupported pending-decision continuation")
     return TurnResult(state=next_state, event_log=event_log.events)
@@ -2111,7 +2145,7 @@ def _queue_wave5_decision(
     continuation_kind: str,
     continuation: tuple[tuple[str, object], ...] = (),
 ) -> GameState:
-    decision_id = f"{source_object_id}:{kind}"
+    decision_id = f"{source_object_id}:{kind}:{chooser_id}:{len(event_log.events)}"
     next_state = replace(state, pending_decision=PendingDecision(decision_id=decision_id, chooser_id=chooser_id, kind=kind, source_object_id=source_object_id, option_ids=tuple(option_ids), min_selections=min_selections, max_selections=max_selections, selection_ordered=selection_ordered, allow_shuffle=allow_shuffle, continuation_kind=continuation_kind, continuation=continuation))
     event_log.append(event_type="choice_requested", active_player=chooser_id, payload={"decision_id": decision_id, "chooser_id": chooser_id, "kind": kind, "option_count": len(option_ids)})
     return next_state
