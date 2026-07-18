@@ -272,7 +272,7 @@ def cast_noncreature_spell(
         effect=effect,
     )
 
-    mana_requirements = _parse_mana_cost(card_definition.mana_cost)
+    mana_requirements = _parse_mana_cost(card_definition.mana_cost, chosen_x=action.chosen_x)
     if not _can_pay_mana_cost(player.mana_pool, mana_requirements):
         raise ValueError("insufficient mana to cast noncreature spell")
 
@@ -315,6 +315,7 @@ def cast_noncreature_spell(
         card_instance_id=action.card_instance_id,
         controller_id=action.player_id,
         target_ids=action.target_instance_ids,
+        chosen_x=action.chosen_x,
     )
     return TurnResult(state=stacked_state, event_log=event_log.events)
 
@@ -339,6 +340,7 @@ def _resolve_noncreature_spell(
         player_id=entry.controller_id,
         card_instance_id=entry.card_instance_id,
         target_instance_ids=entry.target_ids,
+        chosen_x=entry.chosen_x,
     )
     casting_state = state
     event_log = EventLog.from_events(state.game_id, session.event_log)
@@ -660,12 +662,13 @@ def _put_spell_on_stack(
     card_instance_id: str,
     controller_id: str,
     target_ids: tuple[str, ...] = (),
+    chosen_x: int = 0,
 ) -> GameState:
     """Record a cast spell and retain priority for its controller."""
     return replace(
         state,
         stack_entries=state.stack_entries
-        + (StackEntry(card_instance_id=card_instance_id, controller_id=controller_id, target_ids=target_ids),),
+        + (StackEntry(card_instance_id=card_instance_id, controller_id=controller_id, target_ids=target_ids, chosen_x=chosen_x),),
         turn=replace(state.turn, priority_player=controller_id),
         consecutive_passes=0,
     )
@@ -1127,7 +1130,7 @@ def _draw_one_card_for_player_if_available(
     return next_state
 
 
-def _parse_mana_cost(mana_cost: str) -> dict[str, int]:
+def _parse_mana_cost(mana_cost: str, *, chosen_x: int = 0) -> dict[str, int]:
     requirements = {"W": 0, "U": 0, "B": 0, "R": 0, "G": 0, "generic": 0}
     if not mana_cost:
         return requirements
@@ -1137,6 +1140,8 @@ def _parse_mana_cost(mana_cost: str) -> dict[str, int]:
             requirements[symbol] += 1
         elif symbol.isdigit():
             requirements["generic"] += int(symbol)
+        elif symbol == "X":
+            requirements["generic"] += chosen_x
         else:
             raise ValueError(f"unsupported mana symbol in v0: {symbol}")
     return requirements

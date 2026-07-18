@@ -56,6 +56,7 @@ class StackEntry:
     card_instance_id: str
     controller_id: str
     target_ids: tuple[str, ...] = ()
+    chosen_x: int = 0
 
 
 @dataclass(frozen=True)

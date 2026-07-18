@@ -11,6 +11,7 @@ from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
 from mtg_engine.flow.turns import _cleanup_end_of_turn_state, _damage_creatures_once, _require_legal_noncreature_target, _resolve_direct_damage_sorcery
 from mtg_engine.state.zones import move_object
+from mtg_engine.actions.models import CastNonCreatureSpellAction
 
 
 INFO = Path(__file__).resolve().parents[2] / "information"
@@ -70,3 +71,8 @@ class PortalExpansionWaveTests(unittest.TestCase):
     def test_temporary_creature_effects_require_battlefield_creatures(self) -> None:
         with self.assertRaisesRegex(ValueError, "target must be a creature"):
             _require_legal_noncreature_target(self.state, self.repo, ("alice:1",), effect="target_creature_gets_4_4_until_end_of_turn")
+
+    def test_chosen_x_is_nonnegative_and_part_of_the_action(self) -> None:
+        self.assertEqual(CastNonCreatureSpellAction(player_id="alice", card_instance_id="alice:1", chosen_x=3).chosen_x, 3)
+        with self.assertRaisesRegex(ValueError, "must not be negative"):
+            CastNonCreatureSpellAction(player_id="alice", card_instance_id="alice:1", chosen_x=-1)
