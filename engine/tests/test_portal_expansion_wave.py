@@ -25,6 +25,8 @@ MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
 RENEWING_DAWN = "54ea46ea-7c83-44a9-85b0-eff9745c6ffa"
 THEFT_OF_DREAMS = "008011e2-7b82-4962-af6e-be627112f37f"
 VAMPIRIC_FEAST = "1980ca2e-a415-4de1-ac30-7055507e82a2"
+BREATH_OF_LIFE = "30d9e200-b944-43ff-89b8-a550a788ae03"
+DEJA_VU = "7408b9c5-7266-4627-be4e-b691cf5c622c"
 
 
 class PortalExpansionWaveTests(unittest.TestCase):
@@ -136,3 +138,19 @@ class PortalExpansionWaveTests(unittest.TestCase):
         feast_result = _resolve_noncreature_spell(TurnResult(feast_state, ()), StackEntry("alice:1", "alice", ("bob",)), self.repo)
         self.assertEqual(feast_result.state.players["alice"].life_total, 24)
         self.assertEqual(feast_result.state.players["bob"].life_total, 16)
+
+    def test_breath_of_life_reanimates_only_a_creature_and_deja_vu_only_returns_a_sorcery(self) -> None:
+        state = initialize_game(
+            SetupInput("graveyard-types", ("alice", "bob"), "alice", {"alice": (BREATH_OF_LIFE, MUCK_RATS, DEJA_VU, PLAINS), "bob": (PLAINS,)}, {"alice": (BREATH_OF_LIFE, MUCK_RATS, DEJA_VU), "bob": (PLAINS,)}, 8), self.repo
+        ).state
+        state = move_object(state, instance_id="alice:2", from_zone="hand", to_zone="graveyard", player_id="alice")
+        state = move_object(state, instance_id="alice:1", from_zone="hand", to_zone="stack", player_id="alice")
+        result = _resolve_noncreature_spell(TurnResult(state, ()), StackEntry("alice:1", "alice", ("alice:2",)), self.repo)
+        self.assertEqual(result.state.objects["alice:2"].zone, "battlefield")
+        self.assertNotEqual(result.state.objects["alice:2"].object_id, state.objects["alice:2"].object_id)
+        deja_state = move_object(result.state, instance_id="alice:3", from_zone="hand", to_zone="stack", player_id="alice")
+        deja_result = _resolve_noncreature_spell(TurnResult(deja_state, ()), StackEntry("alice:3", "alice", ("alice:1",)), self.repo)
+        self.assertEqual(deja_result.state.objects["alice:1"].zone, "hand")
+        creature_graveyard_state = move_object(result.state, instance_id="alice:2", from_zone="battlefield", to_zone="graveyard", player_id="alice")
+        with self.assertRaisesRegex(ValueError, "sorcery card"):
+            _require_legal_noncreature_target(creature_graveyard_state, self.repo, ("alice:2",), effect="return_target_sorcery_card_from_your_graveyard")

@@ -5,6 +5,7 @@ status_values:
   - deferred
   - not_started
 rules:
+  - {rule_key: graveyard_type_return_sorceries_minimal, source_rules: ["115", "608"], status: implemented, scope: "Breath of Life returns a creature card to battlefield; Déjà Vu returns a sorcery card to hand.", engine_contracts: [docs/contracts/object-identity-and-zone-changes.md], tests: [engine/tests/test_portal_expansion_wave.py], notes: "Owner-bound graveyard targets and fresh zone identity."}
   - {rule_key: targeted_count_sorceries_minimal, source_rules: ["115", "608"], status: implemented, scope: "Renewing Dawn and Theft of Dreams count qualifying permanents controlled by their target opponent on resolution.", engine_contracts: [docs/contracts/portal-sorcery-expansion-wave.md], tests: [engine/tests/test_portal_expansion_wave.py], notes: "Name-scoped target-derived values."}
   - {rule_key: subtype_count_sorceries_minimal, source_rules: ["608"], status: implemented, scope: "Spitting Earth counts controller Mountains; Fruition counts every Forest at resolution.", engine_contracts: [docs/contracts/portal-sorcery-expansion-wave.md], tests: [engine/tests/test_portal_expansion_wave.py], notes: "Name-scoped subtype counts."}
   - {rule_key: x_cost_sorceries_minimal, source_rules: ["107.3", "601.2b", "608"], status: implemented, scope: "Hurricane preserves a nonnegative chosen X from cast through resolution.", engine_contracts: [docs/contracts/costs-and-x-values.md], tests: [engine/tests/test_portal_expansion_wave.py], notes: "Name-scoped X spell."}

@@ -420,10 +420,31 @@ def _resolve_noncreature_spell(
         updated_player = replace(target_player, life_total=target_player.life_total + 8)
         resolved_state = update_player(resolved_state, updated_player)
         event_log.append(event_type="life_total_changed", active_player=action.player_id, payload={"player_id": action.target_instance_id, "life_total": updated_player.life_total})
-    elif effect in {"return_target_creature_card_from_your_graveyard", "return_target_card_from_your_graveyard"}:
+    elif effect in {"return_target_creature_card_from_your_graveyard", "return_target_card_from_your_graveyard", "return_target_sorcery_card_from_your_graveyard"}:
         target = casting_state.objects[action.target_instance_id]
         resolved_state = move_object(casting_state, instance_id=action.target_instance_id, from_zone="graveyard", to_zone="hand", player_id=action.player_id)
         event_log.append(event_type="object_moved_between_zones", active_player=action.player_id, payload={"player_id": action.player_id, "card_instance_id": action.target_instance_id, "oracle_id": target.oracle_id, "from_zone": "graveyard", "to_zone": "hand", **zone_change_identity_payload(resolved_state, action.target_instance_id)})
+    elif effect == "return_target_creature_card_from_your_graveyard_to_battlefield":
+        target = casting_state.objects[action.target_instance_id]
+        resolved_state = move_object(
+            casting_state,
+            instance_id=action.target_instance_id,
+            from_zone="graveyard",
+            to_zone="battlefield",
+            player_id=action.player_id,
+        )
+        event_log.append(
+            event_type="object_moved_between_zones",
+            active_player=action.player_id,
+            payload={
+                "player_id": action.player_id,
+                "card_instance_id": action.target_instance_id,
+                "oracle_id": target.oracle_id,
+                "from_zone": "graveyard",
+                "to_zone": "battlefield",
+                **zone_change_identity_payload(resolved_state, action.target_instance_id),
+            },
+        )
     elif effect == "put_creature_on_top_of_library":
         if action.target_instance_id is None:
             raise ValueError("targeted sorcery requires a target")
@@ -1330,14 +1351,17 @@ def _require_legal_noncreature_target(
         target = state.objects[target_instance_id]
         if target.zone != "battlefield" or not card_repository.get(target.oracle_id).is_creature: raise ValueError("target must be a creature")
         return
-    if effect in {"return_target_creature_card_from_your_graveyard", "return_target_card_from_your_graveyard"}:
+    if effect in {"return_target_creature_card_from_your_graveyard", "return_target_creature_card_from_your_graveyard_to_battlefield", "return_target_card_from_your_graveyard", "return_target_sorcery_card_from_your_graveyard"}:
         if target_instance_id not in state.objects:
             raise ValueError("target must exist")
         target = state.objects[target_instance_id]
         if target.zone != "graveyard" or target.owner_id != state.turn.active_player:
             raise ValueError("target must be in your graveyard")
-        if effect == "return_target_creature_card_from_your_graveyard" and not card_repository.get(target.oracle_id).is_creature:
+        target_definition = card_repository.get(target.oracle_id)
+        if effect in {"return_target_creature_card_from_your_graveyard", "return_target_creature_card_from_your_graveyard_to_battlefield"} and not target_definition.is_creature:
             raise ValueError("target must be a creature card")
+        if effect == "return_target_sorcery_card_from_your_graveyard" and not target_definition.is_sorcery:
+            raise ValueError("target must be a sorcery card")
         return
     if effect == "return_creature_to_hand_and_draw_one":
         if target_instance_id not in state.objects:

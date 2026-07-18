@@ -30,6 +30,9 @@ an implementation convenience, not a claim of general rules coverage.
   target opponent; `Theft of Dreams` draws once per tapped creature that
   opponent controls. `Vampiric Feast` reuses legal any-target damage plus
   caster life gain.
+- Graveyard type movement: `Breath of Life` moves a legal creature card to
+  battlefield with a new zone identity; `Déjà Vu` accepts only a legal sorcery
+  card and returns it to hand.
 
 ## Required Boundaries
 

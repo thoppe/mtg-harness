@@ -57,6 +57,8 @@ IMPLEMENTATIONS = {
     "54ea46ea-7c83-44a9-85b0-eff9745c6ffa": "gain_life_per_opponent_mountain",
     "008011e2-7b82-4962-af6e-be627112f37f": "draw_per_tapped_creature_target_opponent_controls",
     "1980ca2e-a415-4de1-ac30-7055507e82a2": "damage_any_target_4_gain_4",
+    "30d9e200-b944-43ff-89b8-a550a788ae03": "return_target_creature_card_from_your_graveyard_to_battlefield",
+    "7408b9c5-7266-4627-be4e-b691cf5c622c": "return_target_sorcery_card_from_your_graveyard",
 }
 
 
