@@ -121,6 +121,35 @@ card_entries:
   - {set_code: por, oracle_id: "3c46f309-69ae-43b1-adf6-bdb26599c1f4"}
   - {set_code: por, oracle_id: "e5df4597-1647-4ac2-bdb3-a517598d1431"}
   - {set_code: por, oracle_id: "ad218276-a44b-4a61-8e42-26a27929bbbb"}
+  # Wave 3: creature casting/combat reuse plus bounded Islandwalk, Vigilance,
+  # and flying-only blocker support. Alabaster Dragon remains deferred pending
+  # the separate triggered-ability foundation.
+  - {set_code: por, oracle_id: "9971697b-2acc-4bc2-a44e-074d03a51df7"}
+  - {set_code: por, oracle_id: "23625877-b6db-480c-8885-a62b7d0457df"}
+  - {set_code: por, oracle_id: "5edfe083-391b-41ae-ac4d-d648042cfa5e"}
+  - {set_code: por, oracle_id: "60824fae-20ed-4122-82c9-e99a1b679c54"}
+  - {set_code: por, oracle_id: "508248d1-09a4-4e41-a4c9-286618e5061e"}
+  - {set_code: por, oracle_id: "4d62a448-b6a5-43b1-a281-9e9361a5524a"}
+  - {set_code: por, oracle_id: "10706fd1-7847-4316-be8d-59b56143ce45"}
+  - {set_code: por, oracle_id: "ce8f4eb4-08b8-404b-9147-1e28c1b14a65"}
+  - {set_code: por, oracle_id: "72b42c63-fe4d-4823-9692-30fb5bab384a"}
+  - {set_code: por, oracle_id: "092f2c34-1f75-4998-b219-2cf1ca73656d"}
+  - {set_code: por, oracle_id: "cf26dcb4-e181-4ba5-bc03-b56f57032b85"}
+  - {set_code: por, oracle_id: "c181d2a4-5959-4409-9bd3-ecedf8ec9516"}
+  - {set_code: por, oracle_id: "e740ce2f-2134-473c-afa1-1b6d2d1e38ef"}
+  - {set_code: por, oracle_id: "56c5afdc-6777-45c7-8e2c-3cadecb95c5a"}
+  - {set_code: por, oracle_id: "c0e6ae0f-6cf7-48ca-acb8-73d4c38b9005"}
+  - {set_code: por, oracle_id: "14c8f55d-d177-4c25-a931-ebeb9e6062a0"}
+  - {set_code: por, oracle_id: "2f3878b8-61af-4276-b7ab-11b70e44eb62"}
+  - {set_code: por, oracle_id: "342199e0-15b6-4824-83da-25caef2592b3"}
+  - {set_code: por, oracle_id: "7a4ae76b-6241-4fa8-b239-5ec941a0e7df"}
+  - {set_code: por, oracle_id: "920cc1a7-ac6b-44c0-ade7-347f05bba0f2"}
+  - {set_code: por, oracle_id: "123337af-f976-4956-949f-c650da812113"}
+  - {set_code: por, oracle_id: "218d9277-c179-4de3-9c7f-79b5a6d4fa38"}
+  - {set_code: por, oracle_id: "d334aa85-3470-4f5d-9cbc-b88bf991a5af"}
+  - {set_code: por, oracle_id: "9e1a6481-f460-4551-96e8-30b289f2cb92"}
+  - {set_code: por, oracle_id: "fff6f2d0-22b5-41d0-99dc-bc817c3bd166"}
+  - {set_code: por, oracle_id: "9297e50f-f8a5-4793-b64d-a119404f94ce"}
 card_keys:
   - "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
   - "a768ba13-4d1c-4dce-a4a6-86a39c069c3f"
@@ -208,6 +237,32 @@ card_keys:
   - "45b42694-9ee8-44f3-9de3-aa2c0f1b6a13"
   - "7fbb98cc-585c-4184-97f5-9b3d3ebdb1e5"
   - "3c46f309-69ae-43b1-adf6-bdb26599c1f4"
+  - "9971697b-2acc-4bc2-a44e-074d03a51df7"
+  - "23625877-b6db-480c-8885-a62b7d0457df"
+  - "5edfe083-391b-41ae-ac4d-d648042cfa5e"
+  - "60824fae-20ed-4122-82c9-e99a1b679c54"
+  - "508248d1-09a4-4e41-a4c9-286618e5061e"
+  - "4d62a448-b6a5-43b1-a281-9e9361a5524a"
+  - "10706fd1-7847-4316-be8d-59b56143ce45"
+  - "ce8f4eb4-08b8-404b-9147-1e28c1b14a65"
+  - "72b42c63-fe4d-4823-9692-30fb5bab384a"
+  - "092f2c34-1f75-4998-b219-2cf1ca73656d"
+  - "cf26dcb4-e181-4ba5-bc03-b56f57032b85"
+  - "c181d2a4-5959-4409-9bd3-ecedf8ec9516"
+  - "e740ce2f-2134-473c-afa1-1b6d2d1e38ef"
+  - "56c5afdc-6777-45c7-8e2c-3cadecb95c5a"
+  - "c0e6ae0f-6cf7-48ca-acb8-73d4c38b9005"
+  - "14c8f55d-d177-4c25-a931-ebeb9e6062a0"
+  - "2f3878b8-61af-4276-b7ab-11b70e44eb62"
+  - "342199e0-15b6-4824-83da-25caef2592b3"
+  - "7a4ae76b-6241-4fa8-b239-5ec941a0e7df"
+  - "920cc1a7-ac6b-44c0-ade7-347f05bba0f2"
+  - "123337af-f976-4956-949f-c650da812113"
+  - "218d9277-c179-4de3-9c7f-79b5a6d4fa38"
+  - "d334aa85-3470-4f5d-9cbc-b88bf991a5af"
+  - "9e1a6481-f460-4551-96e8-30b289f2cb92"
+  - "fff6f2d0-22b5-41d0-99dc-bc817c3bd166"
+  - "9297e50f-f8a5-4793-b64d-a119404f94ce"
 rule_keys:
   - game_setup_minimal
   - turn_structure_minimal
@@ -233,6 +288,7 @@ rule_keys:
   - flying_keyword_minimal
   - reach_keyword_minimal
   - swampwalk_keyword_minimal
+  - forestwalk_keyword_minimal
   - defender_keyword_minimal
   - combat_minimal
   - zones_minimal
@@ -256,6 +312,8 @@ rule_keys:
   - temporary_characteristics_minimal
   - instant_priority_minimal
   - combat_restrictions_minimal
+  - islandwalk_keyword_minimal
+  - vigilance_keyword_minimal
 source_artifacts:
   - information/cards/data/
   - information/cards/images/

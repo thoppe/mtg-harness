@@ -405,6 +405,15 @@ def can_block_attacker(
     ) is None
 
 
+LANDWALK_KEYWORD_TO_SUBTYPE = {
+    "Swampwalk": "Swamp",
+    "Forestwalk": "Forest",
+    "Islandwalk": "Island",
+}
+
+BLOCKS_ONLY_FLYING_CARD_NAMES = frozenset({"Cloud Dragon", "Cloud Pirates", "Cloud Spirit"})
+
+
 def blocker_attack_rejection_reason(
     *,
     state: GameState,
@@ -421,16 +430,11 @@ def blocker_attack_rejection_reason(
         return "only creatures can block"
     if blocker.tapped:
         return "tapped creature cannot block"
-    if has_keyword(state, card_repository, attacker_id, "Swampwalk") and _player_controls_swamp(
-        state,
-        card_repository,
-        player_id=blocker.owner_id,
-    ):
-        return "blocker cannot block the selected attacker"
-    if has_keyword(state, card_repository, attacker_id, "Forestwalk") and _player_controls_subtype(
-        state, card_repository, player_id=blocker.controller_id, subtype="Forest"
-    ):
-        return "blocker cannot block the selected attacker"
+    for keyword, subtype in LANDWALK_KEYWORD_TO_SUBTYPE.items():
+        if has_keyword(state, card_repository, attacker_id, keyword) and _player_controls_subtype(
+            state, card_repository, player_id=blocker.controller_id, subtype=subtype
+        ):
+            return "blocker cannot block the selected attacker"
     if has_keyword(state, card_repository, attacker_id, "Flying") and not (
         has_keyword(state, card_repository, blocker_id, "Flying") or has_keyword(state, card_repository, blocker_id, "Reach")
     ):
@@ -446,21 +450,11 @@ def blocker_attack_rejection_reason(
         return "blocker cannot block the selected attacker"
     if blocker_definition.name in {"Craven Giant", "Craven Knight", "Hulking Cyclops", "Hulking Goblin", "Jungle Lion"}:
         return "creature cannot block"
-    if blocker_definition.name == "Cloud Dragon" and not has_keyword(state, card_repository, attacker_id, "Flying"):
-        return "Cloud Dragon can block only creatures with flying"
+    if blocker_definition.name in BLOCKS_ONLY_FLYING_CARD_NAMES and not has_keyword(
+        state, card_repository, attacker_id, "Flying"
+    ):
+        return f"{blocker_definition.name} can block only creatures with flying"
     return None
-
-
-def _player_controls_swamp(
-    state: GameState,
-    card_repository: CardRepository,
-    *,
-    player_id: str,
-) -> bool:
-    return any(
-        card_repository.get(state.objects[instance_id].oracle_id).name == "Swamp"
-        for instance_id in state.players[player_id].battlefield
-    )
 
 
 def _player_controls_subtype(state: GameState, card_repository: CardRepository, *, player_id: str, subtype: str) -> bool:

@@ -1077,7 +1077,7 @@ def declare_attackers(
         if rejection_reason is not None:
             raise ValueError(rejection_reason)
 
-    next_state = tap_attackers(state, action.attacker_ids)
+    next_state = tap_attackers(state, action.attacker_ids, card_repository)
     next_state = with_combat_state(
         next_state,
         attacking_player=action.player_id,

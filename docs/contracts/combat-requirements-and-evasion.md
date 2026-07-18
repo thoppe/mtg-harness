@@ -11,6 +11,16 @@ evasion and requirement rules.
   controller's battlefield; haste is an explicit exception.
 - Generic landwalk checks the defending player's battlefield for the named land
   subtype and prevents blocks when present.
+- The supported landwalk mapping is explicit: `Swampwalk` -> `Swamp`,
+  `Forestwalk` -> `Forest`, and the planned Wave 3 increment adds
+  `Islandwalk` -> `Island`. It does not model land-type-changing effects or
+  arbitrary landwalk names.
+- A creature with Flying may be subject to the bounded static restriction
+  “can block only creatures with flying.” This restriction applies to Cloud
+  Dragon, Cloud Pirates, and Cloud Spirit through one shared predicate, and
+  applies in both legal-action enumeration and submitted blocker validation.
+- A creature with Vigilance does not tap when declared as an attacker. It
+  remains eligible to block if otherwise legal later in that combat.
 - A requirement such as “all creatures able to block target creature do so” is
   represented in combat state, considered by legal-action enumeration, and
   revalidated on submitted blockers.
@@ -19,3 +29,10 @@ evasion and requirement rules.
 
 Do not implement a card with a combat requirement by mutating one caller's
 legal-action list only; submitted actions must reject the same illegal result.
+
+## Wave 3 Boundary
+
+The rules above are the complete planned combat scope for Waves 3A--3D. They
+do not authorize triggered abilities, shuffle behavior, or a general static
+ability framework; Alabaster Dragon remains deferred until a separate trigger
+contract increment is accepted.

@@ -34,8 +34,9 @@ This file captures decisions, constraints, and open questions that are explicitl
 - For this initial slice, oracle text is the only gameplay text authority; flavor text is never used for implementation
 - Keyword and combat-text support is limited to the active manifest and its
   bounded contracts, including the original `Flying`, `Reach`, `Swampwalk`,
-  and `Defender` support plus Wave 2's temporary `Forestwalk` and name-scoped
-  attack/block restrictions; broader keyword support remains deferred
+  and `Defender` support plus bounded `Forestwalk`, `Islandwalk`, `Vigilance`,
+  and name-scoped attack/block restrictions; broader keyword support remains
+  deferred
 - Default persisted card image asset type: JPG
 - Deterministic simulation and replayability are first-class requirements in v0, especially for tests
 - The first engine architecture pattern is a deterministic state machine with an append-only event log

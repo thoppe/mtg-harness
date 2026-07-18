@@ -15,8 +15,16 @@ Define the bounded characteristics model used by the Portal expansion waves.
   zones; they never follow a persistent `card_instance_id` into a new object.
 - The initial model supports additive power/toughness bonuses and granted
   keywords only. It is not a general layer system.
+- Wave 3's printed static keywords may be read by the shared combat predicates
+  for `Islandwalk` and `Vigilance`; the latter changes only whether attacker
+  declaration taps that creature. The bounded flying-only blocker restriction
+  for Cloud Dragon, Cloud Pirates, and Cloud Spirit is likewise a combat
+  predicate, not a continuous-effect layer.
 
 ## Expansion Guardrail
 
 Cards needing copy effects, base-setting P/T, dependency/layer ordering, or
 arbitrary characteristic-changing effects require a new contract increment.
+Triggered abilities and effects that shuffle a library, including Alabaster
+Dragon's death trigger, require their own contract increment and are not
+included in Wave 3's characteristics scope.

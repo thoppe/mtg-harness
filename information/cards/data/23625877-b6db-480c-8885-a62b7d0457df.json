@@ -1,0 +1,144 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "23625877-b6db-480c-8885-a62b7d0457df",
+  "name": "Ardent Militia",
+  "provenance": {
+    "collector_number": "4",
+    "fetched_at": "2026-07-18T02:44:43Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/5/4/543f8c6a-bcf1-4400-82e5-83d36cb60464.jpg?1783946853",
+    "oracle_id": "23625877-b6db-480c-8885-a62b7d0457df",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor&unique=cards",
+    "requested_set_code": "por",
+    "scryfall_id": "543f8c6a-bcf1-4400-82e5-83d36cb60464",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/543f8c6a-bcf1-4400-82e5-83d36cb60464"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Mike Raabe",
+    "artist_ids": [
+      "d29cd67f-30a7-4fb9-a081-36c3d5982442"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10151,
+    "cmc": 5.0,
+    "collector_number": "4",
+    "color_identity": [
+      "W"
+    ],
+    "colors": [
+      "W"
+    ],
+    "digital": false,
+    "edhrec_rank": 30568,
+    "finishes": [
+      "nonfoil"
+    ],
+    "flavor_text": "Some fight for honor and some for gold, but the militia fights for hearth and home.",
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "543f8c6a-bcf1-4400-82e5-83d36cb60464",
+    "illustration_id": "7c69948d-4629-4954-8f1e-c42895a33c00",
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T12:47:33Z",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/5/4/543f8c6a-bcf1-4400-82e5-83d36cb60464.jpg?1783946853",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/5/4/543f8c6a-bcf1-4400-82e5-83d36cb60464.jpg?1783946853",
+      "large": "https://cards.scryfall.io/large/front/5/4/543f8c6a-bcf1-4400-82e5-83d36cb60464.jpg?1783946853",
+      "normal": "https://cards.scryfall.io/normal/front/5/4/543f8c6a-bcf1-4400-82e5-83d36cb60464.jpg?1783946853",
+      "png": "https://cards.scryfall.io/png/front/5/4/543f8c6a-bcf1-4400-82e5-83d36cb60464.png?1783946853",
+      "small": "https://cards.scryfall.io/small/front/5/4/543f8c6a-bcf1-4400-82e5-83d36cb60464.jpg?1783946853"
+    },
+    "keywords": [
+      "Vigilance"
+    ],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "competitivebrawl": "not_legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "legal",
+      "paupercommander": "legal",
+      "penny": "legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "tlr": "not_legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{4}{W}",
+    "multiverse_ids": [
+      4372
+    ],
+    "name": "Ardent Militia",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "23625877-b6db-480c-8885-a62b7d0457df",
+    "oracle_text": "Vigilance",
+    "oversized": false,
+    "power": "2",
+    "prices": {
+      "eur": "0.23",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "0.22",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A23625877-b6db-480c-8885-a62b7d0457df&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Ardent+Militia&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10151&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F612%3Fpage%3D1"
+    },
+    "rarity": "uncommon",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Ardent+Militia",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4372&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DArdent%2BMilitia",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DArdent%2BMilitia"
+    },
+    "released_at": "1997-05-01",
+    "reprint": false,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/543f8c6a-bcf1-4400-82e5-83d36cb60464/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/4/ardent-militia?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 612,
+    "textless": false,
+    "toughness": "5",
+    "type_line": "Creature \u2014 Human Soldier",
+    "uri": "https://api.scryfall.com/cards/543f8c6a-bcf1-4400-82e5-83d36cb60464",
+    "variation": false
+  }
+}

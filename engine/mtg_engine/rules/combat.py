@@ -5,13 +5,19 @@ from dataclasses import replace
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.state.models import CombatState, GameOutcome, GameState
 from mtg_engine.state.zones import move_object, update_object, update_player
-from mtg_engine.rules.characteristics import effective_power, effective_toughness
+from mtg_engine.rules.characteristics import effective_power, effective_toughness, has_keyword
 
 
-def tap_attackers(state: GameState, attacker_ids: tuple[str, ...]) -> GameState:
+def tap_attackers(
+    state: GameState,
+    attacker_ids: tuple[str, ...],
+    card_repository: CardRepository,
+) -> GameState:
     current_state = state
     for attacker_id in attacker_ids:
         attacker = current_state.objects[attacker_id]
+        if has_keyword(current_state, card_repository, attacker_id, "Vigilance"):
+            continue
         current_state = update_object(current_state, replace(attacker, tapped=True))
     return current_state
 

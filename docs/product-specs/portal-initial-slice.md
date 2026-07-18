@@ -31,7 +31,12 @@ canonical manifest is introduced.
 
 - Keyword and combat-text support stays bounded to the families declared by the
   active manifest and rules envelope, including Wave 2's temporary `Forestwalk`
-  and name-scoped attack/block restrictions.
+  and name-scoped attack/block restrictions. Wave 3 planning further bounds
+  the next promotion sequence to existing behavior (3A), Cloud Dragon's shared
+  flying-only blocker predicate (3B), Islandwalk (3C), and Vigilance (3D).
+- Alabaster Dragon remains outside the active universe until a triggered-
+  ability and deterministic-shuffle increment is explicitly contracted and
+  implemented.
 - The first slice should implement only the rule families actually needed by this universe.
 - Any new card added beyond this universe should trigger a rules-gap review before implementation.
 

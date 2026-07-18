@@ -1,0 +1,142 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "342199e0-15b6-4824-83da-25caef2592b3",
+  "name": "Hill Giant",
+  "provenance": {
+    "collector_number": "133",
+    "fetched_at": "2026-07-18T02:44:43Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/7/c/7cd36579-c108-40c0-bce4-38ab837a8c65.jpg?1783946817",
+    "oracle_id": "342199e0-15b6-4824-83da-25caef2592b3",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor&unique=cards",
+    "requested_set_code": "por",
+    "scryfall_id": "7cd36579-c108-40c0-bce4-38ab837a8c65",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/7cd36579-c108-40c0-bce4-38ab837a8c65"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Randy Gallegos",
+    "artist_ids": [
+      "a5048cc7-438a-4378-98e4-da99b78e1db0"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10123,
+    "cmc": 4.0,
+    "collector_number": "133",
+    "color_identity": [
+      "R"
+    ],
+    "colors": [
+      "R"
+    ],
+    "digital": false,
+    "edhrec_rank": 28579,
+    "finishes": [
+      "nonfoil"
+    ],
+    "flavor_text": "Hill giants are mostly just big. Of course, that does count for a lot!",
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "7cd36579-c108-40c0-bce4-38ab837a8c65",
+    "illustration_id": "af4b02a3-8a05-4cbf-afab-c9d0eec5f2b4",
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T12:46:57Z",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/7/c/7cd36579-c108-40c0-bce4-38ab837a8c65.jpg?1783946817",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/7/c/7cd36579-c108-40c0-bce4-38ab837a8c65.jpg?1783946817",
+      "large": "https://cards.scryfall.io/large/front/7/c/7cd36579-c108-40c0-bce4-38ab837a8c65.jpg?1783946817",
+      "normal": "https://cards.scryfall.io/normal/front/7/c/7cd36579-c108-40c0-bce4-38ab837a8c65.jpg?1783946817",
+      "png": "https://cards.scryfall.io/png/front/7/c/7cd36579-c108-40c0-bce4-38ab837a8c65.png?1783946817",
+      "small": "https://cards.scryfall.io/small/front/7/c/7cd36579-c108-40c0-bce4-38ab837a8c65.jpg?1783946817"
+    },
+    "keywords": [],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "competitivebrawl": "not_legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "legal",
+      "paupercommander": "legal",
+      "penny": "legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "tlr": "not_legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{3}{R}",
+    "multiverse_ids": [
+      4344
+    ],
+    "name": "Hill Giant",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "342199e0-15b6-4824-83da-25caef2592b3",
+    "oracle_text": "",
+    "oversized": false,
+    "power": "3",
+    "prices": {
+      "eur": "0.09",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "0.12",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A342199e0-15b6-4824-83da-25caef2592b3&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Hill+Giant&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10123&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F694%3Fpage%3D1"
+    },
+    "rarity": "common",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Hill+Giant",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4344&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DHill%2BGiant",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DHill%2BGiant"
+    },
+    "released_at": "1997-05-01",
+    "reprint": true,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/7cd36579-c108-40c0-bce4-38ab837a8c65/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/133/hill-giant?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 694,
+    "textless": false,
+    "toughness": "3",
+    "type_line": "Creature \u2014 Giant",
+    "uri": "https://api.scryfall.com/cards/7cd36579-c108-40c0-bce4-38ab837a8c65",
+    "variation": false
+  }
+}

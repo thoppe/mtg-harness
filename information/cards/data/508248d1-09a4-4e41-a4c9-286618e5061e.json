@@ -1,0 +1,146 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "508248d1-09a4-4e41-a4c9-286618e5061e",
+  "name": "Bog Wraith",
+  "provenance": {
+    "collector_number": "83",
+    "fetched_at": "2026-07-18T02:44:43Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/4/4/4487d7d0-d5a5-4b0c-bf30-e0ec511e9aa4.jpg?1783946831",
+    "oracle_id": "508248d1-09a4-4e41-a4c9-286618e5061e",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor&unique=cards",
+    "requested_set_code": "por",
+    "scryfall_id": "4487d7d0-d5a5-4b0c-bf30-e0ec511e9aa4",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/4487d7d0-d5a5-4b0c-bf30-e0ec511e9aa4"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Ted Naifeh",
+    "artist_ids": [
+      "4601d9e5-616b-47c4-b9ca-e2b4ab257bc9"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 9990,
+    "cmc": 4.0,
+    "collector_number": "83",
+    "color_identity": [
+      "B"
+    ],
+    "colors": [
+      "B"
+    ],
+    "digital": false,
+    "edhrec_rank": 20698,
+    "finishes": [
+      "nonfoil"
+    ],
+    "flavor_text": "It moved through the troops leaving no footprints, save on their souls.",
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "4487d7d0-d5a5-4b0c-bf30-e0ec511e9aa4",
+    "illustration_id": "534b5f76-d698-4916-963e-84ebd1f96f5a",
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T12:47:11Z",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/4/4/4487d7d0-d5a5-4b0c-bf30-e0ec511e9aa4.jpg?1783946831",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/4/4/4487d7d0-d5a5-4b0c-bf30-e0ec511e9aa4.jpg?1783946831",
+      "large": "https://cards.scryfall.io/large/front/4/4/4487d7d0-d5a5-4b0c-bf30-e0ec511e9aa4.jpg?1783946831",
+      "normal": "https://cards.scryfall.io/normal/front/4/4/4487d7d0-d5a5-4b0c-bf30-e0ec511e9aa4.jpg?1783946831",
+      "png": "https://cards.scryfall.io/png/front/4/4/4487d7d0-d5a5-4b0c-bf30-e0ec511e9aa4.png?1783946831",
+      "small": "https://cards.scryfall.io/small/front/4/4/4487d7d0-d5a5-4b0c-bf30-e0ec511e9aa4.jpg?1783946831"
+    },
+    "keywords": [
+      "Landwalk",
+      "Swampwalk"
+    ],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "competitivebrawl": "not_legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "not_legal",
+      "paupercommander": "not_legal",
+      "penny": "legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "tlr": "not_legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{3}{B}",
+    "multiverse_ids": [
+      4211
+    ],
+    "name": "Bog Wraith",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "508248d1-09a4-4e41-a4c9-286618e5061e",
+    "oracle_text": "Swampwalk (This creature can't be blocked as long as defending player controls a Swamp.)",
+    "oversized": false,
+    "penny_rank": 16360,
+    "power": "3",
+    "prices": {
+      "eur": "0.49",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "0.17",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A508248d1-09a4-4e41-a4c9-286618e5061e&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Bog+Wraith&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=9990&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F626%3Fpage%3D1"
+    },
+    "rarity": "uncommon",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Bog+Wraith",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4211&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DBog%2BWraith",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DBog%2BWraith"
+    },
+    "released_at": "1997-05-01",
+    "reprint": true,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/4487d7d0-d5a5-4b0c-bf30-e0ec511e9aa4/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/83/bog-wraith?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 626,
+    "textless": false,
+    "toughness": "3",
+    "type_line": "Creature \u2014 Wraith",
+    "uri": "https://api.scryfall.com/cards/4487d7d0-d5a5-4b0c-bf30-e0ec511e9aa4",
+    "variation": false
+  }
+}

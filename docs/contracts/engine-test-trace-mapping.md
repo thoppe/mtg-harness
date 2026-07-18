@@ -310,6 +310,33 @@ Define how the current rule-family coverage should map to future engine tests an
   - `attackers_declared`
   - `blockers_declared`
 
+### `islandwalk_keyword_minimal`
+
+- Planned tests:
+  - `engine/tests/test_combat.py`
+  - `engine/tests/test_wave3.py`
+- Planned trace assertions:
+  - `attackers_declared`
+  - `blockers_declared`
+
+### `vigilance_keyword_minimal`
+
+- Planned tests:
+  - `engine/tests/test_combat.py`
+  - `engine/tests/test_wave3.py`
+- Planned trace assertions:
+  - `attackers_declared`
+  - `blockers_declared`
+
+### `flying_only_blocker_restriction_minimal`
+
+- Planned tests:
+  - `engine/tests/test_combat.py`
+  - `engine/tests/test_wave3.py`
+- Planned trace assertions:
+  - `attackers_declared`
+  - `blockers_declared`
+
 ### `defender_keyword_minimal`
 
 - Planned tests:
@@ -372,6 +399,9 @@ Define how the current rule-family coverage should map to future engine tests an
   - `flying_keyword_minimal` now has engine coverage for `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`.
   - `reach_keyword_minimal` now has engine coverage for `Keen-Eyed Archers`.
   - `swampwalk_keyword_minimal` now has engine coverage for `Anaconda`.
+  - `islandwalk_keyword_minimal`, `vigilance_keyword_minimal`, and
+    `flying_only_blocker_restriction_minimal` are planned Wave 3 mappings and
+    do not yet claim engine coverage.
   - `defender_keyword_minimal` now has engine coverage for `Wall of Granite`.
   - `simple_life_gain_sorceries_minimal` now has engine coverage for `Sacred Nectar`.
   - `instant_priority_minimal`, `temporary_characteristics_minimal`, and

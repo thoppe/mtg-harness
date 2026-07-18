@@ -1,0 +1,179 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "cf26dcb4-e181-4ba5-bc03-b56f57032b85",
+  "name": "Feral Shadow",
+  "provenance": {
+    "collector_number": "93",
+    "fetched_at": "2026-07-18T02:44:43Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/c/4/c46f4c00-6bf8-440b-9761-b17a0e36c27e.jpg?1783946828",
+    "oracle_id": "cf26dcb4-e181-4ba5-bc03-b56f57032b85",
+    "request_url": "https://api.scryfall.com/cards/search?q=set%3Apor&unique=cards",
+    "requested_set_code": "por",
+    "scryfall_id": "c46f4c00-6bf8-440b-9761-b17a0e36c27e",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/c46f4c00-6bf8-440b-9761-b17a0e36c27e"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "all_parts": [
+      {
+        "component": "combo_piece",
+        "id": "268263bb-6e94-44ce-b84b-53858d4721a7",
+        "name": "Urborg Panther",
+        "object": "related_card",
+        "type_line": "Creature \u2014 Nightstalker Cat",
+        "uri": "https://api.scryfall.com/cards/268263bb-6e94-44ce-b84b-53858d4721a7"
+      },
+      {
+        "component": "combo_piece",
+        "id": "0cd9da69-5e57-4719-a712-630c9464fada",
+        "name": "Breathstealer",
+        "object": "related_card",
+        "type_line": "Creature \u2014 Nightstalker",
+        "uri": "https://api.scryfall.com/cards/0cd9da69-5e57-4719-a712-630c9464fada"
+      },
+      {
+        "component": "combo_piece",
+        "id": "f8d4c95e-7d18-4bb5-b373-e964a21e144b",
+        "name": "Spirit of the Night",
+        "object": "related_card",
+        "type_line": "Legendary Creature \u2014 Demon Spirit",
+        "uri": "https://api.scryfall.com/cards/f8d4c95e-7d18-4bb5-b373-e964a21e144b"
+      },
+      {
+        "component": "combo_piece",
+        "id": "200365f5-05a1-461e-904e-daf99f4b92bb",
+        "name": "Feral Shadow",
+        "object": "related_card",
+        "type_line": "Creature \u2014 Nightstalker",
+        "uri": "https://api.scryfall.com/cards/200365f5-05a1-461e-904e-daf99f4b92bb"
+      }
+    ],
+    "artist": "Colin MacNeil",
+    "artist_ids": [
+      "d756eb39-8c2f-4f12-b200-ec0d365479f3"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10000,
+    "cmc": 3.0,
+    "collector_number": "93",
+    "color_identity": [
+      "B"
+    ],
+    "colors": [
+      "B"
+    ],
+    "digital": false,
+    "edhrec_rank": 28748,
+    "finishes": [
+      "nonfoil"
+    ],
+    "flavor_text": "Not all shadows are cast by light\u2014some are cast by darkness.",
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "c46f4c00-6bf8-440b-9761-b17a0e36c27e",
+    "illustration_id": "ba9fc509-d499-43c3-b44c-b478859f3bd6",
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T12:47:08Z",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/c/4/c46f4c00-6bf8-440b-9761-b17a0e36c27e.jpg?1783946828",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/c/4/c46f4c00-6bf8-440b-9761-b17a0e36c27e.jpg?1783946828",
+      "large": "https://cards.scryfall.io/large/front/c/4/c46f4c00-6bf8-440b-9761-b17a0e36c27e.jpg?1783946828",
+      "normal": "https://cards.scryfall.io/normal/front/c/4/c46f4c00-6bf8-440b-9761-b17a0e36c27e.jpg?1783946828",
+      "png": "https://cards.scryfall.io/png/front/c/4/c46f4c00-6bf8-440b-9761-b17a0e36c27e.png?1783946828",
+      "small": "https://cards.scryfall.io/small/front/c/4/c46f4c00-6bf8-440b-9761-b17a0e36c27e.jpg?1783946828"
+    },
+    "keywords": [
+      "Flying"
+    ],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "competitivebrawl": "not_legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "not_legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "legal",
+      "paupercommander": "legal",
+      "penny": "not_legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "tlr": "legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{2}{B}",
+    "multiverse_ids": [
+      4221
+    ],
+    "name": "Feral Shadow",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "cf26dcb4-e181-4ba5-bc03-b56f57032b85",
+    "oracle_text": "Flying",
+    "oversized": false,
+    "penny_rank": 16710,
+    "power": "2",
+    "prices": {
+      "eur": "0.17",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "0.12",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3Acf26dcb4-e181-4ba5-bc03-b56f57032b85&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Feral+Shadow&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10000&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F667%3Fpage%3D1"
+    },
+    "rarity": "common",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Feral+Shadow",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4221&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DFeral%2BShadow",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DFeral%2BShadow"
+    },
+    "released_at": "1997-05-01",
+    "reprint": true,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/c46f4c00-6bf8-440b-9761-b17a0e36c27e/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/93/feral-shadow?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 667,
+    "textless": false,
+    "toughness": "1",
+    "type_line": "Creature \u2014 Nightstalker",
+    "uri": "https://api.scryfall.com/cards/c46f4c00-6bf8-440b-9761-b17a0e36c27e",
+    "variation": false
+  }
+}

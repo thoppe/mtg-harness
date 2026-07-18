@@ -42,9 +42,51 @@ special-cased in the sorcery resolver.
 
 Reason: reuse temporary P/T state before triggers or choices. Angelic Blessing, Cloak of Feathers, Steadfastness, Warrior's Charge, Valorous Charge, Nature's Cloak, Dread Charge, Treetop Defense, Sacred Knight, Fleet-Footed Monk, Charging Rhino, Stalking Tiger, Phantom Warrior, Craven Giant, Craven Knight, Hulking Cyclops, Hulking Goblin, Jungle Lion, Deep-Sea Serpent, Cloud Dragon.
 
-### Wave 3: Vanilla creatures and existing keyword reuse
+### Wave 3: Dependency-ordered creature expansion
 
-Reason: casting/combat coverage only, or existing Flying, Reach, Defender, Swampwalk, and landwalk. Alabaster Dragon, Archangel, Ardent Militia, Arrogant Vampire, Bog Raiders, Bog Wraith, Bull Hippo, Coral Eel, Desert Drake, Djinn of the Lamp, Elvish Ranger, Feral Shadow, Giant Octopus, Giant Spider, Goblin Bully, Gorilla Warrior, Grizzly Bears, Highland Giant, Hill Giant, Horned Turtle, Knight Errant, Lizard Warrior, Merfolk of the Pearl Trident, Cloud Pirates, Cloud Spirit, Devoted Hero, Elite Cat Warrior.
+Wave 3 supersedes the within-wave printed-order rule. Its cards are grouped by
+the smallest shared rule increment instead. A card is not supported merely
+because its source artifact exists or a superficially similar card is in the
+active slice.
+
+#### Wave 3A: Existing casting and combat behavior
+
+Reason: promote only cards whose behavior is already represented by the active
+slice: vanilla creatures, Flying, Reach, Swampwalk, or Forestwalk. Coral Eel,
+Elvish Ranger, Giant Octopus, Goblin Bully, Gorilla Warrior, Grizzly Bears,
+Highland Giant, Hill Giant, Horned Turtle, Knight Errant, Lizard Warrior,
+Merfolk of the Pearl Trident, Devoted Hero, Arrogant Vampire, Desert Drake,
+Djinn of the Lamp, Feral Shadow, Giant Spider, Bog Raiders, Bog Wraith, Elite
+Cat Warrior.
+
+#### Wave 3B: Shared flying-only blocker restriction
+
+Reason: Cloud Pirates and Cloud Spirit each have Flying and can block only
+creatures with Flying. Generalize the existing Cloud Dragon behavior into one
+bounded combat predicate shared by those three named cards; do not leave a
+card-name special case in blocker validation.
+
+#### Wave 3C: Islandwalk
+
+Reason: Bull Hippo requires the existing landwalk check to use an explicit
+supported-keyword-to-land-subtype mapping that includes Islandwalk alongside
+the currently supported Swampwalk and Forestwalk. This is not a general
+land-type-changing or arbitrary-landwalk framework.
+
+#### Wave 3D: Vigilance
+
+Reason: Archangel and Ardent Militia require the attacker-declaration rule to
+leave a creature with Vigilance untapped. The increment is limited to that
+exception; it must preserve the creature's ability to block later in combat.
+
+#### Wave 3E: Triggered death ability (deferred)
+
+Alabaster Dragon is deliberately deferred beyond Waves 3A--3D. Its death
+trigger requires a separate triggered-ability foundation: death detection,
+trigger creation after state-based actions, deterministic stack and priority
+resolution, library shuffling, replay events, and the case where the Dragon
+leaves its graveyard before the trigger resolves. Do not special-case this
+ability in zone movement or state-based actions.
 
 ### Wave 4: Combat exceptions and haste
 

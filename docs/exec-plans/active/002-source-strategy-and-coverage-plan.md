@@ -158,10 +158,24 @@ Prefer links to canonical manifests over duplicated card lists. If a copied list
 The next session should continue from the manifest-backed slice after the
 completed Wave 2 temporary-characteristic and combat-restriction batch.
 
-1. Keep `docs/coverage/slices/portal.initial.yaml` aligned with the declared active card universe and source pull scope.
-2. Re-evaluate Wave 3 in `docs/contracts/portal-expansion-order.md` against the
-   current engine before promoting any of its cards; source artifacts alone do
-   not imply support.
-3. Before implementation, update source artifacts, manifest, coverage, rules
-   envelope, registry, and edge-case tests together.
-4. Before finishing, run the card-expansion freshness check above.
+1. Treat Wave 3 in `docs/contracts/portal-expansion-order.md` as five
+   dependency-ordered subwaves, not a printed-order batch: 3A existing
+   behavior, 3B shared flying-only blocker restriction, 3C Islandwalk, 3D
+   Vigilance, and 3E Alabaster Dragon's deferred triggered death ability.
+2. Promote Wave 3A's 21 cards first. Keep
+   `docs/coverage/slices/portal.initial.yaml` aligned with the declared active
+   card universe and source pull scope; source artifacts alone do not imply
+   support.
+3. For 3B, replace the Cloud Dragon name-only blocker test with the bounded
+   shared predicate and prove both enumeration and submitted-declaration
+   rejection for all three relevant cards.
+4. For 3C, add Bull Hippo by extending the explicit landwalk mapping only with
+   Islandwalk -> Island, and test both Island-present and Island-absent cases.
+5. For 3D, add Archangel and Ardent Militia through the minimal Vigilance
+   exception and prove they remain untapped after attacking and can block when
+   otherwise legal. Do not promote Alabaster Dragon: 3E needs a separate
+   triggered-ability, deterministic-shuffle, stack/priority, and replay-event
+   contract increment.
+6. Before each implementation subwave, update source artifacts, manifest,
+   coverage, rules envelope, registry, and edge-case tests together; before
+   finishing, run the card-expansion freshness check above.

@@ -18,6 +18,14 @@ declared by `docs/coverage/slices/portal.initial.yaml`.
 - Reach keyword support limited to the blocking behavior required by `Keen-Eyed Archers`
 - Swampwalk keyword support limited to the unblockability condition required by `Anaconda`
 - Defender keyword support limited to preventing `Wall of Granite` from attacking
+- Wave 3A creature promotion limited to vanilla creatures and reuse of the
+  existing Flying, Reach, Swampwalk, and Forestwalk combat behavior
+- Islandwalk keyword support limited to the unblockability condition required
+  by `Bull Hippo`
+- Vigilance keyword support limited to leaving `Archangel` and `Ardent
+  Militia` untapped when declared as attackers
+- Flying-only blocker restriction limited to `Cloud Dragon`, `Cloud Pirates`,
+  and `Cloud Spirit`
 - Lethal damage and creature death as minimal state-based handling
 - Sorcery-speed targeted destruction limited to `Destroy target tapped creature.` and `Destroy target creature. Its owner gains 4 life.`
 - Sorcery-speed targeted destruction limited to the printed nonblack-creature restriction required by `Hand of Death`
@@ -74,12 +82,24 @@ declared by `docs/coverage/slices/portal.initial.yaml`.
 - `Keen-Eyed Archers` may introduce only the minimal reach exception that it can block creatures with flying, without introducing broader anti-air combat text, continuous-effect layering, or generalized keyword interaction beyond the currently supported flying cards.
 - `Anaconda` may introduce only the minimal swampwalk restriction that it cannot be blocked while the defending player controls a `Swamp`, without introducing generalized landwalk handling beyond the printed `Swampwalk` keyword or continuous land-type modification.
 - `Wall of Granite` may introduce only the minimal defender restriction that it cannot be declared as an attacker; broader static-ability handling remains out of scope until another card requires it.
+- Wave 3B may replace Cloud Dragon's name-only blocker check with one bounded
+  predicate for Cloud Dragon, Cloud Pirates, and Cloud Spirit: each can block
+  only creatures with Flying. Both action enumeration and submitted blockers
+  must use that predicate.
+- Wave 3C may extend the explicit landwalk mapping only with `Islandwalk` ->
+  `Island` for Bull Hippo, preserving the existing Swampwalk and Forestwalk
+  behavior and excluding land-type changes.
+- Wave 3D may add only the Vigilance exception that an attacking Archangel or
+  Ardent Militia does not tap. It introduces no broader static-ability or
+  untap-effect system.
 
 ## Out Of Scope
 
 - Keyword abilities beyond those declared by the active manifest and bounded
   contracts
 - Triggered abilities not required by the initial cards
+- Alabaster Dragon's death trigger, library shuffle, and all triggered-ability
+  queue behavior pending a separate contract increment
 - Replacement effects
 - Continuous effects beyond the object-bound additive and keyword-granting
   Wave 2 model
