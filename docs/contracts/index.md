@@ -22,6 +22,7 @@ Contracts define the interfaces and invariants that future code must satisfy.
 - `rules-implementation-lifecycle.md`
 - `state-machine-transitions.md`
 - `stack-and-priority.md`
+- `portal-expansion-order.md`
 - `surface-api.md`
 
 ## Contract Rule
