@@ -16,6 +16,7 @@ from mtg_engine.actions.models import (
     DeclareBlockersAction,
     PassPriorityAction,
     PlayLandAction,
+    ResolveChoiceAction,
 )
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.priority import enumerate_legal_actions
@@ -38,7 +39,7 @@ from mtg_engine.flow.turns import (
 )
 from mtg_engine.rules.combat import with_combat_state
 from mtg_engine.rules.characteristics import has_keyword
-from mtg_engine.state.models import TurnState
+from mtg_engine.state.models import PendingDecision, TurnState
 from mtg_engine.state.zones import move_object, update_object
 
 
@@ -76,6 +77,91 @@ RAIN_OF_DAGGERS = "e2048201-6dc9-4cf5-916f-1d867ae8dbdd"
 
 
 class PriorityTests(unittest.TestCase):
+    def test_pending_multi_selection_enumerates_bounded_combinations(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = initialize_game(
+            SetupInput("choices", ("alice", "bob"), "alice", {"alice": (PLAINS, FOREST), "bob": (SWAMP,)}, {"alice": (PLAINS, FOREST), "bob": (SWAMP,)}, 1),
+            repository,
+        )
+        state = replace(
+            session.state,
+            pending_decision=PendingDecision(
+                decision_id="choice:1",
+                chooser_id="alice",
+                kind="any_number",
+                source_object_id="alice:1@0",
+                option_ids=("alice:1", "alice:2"),
+                min_selections=0,
+                max_selections=2,
+            ),
+        )
+        self.assertEqual(
+            enumerate_legal_actions(state, repository),
+            (
+                ResolveChoiceAction("alice", "choice:1"),
+                ResolveChoiceAction("alice", "choice:1", selected_instance_ids=("alice:1",)),
+                ResolveChoiceAction("alice", "choice:1", selected_instance_ids=("alice:2",)),
+                ResolveChoiceAction("alice", "choice:1", selected_instance_ids=("alice:1", "alice:2")),
+            ),
+        )
+
+    def test_pending_ordered_choice_includes_optional_shuffle_declaration(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = initialize_game(
+            SetupInput("ordered", ("alice", "bob"), "alice", {"alice": (PLAINS, FOREST), "bob": (SWAMP,)}, {"alice": (PLAINS, FOREST), "bob": (SWAMP,)}, 1),
+            repository,
+        )
+        state = replace(
+            session.state,
+            pending_decision=PendingDecision(
+                decision_id="choice:2",
+                chooser_id="alice",
+                kind="order_prefix",
+                source_object_id="alice:1@0",
+                option_ids=("alice:1", "alice:2"),
+                min_selections=2,
+                max_selections=2,
+                selection_ordered=True,
+                allow_shuffle=True,
+            ),
+        )
+        self.assertEqual(
+            enumerate_legal_actions(state, repository),
+            (
+                ResolveChoiceAction("alice", "choice:2", ordered_instance_ids=("alice:1", "alice:2"), shuffle_library=False),
+                ResolveChoiceAction("alice", "choice:2", ordered_instance_ids=("alice:1", "alice:2"), shuffle_library=True),
+                ResolveChoiceAction("alice", "choice:2", ordered_instance_ids=("alice:2", "alice:1"), shuffle_library=False),
+                ResolveChoiceAction("alice", "choice:2", ordered_instance_ids=("alice:2", "alice:1"), shuffle_library=True),
+            ),
+        )
+
+    def test_temporary_truce_choice_enumerates_each_declared_draw_count(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = initialize_game(
+            SetupInput("truce", ("alice", "bob"), "alice", {"alice": (PLAINS,), "bob": (SWAMP,)}, {"alice": (PLAINS,), "bob": (SWAMP,)}, 1),
+            repository,
+        )
+        state = replace(
+            session.state,
+            pending_decision=PendingDecision(
+                decision_id="choice:3",
+                chooser_id="alice",
+                kind="draw_up_to_two",
+                source_object_id="alice:1@0",
+                option_ids=(),
+                min_selections=0,
+                max_selections=0,
+            ),
+        )
+        self.assertEqual(
+            enumerate_legal_actions(state, repository),
+            (
+                ResolveChoiceAction("alice", "choice:3", declared_count=0),
+                ResolveChoiceAction("alice", "choice:3", declared_count=1),
+                ResolveChoiceAction("alice", "choice:3", declared_count=2),
+            ),
+        )
+
     def test_alluring_scent_forces_able_blockers_in_enumeration_and_submission(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         session = _build_multi_block_ready_session(repository)

@@ -34,7 +34,7 @@ class PullSourcesTests(unittest.TestCase):
 
         self.assertEqual(targets[0].set_code, "por")
         self.assertEqual(targets[0].oracle_id, "1ef5003c-f540-4cdc-913f-7d5280ad9f62")
-        self.assertEqual(targets[-1].oracle_id, "19d5eb29-2d35-44e7-afa1-3ba8d812ed41")
+        self.assertEqual(targets[-1].oracle_id, "c586312d-d04a-4bfb-bbb2-b41186ca178e")
         self.assertIn("2392a41a-59d3-4749-be94-4d9df0af9c4c", [target.oracle_id for target in targets])
         self.assertIn("c9ed8b01-959a-47d6-891e-0abbdccf6e4f", [target.oracle_id for target in targets])
         self.assertIn("e2048201-6dc9-4cf5-916f-1d867ae8dbdd", [target.oracle_id for target in targets])
@@ -52,6 +52,8 @@ class PullSourcesTests(unittest.TestCase):
         self.assertIn("9971697b-2acc-4bc2-a44e-074d03a51df7", [target.oracle_id for target in targets])
         self.assertIn("031cd561-d9b1-4a0e-bc38-bc09e80563c3", [target.oracle_id for target in targets])
         self.assertIn("994db177-03f5-43dd-bf7b-2994e8d430d3", [target.oracle_id for target in targets])
+        self.assertIn("8c1fe337-375a-4add-93b6-0ac39ed72b4f", [target.oracle_id for target in targets])
+        self.assertIn("c586312d-d04a-4bfb-bbb2-b41186ca178e", [target.oracle_id for target in targets])
 
     def test_pull_cards_writes_canonical_paths_and_provenance(self) -> None:
         cards = [

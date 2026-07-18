@@ -32,5 +32,8 @@ implementation detail.
 - Alabaster Dragon consumes one cursor position only for the successful
   graveyard-to-library-and-shuffle resolution above; putting its trigger on the
   stack consumes none.
+- Wave 5 random discard and multi-library shuffle semantics are defined in
+  `docs/contracts/wave5-hidden-zone-expansion.md`; they reuse this algorithm
+  identifier and cursor state.
 - No source of randomness may call ambient process RNG.
 - Algorithm migrations require a new identifier and replay compatibility path.

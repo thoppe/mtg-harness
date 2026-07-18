@@ -295,8 +295,28 @@ def cast_noncreature_spell(
     if not _can_pay_mana_cost(player.mana_pool, mana_requirements):
         raise ValueError("insufficient mana to cast noncreature spell")
 
+    if effect == "natural_order":
+        sacrifice_id = action.additional_cost_instance_id
+        if sacrifice_id is None or sacrifice_id not in player.battlefield:
+            raise ValueError("Natural Order requires sacrificing a green creature")
+        sacrifice = state.objects[sacrifice_id]
+        sacrifice_definition = card_repository.get(sacrifice.oracle_id)
+        if not sacrifice_definition.is_creature or not sacrifice_definition.has_color("G"):
+            raise ValueError("Natural Order requires sacrificing a green creature")
+    elif action.additional_cost_instance_id is not None:
+        raise ValueError("spell has no supported additional cost")
+
     remaining_pool = _pay_mana_cost(player.mana_pool, mana_requirements)
     casting_state = update_player(state, replace(player, mana_pool=remaining_pool))
+    if effect == "natural_order":
+        sacrifice = casting_state.objects[action.additional_cost_instance_id]
+        casting_state = move_object(
+            casting_state,
+            instance_id=action.additional_cost_instance_id,
+            from_zone="battlefield",
+            to_zone="graveyard",
+            player_id=action.player_id,
+        )
     casting_state = move_object(
         casting_state,
         instance_id=action.card_instance_id,
@@ -306,6 +326,20 @@ def cast_noncreature_spell(
     )
 
     event_log = EventLog.from_events(state.game_id, session.event_log)
+    if effect == "natural_order":
+        event_log.append(
+            event_type="object_moved_between_zones",
+            active_player=action.player_id,
+            payload={
+                "player_id": action.player_id,
+                "card_instance_id": action.additional_cost_instance_id,
+                "oracle_id": sacrifice.oracle_id,
+                "from_zone": "battlefield",
+                "to_zone": "graveyard",
+                "reason": "additional_cost:Natural Order",
+                **zone_change_identity_payload(casting_state, action.additional_cost_instance_id),
+            },
+        )
     event_log.append(
         event_type="spell_cast",
         active_player=action.player_id,
@@ -335,6 +369,7 @@ def cast_noncreature_spell(
         controller_id=action.player_id,
         target_ids=action.target_instance_ids,
         chosen_x=action.chosen_x,
+        additional_cost_instance_id=action.additional_cost_instance_id,
     )
     return TurnResult(state=stacked_state, event_log=event_log.events)
 
@@ -360,6 +395,7 @@ def _resolve_noncreature_spell(
         card_instance_id=entry.card_instance_id,
         target_instance_ids=entry.target_ids,
         chosen_x=entry.chosen_x,
+        additional_cost_instance_id=entry.additional_cost_instance_id,
     )
     casting_state = state
     event_log = EventLog.from_events(state.game_id, session.event_log)
@@ -422,6 +458,111 @@ def _resolve_noncreature_spell(
                 event_log,
                 player_id=action.player_id,
             )
+    elif effect == "look_at_opponent_hand_draw_one":
+        target_player_id = action.target_instance_id
+        event_log.append(
+            event_type="hand_looked_at",
+            active_player=action.player_id,
+            payload={"viewer_id": action.player_id, "player_id": target_player_id, "count": len(resolved_state.players[target_player_id].hand)},
+        )
+        resolved_state = _draw_one_card_for_player_if_available(resolved_state, event_log, player_id=action.player_id)
+    elif effect in {"baleful_stare", "withering_gaze"}:
+        target_player_id = action.target_instance_id
+        hand = resolved_state.players[target_player_id].hand
+        event_log.append(
+            event_type="hand_revealed",
+            active_player=action.player_id,
+            payload={"player_id": target_player_id, "card_instance_ids": list(hand), "oracle_ids": [resolved_state.objects[instance_id].oracle_id for instance_id in hand]},
+        )
+        subtype, color = ("Mountain", "R") if effect == "baleful_stare" else ("Forest", "G")
+        draw_count = sum(
+            1 for instance_id in hand
+            if (definition := card_repository.get(resolved_state.objects[instance_id].oracle_id)).has_subtype(subtype) or definition.has_color(color)
+        )
+        for _ in range(draw_count):
+            resolved_state = _draw_one_card_for_player_if_available(resolved_state, event_log, player_id=action.player_id)
+    elif effect == "balance_of_power":
+        target_player_id = action.target_instance_id
+        draw_count = max(0, len(resolved_state.players[target_player_id].hand) - len(resolved_state.players[action.player_id].hand))
+        for _ in range(draw_count):
+            resolved_state = _draw_one_card_for_player_if_available(resolved_state, event_log, player_id=action.player_id)
+    elif effect == "starlight":
+        target_player_id = action.target_instance_id
+        black_creatures = sum(
+            1 for instance_id in resolved_state.players[target_player_id].battlefield
+            if (definition := card_repository.get(resolved_state.objects[instance_id].oracle_id)).is_creature and definition.has_color("B")
+        )
+        player = resolved_state.players[action.player_id]
+        updated = replace(player, life_total=player.life_total + black_creatures * 3)
+        resolved_state = update_player(resolved_state, updated)
+        event_log.append(event_type="life_total_changed", active_player=action.player_id, payload={"player_id": action.player_id, "life_total": updated.life_total})
+    elif effect == "cruel_bargain":
+        for _ in range(4):
+            resolved_state = _draw_one_card_for_player_if_available(resolved_state, event_log, player_id=action.player_id)
+        player = resolved_state.players[action.player_id]
+        updated = replace(player, life_total=player.life_total - ((player.life_total + 1) // 2))
+        resolved_state = update_player(resolved_state, updated)
+        event_log.append(event_type="life_total_changed", active_player=action.player_id, payload={"player_id": action.player_id, "life_total": updated.life_total})
+    elif effect == "prosperity":
+        for player_id in _resolution_player_order(resolved_state):
+            for _ in range(action.chosen_x):
+                resolved_state = _draw_one_card_for_player_if_available(resolved_state, event_log, player_id=player_id)
+    elif effect == "mind_knives":
+        target_player_id = action.target_instance_id
+        hand = resolved_state.players[target_player_id].hand
+        if hand:
+            selected_id = random.Random(resolved_state.rng_seed + resolved_state.rng_cursor).choice(hand)
+            resolved_state = _discard_specific_cards(resolved_state, event_log, player_id=target_player_id, instance_ids=(selected_id,), active_player=action.player_id)
+            resolved_state = replace(resolved_state, rng_cursor=resolved_state.rng_cursor + 1)
+            event_log.append(event_type="random_choice_resolved", active_player=action.player_id, payload={"player_id": target_player_id, "algorithm": "python_random_mt19937_v1", "rng_cursor_before": resolved_state.rng_cursor - 1, "rng_cursor_after": resolved_state.rng_cursor})
+    elif effect == "flux":
+        players = _resolution_player_order(resolved_state)
+        resolved_state = _queue_wave5_decision(resolved_state, event_log, chooser_id=players[0], source_object_id=card.object_id, kind="discard_any_number", option_ids=resolved_state.players[players[0]].hand, min_selections=0, max_selections=len(resolved_state.players[players[0]].hand), continuation_kind="wave5_discard_then_draw", continuation=(("remaining_players", players[1:]), ("draw_counts", ())))
+    elif effect == "temporary_truce":
+        players = _resolution_player_order(resolved_state)
+        resolved_state = _queue_wave5_decision(resolved_state, event_log, chooser_id=players[0], source_object_id=card.object_id, kind="draw_up_to_two", option_ids=(), min_selections=0, max_selections=0, continuation_kind="wave5_truce", continuation=(("remaining_players", players[1:]),))
+    elif effect == "ancestral_memories":
+        options = resolved_state.players[action.player_id].library[:7]
+        count = min(2, len(options))
+        resolved_state = _queue_wave5_decision(resolved_state, event_log, chooser_id=action.player_id, source_object_id=card.object_id, kind="choose_two_from_library_prefix", option_ids=options, min_selections=count, max_selections=count, continuation_kind="wave5_ancestral_memories")
+    elif effect == "omen":
+        options = resolved_state.players[action.player_id].library[:3]
+        resolved_state = _queue_wave5_decision(resolved_state, event_log, chooser_id=action.player_id, source_object_id=card.object_id, kind="order_library_prefix_and_may_shuffle", option_ids=options, min_selections=len(options), max_selections=len(options), selection_ordered=True, allow_shuffle=True, continuation_kind="wave5_order_library", continuation=(("draw_after", True),))
+    elif effect == "cruel_fate":
+        target_player_id = action.target_instance_id
+        options = resolved_state.players[target_player_id].library[:5]
+        if options:
+            resolved_state = _queue_wave5_decision(resolved_state, event_log, chooser_id=action.player_id, source_object_id=card.object_id, kind="choose_library_card_for_graveyard", option_ids=options, min_selections=1, max_selections=1, continuation_kind="wave5_cruel_fate_select", continuation=(("target_player_id", target_player_id),))
+    elif effect in {"natural_order", "untamed_wilds", "natures_lore", "gift_of_estates", "cruel_tutor"}:
+        predicate = {
+            "natural_order": lambda definition: definition.is_creature and definition.has_color("G"),
+            "untamed_wilds": lambda definition: definition.is_land and "Basic" in definition.type_line,
+            "natures_lore": lambda definition: definition.is_land and definition.has_subtype("Forest"),
+            "gift_of_estates": lambda definition: definition.is_land and definition.has_subtype("Plains"),
+            "cruel_tutor": lambda definition: True,
+        }[effect]
+        if effect == "gift_of_estates" and not any(
+            sum(1 for instance_id in player.battlefield if card_repository.get(resolved_state.objects[instance_id].oracle_id).is_land)
+            > sum(1 for instance_id in resolved_state.players[action.player_id].battlefield if card_repository.get(resolved_state.objects[instance_id].oracle_id).is_land)
+            for player_id, player in resolved_state.players.items() if player_id != action.player_id
+        ):
+            options = ()
+        else:
+            options = tuple(instance_id for instance_id in resolved_state.players[action.player_id].library if predicate(card_repository.get(resolved_state.objects[instance_id].oracle_id)))
+        max_count = 3 if effect == "gift_of_estates" else 1
+        min_count = 0 if effect == "gift_of_estates" or not options else 1
+        destination = "hand" if effect == "gift_of_estates" else ("battlefield" if effect != "cruel_tutor" else "library")
+        resolved_state = _queue_wave5_decision(resolved_state, event_log, chooser_id=action.player_id, source_object_id=card.object_id, kind=f"search_{effect}", option_ids=options, min_selections=min_count, max_selections=min(max_count, len(options)), continuation_kind=f"wave5_search_{effect}", continuation=(("destination", destination), ("shuffle", True), ("top_after_shuffle", effect == "cruel_tutor"), ("lose_life", 2 if effect == "cruel_tutor" else 0)))
+    elif effect == "winds_of_change":
+        draw_counts = tuple((player_id, len(resolved_state.players[player_id].hand)) for player_id in _resolution_player_order(resolved_state))
+        for player_id, _ in draw_counts:
+            player = resolved_state.players[player_id]
+            for instance_id in tuple(player.hand):
+                resolved_state = _move_with_event(resolved_state, event_log, instance_id=instance_id, from_zone="hand", to_zone="library", player_id=player_id, active_player=action.player_id)
+            resolved_state = _shuffle_library(resolved_state, event_log, player_id=player_id)
+        for player_id, count in draw_counts:
+            for _ in range(count):
+                resolved_state = _draw_one_card_for_player_if_available(resolved_state, event_log, player_id=player_id)
     elif effect == "gain_4_life":
         acting_player = resolved_state.players[action.player_id]
         updated_player = replace(acting_player, life_total=acting_player.life_total + 4)
@@ -665,6 +806,7 @@ def _resolve_noncreature_spell(
                 source_object_id=card.object_id,
                 option_ids=options,
                 selected_card_type=selected_card_type,
+                min_selections=0 if not options else 1,
             ),
         )
         event_log.append(
@@ -833,30 +975,110 @@ def resolve_pending_choice(
         raise ValueError("no pending decision")
     if action.player_id != decision.chooser_id or action.decision_id != decision.decision_id:
         raise ValueError("choice does not match pending decision")
-    if action.selected_instance_id is not None and action.selected_instance_id not in decision.option_ids:
+    selected_ids = action.ordered_instance_ids if decision.selection_ordered else action.selected_instance_ids
+    if len(selected_ids) < decision.min_selections or len(selected_ids) > decision.max_selections:
+        raise ValueError("selection count is outside the declared bounds")
+    if any(instance_id not in decision.option_ids for instance_id in selected_ids):
         raise ValueError("selected card is not a legal option")
-    if action.selected_instance_id is None and decision.option_ids:
-        raise ValueError("a matching card must be selected")
+    if len(set(selected_ids)) != len(selected_ids):
+        raise ValueError("selected cards must be distinct")
+    if decision.selection_ordered and len(selected_ids) != len(decision.option_ids):
+        raise ValueError("ordered choice must arrange every offered card")
 
-    player = state.players[action.player_id]
-    if action.selected_instance_id is not None:
-        selected = state.objects[action.selected_instance_id]
-        definition = card_repository.get(selected.oracle_id)
-        if selected.zone != "library" or not getattr(definition, f"is_{decision.selected_card_type}"):
-            raise ValueError("selected card is no longer a legal option")
-    shuffled = list(player.library)
-    random.Random(state.rng_seed + state.rng_cursor).shuffle(shuffled)
-    if action.selected_instance_id is not None:
-        shuffled.remove(action.selected_instance_id)
-        shuffled.insert(0, action.selected_instance_id)
-    next_state = update_player(state, replace(player, library=tuple(shuffled)))
-    next_state = replace(next_state, pending_decision=None, rng_cursor=state.rng_cursor + 1)
     event_log = EventLog.from_events(state.game_id, session.event_log)
-    if action.selected_instance_id is not None:
-        selected = state.objects[action.selected_instance_id]
-        event_log.append(event_type="card_revealed", active_player=action.player_id, payload={"player_id": action.player_id, "card_instance_id": action.selected_instance_id, "oracle_id": selected.oracle_id, "reason": "tutor"})
-    event_log.append(event_type="choice_resolved", active_player=action.player_id, payload={"decision_id": decision.decision_id, "selected_instance_id": action.selected_instance_id})
-    event_log.append(event_type="library_shuffled", active_player=action.player_id, payload={"player_id": action.player_id, "algorithm": "python_random_mt19937_v1", "rng_cursor_before": state.rng_cursor, "rng_cursor_after": next_state.rng_cursor, "count": len(shuffled)})
+    next_state = replace(state, pending_decision=None)
+    event_log.append(event_type="choice_resolved", active_player=action.player_id, payload={"decision_id": decision.decision_id, "selected_instance_ids": list(action.selected_instance_ids), "ordered_instance_ids": list(action.ordered_instance_ids), "declared_count": action.declared_count, "choice_boolean": action.choice_boolean, "shuffle_library": action.shuffle_library})
+    context = dict(decision.continuation)
+
+    expected_zone = "hand" if decision.continuation_kind == "wave5_discard_then_draw" else "library"
+    if decision.continuation_kind not in {None, "wave5_truce"}:
+        for instance_id in selected_ids:
+            if state.objects[instance_id].zone != expected_zone:
+                raise ValueError("selected card is no longer a legal option")
+
+    if decision.continuation_kind is None:
+        # Wave 3's original tutor choice remains replay-compatible.
+        selected_id = action.selected_instance_id
+        player = next_state.players[action.player_id]
+        next_state = _shuffle_library(next_state, event_log, player_id=action.player_id)
+        if selected_id is not None:
+            shuffled_player = next_state.players[action.player_id]
+            library = [instance_id for instance_id in shuffled_player.library if instance_id != selected_id]
+            library.insert(0, selected_id)
+            next_state = update_player(next_state, replace(shuffled_player, library=tuple(library)))
+            selected = next_state.objects[selected_id]
+            event_log.append(event_type="card_revealed", active_player=action.player_id, payload={"player_id": action.player_id, "card_instance_id": selected_id, "oracle_id": selected.oracle_id, "reason": "tutor"})
+        return TurnResult(state=next_state, event_log=event_log.events)
+
+    kind = decision.continuation_kind
+    if kind == "wave5_discard_then_draw":
+        next_state = _discard_specific_cards(next_state, event_log, player_id=action.player_id, instance_ids=selected_ids, active_player=action.player_id)
+        remaining = tuple(context["remaining_players"])
+        counts = tuple(context.get("draw_counts", ())) + ((action.player_id, len(selected_ids)),)
+        if remaining:
+            next_state = _queue_wave5_decision(next_state, event_log, chooser_id=remaining[0], source_object_id=decision.source_object_id, kind="discard_any_number", option_ids=next_state.players[remaining[0]].hand, min_selections=0, max_selections=len(next_state.players[remaining[0]].hand), continuation_kind=kind, continuation=(("remaining_players", remaining[1:]), ("draw_counts", counts)))
+        else:
+            for player_id, count in counts:
+                for _ in range(count):
+                    next_state = _draw_one_card_for_player_if_available(next_state, event_log, player_id=player_id)
+    elif kind == "wave5_truce":
+        count = action.declared_count
+        if count is None or count > 2:
+            raise ValueError("Temporary Truce requires an explicit count from zero to two")
+        for _ in range(count):
+            next_state = _draw_one_card_for_player_if_available(next_state, event_log, player_id=action.player_id)
+        player = next_state.players[action.player_id]
+        updated = replace(player, life_total=player.life_total + (2 - count) * 2)
+        next_state = update_player(next_state, updated)
+        event_log.append(event_type="life_total_changed", active_player=action.player_id, payload={"player_id": action.player_id, "life_total": updated.life_total})
+        remaining = tuple(context["remaining_players"])
+        if remaining:
+            next_state = _queue_wave5_decision(next_state, event_log, chooser_id=remaining[0], source_object_id=decision.source_object_id, kind="draw_up_to_two", option_ids=(), min_selections=0, max_selections=0, continuation_kind=kind, continuation=(("remaining_players", remaining[1:]),))
+    elif kind == "wave5_ancestral_memories":
+        selected = set(selected_ids)
+        for instance_id in decision.option_ids:
+            destination = "hand" if instance_id in selected else "graveyard"
+            next_state = _move_with_event(next_state, event_log, instance_id=instance_id, from_zone="library", to_zone=destination, player_id=action.player_id, active_player=action.player_id)
+    elif kind == "wave5_order_library":
+        player = next_state.players[action.player_id]
+        remaining = tuple(instance_id for instance_id in player.library if instance_id not in decision.option_ids)
+        next_state = update_player(next_state, replace(player, library=tuple(selected_ids) + remaining))
+        if action.shuffle_library:
+            next_state = _shuffle_library(next_state, event_log, player_id=action.player_id)
+        if context.get("draw_after"):
+            next_state = _draw_one_card_for_player_if_available(next_state, event_log, player_id=action.player_id)
+    elif kind == "wave5_cruel_fate_select":
+        selected_id = selected_ids[0]
+        target_player_id = context["target_player_id"]
+        next_state = _move_with_event(next_state, event_log, instance_id=selected_id, from_zone="library", to_zone="graveyard", player_id=target_player_id, active_player=action.player_id)
+        remaining = tuple(instance_id for instance_id in decision.option_ids if instance_id != selected_id)
+        next_state = _queue_wave5_decision(next_state, event_log, chooser_id=action.player_id, source_object_id=decision.source_object_id, kind="order_remaining_library_cards", option_ids=remaining, min_selections=len(remaining), max_selections=len(remaining), selection_ordered=True, continuation_kind="wave5_cruel_fate_order", continuation=(("target_player_id", target_player_id),))
+    elif kind == "wave5_cruel_fate_order":
+        target_player_id = context["target_player_id"]
+        player = next_state.players[target_player_id]
+        remaining = tuple(instance_id for instance_id in player.library if instance_id not in decision.option_ids)
+        next_state = update_player(next_state, replace(player, library=tuple(selected_ids) + remaining))
+    elif kind.startswith("wave5_search_"):
+        player_id = action.player_id
+        selected_id = selected_ids[0] if selected_ids else None
+        destination = context["destination"]
+        if destination != "library":
+            for instance_id in selected_ids:
+                next_state = _move_with_event(next_state, event_log, instance_id=instance_id, from_zone="library", to_zone=destination, player_id=player_id, active_player=player_id)
+                event_log.append(event_type="card_revealed", active_player=player_id, payload={"player_id": player_id, "card_instance_id": instance_id, "oracle_id": next_state.objects[instance_id].oracle_id, "reason": "search"})
+        if context.get("shuffle", True):
+            next_state = _shuffle_library(next_state, event_log, player_id=player_id)
+        if context.get("top_after_shuffle") and selected_id is not None:
+            player = next_state.players[player_id]
+            library = tuple(instance_id for instance_id in player.library if instance_id != selected_id)
+            next_state = update_player(next_state, replace(player, library=(selected_id,) + library))
+        if context.get("lose_life"):
+            player = next_state.players[player_id]
+            updated = replace(player, life_total=player.life_total - context["lose_life"])
+            next_state = update_player(next_state, updated)
+            event_log.append(event_type="life_total_changed", active_player=player_id, payload={"player_id": player_id, "life_total": updated.life_total})
+    else:
+        raise ValueError("unsupported pending-decision continuation")
     return TurnResult(state=next_state, event_log=event_log.events)
 
 
@@ -867,12 +1089,13 @@ def _put_spell_on_stack(
     controller_id: str,
     target_ids: tuple[str, ...] = (),
     chosen_x: int = 0,
+    additional_cost_instance_id: str | None = None,
 ) -> GameState:
     """Record a cast spell and retain priority for its controller."""
     return replace(
         state,
         stack_entries=state.stack_entries
-        + (StackEntry(card_instance_id=card_instance_id, controller_id=controller_id, target_ids=target_ids, chosen_x=chosen_x),),
+        + (StackEntry(card_instance_id=card_instance_id, controller_id=controller_id, target_ids=target_ids, chosen_x=chosen_x, additional_cost_instance_id=additional_cost_instance_id),),
         turn=replace(state.turn, priority_player=controller_id),
         consecutive_passes=0,
     )
@@ -1447,7 +1670,7 @@ def _require_legal_noncreature_target(
     *,
     effect: str,
 ) -> None:
-    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "additional_three_land_plays", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures", "destroy_all_green_creatures", "destroy_all_white_creatures", "destroy_all_islands", "destroy_all_plains", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures", "damage_all_creatures_2", "damage_all_flying_creatures_4", "damage_all_creatures_and_players_1", "damage_all_creatures_and_players_6", "damage_all_flying_creatures_and_players_x", "controlled_creatures_get_0_3_until_end_of_turn", "controlled_creatures_get_1_1_until_end_of_turn", "white_creatures_get_2_0_until_end_of_turn", "green_controlled_creatures_gain_forestwalk_until_end_of_turn", "black_controlled_creatures_only_blockable_by_black_until_end_of_turn", "controlled_creatures_gain_reach_until_end_of_turn"}:
+    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "additional_three_land_plays", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures", "destroy_all_green_creatures", "destroy_all_white_creatures", "destroy_all_islands", "destroy_all_plains", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures", "damage_all_creatures_2", "damage_all_flying_creatures_4", "damage_all_creatures_and_players_1", "damage_all_creatures_and_players_6", "damage_all_flying_creatures_and_players_x", "controlled_creatures_get_0_3_until_end_of_turn", "controlled_creatures_get_1_1_until_end_of_turn", "white_creatures_get_2_0_until_end_of_turn", "green_controlled_creatures_gain_forestwalk_until_end_of_turn", "black_controlled_creatures_only_blockable_by_black_until_end_of_turn", "controlled_creatures_gain_reach_until_end_of_turn", "flux", "natural_order", "ancestral_memories", "prosperity", "temporary_truce", "winds_of_change", "untamed_wilds", "gift_of_estates", "cruel_bargain", "cruel_tutor", "natures_lore", "omen"}:
         if target_instance_ids:
             raise ValueError("sorcery does not take a target")
         return
@@ -1492,7 +1715,7 @@ def _require_legal_noncreature_target(
         if target_instance_id not in state.players:
             raise ValueError("target must be a player")
         return
-    if effect in {"target_player_gains_8_life", "gain_life_per_opponent_mountain", "draw_per_tapped_creature_target_opponent_controls"}:
+    if effect in {"target_player_gains_8_life", "gain_life_per_opponent_mountain", "draw_per_tapped_creature_target_opponent_controls", "look_at_opponent_hand_draw_one", "balance_of_power", "withering_gaze", "mind_knives", "baleful_stare", "starlight", "cruel_fate"}:
         if target_instance_id not in state.players:
             raise ValueError("target must be a player")
         if effect != "target_player_gains_8_life" and target_instance_id == state.turn.active_player:
@@ -1821,6 +2044,77 @@ def _discard_first_cards_in_hand_order(
             },
         )
     return current_state
+
+
+def _resolution_player_order(state: GameState) -> tuple[str, ...]:
+    """Return active-player-first order without relying on mapping insertion."""
+    return (state.turn.active_player,) + tuple(
+        player_id for player_id in state.players if player_id != state.turn.active_player
+    )
+
+
+def _move_with_event(
+    state: GameState,
+    event_log: EventLog,
+    *,
+    instance_id: str,
+    from_zone: str,
+    to_zone: str,
+    player_id: str,
+    active_player: str,
+) -> GameState:
+    card = state.objects[instance_id]
+    next_state = move_object(state, instance_id=instance_id, from_zone=from_zone, to_zone=to_zone, player_id=player_id)
+    event_log.append(event_type="object_moved_between_zones", active_player=active_player, payload={"player_id": player_id, "card_instance_id": instance_id, "oracle_id": card.oracle_id, "from_zone": from_zone, "to_zone": to_zone, **zone_change_identity_payload(next_state, instance_id)})
+    return next_state
+
+
+def _discard_specific_cards(
+    state: GameState,
+    event_log: EventLog,
+    *,
+    player_id: str,
+    instance_ids: tuple[str, ...],
+    active_player: str,
+) -> GameState:
+    current_state = state
+    for instance_id in instance_ids:
+        if instance_id not in current_state.players[player_id].hand:
+            raise ValueError("discarded card must remain in that player's hand")
+        current_state = _move_with_event(current_state, event_log, instance_id=instance_id, from_zone="hand", to_zone="graveyard", player_id=player_id, active_player=active_player)
+    return current_state
+
+
+def _shuffle_library(state: GameState, event_log: EventLog, *, player_id: str) -> GameState:
+    player = state.players[player_id]
+    shuffled = list(player.library)
+    cursor_before = state.rng_cursor
+    random.Random(state.rng_seed + cursor_before).shuffle(shuffled)
+    next_state = update_player(state, replace(player, library=tuple(shuffled)))
+    next_state = replace(next_state, rng_cursor=cursor_before + 1)
+    event_log.append(event_type="library_shuffled", active_player=player_id, payload={"player_id": player_id, "algorithm": "python_random_mt19937_v1", "rng_cursor_before": cursor_before, "rng_cursor_after": next_state.rng_cursor, "count": len(shuffled)})
+    return next_state
+
+
+def _queue_wave5_decision(
+    state: GameState,
+    event_log: EventLog,
+    *,
+    chooser_id: str,
+    source_object_id: str,
+    kind: str,
+    option_ids: tuple[str, ...],
+    min_selections: int,
+    max_selections: int,
+    selection_ordered: bool = False,
+    allow_shuffle: bool = False,
+    continuation_kind: str,
+    continuation: tuple[tuple[str, object], ...] = (),
+) -> GameState:
+    decision_id = f"{source_object_id}:{kind}"
+    next_state = replace(state, pending_decision=PendingDecision(decision_id=decision_id, chooser_id=chooser_id, kind=kind, source_object_id=source_object_id, option_ids=tuple(option_ids), min_selections=min_selections, max_selections=max_selections, selection_ordered=selection_ordered, allow_shuffle=allow_shuffle, continuation_kind=continuation_kind, continuation=continuation))
+    event_log.append(event_type="choice_requested", active_player=chooser_id, payload={"decision_id": decision_id, "chooser_id": chooser_id, "kind": kind, "option_count": len(option_ids)})
+    return next_state
 
 
 def _other_player(state: GameState, player_id: str) -> str:

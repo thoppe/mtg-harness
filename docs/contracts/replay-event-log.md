@@ -36,6 +36,10 @@ Define the minimum append-only event types required for deterministic replay and
 - `spell_countered_on_resolution`
 - `triggered_ability_put_on_stack`
 - `triggered_ability_resolved`
+- `choice_requested`
+- `choice_resolved`
+- `cards_revealed`
+- `library_prefix_ordered`
 - `damage_applied`
 - `attackers_declared`
 - `blockers_declared`
@@ -77,6 +81,10 @@ Define the minimum append-only event types required for deterministic replay and
 - Future effect systems must be able to add event types without invalidating the append-only model.
 - Event payloads should use stable object identifiers, not transient memory positions.
 - Replay design must allow future insertion of trigger, replacement, and continuous-effect evaluation events beyond the Alabaster-specific pair.
+- Wave 5's decision, reveal, ordering, and RNG-event payload boundaries are
+  defined in `docs/contracts/wave5-hidden-zone-expansion.md`; adding them must
+  preserve the append-only replay model and must not expose nonrevealed hidden
+  options.
 
 ## Related Contracts
 

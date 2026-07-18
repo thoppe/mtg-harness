@@ -67,16 +67,33 @@ class StackEntry:
     source_oracle_id: str | None = None
     owner_id: str | None = None
     expected_graveyard_object_id: str | None = None
+    additional_cost_instance_id: str | None = None
 
 
 @dataclass(frozen=True)
 class PendingDecision:
+    """A name-scoped, replayable choice that suspends spell resolution.
+
+    ``option_ids`` deliberately contains only stable object instance IDs.  It
+    is a snapshot for presenting a choice, not an authority to move a card:
+    resolution must re-check the selected objects against the current state.
+    The bounds and continuation let a single explicit decision surface cover
+    Wave 5's one-card, multi-card, ordered, and sequential choices without
+    making an implicit UI decision part of the rules engine.
+    """
+
     decision_id: str
     chooser_id: str
     kind: str
     source_object_id: str
     option_ids: tuple[str, ...]
-    selected_card_type: str
+    selected_card_type: str = ""
+    min_selections: int = 1
+    max_selections: int = 1
+    selection_ordered: bool = False
+    allow_shuffle: bool = False
+    continuation_kind: str | None = None
+    continuation: tuple[tuple[str, object], ...] = ()
 
 
 @dataclass(frozen=True)

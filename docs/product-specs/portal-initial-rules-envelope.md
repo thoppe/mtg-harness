@@ -31,6 +31,10 @@ declared by `docs/coverage/slices/portal.initial.yaml`.
   each entered its controller's battlefield
 - Wave 4 creature promotion limited to vanilla creatures plus reuse of the
   existing Flying, Reach, Swampwalk, Forestwalk, and Defender combat behavior
+- Wave 5 effects only when the named cards are promoted with the bounded
+  decision, visibility, random-selection, search, prefix-ordering, additional
+  cost, and Prosperity-X contracts in
+  `docs/contracts/wave5-hidden-zone-expansion.md`
 - Flying-only blocker restriction limited to `Cloud Dragon`, `Cloud Pirates`,
   and `Cloud Spirit`
 - Alabaster Dragon's name-scoped death trigger: after it dies, put its trigger
@@ -122,6 +126,13 @@ declared by `docs/coverage/slices/portal.initial.yaml`.
   attack restriction for Raging Cougar, Raging Goblin, Raging Minotaur, and
   Volcanic Dragon. It does not affect summoning-sickness restrictions outside
   attacker declaration or introduce triggered/static-ability handling.
+- Wave 5 may add only the name-scoped subwaves in
+  `docs/contracts/portal-expansion-order.md` and
+  `docs/contracts/wave5-hidden-zone-expansion.md`. In particular, private
+  library-prefix identities and nonrevealed-hand identities must not be put in
+  public replay events; Mind Knives must use the deterministic RNG cursor; and
+  Natural Order's sacrifice and Prosperity's X declaration remain restricted
+  to those cards.
 
 ## Out Of Scope
 
@@ -131,6 +142,8 @@ declared by `docs/coverage/slices/portal.initial.yaml`.
   trigger
 - Generic library shuffle effects and triggered-ability queue behavior beyond
   Alabaster Dragon
+- Generic hidden-information viewing, arbitrary search predicates, generic
+  additional costs, generic X costs, and generic simultaneous-choice handling
 - Replacement effects
 - Continuous effects beyond the object-bound additive and keyword-granting
   Wave 2 model

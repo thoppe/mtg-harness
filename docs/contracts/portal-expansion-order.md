@@ -121,7 +121,91 @@ framework.
 
 ### Wave 5: Draw, discard, hidden zones, and deterministic ordering
 
-Reason: add explicit hidden-zone view and choice policies before search/randomness. Ancestral Memories, Balance of Power, Baleful Stare, Cruel Bargain, Cruel Fate, Mind Knives, Omen, Prosperity, Sorcerous Sight, Temporary Truce, Withering Gaze, Flux, Winds of Change, Gift of Estates, Nature's Lore, Untamed Wilds, Cruel Tutor, Natural Order, Starlight.
+Wave 5 supersedes the within-wave printed-order rule. It is dependency ordered:
+each subwave establishes one explicitly bounded decision, visibility, random,
+or zone-ordering surface before a card relies on it. Source artifacts alone do
+not make any of these cards supported.
+
+#### Wave 5A: Fixed and public derived effects
+
+`Cruel Bargain`, `Balance of Power`, and `Starlight` add fixed multi-card draw
+with rounded life loss, target-opponent hand-size comparison, and counted
+life gain for target opponent's black creatures. These effects use public
+zone/battlefield counts and existing life/draw movement; they create neither a
+hidden-zone decision nor a general arithmetic expression evaluator.
+
+#### Wave 5B: Opponent-hand inspection and card-property counting
+
+`Sorcerous Sight`, `Baleful Stare`, and `Withering Gaze` add only the
+controller-visible inspection/reveal outputs their text requires, followed by
+the printed fixed or counted draw. `Baleful Stare` and `Withering Gaze` count
+each revealed card once when it is respectively red-or-a-Mountain or
+green-or-a-Forest. This is not persistent hand visibility, generalized
+information sharing, or arbitrary card-text predicates.
+
+#### Wave 5C: Deterministic random hand discard
+
+`Mind Knives` adds one deterministic uniform selection from a nonempty target
+opponent hand, then moves that chosen card to its owner's graveyard. It uses
+the versioned RNG cursor exactly once on successful selection; an empty hand
+does not consume RNG. It does not let a player choose the discarded card.
+
+#### Wave 5D: Sequential optional and multi-card decisions
+
+`Temporary Truce` and `Flux` extend the pending-decision contract with
+ordered resolver continuations: each affected player chooses in active-player
+then nonactive-player order. Temporary Truce permits a count from zero through
+two for each player, then grants that player two life for every forgone draw.
+Flux lets each player choose any subset of that player's hand to discard,
+draws the recorded count, then draws one card for its caster. These are
+name-scoped choice schemas, not a general modal or simultaneous-choice engine.
+
+#### Wave 5E: Hand-to-library shuffle and replacement draws
+
+`Winds of Change` records each player's pre-resolution hand count, moves that
+entire hand into its owner's library, shuffles that library once per affected
+player in active-player then nonactive-player order, and draws the recorded
+count. Empty hands still shuffle and consume one cursor under the ordinary
+``shuffle`` instruction. This does not introduce generic hand replacement or
+mass-zone-change parsing.
+
+#### Wave 5F: Search with bounded cardinality and destinations
+
+`Gift of Estates`, `Nature's Lore`, `Untamed Wilds`, and `Cruel Tutor` extend
+the existing private-library chooser path. Gift conditionally chooses zero to
+three Plains cards, reveals them, moves them to hand, then shuffles; Nature's
+Lore and Untamed Wilds choose one Forest or basic-land card respectively and
+put it onto the battlefield before shuffling; Cruel Tutor chooses one card,
+shuffles, places that same card on top, then loses two life. Every search
+shuffles even after an explicit no-selection. The scope excludes arbitrary
+search predicates, replacement effects, and library-wide public disclosure.
+
+#### Wave 5G: Look, select, and order a bounded library prefix
+
+`Ancestral Memories`, `Omen`, and `Cruel Fate` add chooser-visible top-prefix
+decisions. Ancestral Memories selects exactly the available minimum of two
+cards from the top seven for hand and moves the rest to its owner's graveyard;
+Omen orders the top available minimum of three, optionally shuffles, then
+draws; Cruel Fate's controller selects one card from the target opponent's top
+available minimum of five for that player's graveyard and orders the remainder
+on top. The recorded order is authoritative and does not reveal looked-at
+identities unless the oracle text says to reveal them.
+
+#### Wave 5H: Green-creature sacrifice cost plus search
+
+`Natural Order` adds only its name-scoped additional casting cost: choose and
+sacrifice one green creature controlled by the caster while casting. On
+resolution, privately choose a green creature card in that library, put it
+onto the battlefield, then shuffle. This reuses the Wave 5F search decision
+and introduces neither a general additional-cost framework nor generic
+sacrifice-cost support.
+
+#### Wave 5I: Variable-cost all-player draw
+
+`Prosperity` is last because it needs an explicit nonnegative X declaration,
+colored-plus-generic payment validation, and sequential each-player draw.
+This increment is limited to Prosperity's X value; it is not a general
+variable-cost or multi-targeting framework.
 
 ### Wave 6: Variable damage, multi-targeting, costs, and delayed turn rules
 

@@ -30,6 +30,14 @@ selection, ordering, and other effects whose legal options are not public.
 - The selected card is fixed by the choice action before shuffle. A tutor with
   no matching card accepts an explicit no-selection decision and still shuffles.
 
+## Wave 5 Extension Boundary
+
+- The Wave 5 decision kinds, visibility rules, ordered continuations, and
+  card-specific search/prefix bounds are defined in
+  `docs/contracts/wave5-hidden-zone-expansion.md`.
+- Those additions remain name-scoped. They do not make every library, hand,
+  modal, multiple-choice, or ordering effect legal.
+
 ## Replay Guarantees
 
 - Accepted choice actions and resulting choice events carry the decision ID and

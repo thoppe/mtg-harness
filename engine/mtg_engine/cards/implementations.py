@@ -71,6 +71,26 @@ IMPLEMENTATIONS = {
     "bb493c95-5f6d-405b-aac6-c56fe6b6f42f": "green_controlled_creatures_gain_forestwalk_until_end_of_turn",
     "6b7933b3-821a-4d64-9a10-af8a69fa008e": "black_controlled_creatures_only_blockable_by_black_until_end_of_turn",
     "f215d0f9-a53e-431a-a70d-9dc4e3caa41e": "controlled_creatures_gain_reach_until_end_of_turn",
+    # Wave 5: deterministic hidden-zone and hand-information effects.
+    "20370c3b-231f-4d9d-8b6e-f1eb25fa4b5d": "look_at_opponent_hand_draw_one",
+    "b8cff5f1-6871-49d2-89a7-24870308aadb": "flux",
+    "8c1fe337-375a-4add-93b6-0ac39ed72b4f": "natural_order",
+    "95a2802a-2621-40c3-84f8-51e8aad7b6f0": "ancestral_memories",
+    "c586312d-d04a-4bfb-bbb2-b41186ca178e": "prosperity",
+    "ffe6371c-d137-4062-8c6e-6e9794ab25bc": "temporary_truce",
+    "c57ee68e-6832-4d4c-b710-fc03a2c10a9c": "balance_of_power",
+    "9225016d-adfd-43c6-99cd-d41a7e0d35d6": "withering_gaze",
+    "f9be5566-c3df-44cc-9de4-29510c8c245f": "mind_knives",
+    "4135131d-4653-4767-ad1d-68c9bf393c3a": "baleful_stare",
+    "f525cf10-e24c-4c46-9a13-6f8579d09d50": "winds_of_change",
+    "b3b4c21d-f8d7-455f-be46-d5eb909d54df": "untamed_wilds",
+    "1bd70be6-752c-4ecb-a3e8-2bacec4b94fc": "gift_of_estates",
+    "6237896e-f033-41b2-9943-670f1becb582": "starlight",
+    "e199e183-e857-4dc7-87f4-36b32c4dac96": "cruel_fate",
+    "dcf105c1-d37b-4e92-a420-9872a2187764": "cruel_bargain",
+    "d9353eb6-c7e7-4d85-a0c2-32b1d091881a": "cruel_tutor",
+    "78826359-fe63-44ad-adc4-a17ffcd710e4": "natures_lore",
+    "9b8c44a0-82ef-4beb-a762-c2a2a21380f3": "omen",
 }
 
 

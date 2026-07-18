@@ -172,6 +172,26 @@ card_entries:
   - {set_code: por, oracle_id: "eb098958-50d3-4476-ba74-382033703ff9"}
   - {set_code: por, oracle_id: "50fa6a63-e031-47cb-8fd5-a6c235203722"}
   - {set_code: por, oracle_id: "19d5eb29-2d35-44e7-afa1-3ba8d812ed41"}
+  # Wave 5: dependency-ordered draw, hidden-zone, shuffle, and X-cost effects.
+  - {set_code: por, oracle_id: "dcf105c1-d37b-4e92-a420-9872a2187764"}
+  - {set_code: por, oracle_id: "c57ee68e-6832-4d4c-b710-fc03a2c10a9c"}
+  - {set_code: por, oracle_id: "6237896e-f033-41b2-9943-670f1becb582"}
+  - {set_code: por, oracle_id: "20370c3b-231f-4d9d-8b6e-f1eb25fa4b5d"}
+  - {set_code: por, oracle_id: "4135131d-4653-4767-ad1d-68c9bf393c3a"}
+  - {set_code: por, oracle_id: "9225016d-adfd-43c6-99cd-d41a7e0d35d6"}
+  - {set_code: por, oracle_id: "f9be5566-c3df-44cc-9de4-29510c8c245f"}
+  - {set_code: por, oracle_id: "ffe6371c-d137-4062-8c6e-6e9794ab25bc"}
+  - {set_code: por, oracle_id: "b8cff5f1-6871-49d2-89a7-24870308aadb"}
+  - {set_code: por, oracle_id: "f525cf10-e24c-4c46-9a13-6f8579d09d50"}
+  - {set_code: por, oracle_id: "1bd70be6-752c-4ecb-a3e8-2bacec4b94fc"}
+  - {set_code: por, oracle_id: "78826359-fe63-44ad-adc4-a17ffcd710e4"}
+  - {set_code: por, oracle_id: "b3b4c21d-f8d7-455f-be46-d5eb909d54df"}
+  - {set_code: por, oracle_id: "d9353eb6-c7e7-4d85-a0c2-32b1d091881a"}
+  - {set_code: por, oracle_id: "95a2802a-2621-40c3-84f8-51e8aad7b6f0"}
+  - {set_code: por, oracle_id: "9b8c44a0-82ef-4beb-a762-c2a2a21380f3"}
+  - {set_code: por, oracle_id: "e199e183-e857-4dc7-87f4-36b32c4dac96"}
+  - {set_code: por, oracle_id: "8c1fe337-375a-4add-93b6-0ac39ed72b4f"}
+  - {set_code: por, oracle_id: "c586312d-d04a-4bfb-bbb2-b41186ca178e"}
 card_keys:
   - "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
   - "a768ba13-4d1c-4dce-a4a6-86a39c069c3f"
@@ -307,6 +327,25 @@ card_keys:
   - "eb098958-50d3-4476-ba74-382033703ff9"
   - "50fa6a63-e031-47cb-8fd5-a6c235203722"
   - "19d5eb29-2d35-44e7-afa1-3ba8d812ed41"
+  - "dcf105c1-d37b-4e92-a420-9872a2187764"
+  - "c57ee68e-6832-4d4c-b710-fc03a2c10a9c"
+  - "6237896e-f033-41b2-9943-670f1becb582"
+  - "20370c3b-231f-4d9d-8b6e-f1eb25fa4b5d"
+  - "4135131d-4653-4767-ad1d-68c9bf393c3a"
+  - "9225016d-adfd-43c6-99cd-d41a7e0d35d6"
+  - "f9be5566-c3df-44cc-9de4-29510c8c245f"
+  - "ffe6371c-d137-4062-8c6e-6e9794ab25bc"
+  - "b8cff5f1-6871-49d2-89a7-24870308aadb"
+  - "f525cf10-e24c-4c46-9a13-6f8579d09d50"
+  - "1bd70be6-752c-4ecb-a3e8-2bacec4b94fc"
+  - "78826359-fe63-44ad-adc4-a17ffcd710e4"
+  - "b3b4c21d-f8d7-455f-be46-d5eb909d54df"
+  - "d9353eb6-c7e7-4d85-a0c2-32b1d091881a"
+  - "95a2802a-2621-40c3-84f8-51e8aad7b6f0"
+  - "9b8c44a0-82ef-4beb-a762-c2a2a21380f3"
+  - "e199e183-e857-4dc7-87f4-36b32c4dac96"
+  - "8c1fe337-375a-4add-93b6-0ac39ed72b4f"
+  - "c586312d-d04a-4bfb-bbb2-b41186ca178e"
 rule_keys:
   - game_setup_minimal
   - turn_structure_minimal
@@ -361,6 +400,15 @@ rule_keys:
   - alabaster_dragon_death_trigger_minimal
   - mountainwalk_keyword_minimal
   - haste_keyword_minimal
+  - fixed_public_derived_sorceries_minimal
+  - opponent_hand_inspection_sorceries_minimal
+  - random_hand_discard_sorceries_minimal
+  - sequential_choice_sorceries_minimal
+  - hand_library_shuffle_sorceries_minimal
+  - search_shuffle_destinations_sorceries_minimal
+  - library_prefix_selection_ordering_sorceries_minimal
+  - sacrifice_cost_search_sorceries_minimal
+  - variable_cost_all_player_draw_sorceries_minimal
 source_artifacts:
   - information/cards/data/
   - information/cards/images/

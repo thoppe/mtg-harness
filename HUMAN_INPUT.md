@@ -41,6 +41,10 @@ This file captures decisions, constraints, and open questions that are explicitl
 - Triggered-ability support is limited to Alabaster Dragon's name-scoped death
   trigger and its deterministic owner-library shuffle; broader trigger
   dispatch remains deferred
+- Wave 5 hidden-zone work, when promoted, must remain dependency ordered and
+  name-scoped under `docs/contracts/wave5-hidden-zone-expansion.md`; hidden
+  option identities and library ordering are never public replay data unless
+  the oracle text explicitly reveals them
 - Default persisted card image asset type: JPG
 - Deterministic simulation and replayability are first-class requirements in v0, especially for tests
 - The first engine architecture pattern is a deterministic state machine with an append-only event log

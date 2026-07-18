@@ -30,7 +30,9 @@ Define the core state boundaries for simulation.
 - `mana_pools`: at minimum the five basic colors needed for the current active support slice
 - `rng_state`: deterministic seed and any derived RNG cursor state
 - `pending_decision`: an optional, serializable chooser-owned continuation for
-  an unresolved hidden-zone or modal choice
+  an unresolved hidden-zone or modal choice; Wave 5 extends its payload only
+  with the selected tuple/order/count/boolean and resolver-continuation forms
+  declared in `wave5-hidden-zone-expansion.md`
 - `damage_marks`: creature damage marked on objects until cleared by later turn handling
 - `temporary_power_modifiers`: explicit, turn-bounded power and toughness
   changes on objects when a supported card grants them

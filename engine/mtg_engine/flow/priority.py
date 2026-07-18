@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from itertools import combinations
+from itertools import combinations, permutations
 
 from mtg_engine.actions.models import (
     ActivateManaAbilityAction,
@@ -21,20 +21,7 @@ from mtg_engine.rules.characteristics import effective_power, has_keyword, only_
 
 def enumerate_legal_actions(state: GameState, card_repository: CardRepository) -> tuple[object, ...]:
     if state.pending_decision is not None:
-        return tuple(
-            ResolveChoiceAction(
-                player_id=state.pending_decision.chooser_id,
-                decision_id=state.pending_decision.decision_id,
-                selected_instance_id=option_id,
-            )
-            for option_id in state.pending_decision.option_ids
-        ) + (
-            ResolveChoiceAction(
-                player_id=state.pending_decision.chooser_id,
-                decision_id=state.pending_decision.decision_id,
-                selected_instance_id=None,
-            ),
-        )
+        return _enumerate_pending_decision_actions(state.pending_decision)
     if state.stack_entries:
         return _enumerate_instant_priority_actions(state, card_repository)
     if state.turn.step == "precombat_main_step":
@@ -51,6 +38,65 @@ def enumerate_legal_actions(state: GameState, card_repository: CardRepository) -
         return _enumerate_declare_blockers_actions(state, card_repository)
 
     return ()
+
+
+def _enumerate_pending_decision_actions(decision) -> tuple[ResolveChoiceAction, ...]:
+    """Enumerate only the declarations permitted by a pending decision.
+
+    This remains intentionally bounded by the named Wave 5 effects: it is a
+    rules-facing action surface, not a generic power-set interface for every
+    future hidden-zone effect.
+    """
+    if decision.kind == "draw_up_to_two":
+        return tuple(
+            ResolveChoiceAction(
+                player_id=decision.chooser_id,
+                decision_id=decision.decision_id,
+                declared_count=count,
+            )
+            for count in range(3)
+        )
+
+    options = decision.option_ids
+    lower_bound = 0 if not options else decision.min_selections
+    upper_bound = min(decision.max_selections, len(options))
+    actions: list[ResolveChoiceAction] = []
+    for selection_count in range(lower_bound, upper_bound + 1):
+        selections = (
+            permutations(options, selection_count)
+            if decision.selection_ordered
+            else combinations(options, selection_count)
+        )
+        for selection in selections:
+            if decision.selection_ordered:
+                actions.append(
+                    ResolveChoiceAction(
+                        player_id=decision.chooser_id,
+                        decision_id=decision.decision_id,
+                        ordered_instance_ids=tuple(selection),
+                    )
+                )
+            else:
+                actions.append(
+                    ResolveChoiceAction(
+                        player_id=decision.chooser_id,
+                        decision_id=decision.decision_id,
+                        selected_instance_ids=tuple(selection),
+                    )
+                )
+    if decision.allow_shuffle:
+        actions = [
+            ResolveChoiceAction(
+                player_id=action.player_id,
+                decision_id=action.decision_id,
+                selected_instance_ids=action.selected_instance_ids,
+                ordered_instance_ids=action.ordered_instance_ids,
+                shuffle_library=shuffle_library,
+            )
+            for action in actions
+            for shuffle_library in (False, True)
+        ]
+    return tuple(actions)
 
 
 def _enumerate_active_precombat_main_actions(
@@ -310,7 +356,7 @@ def _legal_noncreature_spell_targets(
     spell = state.objects[spell_instance_id]
     card_definition = card_repository.get(spell.oracle_id)
     effect = _supported_targeted_sorcery_effect(card_definition)
-    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "additional_three_land_plays", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures", "controlled_creatures_get_0_3_until_end_of_turn", "controlled_creatures_get_1_1_until_end_of_turn", "white_creatures_get_2_0_until_end_of_turn", "green_controlled_creatures_gain_forestwalk_until_end_of_turn", "black_controlled_creatures_only_blockable_by_black_until_end_of_turn", "controlled_creatures_gain_reach_until_end_of_turn"}:
+    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "additional_three_land_plays", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures", "controlled_creatures_get_0_3_until_end_of_turn", "controlled_creatures_get_1_1_until_end_of_turn", "white_creatures_get_2_0_until_end_of_turn", "green_controlled_creatures_gain_forestwalk_until_end_of_turn", "black_controlled_creatures_only_blockable_by_black_until_end_of_turn", "controlled_creatures_gain_reach_until_end_of_turn", "flux", "natural_order", "ancestral_memories", "prosperity", "temporary_truce", "winds_of_change", "untamed_wilds", "gift_of_estates", "cruel_bargain", "cruel_tutor", "natures_lore", "omen"}:
         return ((),)
     if effect is None:
         return ()
@@ -319,6 +365,12 @@ def _legal_noncreature_spell_targets(
     if effect == "target_player_discards_two":
         return tuple((player_id,) for player_id in state.players)
     if effect == "destroy_all_creatures_target_opponent_you_lose_2_per_creature":
+        return tuple(
+            (player_id,)
+            for player_id in state.players
+            if player_id != state.turn.active_player
+        )
+    if effect in {"look_at_opponent_hand_draw_one", "balance_of_power", "withering_gaze", "mind_knives", "baleful_stare", "starlight", "cruel_fate"}:
         return tuple(
             (player_id,)
             for player_id in state.players
