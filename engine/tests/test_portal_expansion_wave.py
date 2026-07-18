@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
-from mtg_engine.flow.priority import blocker_attack_rejection_reason
+from mtg_engine.flow.priority import attacker_attack_rejection_reason, blocker_attack_rejection_reason
 from mtg_engine.flow.turns import TurnResult, _add_temporary_effect, _battlefield_land_subtype_count, _cleanup_end_of_turn_state, _controlled_land_subtype_count, _damage_creatures_once, _require_legal_noncreature_target, _resolve_direct_damage_sorcery, _resolve_noncreature_spell, play_land, resolve_pending_choice
 from mtg_engine.rules.characteristics import effective_keywords, effective_power, effective_toughness
 from mtg_engine.state.models import StackEntry, TurnState
@@ -110,6 +110,36 @@ class PortalExpansionWaveTests(unittest.TestCase):
             blocker_attack_rejection_reason(state=state, card_repository=self.repo, blocker_id="bob:1", attacker_id="alice:1"),
             "blocker cannot block the selected attacker",
         )
+
+    def test_wave_two_creature_restrictions_use_shared_legality_predicates(self) -> None:
+        state = move_object(self.state, instance_id="alice:1", from_zone="hand", to_zone="battlefield", player_id="alice")
+        state = move_object(state, instance_id="bob:1", from_zone="hand", to_zone="battlefield", player_id="bob")
+        state = replace(state, turn=TurnState(2, "alice", "bob", "declare_blockers_step"))
+
+        def rejection(attacker_oracle_id: str, blocker_oracle_id: str) -> str | None:
+            restricted = replace(
+                state,
+                objects={
+                    **state.objects,
+                    "alice:1": replace(state.objects["alice:1"], oracle_id=attacker_oracle_id),
+                    "bob:1": replace(state.objects["bob:1"], oracle_id=blocker_oracle_id),
+                },
+            )
+            return blocker_attack_rejection_reason(
+                state=restricted, card_repository=self.repo, blocker_id="bob:1", attacker_id="alice:1"
+            )
+
+        self.assertEqual(rejection("fe8f5cc0-5849-437f-8d1f-cb191f2fc638", MUCK_RATS), "blocker cannot block the selected attacker")
+        self.assertEqual(rejection("a6a26261-1915-4699-a2e9-cca43b39a3eb", "a768ba13-4d1c-4dce-a4a6-86a39c069c3f"), "blocker cannot block the selected attacker")
+        self.assertEqual(rejection(MUCK_RATS, "3c46f309-69ae-43b1-adf6-bdb26599c1f4"), "Cloud Dragon can block only creatures with flying")
+        self.assertEqual(rejection(MUCK_RATS, "3ebd9c8d-c840-4c2e-ace6-352a68d1c20f"), "creature cannot block")
+
+        serpent_state = replace(
+            state,
+            objects={**state.objects, "alice:1": replace(state.objects["alice:1"], oracle_id="7fbb98cc-585c-4184-97f5-9b3d3ebdb1e5")},
+            turn=TurnState(2, "alice", "alice", "declare_attackers_step"),
+        )
+        self.assertIsNotNone(attacker_attack_rejection_reason(state=serpent_state, card_repository=self.repo, attacker_id="alice:1"))
 
     def test_temporary_creature_effects_require_battlefield_creatures(self) -> None:
         with self.assertRaisesRegex(ValueError, "target must be a creature"):
