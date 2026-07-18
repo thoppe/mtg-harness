@@ -41,6 +41,7 @@ The initial playable universe contains only these legal card identities:
 - `Plains` from `Portal`
 
 This slice uses mostly vanilla `Portal` creatures plus the simple flyers `Armored Pegasus`, `Wind Drake`, `Bog Imp`, and `Storm Crow`, the reach creature `Keen-Eyed Archers`, the swampwalking creature `Anaconda`, the strict defender creature `Wall of Granite`, the sorceries `Vengeance`, `Path of Peace`, `Hand of Death`, `Touch of Brilliance`, `Time Ebb`, `Tidal Surge`, `Volcanic Hammer`, `Lava Axe`, `Mind Rot`, `Winter's Grasp`, `Symbol of Unsummoning`, `Armageddon`, `Rain of Salt`, `Sacred Nectar`, and `Wrath of God`, the off-Portal testbed sorcery `Rain of Daggers`, and all five `Portal` basic lands to widen the engine through narrow keyword and sorcery-speed noncreature-spell rule families before broader mechanics are introduced.
+The current expansion wave additionally supports `Rain of Tears`, `Stone Rain`, `Scorching Spear`, `Bee Sting`, `Natural Spring`, `Lava Flow`, `Raise Dead`, `Elven Cache`, `Mobilize`, `Blinding Light`, `Pyroclasm`, `Needle Storm`, `Soul Shred`, `Vampiric Touch`, and `Howling Fury` through the bounded families in `docs/contracts/portal-sorcery-expansion-wave.md`.
 Multiplicity is allowed as normal so long as no card identity outside this universe is introduced.
 
 ## Play Mode

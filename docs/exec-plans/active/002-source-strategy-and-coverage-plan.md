@@ -93,6 +93,13 @@ The simulator should only claim support based on layer 3, never merely because l
   therefore is not engine-supported until its source artifacts, coverage
   declarations, rule envelope, effect registration, and tests land together.
 
+## Expansion Completion Note
+
+The selected `Rain of Tears` increment was completed as part of a fifteen-card
+Portal sorcery wave. The active manifest, source artifacts, coverage,
+implementation registry, and regression tests now cover all fifteen selected
+cards.
+
 For rules:
 
 1. Archive official text snapshot.
@@ -147,9 +154,8 @@ Prefer links to canonical manifests over duplicated card lists. If a copied list
 The next session should continue from the manifest-backed slice after the `Tidal Surge` targeted-tapping increment.
 
 1. Keep `docs/coverage/slices/portal.initial.yaml` aligned with the declared active card universe and source pull scope.
-2. Implement the selected `Rain of Tears` increment only after pulling its
-   Portal source artifacts and updating the support manifest, card coverage,
-   rules coverage, and rules envelope together.
-3. Reuse the narrow targeted-land-destruction effect family, adding explicit
-   black-mana and resolution tests rather than broadening the effect system.
+2. Choose the next expansion only after inspecting the active fifteen-card
+   wave for the next genuinely missing rule family.
+3. Before implementation, update source artifacts, manifest, coverage, rules
+   envelope, registry, and edge-case tests together.
 4. Before finishing, run the card-expansion freshness check above.
