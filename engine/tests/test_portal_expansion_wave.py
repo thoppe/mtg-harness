@@ -9,10 +9,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
-from mtg_engine.flow.turns import TurnResult, _battlefield_land_subtype_count, _cleanup_end_of_turn_state, _controlled_land_subtype_count, _damage_creatures_once, _require_legal_noncreature_target, _resolve_direct_damage_sorcery, _resolve_noncreature_spell
+from mtg_engine.flow.turns import TurnResult, _battlefield_land_subtype_count, _cleanup_end_of_turn_state, _controlled_land_subtype_count, _damage_creatures_once, _require_legal_noncreature_target, _resolve_direct_damage_sorcery, _resolve_noncreature_spell, resolve_pending_choice
 from mtg_engine.state.models import StackEntry
 from mtg_engine.state.zones import move_object
-from mtg_engine.actions.models import CastNonCreatureSpellAction
+from mtg_engine.actions.models import CastNonCreatureSpellAction, ResolveChoiceAction
 
 
 INFO = Path(__file__).resolve().parents[2] / "information"
@@ -27,6 +27,8 @@ THEFT_OF_DREAMS = "008011e2-7b82-4962-af6e-be627112f37f"
 VAMPIRIC_FEAST = "1980ca2e-a415-4de1-ac30-7055507e82a2"
 BREATH_OF_LIFE = "30d9e200-b944-43ff-89b8-a550a788ae03"
 DEJA_VU = "7408b9c5-7266-4627-be4e-b691cf5c622c"
+PERSONAL_TUTOR = "90f54959-2c9b-4b8a-84c9-d6893eb43553"
+SYLVAN_TUTOR = "935e0cac-51ee-4cb7-a209-f085e0f099ed"
 
 
 class PortalExpansionWaveTests(unittest.TestCase):
@@ -154,3 +156,22 @@ class PortalExpansionWaveTests(unittest.TestCase):
         creature_graveyard_state = move_object(result.state, instance_id="alice:2", from_zone="battlefield", to_zone="graveyard", player_id="alice")
         with self.assertRaisesRegex(ValueError, "sorcery card"):
             _require_legal_noncreature_target(creature_graveyard_state, self.repo, ("alice:2",), effect="return_target_sorcery_card_from_your_graveyard")
+
+    def test_tutors_require_a_matching_hidden_choice_then_reveal_shuffle_and_topdeck(self) -> None:
+        state = initialize_game(SetupInput("tutors", ("alice", "bob"), "alice", {"alice": (PERSONAL_TUTOR, SYLVAN_TUTOR, RAIN, MUCK_RATS), "bob": (PLAINS,)}, {"alice": (PERSONAL_TUTOR, SYLVAN_TUTOR), "bob": (PLAINS,)}, 9), self.repo).state
+        state = move_object(state, instance_id="alice:1", from_zone="hand", to_zone="stack", player_id="alice")
+        pending = _resolve_noncreature_spell(TurnResult(state, ()), StackEntry("alice:1", "alice"), self.repo)
+        decision = pending.state.pending_decision
+        self.assertEqual(decision.option_ids, ("alice:3",))
+        with self.assertRaisesRegex(ValueError, "legal option"):
+            resolve_pending_choice(pending, ResolveChoiceAction("alice", decision.decision_id, "alice:4"), self.repo)
+        personal = resolve_pending_choice(pending, ResolveChoiceAction("alice", decision.decision_id, "alice:3"), self.repo)
+        self.assertEqual(personal.state.players["alice"].library[0], "alice:3")
+        self.assertEqual(personal.state.rng_cursor, 1)
+        self.assertIsNone(personal.state.pending_decision)
+        sylvan_state = move_object(personal.state, instance_id="alice:2", from_zone="hand", to_zone="stack", player_id="alice")
+        sylvan_pending = _resolve_noncreature_spell(TurnResult(sylvan_state, personal.event_log), StackEntry("alice:2", "alice"), self.repo)
+        sylvan_decision = sylvan_pending.state.pending_decision
+        self.assertEqual(sylvan_decision.option_ids, ("alice:4",))
+        sylvan = resolve_pending_choice(sylvan_pending, ResolveChoiceAction("alice", sylvan_decision.decision_id, "alice:4"), self.repo)
+        self.assertEqual(sylvan.state.players["alice"].library[0], "alice:4")
