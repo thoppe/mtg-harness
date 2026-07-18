@@ -620,6 +620,18 @@ def _resolve_noncreature_spell(
         resolved_state, damage_events = _damage_creatures_once(casting_state, card_repository, targets, damage, action.player_id)
         for damage_event in damage_events:
             event_log.append(event_type=damage_event["event_type"], active_player=damage_event["active_player"], payload=damage_event["payload"])
+    elif effect in {"damage_all_creatures_and_players_1", "damage_all_creatures_and_players_6"}:
+        damage = 1 if effect.endswith("_1") else 6
+        targets = _battlefield_permanents_matching(casting_state, card_repository, predicate=lambda definition: definition.is_creature)
+        resolved_state, events = _damage_creatures_once(casting_state, card_repository, targets, damage, action.player_id, check_sbas=False)
+        for player_id, player in resolved_state.players.items():
+            updated = replace(player, life_total=player.life_total - damage)
+            resolved_state = update_player(resolved_state, updated)
+            events.append({"event_type": "life_total_changed", "active_player": action.player_id, "payload": {"player_id": player_id, "life_total": updated.life_total}})
+        resolved_state, sba_events = apply_state_based_actions(resolved_state, card_repository, active_player=action.player_id)
+        events.extend(sba_events)
+        for event in events:
+            event_log.append(event_type=event["event_type"], active_player=event["active_player"], payload=event["payload"])
     resolved_state = move_object(
         resolved_state,
         instance_id=action.card_instance_id,
@@ -1159,7 +1171,7 @@ def _require_legal_noncreature_target(
     *,
     effect: str,
 ) -> None:
-    if effect in {"draw_two_cards", "gain_4_life", "destroy_all_lands", "destroy_all_creatures", "destroy_all_green_creatures", "destroy_all_white_creatures", "destroy_all_islands", "destroy_all_plains", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures", "damage_all_creatures_2", "damage_all_flying_creatures_4"}:
+    if effect in {"draw_two_cards", "gain_4_life", "destroy_all_lands", "destroy_all_creatures", "destroy_all_green_creatures", "destroy_all_white_creatures", "destroy_all_islands", "destroy_all_plains", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures", "damage_all_creatures_2", "damage_all_flying_creatures_4", "damage_all_creatures_and_players_1", "damage_all_creatures_and_players_6"}:
         if target_instance_ids:
             raise ValueError("sorcery does not take a target")
         return
@@ -1422,7 +1434,7 @@ def _resolve_direct_damage_sorcery(
     return next_state, events
 
 
-def _damage_creatures_once(state: GameState, card_repository: CardRepository, target_ids: tuple[str, ...], damage: int, active_player: str) -> tuple[GameState, list[dict]]:
+def _damage_creatures_once(state: GameState, card_repository: CardRepository, target_ids: tuple[str, ...], damage: int, active_player: str, *, check_sbas: bool = True) -> tuple[GameState, list[dict]]:
     current_state = state
     events: list[dict] = []
     for target_id in target_ids:
@@ -1430,8 +1442,9 @@ def _damage_creatures_once(state: GameState, card_repository: CardRepository, ta
         definition = card_repository.get(target.oracle_id)
         current_state = update_object(current_state, replace(target, damage_marked=target.damage_marked + damage))
         events.append({"event_type": "damage_applied", "active_player": active_player, "payload": {"target_instance_id": target_id, "oracle_id": target.oracle_id, "damage": damage, "new_damage_marked": target.damage_marked + damage, "toughness": int(definition.toughness or "0")}})
-    current_state, sba_events = apply_state_based_actions(current_state, card_repository, active_player=active_player)
-    events.extend(sba_events)
+    if check_sbas:
+        current_state, sba_events = apply_state_based_actions(current_state, card_repository, active_player=active_player)
+        events.extend(sba_events)
     return current_state, events
 
 

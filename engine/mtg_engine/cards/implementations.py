@@ -49,6 +49,8 @@ IMPLEMENTATIONS = {
     "fc070e97-73ac-4028-9432-ff2012f2e778": "destroy_all_white_creatures",
     "7421b711-81a4-4042-b024-f55bf9ff203f": "destroy_all_islands",
     "c281f436-8c77-48f7-b31c-d40cd7f9ed6a": "destroy_all_plains",
+    "980a9957-6b52-45c6-b847-f84974d5a653": "damage_all_creatures_and_players_1",
+    "ede6a352-52de-4ae0-816f-50140033dedf": "damage_all_creatures_and_players_6",
 }
 
 
