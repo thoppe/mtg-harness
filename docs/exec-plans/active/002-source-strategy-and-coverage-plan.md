@@ -81,6 +81,18 @@ The simulator should only claim support based on layer 3, never merely because l
 - The next candidate should return to the smallest nonkeyword `Portal` expansion rather than widening further keyword support.
 - Favor sorceries that fit or minimally extend the current supported effect families before adding broader static-ability, replacement-effect, or triggered-ability families.
 
+## Selected Next Increment
+
+- **Rain of Tears** (`72cecab3-519e-4a23-9623-b423a5c5a251`, `Portal`):
+  `Destroy target land.`
+- It is a nonkeyword sorcery and fits the already implemented targeted-land
+  destruction family (`Winter's Grasp`) while deliberately exercising a new
+  black mana cost. It introduces no new target category, event family,
+  replacement effect, trigger, or keyword.
+- This is a selection only. It is not yet in the active support manifest and
+  therefore is not engine-supported until its source artifacts, coverage
+  declarations, rule envelope, effect registration, and tests land together.
+
 For rules:
 
 1. Archive official text snapshot.
@@ -135,7 +147,9 @@ Prefer links to canonical manifests over duplicated card lists. If a copied list
 The next session should continue from the manifest-backed slice after the `Tidal Surge` targeted-tapping increment.
 
 1. Keep `docs/coverage/slices/portal.initial.yaml` aligned with the declared active card universe and source pull scope.
-2. Pick the next `Portal` card by first inspecting its oracle text for new rule families, activated or triggered abilities, keywords, unusual targeting or combat clauses, and replacement or prevention effects.
-3. Prefer a low-complexity nonkeyword sorcery that fits an existing spell-resolution family or adds only one narrow rule-family increment.
-4. Before implementation, update source artifacts, the support-slice manifest, card coverage, rules coverage, and the rules envelope so the declared support boundary matches the new card.
-5. Before finishing, run the card-expansion freshness check above.
+2. Implement the selected `Rain of Tears` increment only after pulling its
+   Portal source artifacts and updating the support manifest, card coverage,
+   rules coverage, and rules envelope together.
+3. Reuse the narrow targeted-land-destruction effect family, adding explicit
+   black-mana and resolution tests rather than broadening the effect system.
+4. Before finishing, run the card-expansion freshness check above.
