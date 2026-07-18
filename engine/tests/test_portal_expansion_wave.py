@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
-from mtg_engine.flow.turns import _require_legal_noncreature_target, _resolve_direct_damage_sorcery
+from mtg_engine.flow.turns import _damage_creatures_once, _require_legal_noncreature_target, _resolve_direct_damage_sorcery
 from mtg_engine.state.zones import move_object
 
 
@@ -17,6 +17,7 @@ INFO = Path(__file__).resolve().parents[2] / "information"
 PLAINS = "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
 RAIN = "72cecab3-519e-4a23-9623-b423a5c5a251"
 LAVA_FLOW = "91c0a76e-3992-437f-b85a-97b0b4adbb84"
+MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
 
 
 class PortalExpansionWaveTests(unittest.TestCase):
@@ -43,3 +44,12 @@ class PortalExpansionWaveTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "creature card"):
             _require_legal_noncreature_target(graveyard_state, self.repo, ("alice:1",), effect="return_target_creature_card_from_your_graveyard")
         _require_legal_noncreature_target(graveyard_state, self.repo, ("alice:1",), effect="return_target_card_from_your_graveyard")
+
+    def test_mass_damage_marks_all_targets_before_one_sba_checkpoint(self) -> None:
+        state = initialize_game(SetupInput("mass", ("alice", "bob"), "alice", {"alice": (MUCK_RATS,), "bob": (MUCK_RATS,)}, {"alice": (MUCK_RATS,), "bob": (MUCK_RATS,)}, 2), self.repo).state
+        state = move_object(state, instance_id="alice:1", from_zone="hand", to_zone="battlefield", player_id="alice")
+        state = move_object(state, instance_id="bob:1", from_zone="hand", to_zone="battlefield", player_id="bob")
+        result, events = _damage_creatures_once(state, self.repo, ("alice:1", "bob:1"), 2, "alice")
+        self.assertEqual(result.players["alice"].graveyard, ("alice:1",))
+        self.assertEqual(result.players["bob"].graveyard, ("bob:1",))
+        self.assertEqual([event["event_type"] for event in events].count("state_based_actions_checked"), 1)

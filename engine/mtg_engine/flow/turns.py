@@ -586,6 +586,12 @@ def _resolve_noncreature_spell(
                     continue
                 resolved_state = update_object(resolved_state, replace(obj, tapped=desired_tapped))
                 event_log.append(event_type="permanent_tapped" if desired_tapped else "permanent_untapped", active_player=action.player_id, payload={"card_instance_id": instance_id, "oracle_id": obj.oracle_id, "reason": f"spell_effect:{card_definition.name}"})
+    elif effect in {"damage_all_creatures_2", "damage_all_flying_creatures_4"}:
+        damage = 2 if effect == "damage_all_creatures_2" else 4
+        targets = _battlefield_permanents_matching(casting_state, card_repository, predicate=lambda definition: definition.is_creature and (effect == "damage_all_creatures_2" or definition.has_flying))
+        resolved_state, damage_events = _damage_creatures_once(casting_state, card_repository, targets, damage, action.player_id)
+        for damage_event in damage_events:
+            event_log.append(event_type=damage_event["event_type"], active_player=damage_event["active_player"], payload=damage_event["payload"])
     resolved_state = move_object(
         resolved_state,
         instance_id=action.card_instance_id,
@@ -1125,7 +1131,7 @@ def _require_legal_noncreature_target(
     *,
     effect: str,
 ) -> None:
-    if effect in {"draw_two_cards", "gain_4_life", "destroy_all_lands", "destroy_all_creatures", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures"}:
+    if effect in {"draw_two_cards", "gain_4_life", "destroy_all_lands", "destroy_all_creatures", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures", "damage_all_creatures_2", "damage_all_flying_creatures_4"}:
         if target_instance_ids:
             raise ValueError("sorcery does not take a target")
         return
@@ -1373,6 +1379,19 @@ def _resolve_direct_damage_sorcery(
     next_state, sba_events = apply_state_based_actions(next_state, card_repository, active_player=active_player)
     events.extend(sba_events)
     return next_state, events
+
+
+def _damage_creatures_once(state: GameState, card_repository: CardRepository, target_ids: tuple[str, ...], damage: int, active_player: str) -> tuple[GameState, list[dict]]:
+    current_state = state
+    events: list[dict] = []
+    for target_id in target_ids:
+        target = current_state.objects[target_id]
+        definition = card_repository.get(target.oracle_id)
+        current_state = update_object(current_state, replace(target, damage_marked=target.damage_marked + damage))
+        events.append({"event_type": "damage_applied", "active_player": active_player, "payload": {"target_instance_id": target_id, "oracle_id": target.oracle_id, "damage": damage, "new_damage_marked": target.damage_marked + damage, "toughness": int(definition.toughness or "0")}})
+    current_state, sba_events = apply_state_based_actions(current_state, card_repository, active_player=active_player)
+    events.extend(sba_events)
+    return current_state, events
 
 
 def _discard_first_cards_in_hand_order(
