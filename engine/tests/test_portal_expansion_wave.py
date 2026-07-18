@@ -9,9 +9,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
+from mtg_engine.flow.priority import blocker_attack_rejection_reason
 from mtg_engine.flow.turns import TurnResult, _add_temporary_effect, _battlefield_land_subtype_count, _cleanup_end_of_turn_state, _controlled_land_subtype_count, _damage_creatures_once, _require_legal_noncreature_target, _resolve_direct_damage_sorcery, _resolve_noncreature_spell, play_land, resolve_pending_choice
 from mtg_engine.rules.characteristics import effective_keywords, effective_power, effective_toughness
-from mtg_engine.state.models import StackEntry
+from mtg_engine.state.models import StackEntry, TurnState
 from mtg_engine.state.zones import move_object
 from mtg_engine.actions.models import CastNonCreatureSpellAction, PlayLandAction, ResolveChoiceAction
 
@@ -92,6 +93,23 @@ class PortalExpansionWaveTests(unittest.TestCase):
     def test_wave_two_sources_load_from_active_slice(self) -> None:
         self.assertTrue(self.repo.get("f215d0f9-a53e-431a-a70d-9dc4e3caa41e").is_instant)
         self.assertEqual(self.repo.get("23745133-e5e2-4ce3-b94a-73d0d3d8a013").name, "Phantom Warrior")
+
+    def test_phantom_warrior_uses_shared_blocker_legality(self) -> None:
+        state = move_object(self.state, instance_id="alice:1", from_zone="hand", to_zone="battlefield", player_id="alice")
+        state = move_object(state, instance_id="bob:1", from_zone="hand", to_zone="battlefield", player_id="bob")
+        state = replace(
+            state,
+            objects={
+                **state.objects,
+                "alice:1": replace(state.objects["alice:1"], oracle_id="23745133-e5e2-4ce3-b94a-73d0d3d8a013"),
+                "bob:1": replace(state.objects["bob:1"], oracle_id=MUCK_RATS),
+            },
+            turn=TurnState(1, "alice", "bob", "declare_blockers_step"),
+        )
+        self.assertEqual(
+            blocker_attack_rejection_reason(state=state, card_repository=self.repo, blocker_id="bob:1", attacker_id="alice:1"),
+            "blocker cannot block the selected attacker",
+        )
 
     def test_temporary_creature_effects_require_battlefield_creatures(self) -> None:
         with self.assertRaisesRegex(ValueError, "target must be a creature"):
