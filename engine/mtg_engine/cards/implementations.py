@@ -36,6 +36,8 @@ IMPLEMENTATIONS = {
     "91c0a76e-3992-437f-b85a-97b0b4adbb84": "destroy_target_creature_or_land",
     "cbc9c731-181a-4f00-a7b0-eb7e56eac2ea": "return_target_creature_card_from_your_graveyard",
     "8a922366-ee2a-4ddb-a904-683dcf4f191a": "return_target_card_from_your_graveyard",
+    "7416c8db-ec33-4d92-866c-b7fdc69c8b41": "untap_all_creatures_you_control",
+    "6b315dc3-c330-4b30-b6ad-4da12ccf6ca3": "tap_all_nonwhite_creatures",
 }
 
 

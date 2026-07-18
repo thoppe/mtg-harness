@@ -570,6 +570,22 @@ def _resolve_noncreature_spell(
                     "life_total": updated_player.life_total,
                 },
             )
+    elif effect in {"untap_all_creatures_you_control", "tap_all_nonwhite_creatures"}:
+        for player_id, player in resolved_state.players.items():
+            for instance_id in player.battlefield:
+                obj = resolved_state.objects[instance_id]
+                definition = card_repository.get(obj.oracle_id)
+                applies = definition.is_creature and (
+                    (effect == "untap_all_creatures_you_control" and player_id == action.player_id)
+                    or (effect == "tap_all_nonwhite_creatures" and not definition.has_color("W"))
+                )
+                if not applies:
+                    continue
+                desired_tapped = effect == "tap_all_nonwhite_creatures"
+                if obj.tapped == desired_tapped:
+                    continue
+                resolved_state = update_object(resolved_state, replace(obj, tapped=desired_tapped))
+                event_log.append(event_type="permanent_tapped" if desired_tapped else "permanent_untapped", active_player=action.player_id, payload={"card_instance_id": instance_id, "oracle_id": obj.oracle_id, "reason": f"spell_effect:{card_definition.name}"})
     resolved_state = move_object(
         resolved_state,
         instance_id=action.card_instance_id,
@@ -1109,7 +1125,7 @@ def _require_legal_noncreature_target(
     *,
     effect: str,
 ) -> None:
-    if effect in {"draw_two_cards", "gain_4_life", "destroy_all_lands", "destroy_all_creatures"}:
+    if effect in {"draw_two_cards", "gain_4_life", "destroy_all_lands", "destroy_all_creatures", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures"}:
         if target_instance_ids:
             raise ValueError("sorcery does not take a target")
         return

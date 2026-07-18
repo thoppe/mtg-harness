@@ -5,6 +5,7 @@ status_values:
   - deferred
   - not_started
 rules:
+  - {rule_key: mass_status_sorceries_minimal, source_rules: ["608"], status: implemented, scope: "Mobilize untaps caster-controlled creatures; Blinding Light taps nonwhite creatures.", engine_contracts: [docs/contracts/portal-sorcery-expansion-wave.md], tests: [engine/tests/test_spells.py], notes: "Name-scoped."}
   - {rule_key: graveyard_return_sorceries_minimal, source_rules: ["115", "608"], status: implemented, scope: "Raise Dead and Elven Cache return a legal card from the caster's graveyard to hand.", engine_contracts: [docs/contracts/portal-sorcery-expansion-wave.md], tests: [engine/tests/test_portal_expansion_wave.py], notes: "Name-scoped."}
   - {rule_key: targeted_player_life_gain_sorceries_minimal, source_rules: ["115", "608"], status: implemented, scope: "Natural Spring targets one player and grants 8 life.", engine_contracts: [docs/contracts/portal-sorcery-expansion-wave.md], tests: [engine/tests/test_spells.py], notes: "Name-scoped."}
   - {rule_key: creature_or_land_destruction_sorceries_minimal, source_rules: ["115", "608", "701.7"], status: implemented, scope: "Lava Flow destroys one target creature or land.", engine_contracts: [docs/contracts/portal-sorcery-expansion-wave.md], tests: [engine/tests/test_spells.py], notes: "Name-scoped."}
