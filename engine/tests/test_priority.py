@@ -21,10 +21,12 @@ from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.priority import enumerate_legal_actions
 from mtg_engine.flow.setup import SetupInput, initialize_game
 from mtg_engine.flow.turns import (
+    TurnResult,
     activate_mana_ability,
     advance_to_begin_combat,
     advance_to_cleanup,
     cast_creature_spell,
+    cast_noncreature_spell,
     declare_attackers,
     declare_blockers,
     pass_priority,
@@ -33,6 +35,9 @@ from mtg_engine.flow.turns import (
     start_first_turn,
     start_next_turn,
 )
+from mtg_engine.rules.combat import with_combat_state
+from mtg_engine.rules.characteristics import has_keyword
+from mtg_engine.state.models import TurnState
 from mtg_engine.state.zones import move_object, update_object
 
 
@@ -53,6 +58,7 @@ TIDAL_SURGE = "be738992-77fe-498d-b219-e5da4ce5bf07"
 VOLCANIC_HAMMER = "98fa5a06-0553-40fd-999c-bc31c9b3f4db"
 LAVA_AXE = "387b6b07-a283-412d-94c3-f7f1dc76e858"
 MIND_ROT = "ad44cf74-b717-48fb-9fa2-77512024d76a"
+TREETOP_DEFENSE = "f215d0f9-a53e-431a-a70d-9dc4e3caa41e"
 FOREST = "b34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6"
 WINTERS_GRASP = "e9b8679d-52a9-4f0f-9365-f3e4b7a69805"
 SYMBOL_OF_UNSUMMONING = "c44f1a81-269b-4f05-8ff2-e7ce19a93937"
@@ -69,6 +75,24 @@ RAIN_OF_DAGGERS = "e2048201-6dc9-4cf5-916f-1d867ae8dbdd"
 
 
 class PriorityTests(unittest.TestCase):
+    def test_treetop_defense_casts_in_attacked_attackers_window_and_expires(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        setup = SetupInput(
+            "treetop-window", ("alice", "bob"), "alice",
+            {"alice": (BORDER_GUARD,), "bob": (TREETOP_DEFENSE, FOOT_SOLDIERS)},
+            {"alice": (BORDER_GUARD,), "bob": (TREETOP_DEFENSE, FOOT_SOLDIERS,)}, 7,
+        )
+        state = initialize_game(setup, repository).state
+        state = move_object(state, instance_id="alice:1", from_zone="hand", to_zone="battlefield", player_id="alice")
+        state = move_object(state, instance_id="bob:2", from_zone="hand", to_zone="battlefield", player_id="bob")
+        state = with_combat_state(state, attacking_player="alice", defending_player="bob", attackers=("alice:1",), blockers={})
+        state = replace(state, players={**state.players, "bob": replace(state.players["bob"], mana_pool=("G", "G"))}, turn=TurnState(1, "alice", "bob", "declare_attackers_step"))
+        session = cast_noncreature_spell(TurnResult(state=state, event_log=()), CastNonCreatureSpellAction(player_id="bob", card_instance_id="bob:1"), repository)
+        session = pass_priority(session, PassPriorityAction(player_id="bob"), repository)
+        session = pass_priority(session, PassPriorityAction(player_id="alice"), repository)
+        self.assertTrue(has_keyword(session.state, repository, "bob:2", "Reach"))
+        cleanup_ready = replace(session, state=replace(session.state, turn=replace(session.state.turn, step="end_combat_step")))
+        self.assertFalse(has_keyword(advance_to_cleanup(cleanup_ready).state, repository, "bob:2", "Reach"))
     def test_precombat_main_enumerates_land_then_step_controls(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         session = _build_main_phase_session(repository)
