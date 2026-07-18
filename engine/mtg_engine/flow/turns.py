@@ -8,6 +8,7 @@ import re
 
 from mtg_engine.actions.models import (
     ActivateManaAbilityAction,
+    ActivateAbilityAction,
     AdvanceStepAction,
     CastCreatureSpellAction,
     CastNonCreatureSpellAction,
@@ -189,6 +190,38 @@ def activate_mana_ability(
     return TurnResult(state=next_state, event_log=event_log.events)
 
 
+def activate_ability(
+    session: TurnResult | GameBootstrap,
+    action: ActivateAbilityAction,
+    card_repository: CardRepository,
+) -> TurnResult:
+    """Pay and stack the three bounded Wave 7 nonmana abilities."""
+    state = session.state
+    if state.turn.priority_player != action.player_id or state.turn.active_player != action.player_id or state.turn.step != "precombat_main_step":
+        raise ValueError("activated ability requires your precombat-main priority")
+    player = state.players[action.player_id]
+    if action.source_instance_id not in player.battlefield:
+        raise ValueError("ability source must be controlled on the battlefield")
+    source = state.objects[action.source_instance_id]
+    effect = effect_key_for(source.oracle_id)
+    if effect not in {"capricious_sorcerer", "kings_assassin", "stern_marshal"}:
+        raise ValueError("unsupported activated ability")
+    if source.tapped or source.entered_battlefield_turn == state.turn.turn_number:
+        raise ValueError("source must be untapped and controlled since turn start")
+    _require_legal_noncreature_target(state, card_repository, action.target_instance_ids, effect=effect)
+    next_state = update_object(state, replace(source, tapped=True))
+    entry = StackEntry(card_instance_id=action.source_instance_id, controller_id=action.player_id,
+                       target_ids=action.target_instance_ids, entry_kind="activated_ability",
+                       source_object_id=source.object_id, source_oracle_id=source.oracle_id,
+                       target_object_ids=tuple(next_state.objects[target].object_id for target in action.target_instance_ids if target in next_state.objects))
+    next_state = replace(next_state, stack_entries=next_state.stack_entries + (entry,), consecutive_passes=0)
+    event_log = EventLog.from_events(state.game_id, session.event_log)
+    event_log.append(event_type="activated_ability_activated", active_player=action.player_id,
+                     payload={"player_id": action.player_id, "source_instance_id": action.source_instance_id,
+                              "oracle_id": source.oracle_id, "target_instance_ids": list(action.target_instance_ids)})
+    return TurnResult(state=next_state, event_log=event_log.events)
+
+
 def cast_creature_spell(
     session: TurnResult | GameBootstrap,
     action: CastCreatureSpellAction,
@@ -285,12 +318,19 @@ def cast_noncreature_spell(
     effect = _supported_targeted_sorcery_effect(card_definition)
     if effect is None:
         raise ValueError("unsupported noncreature spell in v0")
-    _require_legal_noncreature_target(
-        state,
-        card_repository,
-        action.target_instance_ids,
-        effect=effect,
-    )
+    if effect == "mystic_denial":
+        if len(action.target_instance_ids) != 1 or action.target_instance_ids[0] not in {entry.card_instance_id for entry in state.stack_entries}:
+            raise ValueError("Mystic Denial requires a creature or sorcery spell on the stack")
+        target_definition = card_repository.get(state.objects[action.target_instance_ids[0]].oracle_id)
+        if not (target_definition.is_creature or target_definition.is_sorcery):
+            raise ValueError("Mystic Denial targets a creature or sorcery spell")
+    else:
+        _require_legal_noncreature_target(
+            state,
+            card_repository,
+            action.target_instance_ids,
+            effect=effect,
+        )
     if effect == "forked_lightning":
         _validate_forked_lightning_assignments(action)
     elif action.damage_assignments:
@@ -432,6 +472,40 @@ def _resolve_noncreature_spell(
         },
     )
     resolved_state = casting_state
+    # Wave 7 instants deliberately reuse the spell stack and the existing
+    # temporary/damage helpers.  Their timing predicate is enforced at cast.
+    if effect == "blessed_reversal":
+        count = len(casting_state.combat.attackers) if casting_state.combat and casting_state.combat.defending_player == action.player_id else 0
+        player = resolved_state.players[action.player_id]
+        resolved_state = update_player(resolved_state, replace(player, life_total=player.life_total + 3 * count))
+        event_log.append(event_type="life_total_changed", active_player=action.player_id, payload={"player_id": action.player_id, "life_total": player.life_total + 3 * count})
+    elif effect == "defiant_stand":
+        target = resolved_state.objects[action.target_instance_id]
+        resolved_state = update_object(resolved_state, replace(target, tapped=False))
+        resolved_state = _add_temporary_effect(resolved_state, source_object_id=card.object_id, target_ids=(action.target_instance_id,), power_delta=1, toughness_delta=3)
+    elif effect == "command_of_unsummoning":
+        for target_id in action.target_instance_ids:
+            if target_id in resolved_state.objects and resolved_state.objects[target_id].zone == "battlefield":
+                target = resolved_state.objects[target_id]
+                resolved_state = _move_with_event(resolved_state, event_log, instance_id=target_id, from_zone="battlefield", to_zone="hand", player_id=target.owner_id, active_player=action.player_id)
+    elif effect == "scorching_winds":
+        ids = tuple(casting_state.combat.attackers) if casting_state.combat and casting_state.combat.defending_player == action.player_id else ()
+        resolved_state, events = _damage_creatures_once(resolved_state, card_repository, ids, 1, action.player_id)
+        for event in events: event_log.append(event_type=event["event_type"], active_player=event["active_player"], payload=event["payload"])
+    elif effect == "deep_wood":
+        resolved_state = replace(resolved_state, delayed_turn_effects=resolved_state.delayed_turn_effects + (DelayedTurnEffect(kind="prevent_attacking_damage", player_id=action.player_id, turn_number=resolved_state.turn.turn_number, source_player_id=action.player_id),))
+    elif effect == "harsh_justice":
+        resolved_state = replace(resolved_state, delayed_turn_effects=resolved_state.delayed_turn_effects + (DelayedTurnEffect(kind="retaliate_attacking_damage", player_id=action.player_id, turn_number=resolved_state.turn.turn_number, source_player_id=action.player_id),))
+    elif effect == "assassins_blade":
+        resolved_state, _ = _destroy_permanents(resolved_state, event_log, instance_ids=action.target_instance_ids, active_player=action.player_id, reason="spell_effect:Assassin's Blade")
+    elif effect == "mystic_denial":
+        target_id = action.target_instance_id
+        target_entry = next((item for item in resolved_state.stack_entries if item.card_instance_id == target_id), None)
+        if target_entry is not None:
+            target = resolved_state.objects[target_id]
+            resolved_state = move_object(resolved_state, instance_id=target_id, from_zone="stack", to_zone="graveyard", player_id=target.owner_id)
+            resolved_state = replace(resolved_state, stack_entries=tuple(item for item in resolved_state.stack_entries if item is not target_entry))
+            event_log.append(event_type="spell_countered", active_player=action.player_id, payload={"card_instance_id": target_id, "oracle_id": target.oracle_id, "reason": "Mystic Denial"})
     if effect in {
         "destroy_tapped_creature",
         "destroy_creature_owner_gains_4_life",
@@ -1191,6 +1265,16 @@ def _resolve_top_stack_entry(session: TurnResult, card_repository: CardRepositor
         result = _resolve_alabaster_dragon_death_trigger(
             TurnResult(state=state, event_log=event_log.events), entry
         )
+    elif entry.entry_kind == "wave7_trigger":
+        result = _resolve_wave7_trigger(TurnResult(state=state, event_log=event_log.events), entry, card_repository)
+    elif entry.entry_kind == "wave7_retaliation":
+        target_id = entry.target_ids[0]
+        target = state.players[target_id]
+        resolved_state = update_player(state, replace(target, life_total=target.life_total - (entry.additional_cost_value or 0)))
+        event_log.append(event_type="damage_applied", active_player=entry.controller_id, payload={"target_player_id": target_id, "damage": entry.additional_cost_value or 0, "reason": "Harsh Justice"})
+        result = TurnResult(resolved_state, event_log.events)
+    elif entry.entry_kind == "activated_ability":
+        result = _resolve_wave7_activated_ability(TurnResult(state=state, event_log=event_log.events), entry, card_repository)
     else:
         spell = state.objects[entry.card_instance_id]
         definition = card_repository.get(spell.oracle_id)
@@ -1213,6 +1297,7 @@ def _resolve_top_stack_entry(session: TurnResult, card_repository: CardRepositor
                 payload={"player_id": entry.controller_id, "card_instance_id": entry.card_instance_id, "oracle_id": spell.oracle_id, "from_zone": "stack", "to_zone": "battlefield", **zone_change_identity_payload(resolved_state, entry.card_instance_id)},
             )
             result = TurnResult(state=resolved_state, event_log=event_log.events)
+            result = _queue_wave7_enter_trigger(result, entry, card_repository)
         elif _stack_entry_targets_are_legal(state, entry, card_repository):
             result = _resolve_noncreature_spell(
                 TurnResult(state=state, event_log=event_log.events), entry, card_repository
@@ -1251,6 +1336,124 @@ def _resolve_top_stack_entry(session: TurnResult, card_repository: CardRepositor
         turn=replace(result.state.turn, priority_player=result.state.turn.active_player),
     )
     return TurnResult(state=final_state, event_log=result.event_log)
+
+
+def _queue_wave7_enter_trigger(session: TurnResult, entry: StackEntry, card_repository: CardRepository) -> TurnResult:
+    state = session.state
+    effect = effect_key_for(state.objects[entry.card_instance_id].oracle_id)
+    if effect is None or not effect.endswith("_etb"):
+        return session
+    trigger = StackEntry(card_instance_id=entry.card_instance_id, controller_id=entry.controller_id,
+                         entry_kind="wave7_trigger", source_object_id=state.objects[entry.card_instance_id].object_id,
+                         source_oracle_id=state.objects[entry.card_instance_id].oracle_id)
+    event_log = EventLog.from_events(state.game_id, session.event_log)
+    event_log.append(event_type="triggered_ability_put_on_stack", active_player=state.turn.active_player,
+                     payload={"ability_key": effect, "card_instance_id": entry.card_instance_id, "oracle_id": trigger.source_oracle_id})
+    return TurnResult(replace(state, stack_entries=state.stack_entries + (trigger,), consecutive_passes=0), event_log.events)
+
+
+def _resolve_wave7_activated_ability(session: TurnResult, entry: StackEntry, card_repository: CardRepository) -> TurnResult:
+    state = session.state; event_log = EventLog.from_events(state.game_id, session.event_log)
+    effect = effect_key_for(entry.source_oracle_id or state.objects[entry.card_instance_id].oracle_id)
+    target = entry.target_ids[0] if entry.target_ids else None
+    resolved = state
+    if target is not None and _stack_entry_targets_are_legal(state, entry, card_repository):
+        if effect == "capricious_sorcerer":
+            resolved, events = _resolve_direct_damage_sorcery(state, card_repository, target, effect="damage_any_target_variable", active_player=entry.controller_id, damage_override=1)
+            for item in events: event_log.append(event_type=item["event_type"], active_player=item["active_player"], payload=item["payload"])
+        elif effect == "kings_assassin":
+            resolved, _ = _destroy_permanents(state, event_log, instance_ids=(target,), active_player=entry.controller_id, reason="ability:King's Assassin")
+        elif effect == "stern_marshal":
+            resolved = _add_temporary_effect(state, source_object_id=entry.source_object_id or "", target_ids=(target,), power_delta=2, toughness_delta=2)
+    event_log.append(event_type="activated_ability_resolved", active_player=entry.controller_id, payload={"source_instance_id": entry.card_instance_id, "effect": effect})
+    return TurnResult(resolved, event_log.events)
+
+
+def _resolve_wave7_trigger(session: TurnResult, entry: StackEntry, card_repository: CardRepository) -> TurnResult:
+    """Resolve the registered Wave 7 trigger schemas; no text parsing occurs."""
+    state = session.state; event_log = EventLog.from_events(state.game_id, session.event_log)
+    effect = effect_key_for(entry.source_oracle_id or state.objects[entry.card_instance_id].oracle_id)
+    resolved = state; source = state.objects[entry.card_instance_id]
+    life_delta = {"dread_reaper_etb": -5, "serpent_warrior_etb": -3, "spiritual_guardian_etb": 4, "venerable_monk_etb": 2}.get(effect)
+    if life_delta is not None:
+        player = resolved.players[entry.controller_id]; resolved = update_player(resolved, replace(player, life_total=player.life_total + life_delta))
+        event_log.append(event_type="life_total_changed", active_player=entry.controller_id, payload={"player_id": entry.controller_id, "life_total": player.life_total + life_delta})
+    elif effect in {"charging_bandits_attack", "charging_paladin_attack"}:
+        if source.zone == "battlefield" and source.object_id == entry.source_object_id:
+            power, toughness = (2, 0) if effect == "charging_bandits_attack" else (0, 3)
+            resolved = _add_temporary_effect(resolved, source_object_id=entry.source_object_id or "", target_ids=(source.instance_id,), power_delta=power, toughness_delta=toughness)
+    elif effect == "thundermare_etb":
+        for player in resolved.players.values():
+            for instance_id in player.battlefield:
+                if instance_id != entry.card_instance_id and card_repository.get(resolved.objects[instance_id].oracle_id).is_creature:
+                    resolved = update_object(resolved, replace(resolved.objects[instance_id], tapped=True))
+    elif effect == "owl_familiar_etb":
+        resolved = _draw_one_card_for_player_if_available(resolved, event_log, player_id=entry.controller_id)
+        hand = resolved.players[entry.controller_id].hand
+        if hand: resolved = _discard_specific_cards(resolved, event_log, player_id=entry.controller_id, instance_ids=(hand[0],), active_player=entry.controller_id)
+    elif effect == "ebon_dragon_etb":
+        opponent = next((pid for pid in resolved.players if pid != entry.controller_id), None)
+        if opponent is not None: resolved = _discard_first_cards_in_hand_order(resolved, event_log, player_id=opponent, count=1, active_player=entry.controller_id)
+    elif effect == "gravedigger_etb":
+        choices = tuple(i for i in resolved.players[entry.controller_id].graveyard if card_repository.get(resolved.objects[i].oracle_id).is_creature and i != entry.card_instance_id)
+        if choices: resolved = _move_with_event(resolved, event_log, instance_id=choices[0], from_zone="graveyard", to_zone="hand", player_id=entry.controller_id, active_player=entry.controller_id)
+    elif effect == "wood_elves_etb":
+        choices = tuple(i for i in resolved.players[entry.controller_id].library if card_repository.get(resolved.objects[i].oracle_id).has_subtype("Forest"))
+        if choices: resolved = _move_with_event(resolved, event_log, instance_id=choices[0], from_zone="library", to_zone="battlefield", player_id=entry.controller_id, active_player=entry.controller_id)
+        resolved = _shuffle_library(resolved, event_log, player_id=entry.controller_id)
+    elif effect == "endless_cockroaches_death" and source.zone == "graveyard" and source.object_id == entry.expected_graveyard_object_id:
+        resolved = _move_with_event(resolved, event_log, instance_id=source.instance_id, from_zone="graveyard", to_zone="hand", player_id=source.owner_id, active_player=entry.controller_id)
+    elif effect == "undying_beast_death" and source.zone == "graveyard" and source.object_id == entry.expected_graveyard_object_id:
+        resolved = move_object_to_top_of_library(resolved, instance_id=source.instance_id, from_zone="graveyard", player_id=source.owner_id)
+    elif effect == "noxious_toad_death":
+        for player_id in resolved.players:
+            if player_id != entry.controller_id:
+                resolved = _discard_first_cards_in_hand_order(resolved, event_log, player_id=player_id, count=1, active_player=entry.controller_id)
+    elif effect in {"fire_imp_etb", "fire_dragon_etb", "serpent_assassin_etb", "manowar_etb", "fire_snake_death", "seasoned_marshal_attack"}:
+        # Trigger targets are intentionally not inferred from card text.  This
+        # bounded fallback keeps direct StackEntry/replay callers deterministic
+        # while normal UI selection may supply the declared target identity.
+        candidates = tuple(i for player in resolved.players.values() for i in player.battlefield if card_repository.get(resolved.objects[i].oracle_id).is_creature)
+        target = entry.target_ids[0] if entry.target_ids else (candidates[0] if candidates else None)
+        if effect == "fire_snake_death":
+            lands = tuple(i for player in resolved.players.values() for i in player.battlefield if card_repository.get(resolved.objects[i].oracle_id).is_land)
+            target = entry.target_ids[0] if entry.target_ids else (lands[0] if lands else None)
+        if target is not None:
+            if effect == "fire_imp_etb":
+                resolved, events = _resolve_direct_damage_sorcery(resolved, card_repository, target, effect="damage_any_target_variable", active_player=entry.controller_id, damage_override=2)
+                for item in events: event_log.append(event_type=item["event_type"], active_player=item["active_player"], payload=item["payload"])
+            elif effect == "fire_dragon_etb":
+                damage = _controlled_land_subtype_count(resolved, card_repository, entry.controller_id, "Mountain")
+                resolved, events = _resolve_direct_damage_sorcery(resolved, card_repository, target, effect="damage_any_target_variable", active_player=entry.controller_id, damage_override=damage)
+                for item in events: event_log.append(event_type=item["event_type"], active_player=item["active_player"], payload=item["payload"])
+            elif effect in {"serpent_assassin_etb", "fire_snake_death"}:
+                resolved, _ = _destroy_permanents(resolved, event_log, instance_ids=(target,), active_player=entry.controller_id, reason=f"trigger:{effect}")
+            elif effect == "manowar_etb":
+                target_obj = resolved.objects[target]; resolved = _move_with_event(resolved, event_log, instance_id=target, from_zone="battlefield", to_zone="hand", player_id=target_obj.owner_id, active_player=entry.controller_id)
+            else:
+                resolved = update_object(resolved, replace(resolved.objects[target], tapped=True))
+    elif effect in {"mercenary_knight_etb", "pillaging_horde_etb", "plant_elemental_etb", "primeval_force_etb", "thundering_wurm_etb", "thing_from_the_deep_attack"}:
+        # A mandatory 'unless' payment is deliberately conservative: choose the first
+        # qualifying deterministic option; if none exists, sacrifice the source.
+        qualifying = ()
+        if effect in {"mercenary_knight_etb", "thundering_wurm_etb"}:
+            qualifier = "creature" if effect == "mercenary_knight_etb" else "land"
+            qualifying = tuple(i for i in resolved.players[entry.controller_id].hand if getattr(card_repository.get(resolved.objects[i].oracle_id), f"is_{qualifier}"))
+        elif effect in {"plant_elemental_etb", "primeval_force_etb", "thing_from_the_deep_attack"}:
+            subtype = "Forest" if effect != "thing_from_the_deep_attack" else "Island"; count = 3 if effect == "primeval_force_etb" else 1
+            qualifying = tuple(i for i in resolved.players[entry.controller_id].battlefield if card_repository.get(resolved.objects[i].oracle_id).is_land and card_repository.get(resolved.objects[i].oracle_id).has_subtype(subtype))
+            qualifying = qualifying if len(qualifying) >= count else ()
+        if effect == "pillaging_horde_etb": qualifying = resolved.players[entry.controller_id].hand
+        if qualifying:
+            if effect == "pillaging_horde_etb":
+                selected = random.Random(resolved.rng_seed + resolved.rng_cursor).choice(qualifying); resolved = replace(resolved, rng_cursor=resolved.rng_cursor + 1)
+            else: selected = qualifying[0]
+            if selected in resolved.players[entry.controller_id].hand: resolved = _discard_specific_cards(resolved, event_log, player_id=entry.controller_id, instance_ids=(selected,), active_player=entry.controller_id)
+            else: resolved, _ = _destroy_permanents(resolved, event_log, instance_ids=(selected,), active_player=entry.controller_id, reason="trigger_payment")
+        elif source.zone == "battlefield":
+            resolved, _ = _destroy_permanents(resolved, event_log, instance_ids=(source.instance_id,), active_player=entry.controller_id, reason="unpaid_trigger_cost")
+    event_log.append(event_type="triggered_ability_resolved", active_player=entry.controller_id, payload={"ability_key": effect, "card_instance_id": entry.card_instance_id})
+    return TurnResult(resolved, event_log.events)
 
 
 def _resolve_alabaster_dragon_death_trigger(session: TurnResult, entry: StackEntry) -> TurnResult:
@@ -1470,15 +1673,16 @@ def declare_attackers(
         )
 
     event_log = EventLog.from_events(state.game_id, session.event_log)
-    event_log.append(
-        event_type="attackers_declared",
-        active_player=action.player_id,
-        payload={
-            "player_id": action.player_id,
-            "attacker_ids": list(action.attacker_ids),
-            "defending_player": defending_player,
-        },
-    )
+    event_log.append(event_type="attackers_declared", active_player=action.player_id, payload={"player_id": action.player_id, "attacker_ids": list(action.attacker_ids), "defending_player": defending_player})
+    trigger_entries = []
+    for attacker_id in action.attacker_ids:
+        attacker = next_state.objects[attacker_id]
+        effect = effect_key_for(attacker.oracle_id)
+        if effect in {"charging_bandits_attack", "charging_paladin_attack", "seasoned_marshal_attack", "thing_from_the_deep_attack"}:
+            trigger_entries.append(StackEntry(card_instance_id=attacker_id, controller_id=attacker.controller_id, entry_kind="wave7_trigger", source_object_id=attacker.object_id, source_oracle_id=attacker.oracle_id))
+            event_log.append(event_type="triggered_ability_put_on_stack", active_player=action.player_id, payload={"ability_key": effect, "card_instance_id": attacker_id, "oracle_id": attacker.oracle_id})
+    if trigger_entries:
+        next_state = replace(next_state, stack_entries=next_state.stack_entries + tuple(trigger_entries), consecutive_passes=0)
     return TurnResult(state=next_state, event_log=event_log.events)
 
 
@@ -1788,7 +1992,7 @@ def _require_legal_noncreature_target(
     *,
     effect: str,
 ) -> None:
-    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "additional_three_land_plays", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures", "destroy_all_green_creatures", "destroy_all_white_creatures", "destroy_all_islands", "destroy_all_plains", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures", "damage_all_creatures_2", "damage_all_flying_creatures_4", "damage_all_creatures_and_players_1", "damage_all_creatures_and_players_6", "damage_all_flying_creatures_and_players_x", "controlled_creatures_get_0_3_until_end_of_turn", "controlled_creatures_get_1_1_until_end_of_turn", "white_creatures_get_2_0_until_end_of_turn", "green_controlled_creatures_gain_forestwalk_until_end_of_turn", "black_controlled_creatures_only_blockable_by_black_until_end_of_turn", "controlled_creatures_gain_reach_until_end_of_turn", "flux", "natural_order", "ancestral_memories", "prosperity", "temporary_truce", "winds_of_change", "untamed_wilds", "gift_of_estates", "cruel_bargain", "cruel_tutor", "natures_lore", "omen", "earthquake", "devastation", "last_chance"}:
+    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "additional_three_land_plays", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures", "destroy_all_green_creatures", "destroy_all_white_creatures", "destroy_all_islands", "destroy_all_plains", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures", "damage_all_creatures_2", "damage_all_flying_creatures_4", "damage_all_creatures_and_players_1", "damage_all_creatures_and_players_6", "damage_all_flying_creatures_and_players_x", "controlled_creatures_get_0_3_until_end_of_turn", "controlled_creatures_get_1_1_until_end_of_turn", "white_creatures_get_2_0_until_end_of_turn", "green_controlled_creatures_gain_forestwalk_until_end_of_turn", "black_controlled_creatures_only_blockable_by_black_until_end_of_turn", "controlled_creatures_gain_reach_until_end_of_turn", "flux", "natural_order", "ancestral_memories", "prosperity", "temporary_truce", "winds_of_change", "untamed_wilds", "gift_of_estates", "cruel_bargain", "cruel_tutor", "natures_lore", "omen", "earthquake", "devastation", "last_chance", "blessed_reversal", "deep_wood", "harsh_justice", "scorching_winds", "owl_familiar_etb", "thundermare_etb", "dread_reaper_etb", "serpent_warrior_etb", "spiritual_guardian_etb", "venerable_monk_etb"}:
         if target_instance_ids:
             raise ValueError("sorcery does not take a target")
         return
@@ -1862,7 +2066,7 @@ def _require_legal_noncreature_target(
         if target_instance_id == state.turn.active_player:
             raise ValueError("target must be an opponent")
         return
-    if effect == "destroy_target_land":
+    if effect in {"destroy_target_land", "fire_snake_death"}:
         if target_instance_id not in state.objects:
             raise ValueError("target must exist")
         target = state.objects[target_instance_id]
@@ -1890,7 +2094,7 @@ def _require_legal_noncreature_target(
         target = state.objects[target_instance_id]; definition = card_repository.get(target.oracle_id)
         if target.zone != "battlefield" or not definition.is_creature or definition.is_black: raise ValueError("target must be nonblack creature")
         return
-    if effect in {"target_creature_gets_4_power_until_end_of_turn", "target_creature_gets_4_4_until_end_of_turn", "target_creature_gets_2_power_and_takes_2", "damage_target_creature_per_mountain", "all_able_creatures_block_target_this_turn", "target_creature_gets_3_3_and_flying_until_end_of_turn", "target_creature_gains_flying_and_draw_one"}:
+    if effect in {"target_creature_gets_4_power_until_end_of_turn", "target_creature_gets_4_4_until_end_of_turn", "target_creature_gets_2_power_and_takes_2", "damage_target_creature_per_mountain", "all_able_creatures_block_target_this_turn", "target_creature_gets_3_3_and_flying_until_end_of_turn", "target_creature_gains_flying_and_draw_one", "fire_imp_etb", "fire_dragon_etb", "defiant_stand", "stern_marshal", "seasoned_marshal_attack", "manowar_etb", "command_of_unsummoning"}:
         if target_instance_id not in state.objects: raise ValueError("target must exist")
         target = state.objects[target_instance_id]
         if target.zone != "battlefield" or not card_repository.get(target.oracle_id).is_creature: raise ValueError("target must be a creature")
@@ -1917,7 +2121,7 @@ def _require_legal_noncreature_target(
         if not target_definition.is_creature:
             raise ValueError("target must be a creature")
         return
-    if effect in {"damage_any_target", "damage_any_target_1", "damage_any_target_2", "damage_any_target_4_gain_4", "blaze"}:
+    if effect in {"damage_any_target", "damage_any_target_1", "damage_any_target_2", "damage_any_target_4_gain_4", "blaze", "capricious_sorcerer"}:
         if target_instance_id in state.players:
             return
         if target_instance_id not in state.objects:
@@ -1937,9 +2141,9 @@ def _require_legal_noncreature_target(
     target_definition = card_repository.get(target.oracle_id)
     if not target_definition.is_creature:
         raise ValueError("target must be a creature")
-    if effect == "destroy_tapped_creature" and not target.tapped:
+    if effect in {"destroy_tapped_creature", "kings_assassin"} and not target.tapped:
         raise ValueError("target must be tapped")
-    if effect == "destroy_nonblack_creature" and target_definition.is_black:
+    if effect in {"destroy_nonblack_creature", "assassins_blade", "serpent_assassin_etb"} and target_definition.is_black:
         raise ValueError("target must be nonblack creature")
 
 

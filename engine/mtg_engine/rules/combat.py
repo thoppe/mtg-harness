@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import replace
 
 from mtg_engine.cards.repository import CardRepository
+from mtg_engine.cards.implementations import effect_key_for
 from mtg_engine.state.models import CombatState, GameOutcome, GameState, StackEntry
 from mtg_engine.state.zones import move_object, update_object, update_player, zone_change_identity_payload
 from mtg_engine.rules.characteristics import effective_power, effective_toughness, has_keyword
@@ -60,6 +61,13 @@ def apply_combat_damage(state: GameState, card_repository: CardRepository) -> tu
         attacker_power = effective_power(current_state, card_repository, attacker_id)
 
         if not blockers:
+            prevented = any(
+                effect.kind == "prevent_attacking_damage" and effect.player_id == combat.defending_player and effect.turn_number == state.turn.turn_number
+                for effect in current_state.delayed_turn_effects
+            )
+            if prevented:
+                events.append({"event_type": "damage_prevented", "active_player": combat.attacking_player, "payload": {"source_instance_id": attacker_id, "target_player_id": combat.defending_player, "damage": attacker_power}})
+                continue
             defending_player = current_state.players[combat.defending_player]
             updated_player = replace(defending_player, life_total=defending_player.life_total - attacker_power)
             current_state = update_player(current_state, updated_player)
@@ -84,6 +92,15 @@ def apply_combat_damage(state: GameState, card_repository: CardRepository) -> tu
                     },
                 }
             )
+            # Harsh Justice captures the actually dealt packet and resolves
+            # later through the ordinary stack, never as a damage redirect.
+            if any(effect.kind == "retaliate_attacking_damage" and effect.player_id == combat.defending_player and effect.turn_number == state.turn.turn_number for effect in current_state.delayed_turn_effects):
+                trigger = StackEntry(card_instance_id=attacker_id, controller_id=attacker.controller_id,
+                                     entry_kind="wave7_retaliation", source_object_id=attacker.object_id,
+                                     source_oracle_id=attacker.oracle_id, additional_cost_value=attacker_power,
+                                     target_ids=(attacker.controller_id,))
+                current_state = replace(current_state, stack_entries=current_state.stack_entries + (trigger,))
+                events.append({"event_type": "triggered_ability_put_on_stack", "active_player": combat.attacking_player, "payload": {"ability_key": "harsh_justice_retaliation", "card_instance_id": attacker_id, "damage": attacker_power}})
             continue
 
         blocker_damage_assignments: list[dict] = []
@@ -271,13 +288,15 @@ def queue_death_triggers(
         key=lambda destroyed: player_order.index(destroyed["controller_id"]),
     )
     for destroyed in ordered_destroyed:
-        if destroyed["oracle_id"] != ALABASTER_DRAGON_ORACLE_ID:
+        wave7_effect = effect_key_for(destroyed["oracle_id"])
+        if destroyed["oracle_id"] != ALABASTER_DRAGON_ORACLE_ID and wave7_effect not in {"endless_cockroaches_death", "fire_snake_death", "noxious_toad_death", "undying_beast_death"}:
             continue
+        entry_kind = "alabaster_dragon_death_trigger" if destroyed["oracle_id"] == ALABASTER_DRAGON_ORACLE_ID else "wave7_trigger"
         trigger_entries.append(
             StackEntry(
                 card_instance_id=destroyed["card_instance_id"],
                 controller_id=destroyed["controller_id"],
-                entry_kind="alabaster_dragon_death_trigger",
+                entry_kind=entry_kind,
                 source_object_id=destroyed["source_object_id"],
                 source_oracle_id=destroyed["oracle_id"],
                 owner_id=destroyed["owner_id"],
@@ -289,7 +308,7 @@ def queue_death_triggers(
                 "event_type": "triggered_ability_put_on_stack",
                 "active_player": active_player,
                 "payload": {
-                    "ability_key": "alabaster_dragon_death_trigger",
+                    "ability_key": "alabaster_dragon_death_trigger" if entry_kind == "alabaster_dragon_death_trigger" else wave7_effect,
                     "card_instance_id": destroyed["card_instance_id"],
                     "oracle_id": destroyed["oracle_id"],
                     "owner_id": destroyed["owner_id"],

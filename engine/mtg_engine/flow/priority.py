@@ -4,6 +4,7 @@ from itertools import combinations, permutations
 
 from mtg_engine.actions.models import (
     ActivateManaAbilityAction,
+    ActivateAbilityAction,
     AdvanceStepAction,
     CastCreatureSpellAction,
     CastNonCreatureSpellAction,
@@ -129,6 +130,8 @@ def _enumerate_active_precombat_main_actions(
                 )
             )
 
+    actions.extend(_enumerate_activated_abilities(state, card_repository))
+
     for instance_id in player.hand:
         card = state.objects[instance_id]
         card_definition = card_repository.get(card.oracle_id)
@@ -192,6 +195,7 @@ def _enumerate_instant_priority_actions(state: GameState, card_repository: CardR
         definition = card_repository.get(permanent.oracle_id)
         if len(definition.produced_mana) == 1 and not permanent.tapped:
             actions.append(ActivateManaAbilityAction(player_id=player.player_id, source_instance_id=instance_id))
+    actions.extend(_enumerate_activated_abilities(state, card_repository))
     for instance_id in player.hand:
         card = state.objects[instance_id]
         definition = card_repository.get(card.oracle_id)
@@ -359,7 +363,9 @@ def _legal_noncreature_spell_targets(
     spell = state.objects[spell_instance_id]
     card_definition = card_repository.get(spell.oracle_id)
     effect = _supported_targeted_sorcery_effect(card_definition)
-    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "additional_three_land_plays", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures", "controlled_creatures_get_0_3_until_end_of_turn", "controlled_creatures_get_1_1_until_end_of_turn", "white_creatures_get_2_0_until_end_of_turn", "green_controlled_creatures_gain_forestwalk_until_end_of_turn", "black_controlled_creatures_only_blockable_by_black_until_end_of_turn", "controlled_creatures_gain_reach_until_end_of_turn", "flux", "natural_order", "ancestral_memories", "prosperity", "temporary_truce", "winds_of_change", "untamed_wilds", "gift_of_estates", "cruel_bargain", "cruel_tutor", "natures_lore", "omen", "earthquake", "devastation", "last_chance"}:
+    if effect == "mystic_denial":
+        return tuple((entry.card_instance_id,) for entry in state.stack_entries if card_repository.get(state.objects[entry.card_instance_id].oracle_id).is_creature or card_repository.get(state.objects[entry.card_instance_id].oracle_id).is_sorcery)
+    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "additional_three_land_plays", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures", "controlled_creatures_get_0_3_until_end_of_turn", "controlled_creatures_get_1_1_until_end_of_turn", "white_creatures_get_2_0_until_end_of_turn", "green_controlled_creatures_gain_forestwalk_until_end_of_turn", "black_controlled_creatures_only_blockable_by_black_until_end_of_turn", "controlled_creatures_gain_reach_until_end_of_turn", "flux", "natural_order", "ancestral_memories", "prosperity", "temporary_truce", "winds_of_change", "untamed_wilds", "gift_of_estates", "cruel_bargain", "cruel_tutor", "natures_lore", "omen", "earthquake", "devastation", "last_chance", "blessed_reversal", "deep_wood", "harsh_justice", "scorching_winds"}:
         return ((),)
     if effect is None:
         return ()
@@ -391,14 +397,14 @@ def _legal_noncreature_spell_targets(
         for instance_id in player.battlefield:
             permanent = state.objects[instance_id]
             permanent_definition = card_repository.get(permanent.oracle_id)
-            if effect in {"destroy_target_land", "destroy_two_target_lands"}:
+            if effect in {"destroy_target_land", "destroy_two_target_lands", "fire_snake_death"}:
                 if permanent_definition.is_land:
-                    if effect == "destroy_target_land":
+                    if effect in {"destroy_target_land", "fire_snake_death"}:
                         legal_targets.append((instance_id,))
                     else:
                         land_target_ids.append(instance_id)
                 continue
-            if effect == "return_creature_to_hand_and_draw_one":
+            if effect in {"return_creature_to_hand_and_draw_one", "manowar_etb", "command_of_unsummoning"}:
                 if permanent_definition.is_creature:
                     legal_targets.append((instance_id,))
                 continue
@@ -416,21 +422,23 @@ def _legal_noncreature_spell_targets(
                 continue
             if not permanent_definition.is_creature:
                 continue
-            if effect in {"damage_any_target", "blaze"}:
+            if effect in {"damage_any_target", "blaze", "capricious_sorcerer"}:
                 legal_targets.append((instance_id,))
                 continue
-            if effect == "destroy_tapped_creature" and not permanent.tapped:
+            if effect in {"destroy_tapped_creature", "kings_assassin"} and not permanent.tapped:
                 continue
             if effect == "destroy_creature_owner_gains_4_life":
                 legal_targets.append((instance_id,))
                 continue
-            if effect in {"destroy_nonblack_creature", "wicked_pact"} and not permanent_definition.is_black:
+            if effect in {"destroy_nonblack_creature", "wicked_pact", "assassins_blade", "serpent_assassin_etb"} and not permanent_definition.is_black:
                 legal_targets.append((instance_id,))
                 continue
             if effect == "put_creature_on_top_of_library":
                 legal_targets.append((instance_id,))
                 continue
-            if effect == "destroy_tapped_creature":
+            if effect in {"destroy_tapped_creature", "kings_assassin"}:
+                legal_targets.append((instance_id,))
+            if effect in {"assassins_blade", "serpent_assassin_etb", "fire_imp_etb", "fire_dragon_etb", "defiant_stand", "stern_marshal", "seasoned_marshal_attack"}:
                 legal_targets.append((instance_id,))
     if effect == "wicked_pact":
         legal_targets = list(combinations(tuple(target_id[0] for target_id in legal_targets), 2))
@@ -462,7 +470,42 @@ def _supported_targeted_sorcery_effect(card_definition) -> str | None:
 
 
 def instant_timing_is_legal(state: GameState, card_definition, player_id: str) -> bool:
-    return card_definition.name == "Treetop Defense" and state.turn.step == "declare_attackers_step" and state.combat is not None and state.combat.defending_player == player_id and state.combat.was_attacked
+    attacked_player_instants = {
+        "Treetop Defense", "Assassin's Blade", "Blessed Reversal",
+        "Command of Unsummoning", "Deep Wood", "Defiant Stand",
+        "Harsh Justice", "Scorching Winds",
+    }
+    if card_definition.name in attacked_player_instants:
+        return state.turn.step == "declare_attackers_step" and state.combat is not None and state.combat.defending_player == player_id and state.combat.was_attacked
+    return card_definition.name == "Mystic Denial" and bool(state.stack_entries)
+
+
+def _enumerate_activated_abilities(state: GameState, card_repository: CardRepository) -> tuple[ActivateAbilityAction, ...]:
+    """The Wave 7 tap abilities are deliberately bounded and name-scoped."""
+    if state.turn.priority_player != state.turn.active_player or state.turn.step != "precombat_main_step":
+        return ()
+    player = state.players[state.turn.priority_player]
+    result: list[ActivateAbilityAction] = []
+    for source_id in player.battlefield:
+        source = state.objects[source_id]
+        definition = card_repository.get(source.oracle_id)
+        effect = effect_key_for(source.oracle_id)
+        if effect not in {"capricious_sorcerer", "kings_assassin", "stern_marshal"} or source.tapped or source.entered_battlefield_turn == state.turn.turn_number:
+            continue
+        targets: list[str] = []
+        for candidate_player in state.players:
+            if effect == "capricious_sorcerer":
+                targets.append(candidate_player)
+        for candidate in (obj_id for owner in state.players.values() for obj_id in owner.battlefield):
+            candidate_obj = state.objects[candidate]
+            candidate_definition = card_repository.get(candidate_obj.oracle_id)
+            if not candidate_definition.is_creature:
+                continue
+            if effect == "kings_assassin" and not candidate_obj.tapped:
+                continue
+            targets.append(candidate)
+        result.extend(ActivateAbilityAction(player.player_id, source_id, target_instance_id=target) for target in targets)
+    return tuple(result)
 
 
 def can_block_attacker(

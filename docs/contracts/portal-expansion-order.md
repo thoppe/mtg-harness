@@ -240,9 +240,43 @@ validation rather than introduce generic continuous effects.
 turn and a name-scoped loss at the beginning of that extra turn's end step.
 It must not be represented as generic triggered-ability or extra-turn support.
 
-### Wave 7: Triggers, activated abilities, instants, and prevention
+### Wave 7: Triggered abilities, activated abilities, instants, and prevention
 
-Reason: require a trigger/ability queue, response windows, prevention/replacement, or mandatory additional-cost model. Assassin's Blade, Blessed Reversal, Capricious Sorcerer, Charging Bandits, Charging Paladin, Command of Unsummoning, Deep Wood, Defiant Stand, Dread Reaper, Ebon Dragon, Endless Cockroaches, Fire Dragon, Fire Imp, Fire Snake, Gravedigger, Harsh Justice, Ingenious Thief, King's Assassin, Man-o'-War, Mercenary Knight, Mystic Denial, Noxious Toad, Owl Familiar, Pillaging Horde, Plant Elemental, Primeval Force, Scorching Winds, Seasoned Marshal, Serpent Assassin, Serpent Warrior, Spiritual Guardian, Stern Marshal, Thing from the Deep, Thundering Wurm, Thundermare, Undying Beast, Venerable Monk, Wood Elves.
+Wave 7 is dependency ordered under
+`docs/contracts/wave7-triggers-abilities-and-instants.md`. It extends the Alabaster
+Dragon precedent into registered trigger schemas, not generic card-text
+dispatch. Source artifacts alone do not make any of these cards supported.
+
+#### Wave 7A: Attacked-player instants and one-turn combat records
+
+Assassin's Blade, Blessed Reversal, Command of Unsummoning, Deep Wood,
+Defiant Stand, Harsh Justice, and Scorching Winds reuse the declared-attackers
+response window. They establish only their target, counted-life, prevention,
+retaliation, temporary-stat, and batch-damage effects.
+
+#### Wave 7B: Basic attack, ETB, and dies triggers
+
+Charging Bandits, Charging Paladin, Dread Reaper, Ebon Dragon, Endless
+Cockroaches, Fire Dragon, Fire Imp, Fire Snake, Gravedigger, Ingenious Thief,
+Man-o'-War, Noxious Toad, Serpent Assassin, Serpent Warrior, Spiritual
+Guardian, Thundermare, Undying Beast, Venerable Monk, and Wood Elves establish
+the registered attack/enters/dies trigger dispatcher and their name-scoped
+effects. Use APNAP placement and explicit source/event snapshots.
+
+#### Wave 7C: Trigger-resolution choices and mandatory “unless” costs
+
+Mercenary Knight, Owl Familiar, Pillaging Horde, Plant Elemental, Primeval
+Force, Thing from the Deep, and Thundering Wurm add bounded resolution-time
+discard, random-discard, and permanent-sacrifice choices. An unpayable or
+declined mandatory “unless” payment sacrifices the source; this is not a
+generic additional-cost framework.
+
+#### Wave 7D: Tap abilities and creature-or-sorcery countering
+
+Capricious Sorcerer, King's Assassin, and Stern Marshal use one bounded
+pre-attack tap-ability action path. Mystic Denial introduces the narrow
+creature-or-sorcery stack target and counter operation. Neither subwave implies
+general activated abilities or counterspell support.
 
 ## Deliberate Deferrals
 

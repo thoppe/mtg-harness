@@ -36,6 +36,11 @@ Define the minimum append-only event types required for deterministic replay and
 - `spell_countered_on_resolution`
 - `triggered_ability_put_on_stack`
 - `triggered_ability_resolved`
+- `trigger_order_requested`
+- `activated_ability_activated`
+- `activated_ability_resolved`
+- `damage_prevented`
+- `spell_countered`
 - `choice_requested`
 - `choice_resolved`
 - `cards_revealed`
@@ -63,9 +68,10 @@ Define the minimum append-only event types required for deterministic replay and
 
 ## v0 Simplifications
 
-- The initial slice has two event types only for Alabaster Dragon's
-  name-scoped death trigger. It does not otherwise provide a generic triggered
-  ability event family, replacement effects, or continuous-effect recalculation.
+- The initial slice provides registered trigger and activated-ability event
+  families only for the named Wave 7 cards and Alabaster Dragon. It does not
+  otherwise provide arbitrary trigger dispatch, replacement effects, or
+  continuous-effect recalculation.
 - The first slice may use a single zone-movement event type rather than highly specialized movement events.
 - The currently implemented event log covers setup, first-turn step progression, drawing, explicit action windows for precombat main and combat declarations, two-player priority passing for supported spells and Alabaster Dragon's bounded trigger, land play, five-basic-land mana production, simple creature spell resolution, the declared sorcery families, minimal combat and spell damage/state-based destruction, shared combat-legality checks for the supported `Defender`, `Flying`, `Reach`, `Swampwalk`, `Forestwalk`, `Islandwalk`, and `Vigilance` cards, and printed-color target filtering limited to `Hand of Death`'s nonblack-creature restriction. A spell whose only required targets are illegal when it resolves emits `spell_countered_on_resolution` and moves to its graveyard.
 - The current SBA path emits `state_based_actions_checked` even when no permanents are destroyed.
@@ -92,6 +98,10 @@ Define the minimum append-only event types required for deterministic replay and
   consumption, skipped combat, queued extra-turn identity, and Last Chance's
   terminal end-step outcome. They may not infer any of those facts from
   implicit control flow.
+- Wave 7 event payloads must preserve source/event snapshots, APNAP ordering,
+  activation costs, target choices, expected graveyard identities, countered
+  stack-object identity, and prevention/retaliation application without
+  exposing nonrevealed hand or library identities.
 
 ## Related Contracts
 

@@ -2,8 +2,9 @@
 
 ## Purpose
 
-Define the minimum stack lifecycle needed for rules-faithful, deterministic spell
-resolution, plus the one bounded triggered ability required by Alabaster Dragon.
+Define the minimum stack lifecycle needed for rules-faithful, deterministic
+spell resolution, plus explicitly registered Wave 7 trigger and activated-
+ability entries.
 
 ## Required Lifecycle
 
@@ -13,17 +14,21 @@ resolution, plus the one bounded triggered ability required by Alabaster Dragon.
    turn order.
 3. When every player passes with a nonempty stack, the top object resolves.
 4. When every player passes with an empty stack, the current step may advance.
-5. When Alabaster Dragon (`2392a41a-59d3-4749-be94-4d9df0af9c4c`) dies, its
-   death trigger is created and put onto the stack after the destruction or
-   state-based-action operation completes. It is a stack entry, not a card
-   moved to the stack.
-6. That entry resolves through the same two-player priority cycle as a spell.
+5. When a registered source event occurs, its trigger is created after the
+   current spell, ability, or state-based-action operation completes. Pending
+   triggers are put on the stack in active-player, then nonactive-player
+   order; an individual player orders that player's simultaneous triggers by
+   an explicit decision. A trigger is a stack entry, not a card moved to the
+   stack.
+6. A supported activated nonmana ability pays its printed tap cost at
+   activation, becomes a stack entry, and resolves through the same two-player
+   priority cycle as a spell.
 
 ## Current Scope
 
 - Two players only.
-- Creature spells and the declared name-scoped sorcery implementations may use
-  this lifecycle.
+- Creature spells, declared name-scoped noncreature implementations, and
+  registered Wave 7 ability entries may use this lifecycle.
 - Mana abilities resolve outside the stack.
 - The declared attackers step opens a priority window when an instant is
   available. The current narrow instant predicate is Treetop Defense: only
@@ -36,11 +41,10 @@ resolution, plus the one bounded triggered ability required by Alabaster Dragon.
 - Target legality is rechecked at resolution. A spell whose required targets are
   all illegal on resolution emits `spell_countered_on_resolution`, does not
   apply its effect, and moves to its normal destination.
-- The Alabaster entry captures its source controller, owner, last-known
-  battlefield identity, and the newly created graveyard identity. On resolution
-  it shuffles that card instance into its owner's library only if that same
-  graveyard object still exists; otherwise the entry resolves with no shuffle
-  effect.
+- A trigger entry captures source controller, owner, last-known source
+  identity, event snapshots, and declared targets independently from later
+  changes. A source-specific effect that needs a new graveyard object captures
+  that expected identity and has no effect if it changed zones.
 
 ## State Requirements
 
@@ -57,9 +61,8 @@ resolution, plus the one bounded triggered ability required by Alabaster Dragon.
 
 ## Non-Goals
 
-- Activated nonmana abilities, triggered abilities other than Alabaster
-  Dragon's name-scoped death trigger, copies, split second, and multiplayer
-  priority ordering remain separate increments.
+- Copies, split second, multiplayer priority ordering, arbitrary activated or
+  triggered ability text, and countering abilities remain separate increments.
 
 ## Related Contracts
 

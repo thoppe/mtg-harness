@@ -15,6 +15,28 @@ class ActivateManaAbilityAction:
     source_instance_id: str
 
 
+@dataclass(frozen=True, init=False)
+class ActivateAbilityAction:
+    """Activate one of the deliberately supported permanent abilities.
+
+    The source and targets are declared while paying the cost, so the stack
+    entry has the same target-identity behaviour as a spell.
+    """
+
+    player_id: str
+    source_instance_id: str
+    target_instance_ids: tuple[str, ...] = field(default_factory=tuple)
+
+    def __init__(self, player_id: str, source_instance_id: str,
+                 target_instance_id: str | None = None,
+                 target_instance_ids: tuple[str, ...] | None = None) -> None:
+        if target_instance_id is not None and target_instance_ids is not None:
+            raise ValueError("use target_instance_id or target_instance_ids, not both")
+        object.__setattr__(self, "player_id", player_id)
+        object.__setattr__(self, "source_instance_id", source_instance_id)
+        object.__setattr__(self, "target_instance_ids", tuple(target_instance_ids or (() if target_instance_id is None else (target_instance_id,))))
+
+
 @dataclass(frozen=True)
 class CastCreatureSpellAction:
     player_id: str

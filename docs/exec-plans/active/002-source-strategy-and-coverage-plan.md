@@ -65,6 +65,12 @@ The simulator should only claim support based on layer 3, never merely because l
   dependency-ordered contract for ten X/damage, multi-target, sacrifice,
   next-turn, and extra-turn cards; it is not active support until coverage,
   implementation, and tests land together.
+- Wave 6 is now active through its ten promoted X/damage, allocation,
+  sacrifice-value, next-turn, and Last Chance cards. Wave 7 has a
+  dependency-ordered contract for thirty-eight attacked-player instants,
+  registered attack/ETB/dies triggers, trigger-resolution choices, activated
+  nonmana abilities, and Mystic Denial's narrow counter predicate; it is not
+  active support until coverage, implementation, and tests land together.
 
 ## Workstreams
 
@@ -172,8 +178,8 @@ Prefer links to canonical manifests over duplicated card lists. If a copied list
 ## Resume Here
 
 The next session should continue from the manifest-backed slice after the
-completed Wave 5 hidden-zone batch, using Wave 6's dependency-ordered
-contracts rather than promoting its raw sources as a group.
+completed Wave 6 batch, using Wave 7's dependency-ordered contracts rather
+than promoting its raw sources as a group.
 
 1. Treat the active support-slice manifest as the only playable card-universe
    declaration; source artifacts alone do not imply support.
@@ -192,7 +198,8 @@ contracts rather than promoting its raw sources as a group.
 5. Before each implementation subwave, update source artifacts, manifest,
    coverage, rules envelope, registry, and edge-case tests together; before
    finishing, run the card-expansion freshness check above.
-6. Start Wave 6A only with Blaze, Earthquake, and Forked Lightning, then
-   advance through Wave 6B–6D in `docs/contracts/portal-expansion-order.md`.
-   Preserve `docs/contracts/wave6-damage-and-turn-effects.md` as the authority
-   for allocation, target, marker, queue, and terminal-outcome behavior.
+6. Start Wave 7A only with the attacked-player instants, then advance through
+   Wave 7B–7D in `docs/contracts/portal-expansion-order.md`. Preserve
+   `docs/contracts/wave7-triggers-abilities-and-instants.md` as the authority
+   for registered trigger, source-snapshot, choice, activation, prevention,
+   and counter behavior.

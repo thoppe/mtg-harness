@@ -45,6 +45,11 @@ Define the core state boundaries for simulation.
 - `turn_queue`: the normal next-player turn plus an optional name-scoped queued
   extra turn; Wave 6 permits only Last Chance's one caster-owned queued turn
   and its terminal end-step marker
+- `pending_triggers`: serializable registered Wave 7 trigger records awaiting
+  APNAP placement, each with source/event snapshots and any required expected
+  zone identity
+- `turn_damage_effects`: current-turn, caster-bound Wave 7 prevention and
+  retaliation records; they expire at cleanup
 
 ## v0 State Rules
 
@@ -56,6 +61,9 @@ Define the core state boundaries for simulation.
   decision action may progress the game until it is consumed.
 - The first slice may omit counters, attachments, and status markers not required by the active support slice.
 - Damage marked on creatures must be represented explicitly rather than inferred only from event history.
+- Trigger records and activated-ability stack entries must be explicit state;
+  replay cannot infer their targets, source snapshots, or ordering from later
+  zone contents.
 - A player at zero or less life, or attempting to draw from an empty library,
   completes the game and emits a `game_ended` event with a deterministic reason.
 

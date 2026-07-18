@@ -30,6 +30,7 @@ Contracts define the interfaces and invariants that future code must satisfy.
 - `deterministic-rng-and-shuffle.md`
 - `wave5-hidden-zone-expansion.md`
 - `wave6-damage-and-turn-effects.md`
+- `wave7-triggers-abilities-and-instants.md`
 - `surface-api.md`
 
 ## Contract Rule

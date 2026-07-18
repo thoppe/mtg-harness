@@ -38,6 +38,10 @@ declared by `docs/coverage/slices/portal.initial.yaml`.
 - Wave 6 effects only when the named cards are promoted with the bounded X,
   divided-damage, sacrifice-value, next-turn-marker, and Last Chance
   contracts in `docs/contracts/wave6-damage-and-turn-effects.md`
+- Wave 7 effects only when the named cards are promoted with the bounded
+  registered-trigger, activated-nonmana, attacked-player-instant, prevention,
+  and narrow counterspell contracts in
+  `docs/contracts/wave7-triggers-abilities-and-instants.md`
 - Flying-only blocker restriction limited to `Cloud Dragon`, `Cloud Pirates`,
   and `Cloud Spirit`
 - Alabaster Dragon's name-scoped death trigger: after it dies, put its trigger
@@ -143,19 +147,25 @@ declared by `docs/coverage/slices/portal.initial.yaml`.
   Final Strike captures its sacrifice's power while casting; next-turn
   restrictions are consumable state markers; and Last Chance alone queues an
   extra turn and loses at that turn's end step.
+- Wave 7 may add only the name-scoped subwaves in
+  `docs/contracts/portal-expansion-order.md` and
+  `docs/contracts/wave7-triggers-abilities-and-instants.md`. Its trigger
+  dispatch is limited to registered source/event pairs, trigger ordering is
+  explicit APNAP state, activated tap abilities are pre-attack and
+  creature-bound, and prevention/retaliation records expire at cleanup.
 
 ## Out Of Scope
 
 - Keyword abilities beyond those declared by the active manifest and bounded
   contracts
-- Triggered abilities other than Alabaster Dragon's explicitly bounded death
-  trigger
+- Triggered abilities other than Alabaster Dragon's and the Wave 7 registered
+  source/event schemas
 - Generic library shuffle effects and triggered-ability queue behavior beyond
-  Alabaster Dragon
+  the declared Wave 5 and Wave 7 scopes
 - Generic hidden-information viewing, arbitrary search predicates, generic
   additional costs, generic X costs, and generic simultaneous-choice handling
 - Generic divided-target allocation, arbitrary additional sacrifice costs,
-  prevention, damage redirection, planeswalkers, generic next-turn effects,
+  prevention beyond the named Wave 7 records, damage redirection, planeswalkers, generic next-turn effects,
   generic delayed triggers, and arbitrary extra-turn scheduling
 - Replacement effects
 - Continuous effects beyond the object-bound additive and keyword-granting
