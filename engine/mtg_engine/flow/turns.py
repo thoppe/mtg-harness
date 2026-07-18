@@ -622,9 +622,9 @@ def _resolve_noncreature_spell(
         resolved_state, damage_events = _damage_creatures_once(casting_state, card_repository, targets, damage, action.player_id)
         for damage_event in damage_events:
             event_log.append(event_type=damage_event["event_type"], active_player=damage_event["active_player"], payload=damage_event["payload"])
-    elif effect in {"damage_all_creatures_and_players_1", "damage_all_creatures_and_players_6"}:
-        damage = 1 if effect.endswith("_1") else 6
-        targets = _battlefield_permanents_matching(casting_state, card_repository, predicate=lambda definition: definition.is_creature)
+    elif effect in {"damage_all_creatures_and_players_1", "damage_all_creatures_and_players_6", "damage_all_flying_creatures_and_players_x"}:
+        damage = action.chosen_x if effect.endswith("_x") else (1 if effect.endswith("_1") else 6)
+        targets = _battlefield_permanents_matching(casting_state, card_repository, predicate=lambda definition: definition.is_creature and (effect != "damage_all_flying_creatures_and_players_x" or definition.has_flying))
         resolved_state, events = _damage_creatures_once(casting_state, card_repository, targets, damage, action.player_id, check_sbas=False)
         for player_id, player in resolved_state.players.items():
             updated = replace(player, life_total=player.life_total - damage)
@@ -1176,7 +1176,7 @@ def _require_legal_noncreature_target(
     *,
     effect: str,
 ) -> None:
-    if effect in {"draw_two_cards", "gain_4_life", "destroy_all_lands", "destroy_all_creatures", "destroy_all_green_creatures", "destroy_all_white_creatures", "destroy_all_islands", "destroy_all_plains", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures", "damage_all_creatures_2", "damage_all_flying_creatures_4", "damage_all_creatures_and_players_1", "damage_all_creatures_and_players_6"}:
+    if effect in {"draw_two_cards", "gain_4_life", "destroy_all_lands", "destroy_all_creatures", "destroy_all_green_creatures", "destroy_all_white_creatures", "destroy_all_islands", "destroy_all_plains", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures", "damage_all_creatures_2", "damage_all_flying_creatures_4", "damage_all_creatures_and_players_1", "damage_all_creatures_and_players_6", "damage_all_flying_creatures_and_players_x"}:
         if target_instance_ids:
             raise ValueError("sorcery does not take a target")
         return

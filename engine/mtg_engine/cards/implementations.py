@@ -51,6 +51,7 @@ IMPLEMENTATIONS = {
     "c281f436-8c77-48f7-b31c-d40cd7f9ed6a": "destroy_all_plains",
     "980a9957-6b52-45c6-b847-f84974d5a653": "damage_all_creatures_and_players_1",
     "ede6a352-52de-4ae0-816f-50140033dedf": "damage_all_creatures_and_players_6",
+    "9c021685-4017-49c7-9f58-2ae0243361a0": "damage_all_flying_creatures_and_players_x",
 }
 
 
