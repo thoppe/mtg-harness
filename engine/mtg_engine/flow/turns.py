@@ -663,6 +663,10 @@ def _resolve_noncreature_spell(
             replace(player, land_play_limit_this_turn=player.land_play_limit_this_turn + 3),
         )
         event_log.append(event_type="land_play_allowance_changed", active_player=action.player_id, payload={"player_id": action.player_id, "land_play_limit_this_turn": player.land_play_limit_this_turn + 3})
+    elif effect == "all_able_creatures_block_target_this_turn":
+        target = resolved_state.objects[action.target_instance_id]
+        resolved_state = replace(resolved_state, forced_block_target_object_id=target.object_id)
+        event_log.append(event_type="combat_requirement_created", active_player=action.player_id, payload={"target_object_id": target.object_id, "requirement": "all_able_creatures_block"})
     elif effect == "target_creature_gets_4_power_until_end_of_turn":
         target = resolved_state.objects[action.target_instance_id]
         resolved_state = update_object(resolved_state, replace(target, temporary_power_bonus=target.temporary_power_bonus + 4))
@@ -1018,6 +1022,14 @@ def declare_attackers(
             raise ValueError(rejection_reason)
 
     next_state = tap_attackers(state, action.attacker_ids)
+    forced_target = state.forced_block_target_object_id
+    if forced_target is not None:
+        target_id = next((instance_id for instance_id in state.combat.attackers if state.objects[instance_id].object_id == forced_target), None)
+        if target_id is not None:
+            for blocker_id in state.players[action.player_id].battlefield:
+                if blocker_id not in assigned_blockers and blocker_attack_rejection_reason(state=state, card_repository=card_repository, blocker_id=blocker_id, attacker_id=target_id) is None:
+                    raise ValueError("creature able to block the required target must do so")
+
     next_state = with_combat_state(
         next_state,
         attacking_player=action.player_id,
@@ -1417,7 +1429,7 @@ def _require_legal_noncreature_target(
         target = state.objects[target_instance_id]; definition = card_repository.get(target.oracle_id)
         if target.zone != "battlefield" or not definition.is_creature or definition.is_black: raise ValueError("target must be nonblack creature")
         return
-    if effect in {"target_creature_gets_4_power_until_end_of_turn", "target_creature_gets_4_4_until_end_of_turn", "target_creature_gets_2_power_and_takes_2", "damage_target_creature_per_mountain"}:
+    if effect in {"target_creature_gets_4_power_until_end_of_turn", "target_creature_gets_4_4_until_end_of_turn", "target_creature_gets_2_power_and_takes_2", "damage_target_creature_per_mountain", "all_able_creatures_block_target_this_turn"}:
         if target_instance_id not in state.objects: raise ValueError("target must exist")
         target = state.objects[target_instance_id]
         if target.zone != "battlefield" or not card_repository.get(target.oracle_id).is_creature: raise ValueError("target must be a creature")
@@ -1698,7 +1710,7 @@ def _cleanup_end_of_turn_state(state: GameState) -> GameState:
         instance_id: replace(card, damage_marked=0, temporary_power_bonus=0, temporary_toughness_bonus=0)
         for instance_id, card in state.objects.items()
     }
-    return replace(state, players=updated_players, objects=updated_objects)
+    return replace(state, players=updated_players, objects=updated_objects, forced_block_target_object_id=None)
 
 
 def _untap_player_battlefield(state: GameState, player_id: str) -> GameState:

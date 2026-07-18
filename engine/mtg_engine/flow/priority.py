@@ -214,7 +214,14 @@ def _blocker_assignments(
 
     def build(index: int, current: dict[str, tuple[str, ...]]) -> None:
         if index == len(blockers):
-            assignments.append({attacker_id: current[attacker_id] for attacker_id in attackers if current[attacker_id]})
+            assignment = {attacker_id: current[attacker_id] for attacker_id in attackers if current[attacker_id]}
+            forced_target = state.forced_block_target_object_id
+            target_id = next((instance_id for instance_id in attackers if state.objects[instance_id].object_id == forced_target), None)
+            if target_id is not None:
+                for blocker_id in blockers:
+                    if blocker_attack_rejection_reason(state=state, card_repository=card_repository, blocker_id=blocker_id, attacker_id=target_id) is None and blocker_id not in assignment.get(target_id, ()):
+                        return
+            assignments.append(assignment)
             return
 
         blocker_id = blockers[index]

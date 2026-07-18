@@ -62,6 +62,7 @@ IMPLEMENTATIONS = {
     "90f54959-2c9b-4b8a-84c9-d6893eb43553": "tutor_sorcery_to_top",
     "935e0cac-51ee-4cb7-a209-f085e0f099ed": "tutor_creature_to_top",
     "e5df4597-1647-4ac2-bdb3-a517598d1431": "additional_three_land_plays",
+    "ad218276-a44b-4a61-8e42-26a27929bbbb": "all_able_creatures_block_target_this_turn",
 }
 
 

@@ -92,3 +92,4 @@ class GameState:
     outcome: GameOutcome = GameOutcome()
     pending_decision: PendingDecision | None = None
     rng_cursor: int = 0
+    forced_block_target_object_id: str | None = None
