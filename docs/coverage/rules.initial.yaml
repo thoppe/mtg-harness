@@ -5,6 +5,8 @@ status_values:
   - deferred
   - not_started
 rules:
+  - {rule_key: targeted_player_life_gain_sorceries_minimal, source_rules: ["115", "608"], status: implemented, scope: "Natural Spring targets one player and grants 8 life.", engine_contracts: [docs/contracts/portal-sorcery-expansion-wave.md], tests: [engine/tests/test_spells.py], notes: "Name-scoped."}
+  - {rule_key: creature_or_land_destruction_sorceries_minimal, source_rules: ["115", "608", "701.7"], status: implemented, scope: "Lava Flow destroys one target creature or land.", engine_contracts: [docs/contracts/portal-sorcery-expansion-wave.md], tests: [engine/tests/test_spells.py], notes: "Name-scoped."}
   - rule_key: game_setup_minimal
     source_rules:
       - "103"

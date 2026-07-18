@@ -358,6 +358,7 @@ def _resolve_noncreature_spell(
         "destroy_creature_owner_gains_4_life",
         "destroy_nonblack_creature",
         "destroy_target_land",
+        "destroy_target_creature_or_land",
     }:
         if action.target_instance_id is None:
             raise ValueError("targeted sorcery requires a target")
@@ -412,6 +413,11 @@ def _resolve_noncreature_spell(
                 "life_total": updated_player.life_total,
             },
         )
+    elif effect == "target_player_gains_8_life":
+        target_player = resolved_state.players[action.target_instance_id]
+        updated_player = replace(target_player, life_total=target_player.life_total + 8)
+        resolved_state = update_player(resolved_state, updated_player)
+        event_log.append(event_type="life_total_changed", active_player=action.player_id, payload={"player_id": action.target_instance_id, "life_total": updated_player.life_total})
     elif effect == "put_creature_on_top_of_library":
         if action.target_instance_id is None:
             raise ValueError("targeted sorcery requires a target")
@@ -506,7 +512,7 @@ def _resolve_noncreature_spell(
             active_player=action.player_id,
             reason=f"spell_effect:{card_definition.name}",
         )
-    elif effect in {"damage_any_target", "damage_target_player"}:
+    elif effect in {"damage_any_target", "damage_target_player", "damage_any_target_1", "damage_any_target_2"}:
         resolved_state, damage_events = _resolve_direct_damage_sorcery(
             casting_state,
             card_repository,
@@ -1144,6 +1150,10 @@ def _require_legal_noncreature_target(
         if target_instance_id not in state.players:
             raise ValueError("target must be a player")
         return
+    if effect == "target_player_gains_8_life":
+        if target_instance_id not in state.players:
+            raise ValueError("target must be a player")
+        return
     if effect == "target_player_discards_two":
         if target_instance_id not in state.players:
             raise ValueError("target must be a player")
@@ -1164,6 +1174,16 @@ def _require_legal_noncreature_target(
         if not target_definition.is_land:
             raise ValueError("target must be a land")
         return
+    if effect == "destroy_target_creature_or_land":
+        if target_instance_id not in state.objects:
+            raise ValueError("target must exist")
+        target = state.objects[target_instance_id]
+        if target.zone != "battlefield":
+            raise ValueError("target must be on the battlefield")
+        definition = card_repository.get(target.oracle_id)
+        if not (definition.is_creature or definition.is_land):
+            raise ValueError("target must be a creature or land")
+        return
     if effect == "return_creature_to_hand_and_draw_one":
         if target_instance_id not in state.objects:
             raise ValueError("target must exist")
@@ -1174,7 +1194,7 @@ def _require_legal_noncreature_target(
         if not target_definition.is_creature:
             raise ValueError("target must be a creature")
         return
-    if effect == "damage_any_target":
+    if effect in {"damage_any_target", "damage_any_target_1", "damage_any_target_2"}:
         if target_instance_id in state.players:
             return
         if target_instance_id not in state.objects:
@@ -1278,12 +1298,12 @@ def _resolve_direct_damage_sorcery(
     if target_id is None:
         raise ValueError("targeted sorcery requires a target")
 
-    damage_amount = 3 if effect == "damage_any_target" else 5
+    damage_amount = {"damage_any_target": 3, "damage_target_player": 5, "damage_any_target_1": 1, "damage_any_target_2": 2}[effect]
     if target_id in state.players:
         target_player = state.players[target_id]
         updated_player = replace(target_player, life_total=target_player.life_total - damage_amount)
         next_state = update_player(state, updated_player)
-        return next_state, [
+        events = [
             {
                 "event_type": "damage_applied",
                 "active_player": active_player,
@@ -1301,6 +1321,9 @@ def _resolve_direct_damage_sorcery(
                 },
             },
         ]
+        next_state, sba_events = apply_state_based_actions(next_state, card_repository, active_player=active_player)
+        events.extend(sba_events)
+        return next_state, events
 
     target = state.objects[target_id]
     target_definition = card_repository.get(target.oracle_id)

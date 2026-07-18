@@ -1,0 +1,141 @@
+{
+  "artifact_type": "scryfall_card_snapshot",
+  "canonical_card_id": "f7571a2e-aaf3-4148-ab76-2a2e35273c70",
+  "name": "Natural Spring",
+  "provenance": {
+    "collector_number": "176",
+    "fetched_at": "2026-07-18T00:18:08Z",
+    "image_uri_normal": "https://cards.scryfall.io/normal/front/8/d/8ddfc1cc-5c13-443c-a0ae-0bcc931923e7.jpg?1783946804",
+    "oracle_id": "f7571a2e-aaf3-4148-ab76-2a2e35273c70",
+    "request_url": "https://api.scryfall.com/cards/search?q=%28set%3Apor%20%28oracleid%3Af7571a2e-aaf3-4148-ab76-2a2e35273c70%29%29",
+    "requested_set_code": "por",
+    "scryfall_id": "8ddfc1cc-5c13-443c-a0ae-0bcc931923e7",
+    "set_code": "por",
+    "source_name": "scryfall_api",
+    "source_url": "https://api.scryfall.com/cards/8ddfc1cc-5c13-443c-a0ae-0bcc931923e7"
+  },
+  "schema_version": 1,
+  "source_record": {
+    "artist": "Janine Johnston",
+    "artist_ids": [
+      "51648844-a0be-41e3-ba7b-66e8da88bd57"
+    ],
+    "booster": true,
+    "border_color": "black",
+    "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+    "cardmarket_id": 10087,
+    "cmc": 5.0,
+    "collector_number": "176",
+    "color_identity": [
+      "G"
+    ],
+    "colors": [
+      "G"
+    ],
+    "digital": false,
+    "edhrec_rank": 27287,
+    "finishes": [
+      "nonfoil"
+    ],
+    "flavor_text": "Though many have come to this place to wash their wounds, the water has never turned red.",
+    "foil": false,
+    "frame": "1997",
+    "full_art": false,
+    "game_changer": false,
+    "games": [
+      "paper"
+    ],
+    "highres_image": true,
+    "id": "8ddfc1cc-5c13-443c-a0ae-0bcc931923e7",
+    "illustration_id": "f20871b2-9dd8-42b0-bed0-c062b879b66d",
+    "image_status": "highres_scan",
+    "image_updated_at": "2026-07-13T12:46:44Z",
+    "image_uris": {
+      "art_crop": "https://cards.scryfall.io/art_crop/front/8/d/8ddfc1cc-5c13-443c-a0ae-0bcc931923e7.jpg?1783946804",
+      "border_crop": "https://cards.scryfall.io/border_crop/front/8/d/8ddfc1cc-5c13-443c-a0ae-0bcc931923e7.jpg?1783946804",
+      "large": "https://cards.scryfall.io/large/front/8/d/8ddfc1cc-5c13-443c-a0ae-0bcc931923e7.jpg?1783946804",
+      "normal": "https://cards.scryfall.io/normal/front/8/d/8ddfc1cc-5c13-443c-a0ae-0bcc931923e7.jpg?1783946804",
+      "png": "https://cards.scryfall.io/png/front/8/d/8ddfc1cc-5c13-443c-a0ae-0bcc931923e7.png?1783946804",
+      "small": "https://cards.scryfall.io/small/front/8/d/8ddfc1cc-5c13-443c-a0ae-0bcc931923e7.jpg?1783946804"
+    },
+    "keywords": [],
+    "lang": "en",
+    "layout": "normal",
+    "legalities": {
+      "alchemy": "not_legal",
+      "brawl": "not_legal",
+      "commander": "legal",
+      "competitivebrawl": "not_legal",
+      "duel": "legal",
+      "future": "not_legal",
+      "gladiator": "not_legal",
+      "historic": "not_legal",
+      "legacy": "legal",
+      "modern": "legal",
+      "oathbreaker": "legal",
+      "oldschool": "not_legal",
+      "pauper": "legal",
+      "paupercommander": "legal",
+      "penny": "legal",
+      "pioneer": "not_legal",
+      "predh": "legal",
+      "premodern": "legal",
+      "standard": "not_legal",
+      "standardbrawl": "not_legal",
+      "timeless": "not_legal",
+      "tlr": "not_legal",
+      "vintage": "legal"
+    },
+    "mana_cost": "{3}{G}{G}",
+    "multiverse_ids": [
+      4308
+    ],
+    "name": "Natural Spring",
+    "nonfoil": true,
+    "object": "card",
+    "oracle_id": "f7571a2e-aaf3-4148-ab76-2a2e35273c70",
+    "oracle_text": "Target player gains 8 life.",
+    "oversized": false,
+    "penny_rank": 17213,
+    "prices": {
+      "eur": "0.28",
+      "eur_foil": null,
+      "tix": null,
+      "usd": "0.20",
+      "usd_etched": null,
+      "usd_foil": null
+    },
+    "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3Af7571a2e-aaf3-4148-ab76-2a2e35273c70&unique=prints",
+    "promo": false,
+    "purchase_uris": {
+      "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Natural+Spring&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall",
+      "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=10087&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+      "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F731%3Fpage%3D1"
+    },
+    "rarity": "uncommon",
+    "related_uris": {
+      "edhrec": "https://edhrec.com/route/?cc=Natural+Spring",
+      "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=4308&printed=false",
+      "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DNatural%2BSpring",
+      "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DNatural%2BSpring"
+    },
+    "released_at": "1997-05-01",
+    "reprint": false,
+    "reserved": false,
+    "rulings_uri": "https://api.scryfall.com/cards/8ddfc1cc-5c13-443c-a0ae-0bcc931923e7/rulings",
+    "scryfall_set_uri": "https://scryfall.com/sets/por?utm_source=api",
+    "scryfall_uri": "https://scryfall.com/card/por/176/natural-spring?utm_source=api",
+    "set": "por",
+    "set_id": "478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "set_name": "Portal",
+    "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Apor&unique=prints",
+    "set_type": "starter",
+    "set_uri": "https://api.scryfall.com/sets/478c47df-5058-4ce6-830e-7e80732b2ca9",
+    "story_spotlight": false,
+    "tcgplayer_id": 731,
+    "textless": false,
+    "type_line": "Sorcery",
+    "uri": "https://api.scryfall.com/cards/8ddfc1cc-5c13-443c-a0ae-0bcc931923e7",
+    "variation": false
+  }
+}

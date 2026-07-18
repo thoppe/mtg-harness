@@ -28,6 +28,12 @@ IMPLEMENTATIONS = {
     "c9ed8b01-959a-47d6-891e-0abbdccf6e4f": "destroy_all_lands",
     "34515b16-c9a4-4f98-8c77-416a7a523407": "destroy_all_creatures",
     "e2048201-6dc9-4cf5-916f-1d867ae8dbdd": "destroy_all_creatures_target_opponent_you_lose_2_per_creature",
+    "72cecab3-519e-4a23-9623-b423a5c5a251": "destroy_target_land",
+    "6e880df6-fc00-43d2-a9c8-f575f40b78c6": "destroy_target_land",
+    "9342fbb8-ab35-4895-946d-951ba6a2b067": "damage_any_target_1",
+    "f637d525-2f29-488a-9269-8e5aa377fbb7": "damage_any_target_2",
+    "f7571a2e-aaf3-4148-ab76-2a2e35273c70": "target_player_gains_8_life",
+    "91c0a76e-3992-437f-b85a-97b0b4adbb84": "destroy_target_creature_or_land",
 }
 
 
