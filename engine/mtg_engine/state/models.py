@@ -15,6 +15,7 @@ class CardInstance:
     entered_battlefield_turn: int | None = None
     damage_marked: int = 0
     temporary_power_bonus: int = 0
+    temporary_toughness_bonus: int = 0
 
     @property
     def object_id(self) -> str:

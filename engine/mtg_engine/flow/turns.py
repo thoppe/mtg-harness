@@ -1465,7 +1465,7 @@ def _cleanup_end_of_turn_state(state: GameState) -> GameState:
         for player_id, player in state.players.items()
     }
     updated_objects = {
-        instance_id: replace(card, damage_marked=0, temporary_power_bonus=0)
+        instance_id: replace(card, damage_marked=0, temporary_power_bonus=0, temporary_toughness_bonus=0)
         for instance_id, card in state.objects.items()
     }
     return replace(state, players=updated_players, objects=updated_objects)

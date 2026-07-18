@@ -60,3 +60,9 @@ class PortalExpansionWaveTests(unittest.TestCase):
         self.assertEqual(_cleanup_end_of_turn_state(boosted).objects["alice:1"].temporary_power_bonus, 0)
         moved = move_object(boosted, instance_id="alice:1", from_zone="battlefield", to_zone="graveyard", player_id="alice")
         self.assertEqual(moved.objects["alice:1"].temporary_power_bonus, 0)
+
+    def test_temporary_toughness_bonus_also_expires_and_resets(self) -> None:
+        state = move_object(self.state, instance_id="alice:1", from_zone="hand", to_zone="battlefield", player_id="alice")
+        boosted = replace(state, objects={**state.objects, "alice:1": replace(state.objects["alice:1"], temporary_toughness_bonus=4)})
+        self.assertEqual(_cleanup_end_of_turn_state(boosted).objects["alice:1"].temporary_toughness_bonus, 0)
+        self.assertEqual(move_object(boosted, instance_id="alice:1", from_zone="battlefield", to_zone="graveyard", player_id="alice").objects["alice:1"].temporary_toughness_bonus, 0)

@@ -54,6 +54,7 @@ def move_object(
         entered_battlefield_turn=entered_turn,
         damage_marked=0,
         temporary_power_bonus=0,
+        temporary_toughness_bonus=0,
     )
     return update_object(state, updated_object)
 
@@ -89,6 +90,7 @@ def move_object_to_top_of_library(
         entered_battlefield_turn=None,
         damage_marked=0,
         temporary_power_bonus=0,
+        temporary_toughness_bonus=0,
     )
     return update_object(state, updated_object)
 

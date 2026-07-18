@@ -30,8 +30,8 @@ Define the core state boundaries for simulation.
 - `mana_pools`: at minimum the five basic colors needed for the current active support slice
 - `rng_state`: deterministic seed and any derived RNG cursor state
 - `damage_marks`: creature damage marked on objects until cleared by later turn handling
-- `temporary_power_modifiers`: explicit, turn-bounded combat-stat changes on
-  objects when a supported card grants them
+- `temporary_power_modifiers`: explicit, turn-bounded power and toughness
+  changes on objects when a supported card grants them
 - `outcome`: in-progress or completed game status, winner/loser IDs, and terminal reason
 
 ## v0 State Rules
