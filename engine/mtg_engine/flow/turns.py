@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 
+import random
+
 import re
 
 from mtg_engine.actions.models import (
@@ -13,12 +15,13 @@ from mtg_engine.actions.models import (
     DeclareBlockersAction,
     PassPriorityAction,
     PlayLandAction,
+    ResolveChoiceAction,
 )
 from mtg_engine.actions.validation import require_active_player, require_step
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.cards.implementations import effect_key_for
 from mtg_engine.events.log import EventLog
-from mtg_engine.state.models import GameOutcome, GameState, StackEntry, TurnState
+from mtg_engine.state.models import GameOutcome, GameState, PendingDecision, StackEntry, TurnState
 from mtg_engine.state.zones import move_object, move_object_to_top_of_library, update_object, update_player, zone_change_identity_payload
 from mtg_engine.rules.combat import apply_combat_damage, apply_state_based_actions, tap_attackers, with_combat_state
 
@@ -630,6 +633,29 @@ def _resolve_noncreature_spell(
         total = player.life_total + 4
         resolved_state = update_player(resolved_state, replace(player, life_total=total))
         event_log.append(event_type="life_total_changed", active_player=action.player_id, payload={"player_id": action.player_id, "life_total": total})
+    elif effect in {"tutor_sorcery_to_top", "tutor_creature_to_top"}:
+        selected_card_type = "sorcery" if effect == "tutor_sorcery_to_top" else "creature"
+        options = tuple(
+            instance_id
+            for instance_id in resolved_state.players[action.player_id].library
+            if getattr(card_repository.get(resolved_state.objects[instance_id].oracle_id), f"is_{selected_card_type}")
+        )
+        resolved_state = replace(
+            resolved_state,
+            pending_decision=PendingDecision(
+                decision_id=f"{card.object_id}:tutor",
+                chooser_id=action.player_id,
+                kind="tutor_to_top_after_shuffle",
+                source_object_id=card.object_id,
+                option_ids=options,
+                selected_card_type=selected_card_type,
+            ),
+        )
+        event_log.append(
+            event_type="choice_requested",
+            active_player=action.player_id,
+            payload={"decision_id": f"{card.object_id}:tutor", "chooser_id": action.player_id, "kind": "tutor_to_top_after_shuffle", "option_count": len(options)},
+        )
     elif effect == "target_creature_gets_4_power_until_end_of_turn":
         target = resolved_state.objects[action.target_instance_id]
         resolved_state = update_object(resolved_state, replace(target, temporary_power_bonus=target.temporary_power_bonus + 4))
@@ -735,6 +761,44 @@ def _resolve_noncreature_spell(
         },
     )
     return TurnResult(state=resolved_state, event_log=event_log.events)
+
+
+def resolve_pending_choice(
+    session: TurnResult,
+    action: ResolveChoiceAction,
+    card_repository: CardRepository,
+) -> TurnResult:
+    state = session.state
+    decision = state.pending_decision
+    if decision is None:
+        raise ValueError("no pending decision")
+    if action.player_id != decision.chooser_id or action.decision_id != decision.decision_id:
+        raise ValueError("choice does not match pending decision")
+    if action.selected_instance_id is not None and action.selected_instance_id not in decision.option_ids:
+        raise ValueError("selected card is not a legal option")
+    if action.selected_instance_id is None and decision.option_ids:
+        raise ValueError("a matching card must be selected")
+
+    player = state.players[action.player_id]
+    if action.selected_instance_id is not None:
+        selected = state.objects[action.selected_instance_id]
+        definition = card_repository.get(selected.oracle_id)
+        if selected.zone != "library" or not getattr(definition, f"is_{decision.selected_card_type}"):
+            raise ValueError("selected card is no longer a legal option")
+    shuffled = list(player.library)
+    random.Random(state.rng_seed + state.rng_cursor).shuffle(shuffled)
+    if action.selected_instance_id is not None:
+        shuffled.remove(action.selected_instance_id)
+        shuffled.insert(0, action.selected_instance_id)
+    next_state = update_player(state, replace(player, library=tuple(shuffled)))
+    next_state = replace(next_state, pending_decision=None, rng_cursor=state.rng_cursor + 1)
+    event_log = EventLog.from_events(state.game_id, session.event_log)
+    if action.selected_instance_id is not None:
+        selected = state.objects[action.selected_instance_id]
+        event_log.append(event_type="card_revealed", active_player=action.player_id, payload={"player_id": action.player_id, "card_instance_id": action.selected_instance_id, "oracle_id": selected.oracle_id, "reason": "tutor"})
+    event_log.append(event_type="choice_resolved", active_player=action.player_id, payload={"decision_id": decision.decision_id, "selected_instance_id": action.selected_instance_id})
+    event_log.append(event_type="library_shuffled", active_player=action.player_id, payload={"player_id": action.player_id, "algorithm": "python_random_mt19937_v1", "rng_cursor_before": state.rng_cursor, "rng_cursor_after": next_state.rng_cursor, "count": len(shuffled)})
+    return TurnResult(state=next_state, event_log=event_log.events)
 
 
 def _put_spell_on_stack(
@@ -1257,7 +1321,7 @@ def _require_legal_noncreature_target(
     *,
     effect: str,
 ) -> None:
-    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "destroy_all_lands", "destroy_all_creatures", "destroy_all_green_creatures", "destroy_all_white_creatures", "destroy_all_islands", "destroy_all_plains", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures", "damage_all_creatures_2", "damage_all_flying_creatures_4", "damage_all_creatures_and_players_1", "damage_all_creatures_and_players_6", "damage_all_flying_creatures_and_players_x"}:
+    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures", "destroy_all_green_creatures", "destroy_all_white_creatures", "destroy_all_islands", "destroy_all_plains", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures", "damage_all_creatures_2", "damage_all_flying_creatures_4", "damage_all_creatures_and_players_1", "damage_all_creatures_and_players_6", "damage_all_flying_creatures_and_players_x"}:
         if target_instance_ids:
             raise ValueError("sorcery does not take a target")
         return

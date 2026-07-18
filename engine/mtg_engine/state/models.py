@@ -60,6 +60,16 @@ class StackEntry:
 
 
 @dataclass(frozen=True)
+class PendingDecision:
+    decision_id: str
+    chooser_id: str
+    kind: str
+    source_object_id: str
+    option_ids: tuple[str, ...]
+    selected_card_type: str
+
+
+@dataclass(frozen=True)
 class GameOutcome:
     status: str = "in_progress"
     winner_id: str | None = None
@@ -79,3 +89,5 @@ class GameState:
     stack_entries: tuple[StackEntry, ...] = ()
     consecutive_passes: int = 0
     outcome: GameOutcome = GameOutcome()
+    pending_decision: PendingDecision | None = None
+    rng_cursor: int = 0

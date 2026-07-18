@@ -62,6 +62,13 @@ class PassPriorityAction:
 
 
 @dataclass(frozen=True)
+class ResolveChoiceAction:
+    player_id: str
+    decision_id: str
+    selected_instance_id: str | None
+
+
+@dataclass(frozen=True)
 class AdvanceStepAction:
     player_id: str
     to_step: str

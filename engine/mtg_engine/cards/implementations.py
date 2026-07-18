@@ -59,6 +59,8 @@ IMPLEMENTATIONS = {
     "1980ca2e-a415-4de1-ac30-7055507e82a2": "damage_any_target_4_gain_4",
     "30d9e200-b944-43ff-89b8-a550a788ae03": "return_target_creature_card_from_your_graveyard_to_battlefield",
     "7408b9c5-7266-4627-be4e-b691cf5c622c": "return_target_sorcery_card_from_your_graveyard",
+    "90f54959-2c9b-4b8a-84c9-d6893eb43553": "tutor_sorcery_to_top",
+    "935e0cac-51ee-4cb7-a209-f085e0f099ed": "tutor_creature_to_top",
 }
 
 

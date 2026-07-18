@@ -6,6 +6,7 @@ from .models import (
     DeclareAttackersAction,
     DeclareBlockersAction,
     PlayLandAction,
+    ResolveChoiceAction,
 )
 
 __all__ = [
@@ -14,4 +15,5 @@ __all__ = [
     "DeclareAttackersAction",
     "DeclareBlockersAction",
     "PlayLandAction",
+    "ResolveChoiceAction",
 ]

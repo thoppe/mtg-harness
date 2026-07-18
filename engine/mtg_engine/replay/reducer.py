@@ -13,6 +13,7 @@ from mtg_engine.actions.models import (
     DeclareBlockersAction,
     PassPriorityAction,
     PlayLandAction,
+    ResolveChoiceAction,
 )
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
@@ -26,6 +27,7 @@ from mtg_engine.flow.turns import (
     declare_blockers,
     pass_priority,
     play_land,
+    resolve_pending_choice,
     start_first_turn,
 )
 
@@ -38,6 +40,7 @@ AcceptedAction = (
     | AdvanceStepAction
     | DeclareAttackersAction
     | DeclareBlockersAction
+    | ResolveChoiceAction
 )
 
 
@@ -76,6 +79,8 @@ def replay(input: ReplayInput, card_repository: CardRepository) -> TurnResult:
             session = declare_attackers(session, action, card_repository)
         elif isinstance(action, DeclareBlockersAction):
             session = declare_blockers(session, action, card_repository)
+        elif isinstance(action, ResolveChoiceAction):
+            session = resolve_pending_choice(session, action, card_repository)
         else:
             raise ValueError(f"unsupported replay action: {type(action).__name__}")
 

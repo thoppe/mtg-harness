@@ -11,6 +11,7 @@ from mtg_engine.actions.models import (
     DeclareBlockersAction,
     PassPriorityAction,
     PlayLandAction,
+    ResolveChoiceAction,
 )
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.cards.implementations import effect_key_for
@@ -18,6 +19,21 @@ from mtg_engine.state.models import GameState
 
 
 def enumerate_legal_actions(state: GameState, card_repository: CardRepository) -> tuple[object, ...]:
+    if state.pending_decision is not None:
+        return tuple(
+            ResolveChoiceAction(
+                player_id=state.pending_decision.chooser_id,
+                decision_id=state.pending_decision.decision_id,
+                selected_instance_id=option_id,
+            )
+            for option_id in state.pending_decision.option_ids
+        ) + (
+            ResolveChoiceAction(
+                player_id=state.pending_decision.chooser_id,
+                decision_id=state.pending_decision.decision_id,
+                selected_instance_id=None,
+            ),
+        )
     if state.turn.step == "precombat_main_step":
         if state.stack_entries:
             return (PassPriorityAction(player_id=state.turn.priority_player),)
@@ -252,7 +268,7 @@ def _legal_noncreature_spell_targets(
     spell = state.objects[spell_instance_id]
     card_definition = card_repository.get(spell.oracle_id)
     effect = _supported_targeted_sorcery_effect(card_definition)
-    if effect in {"draw_two_cards", "gain_4_life", "destroy_all_lands", "destroy_all_creatures"}:
+    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "tutor_sorcery_to_top", "tutor_creature_to_top", "destroy_all_lands", "destroy_all_creatures"}:
         return ((),)
     if effect is None:
         return ()
