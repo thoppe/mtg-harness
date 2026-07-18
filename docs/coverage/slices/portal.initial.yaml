@@ -89,6 +89,8 @@ card_entries:
   - {set_code: por, oracle_id: "980a9957-6b52-45c6-b847-f84974d5a653"}
   - {set_code: por, oracle_id: "ede6a352-52de-4ae0-816f-50140033dedf"}
   - {set_code: por, oracle_id: "9c021685-4017-49c7-9f58-2ae0243361a0"}
+  - {set_code: por, oracle_id: "0c3bf4e1-d91e-4dd3-a800-e40971222c71"}
+  - {set_code: por, oracle_id: "5f3ef680-90f4-487f-b44b-db25e29e57ce"}
 card_keys:
   - "1ef5003c-f540-4cdc-913f-7d5280ad9f62"
   - "a768ba13-4d1c-4dce-a4a6-86a39c069c3f"
@@ -145,6 +147,8 @@ card_keys:
   - "980a9957-6b52-45c6-b847-f84974d5a653"
   - "ede6a352-52de-4ae0-816f-50140033dedf"
   - "9c021685-4017-49c7-9f58-2ae0243361a0"
+  - "0c3bf4e1-d91e-4dd3-a800-e40971222c71"
+  - "5f3ef680-90f4-487f-b44b-db25e29e57ce"
 rule_keys:
   - game_setup_minimal
   - turn_structure_minimal
@@ -174,6 +178,8 @@ rule_keys:
   - combat_minimal
   - zones_minimal
   - state_based_actions_minimal
+  - subtype_count_sorceries_minimal
+  - x_cost_sorceries_minimal
 source_artifacts:
   - information/cards/data/
   - information/cards/images/

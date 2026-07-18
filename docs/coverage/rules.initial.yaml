@@ -5,6 +5,8 @@ status_values:
   - deferred
   - not_started
 rules:
+  - {rule_key: subtype_count_sorceries_minimal, source_rules: ["608"], status: implemented, scope: "Spitting Earth counts controller Mountains; Fruition counts every Forest at resolution.", engine_contracts: [docs/contracts/portal-sorcery-expansion-wave.md], tests: [engine/tests/test_portal_expansion_wave.py], notes: "Name-scoped subtype counts."}
+  - {rule_key: x_cost_sorceries_minimal, source_rules: ["107.3", "601.2b", "608"], status: implemented, scope: "Hurricane preserves a nonnegative chosen X from cast through resolution.", engine_contracts: [docs/contracts/costs-and-x-values.md], tests: [engine/tests/test_portal_expansion_wave.py], notes: "Name-scoped X spell."}
   - {rule_key: mass_damage_players_minimal, source_rules: ["608", "704"], status: implemented, scope: "Dry Spell and Fire Tempest damage every creature and player before one SBA check.", engine_contracts: [docs/contracts/portal-sorcery-expansion-wave.md], tests: [engine/tests/test_portal_expansion_wave.py], notes: "Atomic packet."}
   - {rule_key: filtered_mass_destruction_minimal, source_rules: ["608", "701.7"], status: implemented, scope: "Color- and subtype-filtered permanent destruction.", engine_contracts: [docs/contracts/portal-sorcery-expansion-wave.md], tests: [engine/tests/test_spells.py], notes: "Name-scoped Portal effects."}
   - {rule_key: temporary_characteristics_minimal, source_rules: ["613", "704"], status: implemented, scope: "Burning Cloak and Monstrous Growth apply object-bound temporary P/T changes and cleanup expiry.", engine_contracts: [docs/contracts/characteristics-and-continuous-effects.md], tests: [engine/tests/test_portal_expansion_wave.py], notes: "Additive modifiers only."}

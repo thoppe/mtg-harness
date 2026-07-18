@@ -22,6 +22,10 @@ an implementation convenience, not a claim of general rules coverage.
   life; `Vampiric Touch` damages a target opponent and gains life.
 - Temporary modification: `Howling Fury` grants a target creature +4/+0 until
   cleanup of the current turn.
+- Subtype counts: `Spitting Earth` counts only Mountains its controller
+  controls at resolution; `Fruition` counts every Forest on the battlefield.
+- Chosen X: `Hurricane` preserves its cast-time X through the stack and
+  applies that amount to every player and each flying creature.
 
 ## Required Boundaries
 

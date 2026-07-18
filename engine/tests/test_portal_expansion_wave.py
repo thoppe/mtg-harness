@@ -9,13 +9,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
-from mtg_engine.flow.turns import _cleanup_end_of_turn_state, _damage_creatures_once, _require_legal_noncreature_target, _resolve_direct_damage_sorcery
+from mtg_engine.flow.turns import _battlefield_land_subtype_count, _cleanup_end_of_turn_state, _controlled_land_subtype_count, _damage_creatures_once, _require_legal_noncreature_target, _resolve_direct_damage_sorcery
 from mtg_engine.state.zones import move_object
 from mtg_engine.actions.models import CastNonCreatureSpellAction
 
 
 INFO = Path(__file__).resolve().parents[2] / "information"
 PLAINS = "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
+FOREST = "b34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6"
+MOUNTAIN = "a3fb7228-e76b-4e96-a40e-20b5fed75685"
 RAIN = "72cecab3-519e-4a23-9623-b423a5c5a251"
 LAVA_FLOW = "91c0a76e-3992-437f-b85a-97b0b4adbb84"
 MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
@@ -76,3 +78,30 @@ class PortalExpansionWaveTests(unittest.TestCase):
         self.assertEqual(CastNonCreatureSpellAction(player_id="alice", card_instance_id="alice:1", chosen_x=3).chosen_x, 3)
         with self.assertRaisesRegex(ValueError, "must not be negative"):
             CastNonCreatureSpellAction(player_id="alice", card_instance_id="alice:1", chosen_x=-1)
+
+    def test_spitting_earth_counts_only_its_controller_mountains_and_requires_a_creature(self) -> None:
+        state = initialize_game(
+            SetupInput("spitting", ("alice", "bob"), "alice", {"alice": (MOUNTAIN, MOUNTAIN), "bob": (MOUNTAIN, MUCK_RATS)}, {"alice": (MOUNTAIN, MOUNTAIN), "bob": (MOUNTAIN, MUCK_RATS)}, 3),
+            self.repo,
+        ).state
+        for instance_id in ("alice:1", "alice:2", "bob:1", "bob:2"):
+            owner_id = instance_id.split(":")[0]
+            state = move_object(state, instance_id=instance_id, from_zone="hand", to_zone="battlefield", player_id=owner_id)
+        self.assertEqual(_controlled_land_subtype_count(state, self.repo, "alice", "Mountain"), 2)
+        _require_legal_noncreature_target(state, self.repo, ("bob:2",), effect="damage_target_creature_per_mountain")
+        with self.assertRaisesRegex(ValueError, "target must be a creature"):
+            _require_legal_noncreature_target(state, self.repo, ("bob:1",), effect="damage_target_creature_per_mountain")
+        result, events = _resolve_direct_damage_sorcery(state, self.repo, "bob:2", effect="damage_target_creature_variable", active_player="alice", damage_override=2)
+        self.assertEqual(result.objects["bob:2"].zone, "graveyard")
+        self.assertIn("permanent_destroyed", [event["event_type"] for event in events])
+
+    def test_fruition_counts_forests_on_both_sides(self) -> None:
+        state = initialize_game(
+            SetupInput("fruition", ("alice", "bob"), "alice", {"alice": (FOREST,), "bob": (FOREST, FOREST)}, {"alice": (FOREST,), "bob": (FOREST, FOREST)}, 4),
+            self.repo,
+        ).state
+        for instance_id in ("alice:1", "bob:1", "bob:2"):
+            owner_id = instance_id.split(":")[0]
+            state = move_object(state, instance_id=instance_id, from_zone="hand", to_zone="battlefield", player_id=owner_id)
+        self.assertEqual(_battlefield_land_subtype_count(state, self.repo, "Forest"), 3)
+        _require_legal_noncreature_target(state, self.repo, (), effect="gain_life_per_forest")

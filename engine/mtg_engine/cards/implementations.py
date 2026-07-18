@@ -52,6 +52,8 @@ IMPLEMENTATIONS = {
     "980a9957-6b52-45c6-b847-f84974d5a653": "damage_all_creatures_and_players_1",
     "ede6a352-52de-4ae0-816f-50140033dedf": "damage_all_creatures_and_players_6",
     "9c021685-4017-49c7-9f58-2ae0243361a0": "damage_all_flying_creatures_and_players_x",
+    "0c3bf4e1-d91e-4dd3-a800-e40971222c71": "damage_target_creature_per_mountain",
+    "5f3ef680-90f4-487f-b44b-db25e29e57ce": "gain_life_per_forest",
 }
 
 

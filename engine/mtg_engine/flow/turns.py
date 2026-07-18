@@ -549,6 +549,23 @@ def _resolve_noncreature_spell(
         resolved_state, events = _resolve_direct_damage_sorcery(casting_state, card_repository, action.target_instance_id, effect="damage_target_opponent_2", active_player=action.player_id)
         for event in events: event_log.append(event_type=event["event_type"], active_player=event["active_player"], payload=event["payload"])
         player = resolved_state.players[action.player_id]; resolved_state = update_player(resolved_state, replace(player, life_total=player.life_total + 2)); event_log.append(event_type="life_total_changed", active_player=action.player_id, payload={"player_id": action.player_id, "life_total": player.life_total + 2})
+    elif effect == "damage_target_creature_per_mountain":
+        damage = _controlled_land_subtype_count(casting_state, card_repository, action.player_id, "Mountain")
+        resolved_state, events = _resolve_direct_damage_sorcery(
+            casting_state,
+            card_repository,
+            action.target_instance_id,
+            effect="damage_target_creature_variable",
+            active_player=action.player_id,
+            damage_override=damage,
+        )
+        for event in events: event_log.append(event_type=event["event_type"], active_player=event["active_player"], payload=event["payload"])
+    elif effect == "gain_life_per_forest":
+        player = resolved_state.players[action.player_id]
+        forest_count = _battlefield_land_subtype_count(resolved_state, card_repository, "Forest")
+        total = player.life_total + forest_count
+        resolved_state = update_player(resolved_state, replace(player, life_total=total))
+        event_log.append(event_type="life_total_changed", active_player=action.player_id, payload={"player_id": action.player_id, "life_total": total})
     elif effect == "target_creature_gets_4_power_until_end_of_turn":
         target = resolved_state.objects[action.target_instance_id]
         resolved_state = update_object(resolved_state, replace(target, temporary_power_bonus=target.temporary_power_bonus + 4))
@@ -1176,7 +1193,7 @@ def _require_legal_noncreature_target(
     *,
     effect: str,
 ) -> None:
-    if effect in {"draw_two_cards", "gain_4_life", "destroy_all_lands", "destroy_all_creatures", "destroy_all_green_creatures", "destroy_all_white_creatures", "destroy_all_islands", "destroy_all_plains", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures", "damage_all_creatures_2", "damage_all_flying_creatures_4", "damage_all_creatures_and_players_1", "damage_all_creatures_and_players_6", "damage_all_flying_creatures_and_players_x"}:
+    if effect in {"draw_two_cards", "gain_4_life", "gain_life_per_forest", "destroy_all_lands", "destroy_all_creatures", "destroy_all_green_creatures", "destroy_all_white_creatures", "destroy_all_islands", "destroy_all_plains", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures", "damage_all_creatures_2", "damage_all_flying_creatures_4", "damage_all_creatures_and_players_1", "damage_all_creatures_and_players_6", "damage_all_flying_creatures_and_players_x"}:
         if target_instance_ids:
             raise ValueError("sorcery does not take a target")
         return
@@ -1263,7 +1280,7 @@ def _require_legal_noncreature_target(
         target = state.objects[target_instance_id]; definition = card_repository.get(target.oracle_id)
         if target.zone != "battlefield" or not definition.is_creature or definition.is_black: raise ValueError("target must be nonblack creature")
         return
-    if effect in {"target_creature_gets_4_power_until_end_of_turn", "target_creature_gets_4_4_until_end_of_turn", "target_creature_gets_2_power_and_takes_2"}:
+    if effect in {"target_creature_gets_4_power_until_end_of_turn", "target_creature_gets_4_4_until_end_of_turn", "target_creature_gets_2_power_and_takes_2", "damage_target_creature_per_mountain"}:
         if target_instance_id not in state.objects: raise ValueError("target must exist")
         target = state.objects[target_instance_id]
         if target.zone != "battlefield" or not card_repository.get(target.oracle_id).is_creature: raise ValueError("target must be a creature")
@@ -1332,6 +1349,36 @@ def _battlefield_permanents_matching(
     return tuple(instance_ids)
 
 
+def _controlled_land_subtype_count(
+    state: GameState,
+    card_repository: CardRepository,
+    player_id: str,
+    subtype: str,
+) -> int:
+    return sum(
+        1
+        for instance_id in state.players[player_id].battlefield
+        if (
+            (definition := card_repository.get(state.objects[instance_id].oracle_id)).is_land
+            and definition.has_subtype(subtype)
+        )
+    )
+
+
+def _battlefield_land_subtype_count(
+    state: GameState,
+    card_repository: CardRepository,
+    subtype: str,
+) -> int:
+    return len(
+        _battlefield_permanents_matching(
+            state,
+            card_repository,
+            predicate=lambda definition: definition.is_land and definition.has_subtype(subtype),
+        )
+    )
+
+
 def _destroy_permanents(
     state: GameState,
     event_log: EventLog,
@@ -1387,11 +1434,19 @@ def _resolve_direct_damage_sorcery(
     *,
     effect: str,
     active_player: str,
+    damage_override: int | None = None,
 ) -> tuple[GameState, list[dict]]:
     if target_id is None:
         raise ValueError("targeted sorcery requires a target")
 
-    damage_amount = {"damage_any_target": 3, "damage_target_player": 5, "damage_any_target_1": 1, "damage_any_target_2": 2, "damage_nonblack_creature_3": 3, "damage_target_opponent_2": 2}[effect]
+    damage_amount = damage_override if damage_override is not None else {
+        "damage_any_target": 3,
+        "damage_target_player": 5,
+        "damage_any_target_1": 1,
+        "damage_any_target_2": 2,
+        "damage_nonblack_creature_3": 3,
+        "damage_target_opponent_2": 2,
+    }[effect]
     if target_id in state.players:
         target_player = state.players[target_id]
         updated_player = replace(target_player, life_total=target_player.life_total - damage_amount)

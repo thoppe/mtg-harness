@@ -34,7 +34,7 @@ class PullSourcesTests(unittest.TestCase):
 
         self.assertEqual(targets[0].set_code, "por")
         self.assertEqual(targets[0].oracle_id, "1ef5003c-f540-4cdc-913f-7d5280ad9f62")
-        self.assertEqual(targets[-1].oracle_id, "9c021685-4017-49c7-9f58-2ae0243361a0")
+        self.assertEqual(targets[-1].oracle_id, "5f3ef680-90f4-487f-b44b-db25e29e57ce")
         self.assertIn("c9ed8b01-959a-47d6-891e-0abbdccf6e4f", [target.oracle_id for target in targets])
         self.assertIn("e2048201-6dc9-4cf5-916f-1d867ae8dbdd", [target.oracle_id for target in targets])
         self.assertIn("b7593cf8-4dcb-473b-a2ef-180fffe66738", [target.oracle_id for target in targets])
