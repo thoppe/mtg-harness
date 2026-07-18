@@ -45,6 +45,10 @@ IMPLEMENTATIONS = {
     "eda60752-d225-4fd0-9f0f-9b99e321b8fa": "target_creature_gets_4_power_until_end_of_turn",
     "4527c622-cebe-41eb-9178-4895cccffe99": "target_creature_gets_2_power_and_takes_2",
     "35a05836-38d7-45c7-ac9a-996a682c2129": "target_creature_gets_4_4_until_end_of_turn",
+    "d119ca9a-ee82-42c2-81e6-684205ca5183": "destroy_all_green_creatures",
+    "fc070e97-73ac-4028-9432-ff2012f2e778": "destroy_all_white_creatures",
+    "7421b711-81a4-4042-b024-f55bf9ff203f": "destroy_all_islands",
+    "c281f436-8c77-48f7-b31c-d40cd7f9ed6a": "destroy_all_plains",
 }
 
 

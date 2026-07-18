@@ -25,6 +25,9 @@ class CardDefinition:
     def is_creature(self) -> bool:
         return "Creature" in self.type_line
 
+    def has_subtype(self, subtype: str) -> bool:
+        return subtype in self.type_line.split("—")[-1].split()
+
     @property
     def is_sorcery(self) -> bool:
         return "Sorcery" in self.type_line

@@ -5,6 +5,7 @@ status_values:
   - deferred
   - not_started
 rules:
+  - {rule_key: filtered_mass_destruction_minimal, source_rules: ["608", "701.7"], status: implemented, scope: "Color- and subtype-filtered permanent destruction.", engine_contracts: [docs/contracts/portal-sorcery-expansion-wave.md], tests: [engine/tests/test_spells.py], notes: "Name-scoped Portal effects."}
   - {rule_key: temporary_characteristics_minimal, source_rules: ["613", "704"], status: implemented, scope: "Burning Cloak and Monstrous Growth apply object-bound temporary P/T changes and cleanup expiry.", engine_contracts: [docs/contracts/characteristics-and-continuous-effects.md], tests: [engine/tests/test_portal_expansion_wave.py], notes: "Additive modifiers only."}
   - {rule_key: combined_damage_life_sorceries_minimal, source_rules: ["115", "608", "704"], status: implemented, scope: "Soul Shred and Vampiric Touch combine legal damage targets with caster life gain.", engine_contracts: [docs/contracts/portal-sorcery-expansion-wave.md], tests: [engine/tests/test_portal_expansion_wave.py], notes: "Name-scoped."}
   - {rule_key: temporary_power_sorceries_minimal, source_rules: ["611"], status: implemented, scope: "Howling Fury grants +4 power through cleanup or zone change.", engine_contracts: [docs/contracts/portal-sorcery-expansion-wave.md], tests: [engine/tests/test_portal_expansion_wave.py], notes: "Name-scoped."}

@@ -516,6 +516,15 @@ def _resolve_noncreature_spell(
             active_player=action.player_id,
             reason=f"spell_effect:{card_definition.name}",
         )
+    elif effect in {"destroy_all_green_creatures", "destroy_all_white_creatures", "destroy_all_islands", "destroy_all_plains"}:
+        if effect in {"destroy_all_green_creatures", "destroy_all_white_creatures"}:
+            color = "G" if effect == "destroy_all_green_creatures" else "W"
+            predicate = lambda definition: definition.is_creature and definition.has_color(color)
+        else:
+            subtype = "Island" if effect == "destroy_all_islands" else "Plains"
+            predicate = lambda definition: definition.is_land and definition.has_subtype(subtype)
+        ids = _battlefield_permanents_matching(casting_state, card_repository, predicate=predicate)
+        resolved_state, _ = _destroy_permanents(casting_state, event_log, instance_ids=ids, active_player=action.player_id, reason=f"spell_effect:{card_definition.name}")
     elif effect in {"damage_any_target", "damage_target_player", "damage_any_target_1", "damage_any_target_2"}:
         resolved_state, damage_events = _resolve_direct_damage_sorcery(
             casting_state,
@@ -1150,7 +1159,7 @@ def _require_legal_noncreature_target(
     *,
     effect: str,
 ) -> None:
-    if effect in {"draw_two_cards", "gain_4_life", "destroy_all_lands", "destroy_all_creatures", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures", "damage_all_creatures_2", "damage_all_flying_creatures_4"}:
+    if effect in {"draw_two_cards", "gain_4_life", "destroy_all_lands", "destroy_all_creatures", "destroy_all_green_creatures", "destroy_all_white_creatures", "destroy_all_islands", "destroy_all_plains", "untap_all_creatures_you_control", "tap_all_nonwhite_creatures", "damage_all_creatures_2", "damage_all_flying_creatures_4"}:
         if target_instance_ids:
             raise ValueError("sorcery does not take a target")
         return
