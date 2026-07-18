@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 import unittest
 from pathlib import Path
 import sys
@@ -8,8 +9,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
-from mtg_engine.actions.models import ActivateManaAbilityAction, CastNonCreatureSpellAction
-from mtg_engine.flow.turns import activate_mana_ability, cast_noncreature_spell, start_first_turn
+from mtg_engine.actions.models import ActivateManaAbilityAction, CastNonCreatureSpellAction, PassPriorityAction
+from mtg_engine.flow.turns import activate_mana_ability, cast_noncreature_spell as _cast_noncreature_spell, pass_priority, start_first_turn
 from mtg_engine.state.zones import move_object
 
 
@@ -34,6 +35,25 @@ RAIN_OF_SALT = "1219e330-01ac-405a-b75a-dd4298598167"
 SACRED_NECTAR = "30870ee5-6ad7-48a9-983e-d3b018f2344f"
 WRATH_OF_GOD = "34515b16-c9a4-4f98-8c77-416a7a523407"
 RAIN_OF_DAGGERS = "e2048201-6dc9-4cf5-916f-1d867ae8dbdd"
+
+
+def cast_noncreature_spell(session, action, repository):
+    """Resolve a spell after both players pass, preserving a concise trace fixture."""
+    stacked = _cast_noncreature_spell(session, action, repository)
+    after_controller_pass = pass_priority(
+        stacked,
+        PassPriorityAction(player_id=action.player_id),
+        repository,
+    )
+    resolved = pass_priority(
+        after_controller_pass,
+        PassPriorityAction(player_id=after_controller_pass.state.turn.priority_player),
+        repository,
+    )
+    return replace(
+        resolved,
+        event_log=tuple(event for event in resolved.event_log if event.event_type != "priority_passed"),
+    )
 
 
 class ReplayLogTests(unittest.TestCase):

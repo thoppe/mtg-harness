@@ -52,7 +52,7 @@ Define the minimum legal progression points for the first deterministic engine s
 
 ## v0 Simplifications
 
-- The first slice currently enumerates `precombat_main_step`, `declare_attackers_step`, and `declare_blockers_step` actions for the currently relevant player and still auto-resolves unsupported priority branches outside those windows.
+- The first slice currently enumerates `precombat_main_step`, `declare_attackers_step`, and `declare_blockers_step` actions for the currently relevant player. While the stack is nonempty, the sole legal v0 action is for the current priority player to pass; two consecutive passes resolve its top entry.
 - The first slice may limit stack interactions to creature spells, a narrow sorcery-speed noncreature spell path, and mana abilities required by the declared five basic lands.
 - The first slice may model combat with a single combat-damage checkpoint rather than broader combat variants.
 - The currently implemented turn flow reaches cleanup, emits `turn_ended`, and can hand off into the next active player's precombat main.

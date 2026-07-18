@@ -19,6 +19,8 @@ from mtg_engine.state.models import GameState
 
 def enumerate_legal_actions(state: GameState, card_repository: CardRepository) -> tuple[object, ...]:
     if state.turn.step == "precombat_main_step":
+        if state.stack_entries:
+            return (PassPriorityAction(player_id=state.turn.priority_player),)
         if state.turn.priority_player != state.turn.active_player:
             return _enumerate_non_active_priority_actions(state)
         return _enumerate_active_precombat_main_actions(state, card_repository)
@@ -114,7 +116,10 @@ def _enumerate_active_precombat_main_actions(
 
 
 def _enumerate_non_active_priority_actions(state: GameState) -> tuple[object, ...]:
-    return ()
+    # The v0 slice has no instant-speed spells or abilities yet, but the
+    # non-active player must still be able to pass so that a spell can leave
+    # the stack after both players pass consecutively.
+    return (PassPriorityAction(player_id=state.turn.priority_player),)
 
 
 def _enumerate_declare_attackers_actions(

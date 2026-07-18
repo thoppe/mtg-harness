@@ -18,7 +18,7 @@ from mtg_engine.actions.validation import require_active_player, require_step
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.cards.implementations import effect_key_for
 from mtg_engine.events.log import EventLog
-from mtg_engine.state.models import GameOutcome, GameState, TurnState
+from mtg_engine.state.models import GameOutcome, GameState, StackEntry, TurnState
 from mtg_engine.state.zones import move_object, move_object_to_top_of_library, update_object, update_player
 from mtg_engine.rules.combat import apply_combat_damage, apply_state_based_actions, tap_attackers, with_combat_state
 
@@ -235,34 +235,12 @@ def cast_creature_spell(
         },
     )
 
-    resolved_state = move_object(
+    stacked_state = _put_spell_on_stack(
         casting_state,
-        instance_id=action.card_instance_id,
-        from_zone="stack",
-        to_zone="battlefield",
-        player_id=action.player_id,
+        card_instance_id=action.card_instance_id,
+        controller_id=action.player_id,
     )
-    event_log.append(
-        event_type="spell_resolved",
-        active_player=action.player_id,
-        payload={
-            "player_id": action.player_id,
-            "card_instance_id": action.card_instance_id,
-            "oracle_id": card.oracle_id,
-        },
-    )
-    event_log.append(
-        event_type="object_moved_between_zones",
-        active_player=action.player_id,
-        payload={
-            "player_id": action.player_id,
-            "card_instance_id": action.card_instance_id,
-            "oracle_id": card.oracle_id,
-            "from_zone": "stack",
-            "to_zone": "battlefield",
-        },
-    )
-    return TurnResult(state=resolved_state, event_log=event_log.events)
+    return TurnResult(state=stacked_state, event_log=event_log.events)
 
 
 def cast_noncreature_spell(
@@ -329,14 +307,46 @@ def cast_noncreature_spell(
             "to_zone": "stack",
         },
     )
+    stacked_state = _put_spell_on_stack(
+        casting_state,
+        card_instance_id=action.card_instance_id,
+        controller_id=action.player_id,
+        target_ids=action.target_instance_ids,
+    )
+    return TurnResult(state=stacked_state, event_log=event_log.events)
+
+
+def _resolve_noncreature_spell(
+    session: TurnResult,
+    entry: StackEntry,
+    card_repository: CardRepository,
+) -> TurnResult:
+    """Apply an already-cast sorcery's effect.
+
+    Casting and resolution deliberately use separate transitions: target
+    declarations live in the StackEntry until priority passes complete.
+    """
+    state = session.state
+    card = state.objects[entry.card_instance_id]
+    card_definition = card_repository.get(card.oracle_id)
+    effect = _supported_targeted_sorcery_effect(card_definition)
+    if effect is None:
+        raise ValueError("unsupported noncreature spell in v0")
+    action = CastNonCreatureSpellAction(
+        player_id=entry.controller_id,
+        card_instance_id=entry.card_instance_id,
+        target_instance_ids=entry.target_ids,
+    )
+    casting_state = state
+    event_log = EventLog.from_events(state.game_id, session.event_log)
     event_log.append(
         event_type="spell_resolved",
-        active_player=action.player_id,
+        active_player=entry.controller_id,
         payload={
-            "player_id": action.player_id,
-            "card_instance_id": action.card_instance_id,
+            "player_id": entry.controller_id,
+            "card_instance_id": entry.card_instance_id,
             "oracle_id": card.oracle_id,
-            "target_instance_ids": list(action.target_instance_ids),
+            "target_instance_ids": list(entry.target_ids),
         },
     )
     resolved_state = casting_state
@@ -566,6 +576,101 @@ def cast_noncreature_spell(
     return TurnResult(state=resolved_state, event_log=event_log.events)
 
 
+def _put_spell_on_stack(
+    state: GameState,
+    *,
+    card_instance_id: str,
+    controller_id: str,
+    target_ids: tuple[str, ...] = (),
+) -> GameState:
+    """Record a cast spell and retain priority for its controller."""
+    return replace(
+        state,
+        stack_entries=state.stack_entries
+        + (StackEntry(card_instance_id=card_instance_id, controller_id=controller_id, target_ids=target_ids),),
+        turn=replace(state.turn, priority_player=controller_id),
+        consecutive_passes=0,
+    )
+
+
+def _resolve_top_stack_entry(session: TurnResult, card_repository: CardRepository) -> TurnResult:
+    state = session.state
+    entry = state.stack_entries[-1]
+    spell = state.objects[entry.card_instance_id]
+    definition = card_repository.get(spell.oracle_id)
+    event_log = EventLog.from_events(state.game_id, session.event_log)
+
+    if definition.is_creature:
+        resolved_state = move_object(
+            state,
+            instance_id=entry.card_instance_id,
+            from_zone="stack",
+            to_zone="battlefield",
+            player_id=entry.controller_id,
+        )
+        event_log.append(
+            event_type="spell_resolved",
+            active_player=entry.controller_id,
+            payload={"player_id": entry.controller_id, "card_instance_id": entry.card_instance_id, "oracle_id": spell.oracle_id},
+        )
+        event_log.append(
+            event_type="object_moved_between_zones",
+            active_player=entry.controller_id,
+            payload={"player_id": entry.controller_id, "card_instance_id": entry.card_instance_id, "oracle_id": spell.oracle_id, "from_zone": "stack", "to_zone": "battlefield"},
+        )
+        result = TurnResult(state=resolved_state, event_log=event_log.events)
+    elif _stack_entry_targets_are_legal(state, entry, card_repository):
+        result = _resolve_noncreature_spell(
+            TurnResult(state=state, event_log=event_log.events), entry, card_repository
+        )
+    else:
+        countered_state = move_object(
+            state,
+            instance_id=entry.card_instance_id,
+            from_zone="stack",
+            to_zone="graveyard",
+            player_id=entry.controller_id,
+        )
+        event_log.append(
+            event_type="spell_countered_on_resolution",
+            active_player=entry.controller_id,
+            payload={"player_id": entry.controller_id, "card_instance_id": entry.card_instance_id, "oracle_id": spell.oracle_id, "target_instance_ids": list(entry.target_ids)},
+        )
+        event_log.append(
+            event_type="object_moved_between_zones",
+            active_player=entry.controller_id,
+            payload={"player_id": entry.controller_id, "card_instance_id": entry.card_instance_id, "oracle_id": spell.oracle_id, "from_zone": "stack", "to_zone": "graveyard"},
+        )
+        result = TurnResult(state=countered_state, event_log=event_log.events)
+
+    # The active player receives priority after a spell resolves or fizzles.
+    final_state = replace(
+        result.state,
+        stack_entries=result.state.stack_entries[:-1],
+        consecutive_passes=0,
+        turn=replace(result.state.turn, priority_player=result.state.turn.active_player),
+    )
+    return TurnResult(state=final_state, event_log=result.event_log)
+
+
+def _stack_entry_targets_are_legal(
+    state: GameState,
+    entry: StackEntry,
+    card_repository: CardRepository,
+) -> bool:
+    if not entry.target_ids:
+        return True
+    definition = card_repository.get(state.objects[entry.card_instance_id].oracle_id)
+    effect = _supported_targeted_sorcery_effect(definition)
+    if effect is None:
+        return False
+    try:
+        _require_legal_noncreature_target(state, card_repository, entry.target_ids, effect=effect)
+    except ValueError:
+        return False
+    return True
+
+
 def advance_step(session: TurnResult | GameBootstrap, action: AdvanceStepAction) -> TurnResult:
     state = session.state
     require_active_player(state, action.player_id)
@@ -599,9 +704,21 @@ def pass_priority(
         },
     )
 
-    passed_state = replace(state, turn=replace(state.turn, priority_player=next_priority_player))
+    passed_state = replace(
+        state,
+        turn=replace(state.turn, priority_player=next_priority_player),
+        consecutive_passes=state.consecutive_passes + 1,
+    )
+    if state.stack_entries:
+        if passed_state.consecutive_passes < 2:
+            return TurnResult(state=passed_state, event_log=event_log.events)
+        return _resolve_top_stack_entry(
+            TurnResult(state=passed_state, event_log=event_log.events),
+            card_repository,
+        )
+
     opposing_actions = enumerate_legal_actions(passed_state, card_repository)
-    if opposing_actions:
+    if any(not isinstance(candidate, PassPriorityAction) for candidate in opposing_actions):
         return TurnResult(state=passed_state, event_log=event_log.events)
 
     event_log.append(
@@ -613,7 +730,11 @@ def pass_priority(
             "to_player": state.turn.active_player,
         },
     )
-    restored_state = replace(passed_state, turn=replace(passed_state.turn, priority_player=state.turn.active_player))
+    restored_state = replace(
+        passed_state,
+        turn=replace(passed_state.turn, priority_player=state.turn.active_player),
+        consecutive_passes=0,
+    )
     return advance_to_begin_combat(TurnResult(state=restored_state, event_log=event_log.events))
 
 

@@ -229,6 +229,14 @@ class TurnTests(unittest.TestCase):
             repository,
         )
 
+        self.assertEqual(result.state.stack, ("alice:5",))
+        self.assertEqual(result.state.stack_entries[0].target_ids, ())
+        self.assertEqual(result.state.turn.priority_player, "alice")
+        result = pass_priority(result, PassPriorityAction(player_id="alice"), repository)
+        self.assertEqual(result.state.turn.priority_player, "bob")
+        self.assertEqual(result.state.consecutive_passes, 1)
+        result = pass_priority(result, PassPriorityAction(player_id="bob"), repository)
+
         self.assertEqual(result.state.players["alice"].hand, ("alice:6", "alice:7"))
         self.assertEqual(result.state.players["alice"].library, ("alice:8",))
         move_events = [event for event in result.event_log if event.event_type == "object_moved_between_zones"]
@@ -368,11 +376,14 @@ def _cast_creature_from_normal_turns(session, repository: CardRepository, player
             repository,
         )
 
-    return cast_creature_spell(
+    current_session = cast_creature_spell(
         current_session,
         CastCreatureSpellAction(player_id=player_id, card_instance_id=creature_id),
         repository,
     )
+    current_session = pass_priority(current_session, PassPriorityAction(player_id=player_id), repository)
+    opponent_id = "bob" if player_id == "alice" else "alice"
+    return pass_priority(current_session, PassPriorityAction(player_id=opponent_id), repository)
 
 
 def _select_land_ids_for_spell(session, repository: CardRepository, land_ids: list[str], creature_id: str) -> list[str]:

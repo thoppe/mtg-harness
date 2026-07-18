@@ -22,7 +22,7 @@ from mtg_engine.flow.turns import (
     activate_mana_ability,
     advance_to_cleanup,
     cast_creature_spell,
-    cast_noncreature_spell,
+    cast_noncreature_spell as _cast_noncreature_spell,
     declare_attackers,
     declare_blockers,
     pass_priority,
@@ -66,6 +66,27 @@ ANACONDA = "3eff03f1-2c5f-4c59-b465-a8c4cd05e1ba"
 WALL_OF_GRANITE = "8445094f-008b-491a-977c-e8582d5ab72c"
 WRATH_OF_GOD = "34515b16-c9a4-4f98-8c77-416a7a523407"
 RAIN_OF_DAGGERS = "e2048201-6dc9-4cf5-916f-1d867ae8dbdd"
+
+
+def cast_noncreature_spell(session, action, repository):
+    """Resolve a noncreature spell after both players pass priority in test setups."""
+    stacked = _cast_noncreature_spell(session, action, repository)
+    after_controller_pass = pass_priority(
+        stacked,
+        PassPriorityAction(player_id=action.player_id),
+        repository,
+    )
+    resolved = pass_priority(
+        after_controller_pass,
+        PassPriorityAction(player_id=after_controller_pass.state.turn.priority_player),
+        repository,
+    )
+    # Existing effect assertions focus on the spell trace; the dedicated stack
+    # test below owns the two priority-pass assertions.
+    return replace(
+        resolved,
+        event_log=tuple(event for event in resolved.event_log if event.event_type != "priority_passed"),
+    )
 
 
 class SpellTests(unittest.TestCase):
@@ -351,6 +372,48 @@ class SpellTests(unittest.TestCase):
                 repository,
             )
 
+    def test_targeted_spell_is_countered_when_its_only_target_is_gone_on_resolution(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_hand_of_death_session(repository)
+        for source_instance_id in session.state.players["alice"].battlefield:
+            session = activate_mana_ability(
+                session,
+                ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+                repository,
+            )
+
+        stacked = _cast_noncreature_spell(
+            session,
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:4",
+                target_instance_id="bob:1",
+            ),
+            repository,
+        )
+        target_gone_state = move_object(
+            stacked.state,
+            instance_id="bob:1",
+            from_zone="battlefield",
+            to_zone="graveyard",
+            player_id="bob",
+        )
+        after_controller_pass = pass_priority(
+            replace(stacked, state=target_gone_state),
+            PassPriorityAction(player_id="alice"),
+            repository,
+        )
+        result = pass_priority(
+            after_controller_pass,
+            PassPriorityAction(player_id="bob"),
+            repository,
+        )
+
+        self.assertEqual(result.state.players["alice"].graveyard, ("alice:4",))
+        self.assertEqual(result.state.players["bob"].graveyard, ("bob:1",))
+        self.assertNotIn("spell_resolved", [event.event_type for event in result.event_log[-4:]])
+        self.assertEqual(result.event_log[-2].event_type, "spell_countered_on_resolution")
+
     def test_cast_touch_of_brilliance_draws_two_cards_and_moves_spell_to_graveyard(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         session = _build_touch_of_brilliance_session(repository)
@@ -362,13 +425,26 @@ class SpellTests(unittest.TestCase):
                 repository,
             )
 
-        result = cast_noncreature_spell(
+        stacked = _cast_noncreature_spell(
             session,
             CastNonCreatureSpellAction(
                 player_id="alice",
                 card_instance_id="alice:5",
                 target_instance_id=None,
             ),
+            repository,
+        )
+
+        self.assertEqual(stacked.state.stack, ("alice:5",))
+        self.assertEqual(stacked.state.turn.priority_player, "alice")
+        after_controller_pass = pass_priority(
+            stacked,
+            PassPriorityAction(player_id="alice"),
+            repository,
+        )
+        result = pass_priority(
+            after_controller_pass,
+            PassPriorityAction(player_id="bob"),
             repository,
         )
 
@@ -379,7 +455,11 @@ class SpellTests(unittest.TestCase):
         self.assertEqual(result.state.stack, ())
         self.assertEqual(result.state.objects["alice:5"].zone, "graveyard")
         self.assertEqual(result.state.objects["alice:5"].oracle_id, TOUCH_OF_BRILLIANCE)
-        non_mana_events = [event.event_type for event in result.event_log if event.event_type != "mana_added"]
+        non_mana_events = [
+            event.event_type
+            for event in result.event_log
+            if event.event_type not in {"mana_added", "priority_passed"}
+        ]
         spell_cast_index = non_mana_events.index("spell_cast")
         self.assertEqual(
             non_mana_events[spell_cast_index:],
@@ -1583,10 +1663,17 @@ def _cast_creature_from_normal_turns(session, repository: CardRepository, player
             repository,
         )
 
-    return cast_creature_spell(
+    current_session = cast_creature_spell(
         current_session,
         CastCreatureSpellAction(player_id=player_id, card_instance_id=creature_id),
         repository,
+    )
+    current_session = pass_priority(current_session, PassPriorityAction(player_id=player_id), repository)
+    opponent_id = "bob" if player_id == "alice" else "alice"
+    resolved = pass_priority(current_session, PassPriorityAction(player_id=opponent_id), repository)
+    return replace(
+        resolved,
+        event_log=tuple(event for event in resolved.event_log if event.event_type != "priority_passed"),
     )
 
 

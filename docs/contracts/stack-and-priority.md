@@ -9,7 +9,7 @@ resolution without requiring instants or triggered abilities in the first pass.
 
 1. A legal cast pays costs, records declared targets, and moves the spell to the
    stack.
-2. The active player receives priority after casting; priority then passes in
+2. The casting player receives priority after casting; priority then passes in
    turn order.
 3. When every player passes with a nonempty stack, the top object resolves.
 4. When every player passes with an empty stack, the current step may advance.
@@ -23,8 +23,8 @@ resolution without requiring instants or triggered abilities in the first pass.
 - No response spells are required yet, but both players' pass actions and the
   automatic resolution transition must be visible in the event log.
 - Target legality is rechecked at resolution. A spell whose required targets are
-  all illegal on resolution does not apply its effect and moves to its normal
-  destination.
+  all illegal on resolution emits `spell_countered_on_resolution`, does not
+  apply its effect, and moves to its normal destination.
 
 ## State Requirements
 
@@ -32,6 +32,9 @@ resolution without requiring instants or triggered abilities in the first pass.
   and chosen targets independently from later state changes.
 - Priority state must record enough information to determine whether all players
   have passed consecutively since the last stack-changing action.
+- In the two-player v0 slice, the caster's pass gives priority to the opponent;
+  the opponent's following pass resolves the top stack entry and returns
+  priority to the active player.
 
 ## Non-Goals
 

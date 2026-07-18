@@ -1434,11 +1434,14 @@ def _cast_creature_from_normal_turns(session, repository: CardRepository, player
             repository,
         )
 
-    return cast_creature_spell(
+    current_session = cast_creature_spell(
         current_session,
         CastCreatureSpellAction(player_id=player_id, card_instance_id=creature_id),
         repository,
     )
+    current_session = pass_priority(current_session, PassPriorityAction(player_id=player_id), repository)
+    opponent_id = "bob" if player_id == "alice" else "alice"
+    return pass_priority(current_session, PassPriorityAction(player_id=opponent_id), repository)
 
 
 def _advance_to_next_turn(session, repository: CardRepository):

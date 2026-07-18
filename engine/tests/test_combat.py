@@ -633,11 +633,14 @@ def _develop_creature_through_normal_turns(session, repository: CardRepository, 
             repository,
         )
 
-    return cast_creature_spell(
+    current_session = cast_creature_spell(
         current_session,
         CastCreatureSpellAction(player_id=player_id, card_instance_id=creature_id),
         repository,
     )
+    current_session = pass_priority(current_session, PassPriorityAction(player_id=player_id), repository)
+    opponent_id = "bob" if player_id == "alice" else "alice"
+    return pass_priority(current_session, PassPriorityAction(player_id=opponent_id), repository)
 
 
 def _select_land_ids_for_spell(session, repository: CardRepository, land_ids: list[str], creature_id: str) -> list[str]:
