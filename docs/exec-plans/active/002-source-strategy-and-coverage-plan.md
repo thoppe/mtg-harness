@@ -84,6 +84,8 @@ The simulator should only claim support based on layer 3, never merely because l
 - The recorded multiple-attacker damage-order limitation is complete: one
   attacking-player-owned ordered decision is queued per multiply blocked
   attacker in declared-attacker order.
+- The recorded Wave 7 hand-order trigger-discard shortcuts are complete: Ebon
+  Dragon and Noxious Toad now use exact affected-player-owned hand decisions.
 
 ## Workstreams
 
@@ -227,3 +229,5 @@ completed Wave 7 trigger-resolution choice correction.
     manifest-backed `Portal` increment.
 11. Preserve the completed sequential multi-attacker damage-order queue in
     `docs/exec-plans/active/006-multiple-combat-damage-order-choices.md`.
+12. Preserve the completed Ebon Dragon and Noxious Toad discard choices in
+    `docs/exec-plans/active/007-wave7-trigger-discard-choices.md`.

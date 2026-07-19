@@ -57,7 +57,8 @@ declared by `docs/coverage/slices/portal.initial.yaml`.
 - Sorcery-speed targeted creature tapping limited to `Tap up to three target creatures without flying.`
 - Sorcery-speed direct damage limited to `Volcanic Hammer deals 3 damage to any target.` and `Lava Axe deals 5 damage to target player or planeswalker.` with planeswalker targeting omitted in the current slice
 - Sorcery-speed no-target life gain limited to `You gain 4 life.`
-- Sorcery-speed targeted discard limited to `Target player discards two cards.` using deterministic hand-order selection in the current slice
+- Sorcery-speed targeted discard limited to `Target player discards two cards.`
+  using an exact target-player-owned choice in the current slice
 - Sorcery-speed targeted land destruction limited to `Destroy target land.`
 - Sorcery-speed fixed multi-target land destruction limited to `Destroy two target lands.`
 - Sorcery-speed global land destruction limited to `Destroy all lands.`

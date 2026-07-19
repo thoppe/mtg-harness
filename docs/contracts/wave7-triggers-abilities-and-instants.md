@@ -104,10 +104,10 @@ The Wave 7B schemas resolve only as follows:
 - Dread Reaper and Serpent Warrior cause their controller to lose five or
   three life respectively. Spiritual Guardian and Venerable Monk gain their
   controller four or two life respectively.
-- Ebon Dragon may target an opponent; on resolution that opponent discards
-  one card using the existing deterministic hand-order discard path. Ingenious
-  Thief looks at one target player's hand using the existing controller-visible
-  inspection event.
+- Ebon Dragon may target an opponent; on resolution a selected opponent with a
+  nonempty hand chooses one card to discard through an affected-player-owned
+  continuation. Ingenious Thief looks at one target player's hand using the
+  existing controller-visible inspection event.
 - Fire Dragon targets one creature and deals an immutable resolution-time
   count of its controller's Mountains. Fire Imp deals two damage to one target
   creature. Serpent Assassin may destroy one target nonblack creature.
@@ -127,9 +127,10 @@ The Wave 7B schemas resolve only as follows:
   If the required eligible payment is not chosen or cannot be paid, the
   triggering creature is sacrificed. Each is a trigger-resolution choice, not
   a casting additional cost.
-- Thundermare taps every other creature at resolution. Noxious Toad makes
-  each opponent discard one card using deterministic hand order. Fire Snake
-  destroys one target land. Endless Cockroaches returns its expected graveyard
+- Thundermare taps every other creature at resolution. Noxious Toad makes its
+  opponent choose one card to discard through an affected-player-owned
+  continuation when that player's hand is nonempty. Fire Snake destroys one
+  target land. Endless Cockroaches returns its expected graveyard
   object to its owner's hand; Undying Beast puts that expected graveyard object
   on top of its owner's library. If either expected object has left that
   graveyard, its trigger resolves with no effect.
@@ -200,3 +201,14 @@ emitted only after the continuation completes.
 The verified increment and its regression matrix are recorded in
 `docs/exec-plans/active/003-wave7-trigger-resolution-choices.md` and
 `engine/tests/test_wave7_trigger_choices.py`.
+
+## Completed Trigger Discard Choice Correction
+
+Ebon Dragon and Noxious Toad no longer select the first card in deterministic
+hand order. Their affected player chooses exactly one snapshotted hand object,
+with hand-zone and object-identity revalidation. Empty hands resolve without a
+decision, and Ebon Dragon retains its separate optional controller-owned
+opponent choice.
+
+The bounded correction is recorded in
+`docs/exec-plans/active/007-wave7-trigger-discard-choices.md`.

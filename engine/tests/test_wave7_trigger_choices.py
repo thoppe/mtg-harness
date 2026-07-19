@@ -33,6 +33,7 @@ GRAVEDIGGER = "1a2030cc-d7ee-4059-b2d7-fb95ea8e267b"
 INGENIOUS_THIEF = "73ea2949-5812-478d-8f09-00743ce4d40f"
 MAN_O_WAR = "67a3541c-8408-40c8-b44f-90035b860f57"
 MERCENARY_KNIGHT = "ed5429bb-233a-4528-bf7d-df5f6b192b1c"
+NOXIOUS_TOAD = "2fdc484e-b3c3-4f4e-99a1-26a1134aa1cd"
 OWL_FAMILIAR = "099a5835-da6c-4e03-ad3e-aeb448897fed"
 PLANT_ELEMENTAL = "e822bf3d-3a29-4a02-9ae8-e2830ce70f15"
 PRIMEVAL_FORCE = "f4170db0-3adf-4744-b0ec-e889c713bb93"
@@ -91,6 +92,18 @@ class WaveSevenTriggerChoiceTests(unittest.TestCase):
             pending,
             ResolveChoiceAction(
                 "alice", decision.decision_id,
+                selected_instance_ids=tuple(selected),
+            ),
+            self.repo,
+        )
+
+    def _choose_as(self, pending, player_id, *selected):
+        decision = pending.state.pending_decision
+        return resolve_pending_choice(
+            pending,
+            ResolveChoiceAction(
+                player_id,
+                decision.decision_id,
                 selected_instance_ids=tuple(selected),
             ),
             self.repo,
@@ -155,6 +168,98 @@ class WaveSevenTriggerChoiceTests(unittest.TestCase):
         event = next(e for e in inspected.event_log if e.event_type == "hand_looked_at")
         self.assertEqual(event.payload["target_player_id"], "bob")
         self.assertNotIn("card_instance_ids", event.payload)
+
+    def test_ebon_dragon_opponent_chooses_non_first_discard(self) -> None:
+        pending_target = self._request(
+            self._state(
+                EBON_DRAGON,
+                bob_cards=(GRIZZLY_BEARS, MUCK_RATS),
+            ),
+            EBON_DRAGON,
+        )
+        pending_discard = self._choose(pending_target, "bob")
+
+        decision = pending_discard.state.pending_decision
+        self.assertEqual(decision.chooser_id, "bob")
+        self.assertEqual(decision.option_ids, ("bob:1", "bob:2"))
+        self.assertEqual(
+            {
+                action.selected_instance_ids
+                for action in enumerate_legal_actions(
+                    pending_discard.state, self.repo
+                )
+            },
+            {("bob:1",), ("bob:2",)},
+        )
+
+        resolved = self._choose_as(pending_discard, "bob", "bob:2")
+        self.assertEqual(resolved.state.objects["bob:1"].zone, "hand")
+        self.assertEqual(resolved.state.objects["bob:2"].zone, "graveyard")
+        choice_event = [
+            event for event in resolved.event_log
+            if event.event_type == "choice_resolved"
+        ][-1]
+        self.assertNotIn("selected_instance_id", choice_event.payload)
+        self.assertEqual(
+            resolved.event_log[-1].event_type,
+            "triggered_ability_resolved",
+        )
+
+    def test_noxious_toad_opponent_chooses_discard(self) -> None:
+        pending = self._request(
+            self._state(
+                NOXIOUS_TOAD,
+                bob_cards=(GRIZZLY_BEARS, MUCK_RATS),
+            ),
+            NOXIOUS_TOAD,
+        )
+
+        self.assertEqual(pending.state.pending_decision.chooser_id, "bob")
+        resolved = self._choose_as(pending, "bob", "bob:2")
+        self.assertEqual(resolved.state.objects["bob:1"].zone, "hand")
+        self.assertEqual(resolved.state.objects["bob:2"].zone, "graveyard")
+
+    def test_trigger_discard_rejects_reentered_hand_object(self) -> None:
+        pending = self._request(
+            self._state(NOXIOUS_TOAD, bob_cards=(GRIZZLY_BEARS,)),
+            NOXIOUS_TOAD,
+        )
+        stale = move_object(
+            pending.state,
+            instance_id="bob:1",
+            from_zone="hand",
+            to_zone="graveyard",
+            player_id="bob",
+        )
+        stale = move_object(
+            stale,
+            instance_id="bob:1",
+            from_zone="graveyard",
+            to_zone="hand",
+            player_id="bob",
+        )
+
+        with self.assertRaisesRegex(ValueError, "expected hand object"):
+            self._choose_as(replace(pending, state=stale), "bob", "bob:1")
+
+    def test_wave7_trigger_discards_skip_empty_hands(self) -> None:
+        ebon_target = self._request(self._state(EBON_DRAGON), EBON_DRAGON)
+        ebon_resolved = self._choose(ebon_target, "bob")
+        self.assertIsNone(ebon_resolved.state.pending_decision)
+        self.assertEqual(
+            ebon_resolved.event_log[-1].event_type,
+            "triggered_ability_resolved",
+        )
+
+        toad_resolved = self._request(
+            self._state(NOXIOUS_TOAD),
+            NOXIOUS_TOAD,
+        )
+        self.assertIsNone(toad_resolved.state.pending_decision)
+        self.assertEqual(
+            toad_resolved.event_log[-1].event_type,
+            "triggered_ability_resolved",
+        )
 
     def test_primeval_force_requires_exactly_three_distinct_forests(self) -> None:
         state = self._state(PRIMEVAL_FORCE, alice_cards=(FOREST,) * 4)

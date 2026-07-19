@@ -450,7 +450,7 @@ rules:
     tests:
       - engine/tests/test_combat.py
       - engine/tests/test_replay_log.py
-    notes: "Multiple blockers per attacker are supported. Attacker-side damage assignment still follows the listed blocker order without a separate player-choice action."
+    notes: "Multiple blockers per attacker are supported. Each multiply blocked attacker queues an attacking-player-owned damage-order choice in declared-attacker order."
   - rule_key: zones_minimal
     source_rules:
       - "400"

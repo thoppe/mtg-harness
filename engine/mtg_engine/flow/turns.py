@@ -1285,6 +1285,31 @@ def resolve_pending_choice(
             selected_ids,
             card_repository,
         )
+    elif kind == "wave7_trigger_discard":
+        expected_ids = dict(context["option_object_ids"])
+        for instance_id in selected_ids:
+            obj = next_state.objects[instance_id]
+            if (
+                obj.zone != "hand"
+                or obj.controller_id != action.player_id
+                or obj.object_id != expected_ids.get(instance_id)
+            ):
+                raise ValueError("selected card is no longer the expected hand object")
+        next_state = _discard_specific_cards(
+            next_state,
+            event_log,
+            player_id=action.player_id,
+            instance_ids=selected_ids,
+            active_player=context["controller_id"],
+        )
+        event_log.append(
+            event_type="triggered_ability_resolved",
+            active_player=context["controller_id"],
+            payload={
+                "ability_key": context["effect"],
+                "card_instance_id": context["card_instance_id"],
+            },
+        )
     else:
         raise ValueError("unsupported pending-decision continuation")
     return TurnResult(state=next_state, event_log=event_log.events)
@@ -1465,9 +1490,19 @@ def _resolve_wave7_trigger(session: TurnResult, entry: StackEntry, card_reposito
     elif effect == "undying_beast_death" and source.zone == "graveyard" and source.object_id == entry.expected_graveyard_object_id:
         resolved = move_object_to_top_of_library(resolved, instance_id=source.instance_id, from_zone="graveyard", player_id=source.owner_id)
     elif effect == "noxious_toad_death":
-        for player_id in resolved.players:
-            if player_id != entry.controller_id:
-                resolved = _discard_first_cards_in_hand_order(resolved, event_log, player_id=player_id, count=1, active_player=entry.controller_id)
+        opponent_id = next(
+            player_id for player_id in resolved.players
+            if player_id != entry.controller_id
+        )
+        if resolved.players[opponent_id].hand:
+            resolved = _queue_wave7_trigger_discard_decision(
+                resolved,
+                event_log,
+                chooser_id=opponent_id,
+                entry=entry,
+                effect=effect,
+            )
+            return TurnResult(resolved, event_log.events)
     elif effect == "pillaging_horde_etb":
         # A mandatory 'unless' payment is deliberately conservative: choose the first
         # qualifying deterministic option; if none exists, sacrifice the source.
@@ -1586,10 +1621,19 @@ def _resolve_wave7_trigger_choice(
     resolved = state
 
     if effect == "ebon_dragon_etb" and valid_ids:
-        resolved = _discard_first_cards_in_hand_order(
-            resolved, event_log, player_id=valid_ids[0], count=1,
-            active_player=controller_id,
-        )
+        target_player_id = valid_ids[0]
+        if resolved.players[target_player_id].hand:
+            return _queue_wave7_trigger_discard_decision(
+                resolved,
+                event_log,
+                chooser_id=target_player_id,
+                entry=StackEntry(
+                    card_instance_id=context["card_instance_id"],
+                    controller_id=controller_id,
+                    source_object_id=context["source_object_id"],
+                ),
+                effect=effect,
+            )
     elif effect == "ingenious_thief_etb" and valid_ids:
         event_log.append(
             event_type="hand_looked_at",
@@ -1747,6 +1791,58 @@ def _queue_wave7_trigger_decision(
             "chooser_id": entry.controller_id,
             "kind": f"wave7_{effect}",
             "option_scope": option_scope,
+            "option_count": len(option_ids),
+        },
+    )
+    return next_state
+
+
+def _queue_wave7_trigger_discard_decision(
+    state,
+    event_log,
+    *,
+    chooser_id,
+    entry,
+    effect,
+):
+    option_ids = state.players[chooser_id].hand
+    decision_id = (
+        f"{entry.source_object_id}:{effect}:discard:{chooser_id}:"
+        f"{len(event_log.events)}"
+    )
+    next_state = replace(
+        state,
+        pending_decision=PendingDecision(
+            decision_id=decision_id,
+            chooser_id=chooser_id,
+            kind=f"wave7_{effect}_discard",
+            source_object_id=entry.source_object_id or "",
+            option_ids=option_ids,
+            min_selections=1,
+            max_selections=1,
+            continuation_kind="wave7_trigger_discard",
+            continuation=(
+                ("effect", effect),
+                ("controller_id", entry.controller_id),
+                ("card_instance_id", entry.card_instance_id),
+                (
+                    "option_object_ids",
+                    tuple(
+                        (instance_id, state.objects[instance_id].object_id)
+                        for instance_id in option_ids
+                    ),
+                ),
+            ),
+        ),
+    )
+    event_log.append(
+        event_type="choice_requested",
+        active_player=chooser_id,
+        payload={
+            "decision_id": decision_id,
+            "chooser_id": chooser_id,
+            "kind": f"wave7_{effect}_discard",
+            "option_scope": "object",
             "option_count": len(option_ids),
         },
     )

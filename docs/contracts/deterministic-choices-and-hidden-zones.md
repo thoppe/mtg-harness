@@ -49,6 +49,19 @@ selection, ordering, and other effects whose legal options are not public.
 - This name-scoped continuation reuses the existing public-hand selection
   boundary; it does not introduce general discard-effect parsing.
 
+## Wave 7 Trigger Discard Choices
+
+- Ebon Dragon preserves its controller-owned optional opponent choice. If an
+  opponent is selected and has a nonempty hand, resolution then installs an
+  exact-one hand decision owned by that opponent.
+- Noxious Toad installs the same exact-one decision for its opponent when its
+  dies trigger resolves and that opponent has a nonempty hand.
+- Each discard decision snapshots hand object identity, revalidates hand zone
+  and identity when submitted, and resolves immediately without a decision
+  when the affected hand is empty.
+- This two-player, name-scoped continuation does not introduce generic
+  discard-effect parsing or multiplayer simultaneous-choice handling.
+
 ## Replay Guarantees
 
 - Accepted choice actions carry the decision ID and the complete private
