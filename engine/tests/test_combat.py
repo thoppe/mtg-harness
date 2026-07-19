@@ -110,6 +110,44 @@ class CombatTests(unittest.TestCase):
         self.assertEqual(result.event_log[-3].event_type, "life_total_changed")
         self.assertEqual(result.event_log[-2].event_type, "state_based_actions_checked")
 
+    def test_foot_soldiers_attacks_after_normal_cast_and_deals_printed_power(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _state_with_foot_soldiers_ready(repository)
+
+        session = advance_to_begin_combat(session)
+        session = declare_attackers(
+            session,
+            DeclareAttackersAction(player_id="alice", attacker_ids=("alice:5",)),
+            repository,
+        )
+        session = _pass_attackers_window(session, repository)
+        session = declare_blockers(
+            session,
+            DeclareBlockersAction(player_id="bob", blockers={}),
+            repository,
+        )
+        result = resolve_combat_damage(session, repository)
+
+        self.assertEqual(result.state.objects["alice:5"].oracle_id, FOOT_SOLDIERS)
+        self.assertEqual(result.state.players["bob"].life_total, 18)
+        attackers_event = next(
+            event
+            for event in reversed(result.event_log)
+            if event.event_type == "attackers_declared"
+        )
+        self.assertEqual(attackers_event.payload["attacker_ids"], ["alice:5"])
+        self.assertEqual(
+            [event.event_type for event in result.event_log[-6:]],
+            [
+                "blockers_declared",
+                "step_changed",
+                "combat_damage_applied",
+                "life_total_changed",
+                "state_based_actions_checked",
+                "step_changed",
+            ],
+        )
+
     def test_blocked_combat_records_assignment_and_keeps_creatures_alive(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         session = _state_with_creatures_ready_to_fight(repository, include_blocker=True)
@@ -631,6 +669,35 @@ def _state_with_creatures_ready_to_fight(repository: CardRepository, *, include_
         session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "bob")
         session = _develop_creature_through_normal_turns(session, repository, "bob", "bob:4")
     return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
+
+
+def _state_with_foot_soldiers_ready(repository: CardRepository):
+    setup = SetupInput(
+        game_id="combat-foot-soldiers",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (PLAINS, PLAINS, PLAINS, PLAINS, FOOT_SOLDIERS),
+            "bob": (PLAINS,),
+        },
+        opening_hands={
+            "alice": (PLAINS, PLAINS, PLAINS, PLAINS, FOOT_SOLDIERS),
+            "bob": (PLAINS,),
+        },
+        rng_seed=59,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    session = _develop_creature_through_normal_turns(
+        session,
+        repository,
+        "alice",
+        "alice:5",
+    )
+    return _advance_to_player_main_phase(
+        _advance_to_next_turn(session, repository),
+        repository,
+        "alice",
+    )
 
 
 def _state_with_multiple_blockers_ready(repository: CardRepository):

@@ -226,7 +226,8 @@ cards:
       - zones_minimal
     tests:
       - engine/tests/test_spells.py
-    notes: "Canonical card identity keyed by Scryfall oracle_id. The same vanilla-creature combat path is implemented, but Foot Soldiers does not yet have a dedicated combat assertion."
+      - engine/tests/test_combat.py
+    notes: "Canonical card identity keyed by Scryfall oracle_id. Dedicated tests cover its normal four-Plains casting path and later-turn unblocked combat damage."
   - set_code: por
     card_key: "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
     display_name: Muck Rats
