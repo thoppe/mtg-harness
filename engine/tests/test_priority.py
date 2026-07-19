@@ -185,12 +185,19 @@ class PriorityTests(unittest.TestCase):
         )
         state = initialize_game(setup, repository).state
         state = move_object(state, instance_id="alice:1", from_zone="hand", to_zone="battlefield", player_id="alice")
+        state = update_object(state, replace(state.objects["alice:1"], entered_battlefield_turn=0))
         state = move_object(state, instance_id="bob:2", from_zone="hand", to_zone="battlefield", player_id="bob")
         state = move_object(state, instance_id="bob:3", from_zone="hand", to_zone="battlefield", player_id="bob")
         state = move_object(state, instance_id="bob:4", from_zone="hand", to_zone="battlefield", player_id="bob")
-        state = with_combat_state(state, attacking_player="alice", defending_player="bob", attackers=("alice:1",), blockers={})
-        state = replace(state, turn=TurnState(1, "alice", "bob", "declare_attackers_step"))
-        session = activate_mana_ability(TurnResult(state=state, event_log=()), ActivateManaAbilityAction("bob", "bob:3"), repository)
+        session = start_first_turn(replace(initialize_game(setup, repository), state=state))
+        session = advance_to_begin_combat(session)
+        session = declare_attackers(
+            session,
+            DeclareAttackersAction(player_id="alice", attacker_ids=("alice:1",)),
+            repository,
+        )
+        session = pass_priority(session, PassPriorityAction(player_id="alice"), repository)
+        session = activate_mana_ability(session, ActivateManaAbilityAction("bob", "bob:3"), repository)
         session = activate_mana_ability(session, ActivateManaAbilityAction("bob", "bob:4"), repository)
         session = cast_noncreature_spell(session, CastNonCreatureSpellAction(player_id="bob", card_instance_id="bob:1"), repository)
         session = pass_priority(session, PassPriorityAction(player_id="bob"), repository)

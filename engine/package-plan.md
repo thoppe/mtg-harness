@@ -53,5 +53,8 @@ Define the first package boundaries before writing engine code.
   the supported first-turn flow, as does the Summer Bloom additional-land
   regression. Other fixture shortcuts should be corrected only in similarly
   bounded increments. The Renewing Dawn resolution regression now also enters
-  precombat main through the supported first-turn flow.
+  precombat main through the supported first-turn flow. The Treetop Defense
+  attackers-window regression now also reaches that window through first-turn
+  entry, step advancement, and an accepted attacker declaration rather than
+  direct combat and turn-state construction.
 - Keep `rules/` focused on consequences and checks, while `flow/` owns when action windows open and close.

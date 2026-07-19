@@ -124,6 +124,10 @@ The simulator should only claim support based on layer 3, never merely because l
 - The next bounded test-harness initial-turn correction is complete: the
   Renewing Dawn resolution regression enters precombat main through the
   supported first-turn flow rather than direct turn-state replacement.
+- The next bounded test-harness combat-entry correction is complete: the
+  Treetop Defense attackers-window regression enters the first turn, advances
+  to combat, and declares its attacker through supported flow handlers rather
+  than direct combat and turn-state construction.
 
 ## Workstreams
 
@@ -296,3 +300,5 @@ completed Wave 7 trigger-resolution choice correction.
     `docs/exec-plans/active/018-summer-bloom-turn-action-test-path.md`.
 24. Preserve the completed Renewing Dawn initial-turn test-path correction in
     `docs/exec-plans/active/019-renewing-dawn-turn-action-test-path.md`.
+25. Preserve the completed Treetop Defense combat-entry test-path correction in
+    `docs/exec-plans/active/020-treetop-defense-combat-entry-test-path.md`.
