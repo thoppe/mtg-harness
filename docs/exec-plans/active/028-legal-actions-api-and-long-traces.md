@@ -39,9 +39,11 @@ and valid-target surface, then prove it through longer deterministic games.
   numeric CLI remains a direct exact-action picker until a multi-parameter
   descriptor interaction flow is deliberately designed; it must not fake a
   descriptor-only UI by guessing targets.
+- Descriptor-driven CLI parameter collection: active.
 
 ## Resume Here
 
-Build the next bounded long-trace corpus or a real descriptor-driven CLI
-parameter flow. Do not duplicate targeting rules, guess hidden choices, or
-reveal hidden option IDs.
+Complete the descriptor-driven CLI parameter flow, including target candidates,
+multi-targets, ordered choices, X values, allocations, additional costs, and
+structured rejection refresh. Do not duplicate targeting rules, guess hidden
+choices, or reveal hidden option IDs.

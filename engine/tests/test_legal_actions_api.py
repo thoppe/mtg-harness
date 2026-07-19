@@ -19,12 +19,15 @@ from mtg_engine.services.legal_actions_api import (
     valid_targets_response,
 )
 from mtg_engine.state.models import PendingDecision
+from mtg_engine.state.zones import move_object
 
 
 INFORMATION_DIR = Path(__file__).resolve().parents[2] / "information"
 MOUNTAIN = "a3fb7228-e76b-4e96-a40e-20b5fed75685"
 VOLCANIC_HAMMER = "98fa5a06-0553-40fd-999c-bc31c9b3f4db"
 PLAINS = "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
+FORKED_LIGHTNING = "66107cfd-4bdb-4266-a650-940743555ea4"
+SECRET = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
 
 
 class LegalActionsApiTests(unittest.TestCase):
@@ -98,3 +101,46 @@ class LegalActionsApiTests(unittest.TestCase):
         with self.assertRaises(LegalActionApiError) as rejected:
             build_legal_actions_response(state, self.repository, "mallory")
         self.assertEqual(rejected.exception.code, "wrong_player")
+
+    def test_variant_bounds_describe_multi_target_allocation_and_x_actions(self) -> None:
+        bootstrap = initialize_game(
+            SetupInput(
+                "api-variants", ("alice", "bob"), "alice",
+                {"alice": (FORKED_LIGHTNING, SECRET), "bob": (SECRET,)},
+                {"alice": (FORKED_LIGHTNING, SECRET), "bob": (SECRET,)}, 9,
+            ), self.repository,
+        )
+        state = start_first_turn(bootstrap).state
+        state = move_object(
+            state, instance_id="alice:2", from_zone="hand", to_zone="battlefield", player_id="alice"
+        )
+        state = move_object(
+            state, instance_id="bob:1", from_zone="hand", to_zone="battlefield", player_id="bob"
+        )
+        state = replace(state, players={
+            **state.players,
+            "alice": replace(state.players["alice"], mana_pool=("R", "R", "R", "R")),
+        })
+        response = build_legal_actions_response(state, self.repository, "alice")
+        spell = next(action for action in response.actions if action.kind == "CastNonCreatureSpellAction")
+        slots = {slot.name: slot for slot in spell.parameters}
+        self.assertEqual((slots["target_instance_ids"].minimum, slots["target_instance_ids"].maximum), (1, 2))
+        self.assertEqual((slots["damage_assignments"].minimum, slots["damage_assignments"].maximum), (1, 2))
+
+    def test_unknown_partial_slot_rejects_without_widening_candidate_query(self) -> None:
+        state = self._state()
+        state = replace(state, pending_decision=PendingDecision(
+            decision_id="choice:partial", chooser_id="alice", kind="any_number",
+            source_object_id="alice:1@0", option_ids=("alice:1",),
+            min_selections=0, max_selections=1,
+        ))
+        response = build_legal_actions_response(state, self.repository, "alice")
+        choice = next(item for item in response.actions if item.kind == "ResolveChoiceAction")
+        with self.assertRaises(LegalActionApiError) as rejected:
+            valid_targets_response(
+                state, self.repository, "alice", choice.action_id, "selected_instance_ids",
+                {"forged": "value"},
+            )
+        # Unknown slots remain indistinguishable from any other malformed
+        # partial request and cannot be used to widen a legal candidate query.
+        self.assertEqual(rejected.exception.code, "malformed_parameters")

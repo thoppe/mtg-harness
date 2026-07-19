@@ -431,7 +431,7 @@ def _legal_noncreature_spell_targets(
                 continue
             if not permanent_definition.is_creature:
                 continue
-            if effect in {"damage_any_target", "blaze", "capricious_sorcerer"}:
+            if effect in {"damage_any_target", "blaze", "forked_lightning", "capricious_sorcerer"}:
                 legal_targets.append((instance_id,))
                 continue
             if effect in {"destroy_tapped_creature", "kings_assassin"} and not permanent.tapped:

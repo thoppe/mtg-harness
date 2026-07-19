@@ -33,6 +33,18 @@ creating a second action-validation or targeting rules system.
   descriptor, malformed parameters, and no-longer-legal action without
   exposing hidden reasons or hidden objects.
 
+## Descriptor-Driven CLI
+
+- The CLI must display player-scoped descriptors, then collect only the slots
+  declared by the selected descriptor.
+- For every target or choice slot, the CLI must call `valid_targets` with the
+  current partial selection and offer only returned candidates.
+- Multi-target, ordered-choice, X-value, allocation, additional-cost, and
+  boolean slots must be collected explicitly; the CLI must never infer a
+  target, choose a hidden option, or submit an internal action directly.
+- A rejected or stale descriptor submission refreshes the public action view
+  without exposing additional private information.
+
 ## Non-Goals
 
 - Stable browser/network JSON compatibility beyond this versioned v0 schema

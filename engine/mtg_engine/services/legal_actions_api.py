@@ -134,6 +134,9 @@ def valid_targets_response(
     if parameter is None:
         raise LegalActionApiError("unknown_slot", "parameter slot is not available for this action")
     partial = {key: _normalize(value) for key, value in (partial_selection or {}).items()}
+    unknown = set(partial).difference(item.name for item in descriptor.parameters)
+    if unknown:
+        raise LegalActionApiError("malformed_parameters", "partial selection contains an unknown slot")
     candidates = _candidates_for_slot(state, card_repository, actions, parameter, partial)
     return ValidTargetsResponse(
         schema_version=SCHEMA_VERSION,
@@ -193,7 +196,7 @@ def _descriptor_groups(
                 kind=type(first).__name__,
                 player_id=player_id,
                 source=_source_for_action(state, card_repository, first),
-                parameters=_parameter_slots(first),
+                parameters=_parameter_slots(tuple(variants)),
             ),
             tuple(variants),
         ))
@@ -219,8 +222,15 @@ def _action_id(action: object) -> str:
     return f"{type(action).__name__}:{digest}"
 
 
-def _parameter_slots(action: object) -> tuple[ParameterSlot, ...]:
-    name = type(action).__name__
+def _parameter_slots(actions: tuple[object, ...]) -> tuple[ParameterSlot, ...]:
+    """Describe fields using the reducer's currently legal variants.
+
+    The action map identifies parameter shapes, while the actual variants set
+    accurate bounds for this descriptor (such as a one-to-three target spell
+    or the legal X range at the current mana pool).
+    """
+    first = actions[0]
+    name = type(first).__name__
     slots: dict[str, tuple[str, int | None, int | None, bool, bool]] = {
         "CastNonCreatureSpellAction": {
             "target_instance_ids": ("targets", 0, None, False, True),
@@ -239,14 +249,39 @@ def _parameter_slots(action: object) -> tuple[ParameterSlot, ...]:
         "DeclareAttackersAction": {"attacker_ids": ("targets", 0, None, False, True)},
         "DeclareBlockersAction": {"blockers": ("blocker_assignment", 0, None, False, True)},
     }.get(name, {})
-    parameters = _action_parameters(action)
+    parameters = _action_parameters(first)
     return tuple(
-        ParameterSlot(slot_name, *details)
+        _parameter_slot(slot_name, details, actions)
         for slot_name, details in slots.items()
         # Only include meaningful fields.  This avoids requiring clients to
         # submit synthetic None/empty values for a card with no such cost.
         if slot_name in parameters and _field_is_meaningful(slot_name, parameters[slot_name])
     )
+
+
+def _parameter_slot(
+    slot_name: str,
+    details: tuple[str, int | None, int | None, bool, bool],
+    actions: tuple[object, ...],
+) -> ParameterSlot:
+    kind, minimum, maximum, ordered, distinct = details
+    values = tuple(_action_parameters(action)[slot_name] for action in actions)
+    if kind in {"targets", "choice", "allocation"}:
+        lengths = tuple(len(value) for value in values if isinstance(value, tuple))
+        if lengths:
+            minimum, maximum = min(lengths), max(lengths)
+    elif kind == "blocker_assignment":
+        lengths = tuple(len(value) for value in values if isinstance(value, dict))
+        if lengths:
+            minimum, maximum = min(lengths), max(lengths)
+    elif kind == "number":
+        numbers = tuple(
+            value for value in values
+            if isinstance(value, int) and not isinstance(value, bool)
+        )
+        if numbers:
+            minimum, maximum = min(numbers), max(numbers)
+    return ParameterSlot(slot_name, kind, True, minimum, maximum, ordered, distinct)
 
 
 def _field_is_meaningful(name: str, value: object) -> bool:

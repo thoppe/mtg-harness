@@ -16,7 +16,12 @@ from mtg_engine.cards.repository import CardRepository
 from mtg_engine.decks.models import DeckList
 from mtg_engine.flow.deck_start import DeckGameInput
 from mtg_engine.replay.serialization import write_replay_input
-from mtg_engine.services.session import DeckGameSession, GameSession
+from mtg_engine.services.legal_actions_api import (
+    LegalActionDescriptor,
+    ParameterSlot,
+    TargetCandidate,
+)
+from mtg_engine.services.session import DeckGameSession, GameSession, SessionRejection
 
 
 Input = Callable[[str], str]
@@ -30,7 +35,7 @@ def run_cli(
     output: Output = print,
     replay_path: str | Path | None = None,
 ) -> None:
-    """Run a numeric action loop without rendering either player's hand/library.
+    """Run a descriptor-driven action loop without rendering hidden zones.
 
     Replay files contain the private setup required for deterministic replay;
     the terminal itself prints public counts, battlefield cards, and opaque
@@ -38,23 +43,39 @@ def run_cli(
     """
     while session.state.outcome.status != "completed":
         _print_public_state(session, output)
-        actions = session.legal_actions()
-        if not actions:
+        player_id = session.state.turn.priority_player
+        response = session.legal_actions_api(player_id)
+        if isinstance(response, SessionRejection):
+            output(f"Could not load actions: {response.code}")
+            break
+        if not response.actions:
             output("No enumerated legal actions; session stopped.")
             break
-        for index, action in enumerate(actions, start=1):
+        for index, action in enumerate(response.actions, start=1):
             output(f"{index}. {_describe_action(action)}")
         raw = input_fn("Choose action number (q to quit): ").strip().lower()
         if raw in {"q", "quit", "exit"}:
             break
         try:
             choice = int(raw)
-            if not 1 <= choice <= len(actions):
+            if not 1 <= choice <= len(response.actions):
                 raise ValueError
         except ValueError:
             output("Please enter one displayed action number or q.")
             continue
-        session.submit(actions[choice - 1])
+        descriptor = response.actions[choice - 1]
+        parameters = _collect_parameters(session, player_id, descriptor, output, input_fn)
+        if parameters is None:
+            # Do not submit a partial descriptor.  The next loop obtains a
+            # fresh revision and gives the player an opportunity to choose
+            # another visible action.
+            continue
+        submission = session.submit_descriptor(
+            player_id, descriptor.action_id, parameters, response.state_revision
+        )
+        if not submission.accepted:
+            assert submission.rejection is not None
+            output(f"Action rejected: {submission.rejection.code}; refreshing actions.")
 
     if replay_path is not None:
         write_replay_input(replay_path, session.replay_input())
@@ -78,10 +99,138 @@ def _print_public_state(session: GameSession, output: Output) -> None:
         )
 
 
-def _describe_action(action: object) -> str:
-    """Show opaque object identifiers, never card names from private zones."""
-    fields = ", ".join(f"{name}={value}" for name, value in vars(action).items())
-    return f"{type(action).__name__}({fields})"
+def _describe_action(action: LegalActionDescriptor) -> str:
+    """Describe a public descriptor, not an internal reducer action."""
+    source = f" from {action.source.label}" if action.source is not None else ""
+    slots = ", ".join(slot.name for slot in action.parameters)
+    suffix = f" (requires: {slots})" if slots else ""
+    return f"{action.kind}{source}{suffix}"
+
+
+def _collect_parameters(
+    session: GameSession,
+    player_id: str,
+    descriptor: LegalActionDescriptor,
+    output: Output,
+    input_fn: Input,
+) -> dict[str, object] | None:
+    """Collect precisely the descriptor slots using API-projected candidates.
+
+    There is deliberately no card-text parsing or target inference here.  A
+    value can enter this mapping only after it has appeared in the current
+    ``valid_targets_api`` response for the selected action and partial input.
+    """
+    selected: dict[str, object] = {}
+    for slot in descriptor.parameters:
+        value = _collect_slot(session, player_id, descriptor, slot, selected, output, input_fn)
+        if value is None:
+            return None
+        selected[slot.name] = value
+    return selected
+
+
+def _collect_slot(
+    session: GameSession,
+    player_id: str,
+    descriptor: LegalActionDescriptor,
+    slot: ParameterSlot,
+    selected: dict[str, object],
+    output: Output,
+    input_fn: Input,
+) -> object | None:
+    """Collect one declared parameter slot, preserving ordered selections."""
+    if slot.kind in {"targets", "choice"}:
+        return _collect_many(session, player_id, descriptor, slot, selected, output, input_fn)
+
+    candidates = _slot_candidates(session, player_id, descriptor, slot, selected)
+    if candidates is None:
+        return None
+    return _choose_candidate(candidates, slot, output, input_fn)
+
+
+def _collect_many(
+    session: GameSession,
+    player_id: str,
+    descriptor: LegalActionDescriptor,
+    slot: ParameterSlot,
+    selected: dict[str, object],
+    output: Output,
+    input_fn: Input,
+) -> tuple[object, ...] | None:
+    """Choose zero or more API candidates, in API-confirmed order when needed."""
+    values: list[object] = []
+    while slot.maximum is None or len(values) < slot.maximum:
+        partial = dict(selected)
+        partial[slot.name] = tuple(values)
+        candidates = _slot_candidates(session, player_id, descriptor, slot, partial)
+        if candidates is None:
+            return None
+        _print_candidates(candidates, output)
+        raw = input_fn(f"Select {slot.name} number (d when done, q to cancel): ").strip().lower()
+        if raw in {"q", "quit", "cancel"}:
+            return None
+        if raw in {"d", "done"}:
+            if slot.minimum is not None and len(values) < slot.minimum:
+                output(f"Select at least {slot.minimum} value(s).")
+                continue
+            return tuple(values)
+        candidate = _candidate_from_input(raw, candidates, output)
+        if candidate is None:
+            continue
+        # A distinct slot cannot accept the same candidate twice even if a
+        # future API implementation happens to return it again.
+        if slot.distinct and candidate.value in values:
+            output("That value is already selected.")
+            continue
+        values.append(candidate.value)
+    return tuple(values)
+
+
+def _slot_candidates(
+    session: GameSession,
+    player_id: str,
+    descriptor: LegalActionDescriptor,
+    slot: ParameterSlot,
+    partial: dict[str, object],
+) -> tuple[TargetCandidate, ...] | None:
+    response = session.valid_targets_api(player_id, descriptor.action_id, slot.name, partial)
+    if isinstance(response, SessionRejection):
+        return None
+    return response.candidates
+
+
+def _choose_candidate(
+    candidates: tuple[TargetCandidate, ...],
+    slot: ParameterSlot,
+    output: Output,
+    input_fn: Input,
+) -> object | None:
+    """Choose the single concrete candidate for scalar and composite slots."""
+    while True:
+        _print_candidates(candidates, output)
+        raw = input_fn(f"Select {slot.name} number (q to cancel): ").strip().lower()
+        if raw in {"q", "quit", "cancel"}:
+            return None
+        candidate = _candidate_from_input(raw, candidates, output)
+        if candidate is not None:
+            return candidate.value
+
+
+def _print_candidates(candidates: tuple[TargetCandidate, ...], output: Output) -> None:
+    for index, candidate in enumerate(candidates, start=1):
+        output(f"  {index}. {candidate.label}")
+
+
+def _candidate_from_input(
+    raw: str, candidates: tuple[TargetCandidate, ...], output: Output) -> TargetCandidate | None:
+    try:
+        index = int(raw)
+        if not 1 <= index <= len(candidates):
+            raise ValueError
+    except ValueError:
+        output("Please enter one displayed number.")
+        return None
+    return candidates[index - 1]
 
 
 def main(argv: list[str] | None = None) -> int:
