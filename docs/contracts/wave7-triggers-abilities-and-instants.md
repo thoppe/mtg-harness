@@ -193,9 +193,13 @@ controller to choose or decline.
 This limitation affects, at minimum, optional/targeted effects for Ebon
 Dragon, Gravedigger, Ingenious Thief, Man-o'-War, Fire Imp, Fire Dragon,
 Serpent Assassin, Fire Snake, Seasoned Marshal, and Wood Elves, plus the
-"unless" payment choices for Mercenary Knight, Owl Familiar, Plant Elemental,
-Primeval Force, Thing from the Deep, and Thundering Wurm. It must be resolved
-by a dedicated trigger-choice increment before the engine claims full oracle
-fidelity for those effects. That increment must use the existing redacted
-hidden-zone decision/event rules and capture targets or payment options at the
-correct trigger-resolution boundary.
+pay-or-sacrifice choices for Mercenary Knight, Plant Elemental, Primeval
+Force, Thing from the Deep, and Thundering Wurm. Owl Familiar is a separate
+mandatory post-draw discard choice when able, not an "unless" payment.
+
+The dedicated increment is specified by
+`docs/exec-plans/active/003-wave7-trigger-resolution-choices.md`. It must use
+the existing redacted hidden-zone decision/event rules, distinguish player
+from object options, and capture targets or payment options at the declared
+trigger-resolution boundary before the engine claims full oracle fidelity for
+these effects.

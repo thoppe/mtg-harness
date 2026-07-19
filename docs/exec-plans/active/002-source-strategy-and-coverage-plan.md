@@ -200,6 +200,7 @@ than promoting its raw sources as a group.
    finishing, run the card-expansion freshness check above.
 6. Before widening into another set, complete the recorded Wave 7
    trigger-resolution-choice increment in
-   `docs/contracts/wave7-triggers-abilities-and-instants.md`. Preserve that
-   contract as the authority for registered triggers, source snapshots,
-   activation, prevention, counters, and the explicit remaining choice gap.
+   `docs/exec-plans/active/003-wave7-trigger-resolution-choices.md`. Preserve
+   `docs/contracts/wave7-triggers-abilities-and-instants.md` as the authority
+   for registered triggers, source snapshots, activation, prevention,
+   counters, and the explicit remaining choice gap.
