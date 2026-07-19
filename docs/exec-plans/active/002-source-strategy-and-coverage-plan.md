@@ -89,6 +89,9 @@ The simulator should only claim support based on layer 3, never merely because l
 - The recorded Foot Soldiers test-coverage gap is complete: its normal
   cast-to-later-turn combat path now has a dedicated unblocked-damage and
   replay assertion.
+- The recorded replay-reducer combat evidence gap is complete: empty attacker
+  and blocker declarations plus the intervening response passes now have a
+  direct state-and-event equivalence regression.
 
 ## Workstreams
 
@@ -236,3 +239,5 @@ completed Wave 7 trigger-resolution choice correction.
     `docs/exec-plans/active/007-wave7-trigger-discard-choices.md`.
 13. Preserve the completed Foot Soldiers combat regression in
     `docs/exec-plans/active/008-foot-soldiers-combat-coverage.md`.
+14. Preserve the completed combat-declaration replay equivalence regression in
+    `docs/exec-plans/active/009-combat-replay-equivalence.md`.
