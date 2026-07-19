@@ -64,5 +64,7 @@ Define the first package boundaries before writing engine code.
   construction. The shared Wave 3 combat fixture now likewise reaches the
   blockers declaration window through supported first-turn, attacker
   declaration, and priority flow rather than direct combat and turn-state
+  construction. The shared Wave 4 combat fixture now reaches that window
+  through the same supported flow rather than direct combat and turn-state
   construction.
 - Keep `rules/` focused on consequences and checks, while `flow/` owns when action windows open and close.
