@@ -112,6 +112,9 @@ The simulator should only claim support based on layer 3, never merely because l
 - The next bounded test-harness mana correction is complete: the Treetop
   Defense attackers-window regression obtains its two green mana through
   accepted Forest activations rather than direct mana-pool replacement.
+- The next bounded test-harness turn-state correction is complete: the same
+  Treetop Defense regression reaches cleanup through accepted combat and
+  turn-flow actions rather than a direct end-combat step replacement.
 
 ## Workstreams
 
@@ -276,3 +279,5 @@ completed Wave 7 trigger-resolution choice correction.
     evidence increments.
 20. Preserve the completed Treetop Defense mana-action correction in
     `docs/exec-plans/active/015-treetop-defense-mana-action-test-path.md`.
+21. Preserve the completed Treetop Defense cleanup-action correction in
+    `docs/exec-plans/active/016-treetop-defense-cleanup-action-path.md`.

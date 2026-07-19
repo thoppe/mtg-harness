@@ -196,8 +196,16 @@ class PriorityTests(unittest.TestCase):
         session = pass_priority(session, PassPriorityAction(player_id="bob"), repository)
         session = pass_priority(session, PassPriorityAction(player_id="alice"), repository)
         self.assertTrue(has_keyword(session.state, repository, "bob:2", "Reach"))
-        cleanup_ready = replace(session, state=replace(session.state, turn=replace(session.state.turn, step="end_combat_step")))
-        self.assertFalse(has_keyword(advance_to_cleanup(cleanup_ready).state, repository, "bob:2", "Reach"))
+        session = pass_priority(session, PassPriorityAction(player_id="alice"), repository)
+        session = pass_priority(session, PassPriorityAction(player_id="bob"), repository)
+        session = declare_blockers(
+            session,
+            DeclareBlockersAction(player_id="bob", blockers={}),
+            repository,
+        )
+        session = resolve_combat_damage(session, repository)
+        self.assertFalse(has_keyword(advance_to_cleanup(session).state, repository, "bob:2", "Reach"))
+
     def test_precombat_main_enumerates_land_then_step_controls(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         session = _build_main_phase_session(repository)
