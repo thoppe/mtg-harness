@@ -14,9 +14,11 @@ from mtg_engine.actions.models import (
     DeclareBlockersAction,
     PassPriorityAction,
     PlayLandAction,
+    ResolveChoiceAction,
 )
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
+from mtg_engine.flow.priority import enumerate_legal_actions
 from mtg_engine.flow.turns import (
     activate_mana_ability,
     advance_to_cleanup,
@@ -27,6 +29,7 @@ from mtg_engine.flow.turns import (
     pass_priority,
     play_land,
     resolve_combat_damage,
+    resolve_pending_choice,
     start_first_turn,
     start_next_turn,
 )
@@ -155,11 +158,23 @@ class CombatTests(unittest.TestCase):
             DeclareBlockersAction(player_id="bob", blockers={"alice:4": ("bob:4", "bob:6")}),
             repository,
         )
+        decision = session.state.pending_decision
+        self.assertEqual(decision.chooser_id, "alice")
+        self.assertEqual(decision.kind, "combat_damage_order")
+        session = resolve_pending_choice(
+            session,
+            ResolveChoiceAction(
+                player_id="alice",
+                decision_id=decision.decision_id,
+                ordered_instance_ids=("bob:6", "bob:4"),
+            ),
+            repository,
+        )
         result = resolve_combat_damage(session, repository)
 
         self.assertEqual(result.state.objects["alice:4"].damage_marked, 2)
-        self.assertEqual(result.state.objects["bob:4"].damage_marked, 1)
-        self.assertEqual(result.state.objects["bob:6"].damage_marked, 0)
+        self.assertEqual(result.state.objects["bob:4"].damage_marked, 0)
+        self.assertEqual(result.state.objects["bob:6"].zone, "graveyard")
         self.assertEqual(result.state.turn.step, "end_combat_step")
         combat_assignment = next(
             event for event in result.event_log if event.event_type == "combat_damage_assigned"
@@ -167,8 +182,8 @@ class CombatTests(unittest.TestCase):
         self.assertEqual(
             combat_assignment.payload["assignments"],
             [
-                {"blocker_id": "bob:4", "attacker_damage": 1, "blocker_damage": 1},
-                {"blocker_id": "bob:6", "attacker_damage": 0, "blocker_damage": 1},
+                {"blocker_id": "bob:6", "attacker_damage": 1, "blocker_damage": 1},
+                {"blocker_id": "bob:4", "attacker_damage": 0, "blocker_damage": 1},
             ],
         )
 
@@ -200,6 +215,16 @@ class CombatTests(unittest.TestCase):
             DeclareBlockersAction(player_id="bob", blockers={"alice:5": ("bob:2", "bob:3")}),
             repository,
         )
+        decision = session.state.pending_decision
+        session = resolve_pending_choice(
+            session,
+            ResolveChoiceAction(
+                player_id="alice",
+                decision_id=decision.decision_id,
+                ordered_instance_ids=("bob:2", "bob:3"),
+            ),
+            repository,
+        )
         result = resolve_combat_damage(session, repository)
 
         combat_assignment = next(
@@ -212,6 +237,110 @@ class CombatTests(unittest.TestCase):
                 {"blocker_id": "bob:3", "attacker_damage": 1, "blocker_damage": 1},
             ],
         )
+
+    def test_damage_order_choice_enumerates_attacker_owned_permutations(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _state_with_multiple_blockers_ready(repository)
+        session = advance_to_begin_combat(session)
+        session = declare_attackers(
+            session,
+            DeclareAttackersAction("alice", ("alice:4",)),
+            repository,
+        )
+        session = _pass_attackers_window(session, repository)
+        session = declare_blockers(
+            session,
+            DeclareBlockersAction("bob", {"alice:4": ("bob:4", "bob:6")}),
+            repository,
+        )
+
+        decision = session.state.pending_decision
+        actions = enumerate_legal_actions(session.state, repository)
+        self.assertEqual(
+            {action.ordered_instance_ids for action in actions},
+            {("bob:4", "bob:6"), ("bob:6", "bob:4")},
+        )
+        self.assertTrue(all(action.player_id == "alice" for action in actions))
+        with self.assertRaises(ValueError):
+            resolve_pending_choice(
+                session,
+                ResolveChoiceAction(
+                    "bob",
+                    decision.decision_id,
+                    ordered_instance_ids=("bob:4", "bob:6"),
+                ),
+                repository,
+            )
+
+    def test_damage_order_choice_rejects_stale_blocker_identity(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _state_with_multiple_blockers_ready(repository)
+        session = advance_to_begin_combat(session)
+        session = declare_attackers(
+            session,
+            DeclareAttackersAction("alice", ("alice:4",)),
+            repository,
+        )
+        session = _pass_attackers_window(session, repository)
+        session = declare_blockers(
+            session,
+            DeclareBlockersAction("bob", {"alice:4": ("bob:4", "bob:6")}),
+            repository,
+        )
+        decision = session.state.pending_decision
+        stale_state = move_object(
+            session.state,
+            instance_id="bob:4",
+            from_zone="battlefield",
+            to_zone="graveyard",
+            player_id="bob",
+        )
+
+        with self.assertRaisesRegex(ValueError, "expected battlefield object"):
+            resolve_pending_choice(
+                replace(session, state=stale_state),
+                ResolveChoiceAction(
+                    "alice",
+                    decision.decision_id,
+                    ordered_instance_ids=("bob:4", "bob:6"),
+                ),
+                repository,
+            )
+
+    def test_damage_order_choice_events_redact_order_until_assignment(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _state_with_multiple_blockers_ready(repository)
+        session = advance_to_begin_combat(session)
+        session = declare_attackers(
+            session,
+            DeclareAttackersAction("alice", ("alice:4",)),
+            repository,
+        )
+        session = _pass_attackers_window(session, repository)
+        session = declare_blockers(
+            session,
+            DeclareBlockersAction("bob", {"alice:4": ("bob:4", "bob:6")}),
+            repository,
+        )
+        requested = session.event_log[-1]
+        decision = session.state.pending_decision
+        self.assertEqual(requested.event_type, "choice_requested")
+        self.assertEqual(requested.payload["option_count"], 2)
+        self.assertNotIn("option_ids", requested.payload)
+
+        session = resolve_pending_choice(
+            session,
+            ResolveChoiceAction(
+                "alice",
+                decision.decision_id,
+                ordered_instance_ids=("bob:6", "bob:4"),
+            ),
+            repository,
+        )
+        resolved = session.event_log[-1]
+        self.assertEqual(resolved.event_type, "choice_resolved")
+        self.assertEqual(resolved.payload["ordered_count"], 2)
+        self.assertNotIn("ordered_instance_ids", resolved.payload)
 
     def test_state_based_actions_destroy_muck_rats_after_lethal_combat_damage(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)

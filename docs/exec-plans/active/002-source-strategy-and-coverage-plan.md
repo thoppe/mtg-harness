@@ -78,6 +78,9 @@ The simulator should only claim support based on layer 3, never merely because l
 - The recorded `Mind Rot` deterministic hand-order limitation is complete:
   its target player now chooses the exact discard set through the existing
   replayable public-hand decision surface.
+- The recorded single-attacker multi-block damage-order limitation is complete:
+  blocker declaration now queues an explicit attacking-player-owned ordered
+  decision with object-identity revalidation before combat damage.
 
 ## Workstreams
 
@@ -214,5 +217,8 @@ completed Wave 7 trigger-resolution choice correction.
    widening another mechanic family or set.
 8. Preserve the completed target-player-owned `Mind Rot` discard choice in
    `docs/exec-plans/active/004-mind-rot-discard-choice.md`.
-9. The next smallest recorded in-slice correction is attacker-owned damage
-   ordering when one attacker is blocked by multiple creatures.
+9. Preserve the completed attacker-owned damage-order correction in
+   `docs/exec-plans/active/005-combat-damage-order-choice.md`, including its
+   explicit single-multiply-blocked-attacker boundary.
+10. Select the smallest remaining recorded in-slice limitation or the smallest
+    manifest-backed `Portal` increment.

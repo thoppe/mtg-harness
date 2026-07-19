@@ -1148,6 +1148,30 @@ def resolve_pending_choice(
     event_log.append(event_type="choice_resolved", active_player=action.player_id, payload=choice_payload)
     context = dict(decision.continuation)
 
+    if decision.continuation_kind == "combat_damage_order":
+        attacker_id = context["attacker_id"]
+        expected_object_ids = dict(context["blocker_object_ids"])
+        if state.combat is None or attacker_id not in state.combat.attackers:
+            raise ValueError("combat damage order is no longer legal")
+        if set(selected_ids) != set(state.combat.blockers.get(attacker_id, ())):
+            raise ValueError("combat damage order must contain the current blockers")
+        for blocker_id in selected_ids:
+            blocker = state.objects[blocker_id]
+            if (
+                blocker.object_id != expected_object_ids[blocker_id]
+                or blocker.zone != "battlefield"
+                or blocker.controller_id != state.combat.defending_player
+            ):
+                raise ValueError("blocker is no longer the expected battlefield object")
+        next_state = with_combat_state(
+            next_state,
+            attacking_player=state.combat.attacking_player,
+            defending_player=state.combat.defending_player,
+            attackers=state.combat.attackers,
+            blockers={**state.combat.blockers, attacker_id: tuple(selected_ids)},
+        )
+        return TurnResult(state=next_state, event_log=event_log.events)
+
     expected_zone = "hand" if decision.continuation_kind in {"wave5_discard_then_draw", "mind_rot_discard"} else "library"
     if decision.continuation_kind not in {None, "wave5_truce"} and not decision.continuation_kind.startswith("wave7_"):
         for instance_id in selected_ids:
@@ -2029,6 +2053,51 @@ def declare_blockers(
             "to_step": "combat_damage_step",
         },
     )
+    multiply_blocked = [
+        (attacker_id, tuple(blocker_ids))
+        for attacker_id, blocker_ids in action.blockers.items()
+        if len(blocker_ids) > 1
+    ]
+    if len(multiply_blocked) == 1:
+        attacker_id, blocker_ids = multiply_blocked[0]
+        decision_id = (
+            f"{next_state.objects[attacker_id].object_id}:"
+            f"combat_damage_order:{state.combat.attacking_player}:{len(event_log.events)}"
+        )
+        next_state = replace(
+            next_state,
+            pending_decision=PendingDecision(
+                decision_id=decision_id,
+                chooser_id=state.combat.attacking_player,
+                kind="combat_damage_order",
+                source_object_id=next_state.objects[attacker_id].object_id,
+                option_ids=blocker_ids,
+                min_selections=len(blocker_ids),
+                max_selections=len(blocker_ids),
+                selection_ordered=True,
+                continuation_kind="combat_damage_order",
+                continuation=(
+                    ("attacker_id", attacker_id),
+                    (
+                        "blocker_object_ids",
+                        tuple(
+                            (blocker_id, next_state.objects[blocker_id].object_id)
+                            for blocker_id in blocker_ids
+                        ),
+                    ),
+                ),
+            ),
+        )
+        event_log.append(
+            event_type="choice_requested",
+            active_player=state.combat.attacking_player,
+            payload={
+                "decision_id": decision_id,
+                "chooser_id": state.combat.attacking_player,
+                "kind": "combat_damage_order",
+                "option_count": len(blocker_ids),
+            },
+        )
     return TurnResult(state=next_state, event_log=event_log.events)
 
 
@@ -2038,6 +2107,8 @@ def resolve_combat_damage(
 ) -> TurnResult:
     state = session.state
     require_step(state, "combat_damage_step")
+    if state.pending_decision is not None:
+        raise ValueError("combat damage requires the pending decision to resolve")
 
     next_state, combat_events = apply_combat_damage(state, card_repository)
     next_step = "combat_damage_step" if next_state.stack_entries else "end_combat_step"

@@ -65,7 +65,13 @@ Define the minimum legal progression points for the first deterministic engine s
 - The first slice may model combat with a single combat-damage checkpoint rather than broader combat variants.
 - The currently implemented turn flow reaches cleanup, emits `turn_ended`, and can hand off into the next active player's precombat main.
 - Full long-run game-loop completion beyond the supported subset still remains future work.
-- The currently implemented combat model supports multiple blockers per attacker, but attacker-side damage assignment still follows the listed blocker order without a separate player choice action.
+- When exactly one attacker is blocked by multiple creatures, blocker
+  declaration queues an ordered, attacking-player-owned decision before combat
+  damage. The decision offers every blocker assigned to that attacker exactly
+  once, revalidates each blocker's object identity and battlefield membership,
+  and stores the selected order as the combat-damage assignment order.
+- Simultaneous ordering choices for multiple multiply blocked attackers remain
+  outside the current combat model.
 - The targeted-discard slice resolves `Mind Rot` through an explicit
   target-player-owned decision for exactly the lesser of two cards or that
   player's hand size.

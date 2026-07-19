@@ -147,6 +147,11 @@ Define the minimum append-only event types required for deterministic replay and
   activation costs, target choices, expected graveyard identities, countered
   stack-object identity, and prevention/retaliation application without
   exposing nonrevealed hand or library identities.
+- A single multiply blocked attacker produces a public `choice_requested`
+  event owned by the attacking player and a `choice_resolved` event that
+  records ordered cardinality without duplicating object identities. The
+  subsequent public `combat_damage_assigned` event exposes the applied blocker
+  order and damage amounts.
 
 ## Related Contracts
 
