@@ -10,6 +10,7 @@ from mtg_engine.actions.models import (
     ActivateManaAbilityAction,
     AdvanceStepAction,
     CastCreatureSpellAction,
+    CastNonCreatureSpellAction,
     DeclareAttackersAction,
     DeclareBlockersAction,
     PassPriorityAction,
@@ -21,6 +22,7 @@ from mtg_engine.flow.turns import (
     activate_mana_ability,
     advance_step,
     cast_creature_spell,
+    cast_noncreature_spell,
     declare_attackers,
     declare_blockers,
     pass_priority,
@@ -33,7 +35,9 @@ from mtg_engine.replay.reducer import ReplayInput, replay
 INFORMATION_DIR = Path(__file__).resolve().parents[2] / "information"
 PLAINS = "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
 SWAMP = "56719f6a-1a6c-4c0a-8d21-18f7d7350b68"
+ISLAND = "b2c6aa39-2d2a-459c-a555-fb48ba993373"
 MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
+SORCEROUS_SIGHT = "20370c3b-231f-4d9d-8b6e-f1eb25fa4b5d"
 
 
 class ReplayReducerTests(unittest.TestCase):
@@ -102,6 +106,56 @@ class ReplayReducerTests(unittest.TestCase):
                 "step_changed",
                 "blockers_declared",
                 "step_changed",
+            ],
+        )
+
+    def test_replays_targeted_noncreature_cast_resolution_and_draw(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        setup = SetupInput(
+            game_id="replay-reducer-sorcery",
+            players=("alice", "bob"),
+            starting_player="alice",
+            libraries={
+                "alice": (ISLAND, SORCEROUS_SIGHT, PLAINS),
+                "bob": (SWAMP,),
+            },
+            opening_hands={
+                "alice": (ISLAND, SORCEROUS_SIGHT),
+                "bob": (SWAMP,),
+            },
+            rng_seed=74,
+        )
+        actions = (
+            PlayLandAction(player_id="alice", card_instance_id="alice:1"),
+            ActivateManaAbilityAction(player_id="alice", source_instance_id="alice:1"),
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:2",
+                target_instance_id="bob",
+            ),
+            PassPriorityAction(player_id="alice"),
+            PassPriorityAction(player_id="bob"),
+        )
+
+        direct = start_first_turn(initialize_game(setup, repository))
+        direct = play_land(direct, actions[0], repository)
+        direct = activate_mana_ability(direct, actions[1], repository)
+        direct = cast_noncreature_spell(direct, actions[2], repository)
+        direct = pass_priority(direct, actions[3], repository)
+        direct = pass_priority(direct, actions[4], repository)
+        reduced = replay(ReplayInput(setup=setup, actions=actions), repository)
+
+        self.assertEqual(reduced.state, direct.state)
+        self.assertEqual(reduced.event_log, direct.event_log)
+        self.assertEqual(reduced.state.players["alice"].hand, ("alice:3",))
+        self.assertEqual(reduced.state.players["alice"].graveyard, ("alice:2",))
+        self.assertEqual(
+            [event.event_type for event in reduced.event_log[-4:]],
+            [
+                "spell_resolved",
+                "hand_looked_at",
+                "object_moved_between_zones",
+                "object_moved_between_zones",
             ],
         )
 

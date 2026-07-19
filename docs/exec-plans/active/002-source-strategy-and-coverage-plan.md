@@ -92,6 +92,10 @@ The simulator should only claim support based on layer 3, never merely because l
 - The recorded replay-reducer combat evidence gap is complete: empty attacker
   and blocker declarations plus the intervening response passes now have a
   direct state-and-event equivalence regression.
+- The recorded replay-reducer noncreature-casting evidence gap is complete:
+  targeted `Sorcerous Sight` casting, both stack passes, resolution-time hand
+  inspection, draw, and zone movement now have a direct state-and-event
+  equivalence regression.
 
 ## Workstreams
 
@@ -241,3 +245,5 @@ completed Wave 7 trigger-resolution choice correction.
     `docs/exec-plans/active/008-foot-soldiers-combat-coverage.md`.
 14. Preserve the completed combat-declaration replay equivalence regression in
     `docs/exec-plans/active/009-combat-replay-equivalence.md`.
+15. Preserve the completed targeted noncreature replay equivalence regression
+    in `docs/exec-plans/active/010-noncreature-replay-equivalence.md`.

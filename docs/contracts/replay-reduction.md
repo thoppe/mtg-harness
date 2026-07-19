@@ -32,9 +32,10 @@ combat state, and stack state.
 - Existing trace tests remain useful event-vocabulary checks.
 - The reducer now covers setup, first-turn start, land play, mana abilities,
   casting, priority passing, and the current combat declarations. Equivalence
-  tests cover land play, mana production, creature casting, both stack passes,
-  and an empty combat through attacker and blocker declaration; add equivalent
-  tests as each remaining action family is widened.
+  tests cover land play, mana production, creature casting, targeted
+  noncreature casting and resolution, both stack passes, and an empty combat
+  through attacker and blocker declaration; add equivalent tests as each
+  remaining action family is widened.
 
 ## Related Contracts
 
