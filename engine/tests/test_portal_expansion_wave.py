@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
 from mtg_engine.flow.priority import attacker_attack_rejection_reason, blocker_attack_rejection_reason
-from mtg_engine.flow.turns import TurnResult, _add_temporary_effect, _battlefield_land_subtype_count, _cleanup_end_of_turn_state, _controlled_land_subtype_count, _damage_creatures_once, _require_legal_noncreature_target, _resolve_direct_damage_sorcery, _resolve_noncreature_spell, play_land, resolve_pending_choice
+from mtg_engine.flow.turns import TurnResult, _add_temporary_effect, _battlefield_land_subtype_count, _cleanup_end_of_turn_state, _controlled_land_subtype_count, _damage_creatures_once, _require_legal_noncreature_target, _resolve_direct_damage_sorcery, _resolve_noncreature_spell, play_land, resolve_pending_choice, start_first_turn
 from mtg_engine.rules.characteristics import effective_keywords, effective_power, effective_toughness
 from mtg_engine.state.models import StackEntry, TurnState
 from mtg_engine.state.zones import move_object
@@ -241,8 +241,10 @@ class PortalExpansionWaveTests(unittest.TestCase):
         self.assertEqual(sylvan.state.players["alice"].library[0], "alice:4")
 
     def test_summer_bloom_allows_exactly_three_additional_land_plays_then_resets(self) -> None:
-        state = initialize_game(SetupInput("bloom", ("alice", "bob"), "alice", {"alice": (SUMMER_BLOOM, PLAINS, PLAINS, PLAINS, PLAINS), "bob": (PLAINS,)}, {"alice": (SUMMER_BLOOM, PLAINS, PLAINS, PLAINS, PLAINS), "bob": (PLAINS,)}, 10), self.repo).state
-        state = replace(state, turn=replace(state.turn, step="precombat_main_step"))
+        started = start_first_turn(
+            initialize_game(SetupInput("bloom", ("alice", "bob"), "alice", {"alice": (SUMMER_BLOOM, PLAINS, PLAINS, PLAINS, PLAINS), "bob": (PLAINS,)}, {"alice": (SUMMER_BLOOM, PLAINS, PLAINS, PLAINS, PLAINS), "bob": (PLAINS,)}, 10), self.repo)
+        )
+        state = started.state
         state = move_object(state, instance_id="alice:1", from_zone="hand", to_zone="stack", player_id="alice")
         resolved = _resolve_noncreature_spell(TurnResult(state, ()), StackEntry("alice:1", "alice"), self.repo)
         self.assertEqual(resolved.state.players["alice"].land_play_limit_this_turn, 4)

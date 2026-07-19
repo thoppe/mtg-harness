@@ -50,6 +50,7 @@ Define the first package boundaries before writing engine code.
   green mana and reaches cleanup through accepted priority, combat, and
   turn-flow actions rather than direct turn-state replacement. The Alabaster
   Dragon full-cost casting regression now also enters precombat main through
-  the supported first-turn flow. Other fixture shortcuts should be corrected
-  only in similarly bounded increments.
+  the supported first-turn flow, as does the Summer Bloom additional-land
+  regression. Other fixture shortcuts should be corrected only in similarly
+  bounded increments.
 - Keep `rules/` focused on consequences and checks, while `flow/` owns when action windows open and close.
