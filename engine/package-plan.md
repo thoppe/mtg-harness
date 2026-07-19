@@ -52,5 +52,6 @@ Define the first package boundaries before writing engine code.
   Dragon full-cost casting regression now also enters precombat main through
   the supported first-turn flow, as does the Summer Bloom additional-land
   regression. Other fixture shortcuts should be corrected only in similarly
-  bounded increments.
+  bounded increments. The Renewing Dawn resolution regression now also enters
+  precombat main through the supported first-turn flow.
 - Keep `rules/` focused on consequences and checks, while `flow/` owns when action windows open and close.

@@ -183,7 +183,7 @@ class PortalExpansionWaveTests(unittest.TestCase):
         ).state
         for instance_id in ("alice:2", "bob:1", "bob:2"):
             state = move_object(state, instance_id=instance_id, from_zone="hand", to_zone="battlefield", player_id=instance_id.split(":")[0])
-        state = replace(state, turn=replace(state.turn, step="precombat_main_step"))
+        state = start_first_turn(TurnResult(state, ())).state
         state = move_object(state, instance_id="alice:1", from_zone="hand", to_zone="stack", player_id="alice")
         result = _resolve_noncreature_spell(TurnResult(state, ()), StackEntry("alice:1", "alice", ("bob",)), self.repo)
         self.assertEqual(result.state.players["alice"].life_total, 24)
