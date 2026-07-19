@@ -36,6 +36,22 @@ MYSTIC_DENIAL = "d2bd23a6-4f77-4d6e-bf8f-339cb7a4184d"
 MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
 RAIN_OF_DAGGERS = "e2048201-6dc9-4cf5-916f-1d867ae8dbdd"
 VOLCANIC_HAMMER = "98fa5a06-0553-40fd-999c-bc31c9b3f4db"
+PLAINS = "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
+
+# Scenarios begin at a specific decision point, but remain live games rather
+# than one-action demonstrations.  This deterministic tail keeps a player
+# from losing their very next turn solely because the fixture's opening hand
+# consumed its entire library.
+SCENARIO_LIBRARY_TAIL = (
+    PLAINS,
+    GRIZZLY_BEARS,
+    PLAINS,
+    GRIZZLY_BEARS,
+    PLAINS,
+    GRIZZLY_BEARS,
+    PLAINS,
+    GRIZZLY_BEARS,
+)
 
 
 @dataclass(frozen=True)
@@ -117,7 +133,10 @@ def _session(card_repository: CardRepository, game_id: str, alice: tuple[str, ..
         game_id=game_id,
         players=("alice", "bob"),
         starting_player="alice",
-        libraries={"alice": alice, "bob": bob},
+        libraries={
+            "alice": alice + SCENARIO_LIBRARY_TAIL,
+            "bob": bob + SCENARIO_LIBRARY_TAIL,
+        },
         opening_hands={"alice": alice, "bob": bob},
         rng_seed=501,
     )

@@ -104,6 +104,9 @@ or leaking hidden information.
   or ordered setup, starting viewer/priority context, and the intended
   interesting decision point. Rules-harness scenarios may use `Rain of
   Daggers`; legal-deck scenarios may not.
+- A scenario must include enough deterministic remaining library state to
+  continue through its entry decision and into the next relevant turn. It may
+  not end immediately only because its setup hand consumed the entire library.
 - The initial catalog must include mid-game states that exercise at least
   combat-response timing, multiple blockers and damage ordering, stack
   responses/countering, a multi-target or allocation spell, a private
