@@ -25,9 +25,10 @@ Complete.
 
 ## Explicit Boundary
 
-This increment covers exactly one attacker blocked by multiple creatures.
-Simultaneous ordering choices for multiple multiply blocked attackers remain
-deferred.
+This increment originally covered exactly one attacker blocked by multiple
+creatures. The follow-on queue for multiple multiply blocked attackers is
+completed in
+`docs/exec-plans/active/006-multiple-combat-damage-order-choices.md`.
 
 ## Verification
 
@@ -40,5 +41,5 @@ deferred.
 
 Return to the active source strategy plan and select the smallest remaining
 recorded in-slice limitation or the smallest manifest-backed `Portal`
-increment. Preserve the explicit boundary that simultaneous ordering choices
-for multiple multiply blocked attackers remain deferred.
+increment. Preserve this increment's per-attacker order and identity checks;
+the multi-attacker sequencing contract is recorded in plan 006.

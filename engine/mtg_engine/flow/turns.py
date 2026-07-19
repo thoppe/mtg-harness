@@ -1170,6 +1170,11 @@ def resolve_pending_choice(
             attackers=state.combat.attackers,
             blockers={**state.combat.blockers, attacker_id: tuple(selected_ids)},
         )
+        next_state = _queue_combat_damage_order_decision(
+            next_state,
+            event_log,
+            attacker_ids=tuple(context.get("remaining_attacker_ids", ())),
+        )
         return TurnResult(state=next_state, event_log=event_log.events)
 
     expected_zone = "hand" if decision.continuation_kind in {"wave5_discard_then_draw", "mind_rot_discard"} else "library"
@@ -2053,52 +2058,73 @@ def declare_blockers(
             "to_step": "combat_damage_step",
         },
     )
-    multiply_blocked = [
-        (attacker_id, tuple(blocker_ids))
-        for attacker_id, blocker_ids in action.blockers.items()
-        if len(blocker_ids) > 1
-    ]
-    if len(multiply_blocked) == 1:
-        attacker_id, blocker_ids = multiply_blocked[0]
-        decision_id = (
-            f"{next_state.objects[attacker_id].object_id}:"
-            f"combat_damage_order:{state.combat.attacking_player}:{len(event_log.events)}"
-        )
-        next_state = replace(
-            next_state,
-            pending_decision=PendingDecision(
-                decision_id=decision_id,
-                chooser_id=state.combat.attacking_player,
-                kind="combat_damage_order",
-                source_object_id=next_state.objects[attacker_id].object_id,
-                option_ids=blocker_ids,
-                min_selections=len(blocker_ids),
-                max_selections=len(blocker_ids),
-                selection_ordered=True,
-                continuation_kind="combat_damage_order",
-                continuation=(
-                    ("attacker_id", attacker_id),
-                    (
-                        "blocker_object_ids",
-                        tuple(
-                            (blocker_id, next_state.objects[blocker_id].object_id)
-                            for blocker_id in blocker_ids
-                        ),
+    next_state = _queue_combat_damage_order_decision(
+        next_state,
+        event_log,
+        attacker_ids=tuple(
+            attacker_id
+            for attacker_id in next_state.combat.attackers
+            if len(action.blockers.get(attacker_id, ())) > 1
+        ),
+    )
+    return TurnResult(state=next_state, event_log=event_log.events)
+
+
+def _queue_combat_damage_order_decision(
+    state: GameState,
+    event_log: EventLog,
+    *,
+    attacker_ids: tuple[str, ...],
+) -> GameState:
+    if not attacker_ids:
+        return state
+    if state.combat is None:
+        raise ValueError("combat damage order requires active combat")
+
+    attacker_id, *remaining_attacker_ids = attacker_ids
+    blocker_ids = tuple(state.combat.blockers.get(attacker_id, ()))
+    if len(blocker_ids) < 2:
+        raise ValueError("combat damage order requires multiple blockers")
+    decision_id = (
+        f"{state.objects[attacker_id].object_id}:"
+        f"combat_damage_order:{state.combat.attacking_player}:{len(event_log.events)}"
+    )
+    next_state = replace(
+        state,
+        pending_decision=PendingDecision(
+            decision_id=decision_id,
+            chooser_id=state.combat.attacking_player,
+            kind="combat_damage_order",
+            source_object_id=state.objects[attacker_id].object_id,
+            option_ids=blocker_ids,
+            min_selections=len(blocker_ids),
+            max_selections=len(blocker_ids),
+            selection_ordered=True,
+            continuation_kind="combat_damage_order",
+            continuation=(
+                ("attacker_id", attacker_id),
+                (
+                    "blocker_object_ids",
+                    tuple(
+                        (blocker_id, state.objects[blocker_id].object_id)
+                        for blocker_id in blocker_ids
                     ),
                 ),
+                ("remaining_attacker_ids", tuple(remaining_attacker_ids)),
             ),
-        )
-        event_log.append(
-            event_type="choice_requested",
-            active_player=state.combat.attacking_player,
-            payload={
-                "decision_id": decision_id,
-                "chooser_id": state.combat.attacking_player,
-                "kind": "combat_damage_order",
-                "option_count": len(blocker_ids),
-            },
-        )
-    return TurnResult(state=next_state, event_log=event_log.events)
+        ),
+    )
+    event_log.append(
+        event_type="choice_requested",
+        active_player=state.combat.attacking_player,
+        payload={
+            "decision_id": decision_id,
+            "chooser_id": state.combat.attacking_player,
+            "kind": "combat_damage_order",
+            "option_count": len(blocker_ids),
+        },
+    )
+    return next_state
 
 
 def resolve_combat_damage(

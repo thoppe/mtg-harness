@@ -98,7 +98,7 @@ rules:
       - "508"
       - "509"
     status: implemented
-    scope: Explicit action enumeration for attacker declaration and blocker declaration in the declared support slice, plus an attacking-player-owned blocker damage-order choice when exactly one attacker is blocked by multiple creatures.
+    scope: Explicit action enumeration for attacker declaration and blocker declaration in the declared support slice, plus sequential attacking-player-owned blocker damage-order choices for every attacker blocked by multiple creatures.
     engine_contracts:
       - docs/contracts/play-engine.md
       - docs/contracts/state-machine-transitions.md
@@ -106,7 +106,7 @@ rules:
     tests:
       - engine/tests/test_priority.py
       - engine/tests/test_combat.py
-    notes: "Current support enumerates legal subsets of attackers and blocker assignments for the available creatures, including defender-based attack exclusion for `Wall of Granite`; simultaneous ordering choices for multiple multiply blocked attackers remain deferred."
+    notes: "Current support enumerates legal subsets of attackers and blocker assignments for the available creatures, including defender-based attack exclusion for `Wall of Granite`; multiple blocker-order decisions are queued in declared-attacker order."
   - rule_key: defender_keyword_minimal
     source_rules:
       - "702.3"

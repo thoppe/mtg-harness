@@ -342,6 +342,76 @@ class CombatTests(unittest.TestCase):
         self.assertEqual(resolved.payload["ordered_count"], 2)
         self.assertNotIn("ordered_instance_ids", resolved.payload)
 
+    def test_multiple_damage_order_choices_queue_in_declared_attacker_order(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _state_with_two_multiply_blocked_attackers(repository)
+        session = advance_to_begin_combat(session)
+        session = declare_attackers(
+            session,
+            DeclareAttackersAction("alice", ("alice:1", "alice:2")),
+            repository,
+        )
+        session = _pass_attackers_window(session, repository)
+        session = declare_blockers(
+            session,
+            DeclareBlockersAction(
+                "bob",
+                {
+                    "alice:1": ("bob:1", "bob:2"),
+                    "alice:2": ("bob:3", "bob:4"),
+                },
+            ),
+            repository,
+        )
+
+        first = session.state.pending_decision
+        self.assertEqual(first.source_object_id, session.state.objects["alice:1"].object_id)
+        self.assertEqual(first.option_ids, ("bob:1", "bob:2"))
+        with self.assertRaisesRegex(ValueError, "pending decision"):
+            resolve_combat_damage(session, repository)
+        self.assertEqual(
+            {action.ordered_instance_ids for action in enumerate_legal_actions(session.state, repository)},
+            {("bob:1", "bob:2"), ("bob:2", "bob:1")},
+        )
+
+        session = resolve_pending_choice(
+            session,
+            ResolveChoiceAction(
+                "alice",
+                first.decision_id,
+                ordered_instance_ids=("bob:2", "bob:1"),
+            ),
+            repository,
+        )
+        second = session.state.pending_decision
+        self.assertEqual(second.source_object_id, session.state.objects["alice:2"].object_id)
+        self.assertEqual(second.option_ids, ("bob:3", "bob:4"))
+        self.assertEqual(
+            [event.event_type for event in session.event_log[-3:]],
+            ["choice_requested", "choice_resolved", "choice_requested"],
+        )
+
+        session = resolve_pending_choice(
+            session,
+            ResolveChoiceAction(
+                "alice",
+                second.decision_id,
+                ordered_instance_ids=("bob:4", "bob:3"),
+            ),
+            repository,
+        )
+        self.assertIsNone(session.state.pending_decision)
+        result = resolve_combat_damage(session, repository)
+        assignments = [
+            event.payload["assignments"]
+            for event in result.event_log
+            if event.event_type == "combat_damage_assigned"
+        ]
+        self.assertEqual(
+            [[assignment["blocker_id"] for assignment in group] for group in assignments],
+            [["bob:2", "bob:1"], ["bob:4", "bob:3"]],
+        )
+
     def test_state_based_actions_destroy_muck_rats_after_lethal_combat_damage(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         session = _state_with_muck_rats_blocker_ready(repository)
@@ -585,6 +655,45 @@ def _state_with_multiple_blockers_ready(repository: CardRepository):
     session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "bob")
     session = _develop_creature_through_normal_turns(session, repository, "bob", "bob:6")
     return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
+
+
+def _state_with_two_multiply_blocked_attackers(repository: CardRepository):
+    setup = SetupInput(
+        game_id="combat-two-multi-blocks",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={
+            "alice": (BORDER_GUARD, BORDER_GUARD),
+            "bob": (MUCK_RATS, MUCK_RATS, MUCK_RATS, MUCK_RATS),
+        },
+        opening_hands={
+            "alice": (BORDER_GUARD, BORDER_GUARD),
+            "bob": (MUCK_RATS, MUCK_RATS, MUCK_RATS, MUCK_RATS),
+        },
+        rng_seed=53,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    state = session.state
+    for player_id, instance_ids in (
+        ("alice", ("alice:1", "alice:2")),
+        ("bob", ("bob:1", "bob:2", "bob:3", "bob:4")),
+    ):
+        for instance_id in instance_ids:
+            state = move_object(
+                state,
+                instance_id=instance_id,
+                from_zone="hand",
+                to_zone="battlefield",
+                player_id=player_id,
+            )
+    objects = {
+        **state.objects,
+        **{
+            instance_id: replace(state.objects[instance_id], entered_battlefield_turn=0)
+            for instance_id in ("alice:1", "alice:2", "bob:1", "bob:2", "bob:3", "bob:4")
+        },
+    }
+    return replace(session, state=replace(state, objects=objects))
 
 
 def _state_with_muck_rats_blocker_ready(repository: CardRepository):

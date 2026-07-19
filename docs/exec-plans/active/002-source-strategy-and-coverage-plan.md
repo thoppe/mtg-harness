@@ -81,6 +81,9 @@ The simulator should only claim support based on layer 3, never merely because l
 - The recorded single-attacker multi-block damage-order limitation is complete:
   blocker declaration now queues an explicit attacking-player-owned ordered
   decision with object-identity revalidation before combat damage.
+- The recorded multiple-attacker damage-order limitation is complete: one
+  attacking-player-owned ordered decision is queued per multiply blocked
+  attacker in declared-attacker order.
 
 ## Workstreams
 
@@ -222,3 +225,5 @@ completed Wave 7 trigger-resolution choice correction.
    explicit single-multiply-blocked-attacker boundary.
 10. Select the smallest remaining recorded in-slice limitation or the smallest
     manifest-backed `Portal` increment.
+11. Preserve the completed sequential multi-attacker damage-order queue in
+    `docs/exec-plans/active/006-multiple-combat-damage-order-choices.md`.
