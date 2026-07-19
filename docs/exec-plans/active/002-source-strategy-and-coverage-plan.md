@@ -96,6 +96,9 @@ The simulator should only claim support based on layer 3, never merely because l
   targeted `Sorcerous Sight` casting, both stack passes, resolution-time hand
   inspection, draw, and zone movement now have a direct state-and-event
   equivalence regression.
+- The recorded replay-reducer choice evidence gap is complete: `Personal
+  Tutor` selection, deterministic shuffle, reveal, and library-top placement
+  now have a direct state-and-event equivalence regression.
 
 ## Workstreams
 
@@ -247,3 +250,5 @@ completed Wave 7 trigger-resolution choice correction.
     `docs/exec-plans/active/009-combat-replay-equivalence.md`.
 15. Preserve the completed targeted noncreature replay equivalence regression
     in `docs/exec-plans/active/010-noncreature-replay-equivalence.md`.
+16. Preserve the completed choice-resolution replay equivalence regression in
+    `docs/exec-plans/active/011-choice-replay-equivalence.md`.

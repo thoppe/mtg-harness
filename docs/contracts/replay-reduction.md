@@ -34,8 +34,10 @@ combat state, and stack state.
   casting, priority passing, and the current combat declarations. Equivalence
   tests cover land play, mana production, creature casting, targeted
   noncreature casting and resolution, both stack passes, and an empty combat
-  through attacker and blocker declaration; add equivalent tests as each
-  remaining action family is widened.
+  through attacker and blocker declaration. A `Personal Tutor` regression also
+  covers private choice resolution, deterministic shuffle, reveal, and
+  library-top placement; add equivalent tests as each remaining action family
+  is widened.
 
 ## Related Contracts
 
