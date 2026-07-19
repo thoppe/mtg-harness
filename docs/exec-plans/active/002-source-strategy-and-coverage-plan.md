@@ -71,6 +71,10 @@ The simulator should only claim support based on layer 3, never merely because l
   registered attack/ETB/dies triggers, trigger-resolution choices, activated
   nonmana abilities, and Mystic Denial's narrow counter predicate; it is not
   active support until coverage, implementation, and tests land together.
+- Wave 7's recorded trigger-resolution choice limitation is complete:
+  supported target, player, hidden-zone, discard, and pay-or-sacrifice
+  triggers now use explicit chooser-owned continuations with identity
+  revalidation and redacted public events.
 
 ## Workstreams
 
@@ -178,8 +182,7 @@ Prefer links to canonical manifests over duplicated card lists. If a copied list
 ## Resume Here
 
 The next session should continue from the manifest-backed slice after the
-completed Wave 6 batch, using Wave 7's dependency-ordered contracts rather
-than promoting its raw sources as a group.
+completed Wave 7 trigger-resolution choice correction.
 
 1. Treat the active support-slice manifest as the only playable card-universe
    declaration; source artifacts alone do not imply support.
@@ -198,9 +201,11 @@ than promoting its raw sources as a group.
 5. Before each implementation subwave, update source artifacts, manifest,
    coverage, rules envelope, registry, and edge-case tests together; before
    finishing, run the card-expansion freshness check above.
-6. Before widening into another set, complete the recorded Wave 7
-   trigger-resolution-choice increment in
-   `docs/exec-plans/active/003-wave7-trigger-resolution-choices.md`. Preserve
+6. The Wave 7 trigger-resolution-choice increment in
+   `docs/exec-plans/active/003-wave7-trigger-resolution-choices.md` is
+   complete. Preserve
    `docs/contracts/wave7-triggers-abilities-and-instants.md` as the authority
-   for registered triggers, source snapshots, activation, prevention,
-   counters, and the explicit remaining choice gap.
+   for registered triggers, source snapshots, chooser-owned continuations,
+   activation, prevention, and counters.
+7. Select the smallest next manifest-backed Portal implementation set before
+   widening another mechanic family or set.

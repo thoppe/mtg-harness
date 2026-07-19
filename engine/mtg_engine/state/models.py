@@ -77,9 +77,10 @@ class StackEntry:
 class PendingDecision:
     """A name-scoped, replayable choice that suspends spell resolution.
 
-    ``option_ids`` deliberately contains only stable object instance IDs.  It
-    is a snapshot for presenting a choice, not an authority to move a card:
-    resolution must re-check the selected objects against the current state.
+    ``option_ids`` contains stable object instance IDs by default, or player
+    IDs when ``option_scope`` is ``player``. It is a snapshot for presenting a
+    choice, not an authority to mutate state: resolution must re-check object
+    identity and zone before applying the selection.
     The bounds and continuation let a single explicit decision surface cover
     Wave 5's one-card, multi-card, ordered, and sequential choices without
     making an implicit UI decision part of the rules engine.
@@ -90,6 +91,7 @@ class PendingDecision:
     kind: str
     source_object_id: str
     option_ids: tuple[str, ...]
+    option_scope: str = "object"
     selected_card_type: str = ""
     min_selections: int = 1
     max_selections: int = 1
@@ -97,6 +99,7 @@ class PendingDecision:
     allow_shuffle: bool = False
     continuation_kind: str | None = None
     continuation: tuple[tuple[str, object], ...] = ()
+    selection_counts: tuple[int, ...] = ()
 
 
 @dataclass(frozen=True)

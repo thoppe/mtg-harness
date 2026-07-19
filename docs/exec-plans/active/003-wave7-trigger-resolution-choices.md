@@ -12,6 +12,13 @@ This is a rule-correction increment for the already-active Wave 7 cards. It
 does not add card source artifacts or promote new cards. The contract remains
 name-scoped and deliberately chooses targets only when the trigger resolves.
 
+## Status
+
+- Phase: complete
+- Completed: chooser-owned object/player decisions, identity-safe
+  continuations, hidden-zone redaction, payment cardinality, and focused
+  regression coverage
+
 ## Required Stages
 
 1. Extend `PendingDecision` with an explicit option scope (`object` by
@@ -60,7 +67,8 @@ all stages pass.
 
 ## Resume Here
 
-Implement stages 1--3 as one coherent rule change, beginning with the
-`PendingDecision` option scope and continuation dispatcher. Do not mark any
-Wave 7 card fully oracle-faithful until the behavioral and replay coverage in
-stage 5 is present.
+The trigger-resolution choice limitation is closed. Resume from
+`docs/exec-plans/active/002-source-strategy-and-coverage-plan.md` and select the
+smallest next manifest-backed Portal increment. Preserve the object/player
+option-scope distinction and object-identity snapshots when adding any later
+decision continuation.

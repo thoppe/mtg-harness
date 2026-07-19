@@ -9,6 +9,10 @@ set_summaries:
     notes: "The declared support slice currently includes Rain of Daggers as an explicit off-Portal source addition used to widen reusable mass-destruction support."
 cards:
   # Wave 7: constrained instants plus activated, attack, enters, and dies triggers.
+  # Chooser-owned resolution behavior for the Wave 7 target, search, discard,
+  # and pay-or-sacrifice entries below is covered by
+  # engine/tests/test_wave7_trigger_choices.py in addition to the identity
+  # registry coverage named on each entry.
   - {set_code: por, card_key: "76da2150-34b9-4483-99df-131e1c5468d5", display_name: "Assassin's Blade", card_instances: variable, status: implemented, engine_scope: "Declare-attackers response destroying one nonblack attacking creature.", required_rules: [wave7_constrained_instants_minimal], tests: [engine/tests/test_wave7.py]}
   - {set_code: por, card_key: "70e0b676-61a2-4dcf-8f61-d9281467ed43", display_name: Blessed Reversal, card_instances: variable, status: implemented, engine_scope: "Declare-attackers response gaining three life per creature attacking its controller.", required_rules: [wave7_constrained_instants_minimal], tests: [engine/tests/test_wave7.py]}
   - {set_code: por, card_key: "09fe624f-c66a-46e4-a9af-7e3c3ca1a4e3", display_name: Capricious Sorcerer, card_instances: variable, status: implemented, engine_scope: "Name-scoped pre-attack tap activation for one any-target damage.", required_rules: [wave7_activated_abilities_minimal], tests: [engine/tests/test_wave7.py]}

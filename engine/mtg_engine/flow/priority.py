@@ -62,7 +62,10 @@ def _enumerate_pending_decision_actions(decision) -> tuple[ResolveChoiceAction, 
     lower_bound = 0 if not options else decision.min_selections
     upper_bound = min(decision.max_selections, len(options))
     actions: list[ResolveChoiceAction] = []
-    for selection_count in range(lower_bound, upper_bound + 1):
+    selection_counts = decision.selection_counts or tuple(range(lower_bound, upper_bound + 1))
+    for selection_count in selection_counts:
+        if selection_count < lower_bound or selection_count > upper_bound:
+            continue
         selections = (
             permutations(options, selection_count)
             if decision.selection_ordered

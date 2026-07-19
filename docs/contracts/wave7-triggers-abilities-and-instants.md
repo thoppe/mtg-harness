@@ -181,25 +181,22 @@ activated abilities, generic replacement effects, general counterspells,
 multi-player priority, damage redirection, regeneration, or persistent hidden
 information visibility.
 
-## Recorded Limitation: Trigger-Resolution Choices
+## Completed Trigger-Resolution Choice Increment
 
-The current engine records and resolves the supported Wave 7 trigger entries,
-but does **not** yet expose a chooser-owned pending-decision continuation for
-every optional or target-bearing trigger at resolution. In those paths, the
-implementation currently uses a deterministic first-legal fallback (or no
-effect where the trigger branch is not yet modeled) rather than asking the
-controller to choose or decline.
+The supported Wave 7 optional, target-bearing, search, post-draw discard, and
+pay-or-sacrifice triggers now suspend resolution with one chooser-owned
+`PendingDecision`. Decisions distinguish object options from player options,
+snapshot object identity at the trigger-resolution boundary, and revalidate
+zone and identity before applying the continuation. Stale targets resolve with
+no effect; stale or declined payments take the unpaid source-sacrifice branch.
 
-This limitation affects, at minimum, optional/targeted effects for Ebon
-Dragon, Gravedigger, Ingenious Thief, Man-o'-War, Fire Imp, Fire Dragon,
-Serpent Assassin, Fire Snake, Seasoned Marshal, and Wood Elves, plus the
-pay-or-sacrifice choices for Mercenary Knight, Plant Elemental, Primeval
-Force, Thing from the Deep, and Thundering Wurm. Owl Familiar is a separate
-mandatory post-draw discard choice when able, not an "unless" payment.
+Public request and resolution events expose decision metadata, option scope,
+and counts but do not expose hidden hand or library identities. Wood Elves
+shuffles after a selected, declined, or stale search. Primeval Force accepts
+only zero or exactly three distinct Forest selections. The trigger stack entry
+is removed when resolution suspends, and `triggered_ability_resolved` is
+emitted only after the continuation completes.
 
-The dedicated increment is specified by
-`docs/exec-plans/active/003-wave7-trigger-resolution-choices.md`. It must use
-the existing redacted hidden-zone decision/event rules, distinguish player
-from object options, and capture targets or payment options at the declared
-trigger-resolution boundary before the engine claims full oracle fidelity for
-these effects.
+The verified increment and its regression matrix are recorded in
+`docs/exec-plans/active/003-wave7-trigger-resolution-choices.md` and
+`engine/tests/test_wave7_trigger_choices.py`.

@@ -1112,6 +1112,8 @@ def resolve_pending_choice(
     selected_ids = action.ordered_instance_ids if decision.selection_ordered else action.selected_instance_ids
     if len(selected_ids) < decision.min_selections or len(selected_ids) > decision.max_selections:
         raise ValueError("selection count is outside the declared bounds")
+    if decision.selection_counts and len(selected_ids) not in decision.selection_counts:
+        raise ValueError("selection count is not legal for this decision")
     if any(instance_id not in decision.option_ids for instance_id in selected_ids):
         raise ValueError("selected card is not a legal option")
     if len(set(selected_ids)) != len(selected_ids):
@@ -1139,7 +1141,7 @@ def resolve_pending_choice(
     context = dict(decision.continuation)
 
     expected_zone = "hand" if decision.continuation_kind == "wave5_discard_then_draw" else "library"
-    if decision.continuation_kind not in {None, "wave5_truce"}:
+    if decision.continuation_kind not in {None, "wave5_truce"} and not decision.continuation_kind.startswith("wave7_"):
         for instance_id in selected_ids:
             if state.objects[instance_id].zone != expected_zone:
                 raise ValueError("selected card is no longer a legal option")
@@ -1230,6 +1232,14 @@ def resolve_pending_choice(
             next_state, sba_events = apply_state_based_actions(next_state, card_repository, active_player=player_id)
             for event in sba_events:
                 event_log.append(event_type=event["event_type"], active_player=event["active_player"], payload=event["payload"])
+    elif kind == "wave7_trigger_choice":
+        next_state = _resolve_wave7_trigger_choice(
+            next_state,
+            event_log,
+            decision,
+            selected_ids,
+            card_repository,
+        )
     else:
         raise ValueError("unsupported pending-decision continuation")
     return TurnResult(state=next_state, event_log=event_log.events)
@@ -1372,6 +1382,26 @@ def _resolve_wave7_trigger(session: TurnResult, entry: StackEntry, card_reposito
     state = session.state; event_log = EventLog.from_events(state.game_id, session.event_log)
     effect = effect_key_for(entry.source_oracle_id or state.objects[entry.card_instance_id].oracle_id)
     resolved = state; source = state.objects[entry.card_instance_id]
+    if effect == "owl_familiar_etb":
+        resolved = _draw_one_card_for_player_if_available(resolved, event_log, player_id=entry.controller_id)
+    decision_options = _wave7_trigger_choice_options(
+        resolved, entry, effect, card_repository
+    )
+    if decision_options is not None:
+        option_scope, options, minimum, maximum, selection_counts = decision_options
+        resolved = _queue_wave7_trigger_decision(
+            resolved,
+            event_log,
+            entry=entry,
+            effect=effect,
+            option_scope=option_scope,
+            option_ids=options,
+            min_selections=minimum,
+            max_selections=maximum,
+            selection_counts=selection_counts,
+            card_repository=card_repository,
+        )
+        return TurnResult(resolved, event_log.events)
     life_delta = {"dread_reaper_etb": -5, "serpent_warrior_etb": -3, "spiritual_guardian_etb": 4, "venerable_monk_etb": 2}.get(effect)
     if life_delta is not None:
         player = resolved.players[entry.controller_id]; resolved = update_player(resolved, replace(player, life_total=player.life_total + life_delta))
@@ -1385,20 +1415,6 @@ def _resolve_wave7_trigger(session: TurnResult, entry: StackEntry, card_reposito
             for instance_id in player.battlefield:
                 if instance_id != entry.card_instance_id and card_repository.get(resolved.objects[instance_id].oracle_id).is_creature:
                     resolved = update_object(resolved, replace(resolved.objects[instance_id], tapped=True))
-    elif effect == "owl_familiar_etb":
-        resolved = _draw_one_card_for_player_if_available(resolved, event_log, player_id=entry.controller_id)
-        hand = resolved.players[entry.controller_id].hand
-        if hand: resolved = _discard_specific_cards(resolved, event_log, player_id=entry.controller_id, instance_ids=(hand[0],), active_player=entry.controller_id)
-    elif effect == "ebon_dragon_etb":
-        opponent = next((pid for pid in resolved.players if pid != entry.controller_id), None)
-        if opponent is not None: resolved = _discard_first_cards_in_hand_order(resolved, event_log, player_id=opponent, count=1, active_player=entry.controller_id)
-    elif effect == "gravedigger_etb":
-        choices = tuple(i for i in resolved.players[entry.controller_id].graveyard if card_repository.get(resolved.objects[i].oracle_id).is_creature and i != entry.card_instance_id)
-        if choices: resolved = _move_with_event(resolved, event_log, instance_id=choices[0], from_zone="graveyard", to_zone="hand", player_id=entry.controller_id, active_player=entry.controller_id)
-    elif effect == "wood_elves_etb":
-        choices = tuple(i for i in resolved.players[entry.controller_id].library if card_repository.get(resolved.objects[i].oracle_id).has_subtype("Forest"))
-        if choices: resolved = _move_with_event(resolved, event_log, instance_id=choices[0], from_zone="library", to_zone="battlefield", player_id=entry.controller_id, active_player=entry.controller_id)
-        resolved = _shuffle_library(resolved, event_log, player_id=entry.controller_id)
     elif effect == "endless_cockroaches_death" and source.zone == "graveyard" and source.object_id == entry.expected_graveyard_object_id:
         resolved = _move_with_event(resolved, event_log, instance_id=source.instance_id, from_zone="graveyard", to_zone="hand", player_id=source.owner_id, active_player=entry.controller_id)
     elif effect == "undying_beast_death" and source.zone == "graveyard" and source.object_id == entry.expected_graveyard_object_id:
@@ -1407,51 +1423,289 @@ def _resolve_wave7_trigger(session: TurnResult, entry: StackEntry, card_reposito
         for player_id in resolved.players:
             if player_id != entry.controller_id:
                 resolved = _discard_first_cards_in_hand_order(resolved, event_log, player_id=player_id, count=1, active_player=entry.controller_id)
-    elif effect in {"fire_imp_etb", "fire_dragon_etb", "serpent_assassin_etb", "manowar_etb", "fire_snake_death", "seasoned_marshal_attack"}:
-        # Trigger targets are intentionally not inferred from card text.  This
-        # bounded fallback keeps direct StackEntry/replay callers deterministic
-        # while normal UI selection may supply the declared target identity.
-        candidates = tuple(i for player in resolved.players.values() for i in player.battlefield if card_repository.get(resolved.objects[i].oracle_id).is_creature)
-        target = entry.target_ids[0] if entry.target_ids else (candidates[0] if candidates else None)
-        if effect == "fire_snake_death":
-            lands = tuple(i for player in resolved.players.values() for i in player.battlefield if card_repository.get(resolved.objects[i].oracle_id).is_land)
-            target = entry.target_ids[0] if entry.target_ids else (lands[0] if lands else None)
-        if target is not None:
-            if effect == "fire_imp_etb":
-                resolved, events = _resolve_direct_damage_sorcery(resolved, card_repository, target, effect="damage_any_target_variable", active_player=entry.controller_id, damage_override=2)
-                for item in events: event_log.append(event_type=item["event_type"], active_player=item["active_player"], payload=item["payload"])
-            elif effect == "fire_dragon_etb":
-                damage = _controlled_land_subtype_count(resolved, card_repository, entry.controller_id, "Mountain")
-                resolved, events = _resolve_direct_damage_sorcery(resolved, card_repository, target, effect="damage_any_target_variable", active_player=entry.controller_id, damage_override=damage)
-                for item in events: event_log.append(event_type=item["event_type"], active_player=item["active_player"], payload=item["payload"])
-            elif effect in {"serpent_assassin_etb", "fire_snake_death"}:
-                resolved, _ = _destroy_permanents(resolved, event_log, instance_ids=(target,), active_player=entry.controller_id, reason=f"trigger:{effect}")
-            elif effect == "manowar_etb":
-                target_obj = resolved.objects[target]; resolved = _move_with_event(resolved, event_log, instance_id=target, from_zone="battlefield", to_zone="hand", player_id=target_obj.owner_id, active_player=entry.controller_id)
-            else:
-                resolved = update_object(resolved, replace(resolved.objects[target], tapped=True))
-    elif effect in {"mercenary_knight_etb", "pillaging_horde_etb", "plant_elemental_etb", "primeval_force_etb", "thundering_wurm_etb", "thing_from_the_deep_attack"}:
+    elif effect == "pillaging_horde_etb":
         # A mandatory 'unless' payment is deliberately conservative: choose the first
         # qualifying deterministic option; if none exists, sacrifice the source.
-        qualifying = ()
-        if effect in {"mercenary_knight_etb", "thundering_wurm_etb"}:
-            qualifier = "creature" if effect == "mercenary_knight_etb" else "land"
-            qualifying = tuple(i for i in resolved.players[entry.controller_id].hand if getattr(card_repository.get(resolved.objects[i].oracle_id), f"is_{qualifier}"))
-        elif effect in {"plant_elemental_etb", "primeval_force_etb", "thing_from_the_deep_attack"}:
-            subtype = "Forest" if effect != "thing_from_the_deep_attack" else "Island"; count = 3 if effect == "primeval_force_etb" else 1
-            qualifying = tuple(i for i in resolved.players[entry.controller_id].battlefield if card_repository.get(resolved.objects[i].oracle_id).is_land and card_repository.get(resolved.objects[i].oracle_id).has_subtype(subtype))
-            qualifying = qualifying if len(qualifying) >= count else ()
-        if effect == "pillaging_horde_etb": qualifying = resolved.players[entry.controller_id].hand
+        qualifying = resolved.players[entry.controller_id].hand
         if qualifying:
-            if effect == "pillaging_horde_etb":
-                selected = random.Random(resolved.rng_seed + resolved.rng_cursor).choice(qualifying); resolved = replace(resolved, rng_cursor=resolved.rng_cursor + 1)
-            else: selected = qualifying[0]
-            if selected in resolved.players[entry.controller_id].hand: resolved = _discard_specific_cards(resolved, event_log, player_id=entry.controller_id, instance_ids=(selected,), active_player=entry.controller_id)
-            else: resolved, _ = _destroy_permanents(resolved, event_log, instance_ids=(selected,), active_player=entry.controller_id, reason="trigger_payment")
+            selected = random.Random(resolved.rng_seed + resolved.rng_cursor).choice(qualifying); resolved = replace(resolved, rng_cursor=resolved.rng_cursor + 1)
+            resolved = _discard_specific_cards(resolved, event_log, player_id=entry.controller_id, instance_ids=(selected,), active_player=entry.controller_id)
         elif source.zone == "battlefield":
             resolved, _ = _destroy_permanents(resolved, event_log, instance_ids=(source.instance_id,), active_player=entry.controller_id, reason="unpaid_trigger_cost")
     event_log.append(event_type="triggered_ability_resolved", active_player=entry.controller_id, payload={"ability_key": effect, "card_instance_id": entry.card_instance_id})
     return TurnResult(resolved, event_log.events)
+
+
+def _wave7_trigger_choice_options(state, entry, effect, card_repository):
+    """Snapshot the deliberately name-scoped Wave 7 resolution choices."""
+    battlefield = tuple(
+        instance_id
+        for player in state.players.values()
+        for instance_id in player.battlefield
+    )
+    creatures = tuple(
+        instance_id
+        for instance_id in battlefield
+        if card_repository.get(state.objects[instance_id].oracle_id).is_creature
+    )
+    if effect == "ebon_dragon_etb":
+        return ("player", tuple(pid for pid in state.players if pid != entry.controller_id), 0, 1, ())
+    if effect == "ingenious_thief_etb":
+        return ("player", tuple(state.players), 1, 1, ())
+    if effect == "gravedigger_etb":
+        options = tuple(
+            instance_id
+            for instance_id in state.players[entry.controller_id].graveyard
+            if card_repository.get(state.objects[instance_id].oracle_id).is_creature
+        )
+        return ("object", options, 0, 1, ())
+    if effect in {"serpent_assassin_etb", "seasoned_marshal_attack"}:
+        options = creatures
+        if effect == "serpent_assassin_etb":
+            options = tuple(
+                instance_id for instance_id in options
+                if not card_repository.get(state.objects[instance_id].oracle_id).has_color("B")
+            )
+        return ("object", options, 0, 1, ())
+    if effect in {"fire_imp_etb", "fire_dragon_etb", "manowar_etb"}:
+        return ("object", creatures, 0 if not creatures else 1, 1, ())
+    if effect == "fire_snake_death":
+        lands = tuple(
+            instance_id for instance_id in battlefield
+            if card_repository.get(state.objects[instance_id].oracle_id).is_land
+        )
+        return ("object", lands, 0 if not lands else 1, 1, ())
+    if effect == "wood_elves_etb":
+        forests = tuple(
+            instance_id
+            for instance_id in state.players[entry.controller_id].library
+            if card_repository.get(state.objects[instance_id].oracle_id).has_subtype("Forest")
+        )
+        return ("object", forests, 0, 1, ())
+    if effect == "owl_familiar_etb":
+        hand = state.players[entry.controller_id].hand
+        return ("object", hand, 0 if not hand else 1, 1, ())
+    if effect in {"mercenary_knight_etb", "thundering_wurm_etb"}:
+        qualifier = "creature" if effect == "mercenary_knight_etb" else "land"
+        options = tuple(
+            instance_id
+            for instance_id in state.players[entry.controller_id].hand
+            if getattr(card_repository.get(state.objects[instance_id].oracle_id), f"is_{qualifier}")
+        )
+        return ("object", options, 0, 1, (0, 1))
+    if effect in {"plant_elemental_etb", "primeval_force_etb", "thing_from_the_deep_attack"}:
+        subtype = "Island" if effect == "thing_from_the_deep_attack" else "Forest"
+        required = 3 if effect == "primeval_force_etb" else 1
+        options = tuple(
+            instance_id
+            for instance_id in state.players[entry.controller_id].battlefield
+            if card_repository.get(state.objects[instance_id].oracle_id).is_land
+            and card_repository.get(state.objects[instance_id].oracle_id).has_subtype(subtype)
+        )
+        counts = (0, required) if len(options) >= required else (0,)
+        return ("object", options, 0, min(required, len(options)), counts)
+    return None
+
+
+def _resolve_wave7_trigger_choice(
+    state,
+    event_log,
+    decision,
+    selected_ids,
+    card_repository,
+):
+    context = dict(decision.continuation)
+    effect = context["effect"]
+    controller_id = context["controller_id"]
+    expected_ids = dict(context["option_object_ids"])
+    expected_zone = {
+        "gravedigger_etb": "graveyard",
+        "wood_elves_etb": "library",
+        "owl_familiar_etb": "hand",
+        "mercenary_knight_etb": "hand",
+        "thundering_wurm_etb": "hand",
+    }.get(effect, "battlefield")
+    valid_ids = tuple(
+        instance_id
+        for instance_id in selected_ids
+        if (
+            decision.option_scope == "player"
+            and instance_id in state.players
+        ) or (
+            decision.option_scope == "object"
+            and instance_id in state.objects
+            and state.objects[instance_id].object_id == expected_ids.get(instance_id)
+            and state.objects[instance_id].zone == expected_zone
+        )
+    )
+    resolved = state
+
+    if effect == "ebon_dragon_etb" and valid_ids:
+        resolved = _discard_first_cards_in_hand_order(
+            resolved, event_log, player_id=valid_ids[0], count=1,
+            active_player=controller_id,
+        )
+    elif effect == "ingenious_thief_etb" and valid_ids:
+        event_log.append(
+            event_type="hand_looked_at",
+            active_player=controller_id,
+            payload={
+                "viewer_id": controller_id,
+                "target_player_id": valid_ids[0],
+                "card_count": len(resolved.players[valid_ids[0]].hand),
+            },
+        )
+    elif effect == "gravedigger_etb" and valid_ids:
+        resolved = _move_with_event(
+            resolved, event_log, instance_id=valid_ids[0],
+            from_zone="graveyard", to_zone="hand", player_id=controller_id,
+            active_player=controller_id,
+        )
+    elif effect == "wood_elves_etb":
+        if valid_ids:
+            resolved = _move_with_event(
+                resolved, event_log, instance_id=valid_ids[0],
+                from_zone="library", to_zone="battlefield",
+                player_id=controller_id, active_player=controller_id,
+            )
+        resolved = _shuffle_library(resolved, event_log, player_id=controller_id)
+    elif effect == "owl_familiar_etb" and valid_ids:
+        resolved = _discard_specific_cards(
+            resolved, event_log, player_id=controller_id,
+            instance_ids=(valid_ids[0],), active_player=controller_id,
+        )
+    elif effect in {
+        "fire_imp_etb", "fire_dragon_etb", "serpent_assassin_etb",
+        "manowar_etb", "fire_snake_death", "seasoned_marshal_attack",
+    } and valid_ids:
+        target = valid_ids[0]
+        if effect in {"fire_imp_etb", "fire_dragon_etb"}:
+            damage = 2 if effect == "fire_imp_etb" else context["fire_dragon_damage"]
+            resolved, events = _resolve_direct_damage_sorcery(
+                resolved, card_repository, target,
+                effect="damage_any_target_variable",
+                active_player=controller_id, damage_override=damage,
+            )
+            for item in events:
+                event_log.append(
+                    event_type=item["event_type"],
+                    active_player=item["active_player"],
+                    payload=item["payload"],
+                )
+        elif effect in {"serpent_assassin_etb", "fire_snake_death"}:
+            resolved, _ = _destroy_permanents(
+                resolved, event_log, instance_ids=(target,),
+                active_player=controller_id, reason=f"trigger:{effect}",
+            )
+        elif effect == "manowar_etb":
+            target_obj = resolved.objects[target]
+            resolved = _move_with_event(
+                resolved, event_log, instance_id=target,
+                from_zone="battlefield", to_zone="hand",
+                player_id=target_obj.owner_id, active_player=controller_id,
+            )
+        else:
+            resolved = update_object(
+                resolved, replace(resolved.objects[target], tapped=True)
+            )
+    elif effect in {
+        "mercenary_knight_etb", "plant_elemental_etb",
+        "primeval_force_etb", "thing_from_the_deep_attack",
+        "thundering_wurm_etb",
+    }:
+        required = 3 if effect == "primeval_force_etb" else 1
+        paid = len(valid_ids) == required
+        if paid:
+            if expected_zone == "hand":
+                resolved = _discard_specific_cards(
+                    resolved, event_log, player_id=controller_id,
+                    instance_ids=valid_ids, active_player=controller_id,
+                )
+            else:
+                resolved, _ = _destroy_permanents(
+                    resolved, event_log, instance_ids=valid_ids,
+                    active_player=controller_id, reason="trigger_payment",
+                )
+        else:
+            source_id = context["card_instance_id"]
+            source = resolved.objects[source_id]
+            if (
+                source.zone == "battlefield"
+                and source.object_id == context["source_object_id"]
+            ):
+                resolved, _ = _destroy_permanents(
+                    resolved, event_log, instance_ids=(source_id,),
+                    active_player=controller_id, reason="unpaid_trigger_cost",
+                )
+
+    event_log.append(
+        event_type="triggered_ability_resolved",
+        active_player=controller_id,
+        payload={
+            "ability_key": effect,
+            "card_instance_id": context["card_instance_id"],
+        },
+    )
+    return resolved
+
+
+def _queue_wave7_trigger_decision(
+    state,
+    event_log,
+    *,
+    entry,
+    effect,
+    option_scope,
+    option_ids,
+    min_selections,
+    max_selections,
+    selection_counts,
+    card_repository,
+):
+    decision_id = f"{entry.source_object_id}:{effect}:{entry.controller_id}:{len(event_log.events)}"
+    option_object_ids = (
+        ()
+        if option_scope == "player"
+        else tuple((instance_id, state.objects[instance_id].object_id) for instance_id in option_ids)
+    )
+    continuation = (
+        ("effect", effect),
+        ("controller_id", entry.controller_id),
+        ("card_instance_id", entry.card_instance_id),
+        ("source_object_id", entry.source_object_id),
+        ("option_object_ids", option_object_ids),
+        ("fire_dragon_damage", _controlled_land_subtype_count(
+            state, card_repository, entry.controller_id, "Mountain"
+        ) if effect == "fire_dragon_etb" else 0),
+    )
+    next_state = replace(
+        state,
+        pending_decision=PendingDecision(
+            decision_id=decision_id,
+            chooser_id=entry.controller_id,
+            kind=f"wave7_{effect}",
+            source_object_id=entry.source_object_id or "",
+            option_ids=tuple(option_ids),
+            option_scope=option_scope,
+            min_selections=min_selections,
+            max_selections=max_selections,
+            continuation_kind="wave7_trigger_choice",
+            continuation=continuation,
+            selection_counts=selection_counts,
+        ),
+    )
+    event_log.append(
+        event_type="choice_requested",
+        active_player=entry.controller_id,
+        payload={
+            "decision_id": decision_id,
+            "chooser_id": entry.controller_id,
+            "kind": f"wave7_{effect}",
+            "option_scope": option_scope,
+            "option_count": len(option_ids),
+        },
+    )
+    return next_state
 
 
 def _resolve_alabaster_dragon_death_trigger(session: TurnResult, entry: StackEntry) -> TurnResult:
