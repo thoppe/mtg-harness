@@ -9,8 +9,9 @@ selection, ordering, and other effects whose legal options are not public.
 
 - A resolving effect may install exactly one `pending_decision` in game state.
 - A pending decision records a stable `decision_id`, chooser, kind, source
-  object ID, legal option instance IDs, visibility policy, and continuation
-  payload. It is part of replayable state, not a UI-only prompt.
+  object ID, legal option instance IDs, and continuation payload. Its kind and
+  the effect contract determine the visibility boundary; it is part of
+  replayable state, not a UI-only prompt.
 - While a decision is pending, only its chooser may submit the matching choice
   action; unrelated game actions are not legal.
 
@@ -40,8 +41,10 @@ selection, ordering, and other effects whose legal options are not public.
 
 ## Replay Guarantees
 
-- Accepted choice actions and resulting choice events carry the decision ID and
-  selected instance ID. The reducer can reproduce the transition from setup,
-  action log, and deterministic RNG state.
+- Accepted choice actions carry the decision ID and the complete private
+  selection needed by the reducer. Resulting public choice events carry the
+  decision ID but redact selected hidden instance IDs unless the effect reveals
+  them or makes them public through a zone change. The reducer can reproduce
+  the transition from setup, action log, and deterministic RNG state.
 - A decision is consumed exactly once; it cannot be re-applied after resolution
   or zone movement.

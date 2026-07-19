@@ -29,6 +29,7 @@ Define the minimum append-only event types required for deterministic replay and
 - `step_changed`
 - `priority_passed`
 - `land_played`
+- `land_play_allowance_changed`
 - `mana_added`
 - `spell_cast`
 - `object_moved_between_zones`
@@ -36,15 +37,12 @@ Define the minimum append-only event types required for deterministic replay and
 - `spell_countered_on_resolution`
 - `triggered_ability_put_on_stack`
 - `triggered_ability_resolved`
-- `trigger_order_requested`
 - `activated_ability_activated`
 - `activated_ability_resolved`
 - `damage_prevented`
 - `spell_countered`
 - `choice_requested`
 - `choice_resolved`
-- `cards_revealed`
-- `library_prefix_ordered`
 - `damage_applied`
 - `attackers_declared`
 - `blockers_declared`
@@ -55,8 +53,17 @@ Define the minimum append-only event types required for deterministic replay and
 - `state_based_actions_checked`
 - `permanent_destroyed`
 - `turn_ended`
-- `extra_turn_queued`
-- `combat_skipped`
+- `card_revealed`
+- `hand_looked_at`
+- `hand_revealed`
+- `library_shuffled`
+- `random_choice_resolved`
+- `delayed_turn_effect_created`
+- `extra_turn_scheduled`
+- `extra_turn_started`
+- `untap_prevented`
+- `combat_phase_skipped`
+- `combat_requirement_created`
 
 ## Guarantees
 
@@ -65,6 +72,34 @@ Define the minimum append-only event types required for deterministic replay and
 - Replay tests must be able to assert exact event sequences for the initial slice.
 - The event vocabulary may grow, but existing event meanings should not drift silently.
 - Automatic-destruction events should record the engine reason for that destruction when the current rule family can identify it explicitly.
+
+## Event Names And Visibility
+
+- Event names are singular, lower-snake-case facts.  The v0 vocabulary uses
+  `card_revealed`, not `cards_revealed`; `combat_phase_skipped`, not
+  `combat_skipped`; and `extra_turn_scheduled`, not `extra_turn_queued`.
+  Consumers must use the names in the required list rather than infer aliases.
+- `choice_requested` always exposes only `decision_id`, `chooser_id`, `kind`,
+  and `option_count`.  It must not expose a hidden option ID, a hidden library
+  order, or a private continuation payload.
+- `choice_resolved` always identifies the decision; its chooser and kind are
+  obtained from the matching request (and its active-player context). A
+  selection from a nonrevealed hand or library is represented only by its
+  public aggregate (`selected_count`, declared count, or yes/no outcome).
+  It may identify an individual selected card only when the effect separately
+  emits `card_revealed` or the resulting zone change makes that identity public.
+- `hand_looked_at` records viewer, viewed player, and count only.  By contrast,
+  `hand_revealed` records the hand's card-instance and oracle identities because
+  the source text makes those facts public.
+- `card_revealed` records the revealed instance, oracle ID, owner/controller
+  context when applicable, and a stable reason such as `tutor` or `search`.
+  It is the only generic public reveal event; no plural alias exists.
+- `library_shuffled` and `random_choice_resolved` record the algorithm
+  identifier and cursor transition, plus public counts.  Neither records a
+  library order or the pre-random hidden option list.
+- Zone movement is authoritative for public card identities after a card leaves
+  a hidden zone.  A reveal event is not a substitute for the corresponding
+  `object_moved_between_zones` event.
 
 ## v0 Simplifications
 
@@ -83,6 +118,16 @@ Define the minimum append-only event types required for deterministic replay and
   and `triggered_ability_resolved`; an unsuccessful resolution emits only the
   resolved event with its no-effect outcome. Trigger payloads retain the
   source's last-known object identity and owner.
+- Wave 5 uses `hand_looked_at`, `hand_revealed`, `choice_requested`,
+  `choice_resolved`, `card_revealed`, `random_choice_resolved`, and
+  `library_shuffled`.  Hidden selection identities remain absent until an
+  explicit reveal or a public zone movement.
+- Wave 6 uses `delayed_turn_effect_created`, `extra_turn_scheduled`,
+  `extra_turn_started`, `untap_prevented`, and `combat_phase_skipped`.  These
+  records expose the affected player and declared rule outcome, rather than an
+  implicit marker implementation.
+- Wave 7 uses `combat_requirement_created` in addition to the trigger,
+  activation, counter, and prevention events listed above.
 
 ## Expansion Guardrails
 

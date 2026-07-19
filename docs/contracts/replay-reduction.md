@@ -18,6 +18,10 @@ combat state, and stack state.
   engine events.
 - Automatic transitions remain events, but are recomputed by the reducer rather
   than treated as an unvalidated source of truth.
+- The accepted-action log is trusted replay input and may contain private
+  choice selections. The public event log is an observation stream and must
+  retain the redaction guarantees in `replay-event-log.md`; it is not a
+  substitute for private replay input.
 - The reducer rejects malformed, out-of-order, or illegal actions rather than
   silently producing a divergent state.
 - Tests for each implemented action family must include at least one replay

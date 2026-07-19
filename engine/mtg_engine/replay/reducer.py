@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 from mtg_engine.actions.models import (
     ActivateManaAbilityAction,
+    ActivateAbilityAction,
     AdvanceStepAction,
     CastCreatureSpellAction,
     CastNonCreatureSpellAction,
@@ -20,6 +21,7 @@ from mtg_engine.flow.setup import SetupInput, initialize_game
 from mtg_engine.flow.turns import (
     TurnResult,
     activate_mana_ability,
+    activate_ability,
     advance_step,
     cast_creature_spell,
     cast_noncreature_spell,
@@ -34,6 +36,7 @@ from mtg_engine.flow.turns import (
 AcceptedAction = (
     PlayLandAction
     | ActivateManaAbilityAction
+    | ActivateAbilityAction
     | CastCreatureSpellAction
     | CastNonCreatureSpellAction
     | PassPriorityAction
@@ -63,10 +66,14 @@ def replay(input: ReplayInput, card_repository: CardRepository) -> TurnResult:
         session = start_first_turn(session)  # type: ignore[arg-type]
 
     for action in input.actions:
+        if isinstance(session, TurnResult) and session.state.outcome.status == "completed":
+            raise ValueError("cannot replay an action after the game has completed")
         if isinstance(action, PlayLandAction):
             session = play_land(session, action, card_repository)
         elif isinstance(action, ActivateManaAbilityAction):
             session = activate_mana_ability(session, action, card_repository)
+        elif isinstance(action, ActivateAbilityAction):
+            session = activate_ability(session, action, card_repository)
         elif isinstance(action, CastCreatureSpellAction):
             session = cast_creature_spell(session, action, card_repository)
         elif isinstance(action, CastNonCreatureSpellAction):

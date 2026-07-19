@@ -1324,14 +1324,12 @@ def _resolve_top_stack_entry(session: TurnResult, card_repository: CardRepositor
 
     # Resolution can put triggered abilities above this entry.  Remove the
     # entry that was selected at the start, while retaining those new entries.
-    original_entry_index = len(state.stack_entries) - 1
-    remaining_entries = (
-        result.state.stack_entries[:original_entry_index]
-        + result.state.stack_entries[original_entry_index + 1 :]
-    )
+    remaining_entries = list(result.state.stack_entries)
+    if entry in remaining_entries:
+        remaining_entries.remove(entry)
     final_state = replace(
         result.state,
-        stack_entries=remaining_entries,
+        stack_entries=tuple(remaining_entries),
         consecutive_passes=0,
         turn=replace(result.state.turn, priority_player=result.state.turn.active_player),
     )
@@ -1506,8 +1504,14 @@ def _stack_entry_targets_are_legal(
 ) -> bool:
     if not entry.target_ids:
         return True
-    definition = card_repository.get(state.objects[entry.card_instance_id].oracle_id)
-    effect = _supported_targeted_sorcery_effect(definition)
+    for target_id, expected_object_id in zip(entry.target_ids, entry.target_object_ids):
+        if target_id in state.objects and state.objects[target_id].object_id != expected_object_id:
+            return False
+    if entry.entry_kind == "activated_ability":
+        effect = effect_key_for(entry.source_oracle_id or state.objects[entry.card_instance_id].oracle_id)
+    else:
+        definition = card_repository.get(state.objects[entry.card_instance_id].oracle_id)
+        effect = _supported_targeted_sorcery_effect(definition)
     if effect is None:
         return False
     try:
