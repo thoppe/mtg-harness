@@ -13,6 +13,7 @@ from typing import Any, Mapping
 
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.priority import enumerate_legal_actions
+from mtg_engine.rules.characteristics import effective_power, effective_toughness
 from mtg_engine.state.models import GameState
 
 
@@ -380,11 +381,10 @@ def _candidate_label(
     if kind == "allocation":
         return _damage_allocation_label(state, card_repository, value)
     if isinstance(value, str) and value in state.objects:
-        card = state.objects[value]
         # Candidate object identities are only emitted from visible battlefield
         # targets or from the querying player's pending choice.  The latter is
         # protected by player filtering at descriptor-group construction.
-        return card_repository.get(card.oracle_id).name if card.zone != "library" else "private card"
+        return _object_label(state, card_repository, value)
     if isinstance(value, bool):
         return "Yes" if value else "No"
     return str(value)
@@ -394,7 +394,14 @@ def _object_label(state: GameState, card_repository: CardRepository, instance_id
     """Name an object without exposing its engine instance identifier."""
     if isinstance(instance_id, str) and instance_id in state.objects:
         card = state.objects[instance_id]
-        return card_repository.get(card.oracle_id).name if card.zone != "library" else "private card"
+        if card.zone == "library":
+            return "private card"
+        definition = card_repository.get(card.oracle_id)
+        if definition.is_creature:
+            power = effective_power(state, card_repository, instance_id)
+            toughness = effective_toughness(state, card_repository, instance_id)
+            return f"{definition.name} ({power}/{toughness})"
+        return definition.name
     return "unknown object"
 
 

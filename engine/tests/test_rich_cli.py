@@ -113,7 +113,7 @@ class RichCliRendererTests(unittest.TestCase):
 
         rendered = output.getvalue()
         self.assertIn("Declare no blockers", rendered)
-        self.assertIn("Muck Rats blocks Charging Rhino", rendered)
+        self.assertIn("Muck Rats (1/1) blocks Charging Rhino (4/4)", rendered)
         self.assertNotIn("alice:1", rendered)
         self.assertNotIn("bob:2", rendered)
         self.assertNotIn("[[", rendered)

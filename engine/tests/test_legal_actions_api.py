@@ -156,11 +156,11 @@ class LegalActionsApiTests(unittest.TestCase):
         self.assertEqual(labels_by_value[()], "Declare no blockers")
         self.assertEqual(
             labels_by_value[(("alice:1", ("bob:2",)),)],
-            "Muck Rats blocks Charging Rhino",
+            "Muck Rats (1/1) blocks Charging Rhino (4/4)",
         )
         self.assertEqual(
             labels_by_value[(("alice:1", ("bob:1",)),)],
-            "Grizzly Bears blocks Charging Rhino",
+            "Grizzly Bears (2/2) blocks Charging Rhino (4/4)",
         )
         for candidate in candidates.candidates:
             self.assertNotIn("alice:", candidate.label)
