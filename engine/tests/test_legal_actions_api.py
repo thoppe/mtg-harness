@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from mtg_engine.actions.models import CastNonCreatureSpellAction, ResolveChoiceAction
 from mtg_engine.cards.repository import CardRepository
+from mtg_engine.flow.midgame_scenarios import create_midgame_session
 from mtg_engine.flow.setup import SetupInput, initialize_game
 from mtg_engine.flow.turns import start_first_turn
 from mtg_engine.services.legal_actions_api import (
@@ -144,3 +145,37 @@ class LegalActionsApiTests(unittest.TestCase):
         # Unknown slots remain indistinguishable from any other malformed
         # partial request and cannot be used to widen a legal candidate query.
         self.assertEqual(rejected.exception.code, "malformed_parameters")
+
+    def test_composite_candidates_have_player_readable_labels_without_instance_ids(self) -> None:
+        session = create_midgame_session(self.repository, "combat-blockers")
+        actions = session.legal_actions_api("bob")
+        blocker_action = next(action for action in actions.actions if action.kind == "DeclareBlockersAction")
+        candidates = session.valid_targets_api("bob", blocker_action.action_id, "blockers")
+
+        labels_by_value = {candidate.value: candidate.label for candidate in candidates.candidates}
+        self.assertEqual(labels_by_value[()], "Declare no blockers")
+        self.assertEqual(
+            labels_by_value[(("alice:1", ("bob:2",)),)],
+            "Muck Rats blocks Charging Rhino",
+        )
+        self.assertEqual(
+            labels_by_value[(("alice:1", ("bob:1",)),)],
+            "Grizzly Bears blocks Charging Rhino",
+        )
+        for candidate in candidates.candidates:
+            self.assertNotIn("alice:", candidate.label)
+            self.assertNotIn("bob:", candidate.label)
+            self.assertNotIn("[", candidate.label)
+
+    def test_damage_allocations_have_player_readable_labels_without_instance_ids(self) -> None:
+        session = create_midgame_session(self.repository, "forked-lightning-targets")
+        actions = session.legal_actions_api("alice")
+        spell = next(action for action in actions.actions if action.kind == "CastNonCreatureSpellAction")
+        candidates = session.valid_targets_api("alice", spell.action_id, "damage_assignments")
+
+        self.assertTrue(candidates.candidates)
+        for candidate in candidates.candidates:
+            self.assertTrue(candidate.label.startswith("Deal "))
+            self.assertNotIn("alice:", candidate.label)
+            self.assertNotIn("bob:", candidate.label)
+            self.assertNotIn("[", candidate.label)

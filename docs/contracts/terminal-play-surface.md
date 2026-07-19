@@ -55,6 +55,32 @@ or leaking hidden information.
   and refreshes the state and action panes from the session. It must not retain
   or reveal candidates from the rejected revision.
 
+## Human-Readable Interaction Labels
+
+- Every visible terminal state, action, source, cost, parameter prompt,
+  candidate, assignment, confirmation, rejection, and event summary must use
+  useful player-facing language. A player must be able to understand what a
+  displayed option does and which public game objects it concerns without
+  decoding a serialized engine value.
+- The terminal must not render raw JSON, Python `repr` output, opaque
+  descriptor payloads, internal instance/object IDs, player IDs, or storage
+  keys as user-facing choices or explanations. This includes nested values
+  such as blocker assignments, ordered target lists, allocation maps, and
+  choice selections.
+- Compound choices must be rendered as a concise natural-language summary of
+  their game meaning. For example, a blocker assignment is shown as
+  "Muck Rats blocks Charging Rhino", not an array containing internal object
+  identifiers; an empty assignment is shown as "Declare no blockers".
+- Presentation adapters may retain opaque descriptor payload values beneath a
+  displayed label and submit those exact values after selection. This mapping
+  is an implementation detail: it must not widen the candidate set, replace
+  server/session validation, or expose the opaque value in normal terminal
+  output.
+- Labels must disambiguate multiple visible instances with stable
+  player-facing context (for example, card name plus controller and a visible
+  ordinal when needed), rather than revealing internal IDs. Text must remain
+  understandable with color disabled.
+
 ## Rich Live Presentation
 
 - The live layout must include a concise state header, a player-safe board,
@@ -99,6 +125,8 @@ or leaking hidden information.
 - Render tests must cover both Rich-capable and no-color/plain output using
   stable semantic snapshots. Snapshots assert required labels and safe content,
   not terminal-width-specific box geometry or ANSI escape sequences.
+- Tests must cover compound parameter labels and assert that normal terminal
+  output contains neither raw serialized payloads nor internal identifiers.
 
 ## Non-Goals
 

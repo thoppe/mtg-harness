@@ -98,6 +98,26 @@ class RichCliRendererTests(unittest.TestCase):
             self.assertNotIn(candidate.candidate_id, rendered)
             self.assertNotIn(str(candidate.value), rendered)
 
+    def test_blocker_assignment_pane_uses_prose_not_serialized_assignments(self) -> None:
+        session = create_midgame_session(self.repository, "combat-blockers")
+        response = session.legal_actions_api("bob")
+        self.assertNotIsInstance(response, SessionRejection)
+        assert not isinstance(response, SessionRejection)
+        blockers = next(action for action in response.actions if action.kind == "DeclareBlockersAction")
+        candidates = session.valid_targets_api("bob", blockers.action_id, "blockers")
+        self.assertNotIsInstance(candidates, SessionRejection)
+        assert not isinstance(candidates, SessionRejection)
+        renderer, output = self._renderer()
+
+        renderer.candidates(candidates.candidates)
+
+        rendered = output.getvalue()
+        self.assertIn("Declare no blockers", rendered)
+        self.assertIn("Muck Rats blocks Charging Rhino", rendered)
+        self.assertNotIn("alice:1", rendered)
+        self.assertNotIn("bob:2", rendered)
+        self.assertNotIn("[[", rendered)
+
 
 if __name__ == "__main__":  # pragma: no cover
     unittest.main()

@@ -357,17 +357,81 @@ def _remaining_values(value: object, selected: object | None, slot: ParameterSlo
 
 
 def _candidate(state: GameState, card_repository: CardRepository, value: object, kind: str) -> TargetCandidate:
+    label = _candidate_label(state, card_repository, value, kind)
+    if isinstance(value, str) and value in state.objects:
+        return TargetCandidate(value, value, kind, label)
+    if isinstance(value, str) and value in state.players:
+        return TargetCandidate(value, value, kind, value)
+    rendered = _canonical_json(_jsonable(value))
+    return TargetCandidate(rendered, value, kind, label)
+
+
+def _candidate_label(
+    state: GameState, card_repository: CardRepository, value: object, kind: str,
+) -> str:
+    """Return a player-facing description while retaining ``value`` verbatim.
+
+    Composite candidates are complete legal choices, not data intended for a
+    human to parse.  In particular, blocker assignments contain instance IDs
+    by necessity; those IDs must never become terminal-facing labels.
+    """
+    if kind == "blocker_assignment":
+        return _blocker_assignment_label(state, card_repository, value)
+    if kind == "allocation":
+        return _damage_allocation_label(state, card_repository, value)
     if isinstance(value, str) and value in state.objects:
         card = state.objects[value]
         # Candidate object identities are only emitted from visible battlefield
         # targets or from the querying player's pending choice.  The latter is
         # protected by player filtering at descriptor-group construction.
-        label = card_repository.get(card.oracle_id).name if card.zone != "library" else "private card"
-        return TargetCandidate(value, value, kind, label)
-    if isinstance(value, str) and value in state.players:
-        return TargetCandidate(value, value, kind, value)
-    rendered = _canonical_json(_jsonable(value))
-    return TargetCandidate(rendered, value, kind, rendered)
+        return card_repository.get(card.oracle_id).name if card.zone != "library" else "private card"
+    if isinstance(value, bool):
+        return "Yes" if value else "No"
+    return str(value)
+
+
+def _object_label(state: GameState, card_repository: CardRepository, instance_id: object) -> str:
+    """Name an object without exposing its engine instance identifier."""
+    if isinstance(instance_id, str) and instance_id in state.objects:
+        card = state.objects[instance_id]
+        return card_repository.get(card.oracle_id).name if card.zone != "library" else "private card"
+    return "unknown object"
+
+
+def _blocker_assignment_label(
+    state: GameState, card_repository: CardRepository, value: object,
+) -> str:
+    if not isinstance(value, tuple):
+        return "Invalid blocker assignment"
+    if not value:
+        return "Declare no blockers"
+    assignments: list[str] = []
+    for entry in value:
+        if not (isinstance(entry, tuple) and len(entry) == 2 and isinstance(entry[1], tuple)):
+            return "Invalid blocker assignment"
+        attacker_id, blocker_ids = entry
+        attacker = _object_label(state, card_repository, attacker_id)
+        blockers = [_object_label(state, card_repository, blocker_id) for blocker_id in blocker_ids]
+        if not blockers:
+            continue
+        verb = "blocks" if len(blockers) == 1 else "block"
+        assignments.append(f"{' and '.join(blockers)} {verb} {attacker}")
+    return "; ".join(assignments) if assignments else "Declare no blockers"
+
+
+def _damage_allocation_label(
+    state: GameState, card_repository: CardRepository, value: object,
+) -> str:
+    if not isinstance(value, tuple) or not value:
+        return "No damage allocation"
+    assignments: list[str] = []
+    for entry in value:
+        if not (isinstance(entry, tuple) and len(entry) == 2 and isinstance(entry[1], int)):
+            return "Invalid damage allocation"
+        target_id, amount = entry
+        noun = "damage" if amount != 1 else "damage"
+        assignments.append(f"{amount} {noun} to {_object_label(state, card_repository, target_id)}")
+    return "Deal " + " and ".join(assignments)
 
 
 def _require_player(state: GameState, player_id: str) -> None:
