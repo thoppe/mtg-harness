@@ -39,6 +39,16 @@ selection, ordering, and other effects whose legal options are not public.
 - Those additions remain name-scoped. They do not make every library, hand,
   modal, multiple-choice, or ordering effect legal.
 
+## Mind Rot Public-Hand Choice
+
+- `Mind Rot` snapshots the targeted player's hand on resolution and installs a
+  chooser-owned decision for exactly the lesser of two cards or the number of
+  cards in that hand.
+- The target player, not the spell's controller, chooses the distinct cards.
+  The chosen cards remain public when moved from hand to graveyard.
+- This name-scoped continuation reuses the existing public-hand selection
+  boundary; it does not introduce general discard-effect parsing.
+
 ## Replay Guarantees
 
 - Accepted choice actions carry the decision ID and the complete private

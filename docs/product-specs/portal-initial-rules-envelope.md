@@ -84,7 +84,9 @@ declared by `docs/coverage/slices/portal.initial.yaml`.
 - `Time Ebb` may reuse targeted sorcery selection while adding only battlefield-to-library-top movement for creatures, without introducing shuffle, reveal, or replacement-effect support.
 - `Volcanic Hammer` and `Lava Axe` may introduce only the minimal direct-damage path required to mark damage on creatures, reduce player life totals, and run the existing lethal-damage SBA check, without introducing prevention, redirection, or planeswalker support.
 - `Sacred Nectar` may introduce only the minimal no-target life-gain path required to increase the caster's life total by 4 and emit the corresponding life-total-change event, without introducing prevention, replacement effects, or generalized life-setting support.
-- `Mind Rot` may introduce only the minimal targeted-discard path required for a player to discard exactly two cards, with the current deterministic implementation using the target player's hand order rather than a separate choice action.
+- `Mind Rot` introduces only the minimal targeted-discard path required for its
+  target player to choose and discard exactly two cards, or every card if that
+  player has fewer than two.
 - `Winter's Grasp` may introduce only the minimal targeted land-destruction path required to choose a land on the battlefield, move it to its owner's graveyard, and emit the matching destruction and zone-move events, without introducing mana burn, land animation, or broader permanent-destruction generalization.
 - `Rain of Salt` may introduce only the minimal fixed multi-target land-destruction path required to choose exactly two distinct land targets on the battlefield, destroy those lands on resolution, and emit the matching destruction and zone-move events, without introducing generalized arbitrary target counts or retargeting support.
 - `Symbol of Unsummoning` may introduce only the minimal targeted battlefield-to-hand path required to return a creature to its owner's hand and then draw one card for the caster, without introducing instant timing, save effects, or broader hand-size rules.

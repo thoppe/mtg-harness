@@ -66,7 +66,9 @@ Define the minimum legal progression points for the first deterministic engine s
 - The currently implemented turn flow reaches cleanup, emits `turn_ended`, and can hand off into the next active player's precombat main.
 - Full long-run game-loop completion beyond the supported subset still remains future work.
 - The currently implemented combat model supports multiple blockers per attacker, but attacker-side damage assignment still follows the listed blocker order without a separate player choice action.
-- The current targeted-discard slice may resolve `Mind Rot` by discarding the first two cards in the target player's hand order rather than introducing a separate player-choice action.
+- The targeted-discard slice resolves `Mind Rot` through an explicit
+  target-player-owned decision for exactly the lesser of two cards or that
+  player's hand size.
 - Wave 6 may consume a name-scoped next-untap marker during `untap_step`, skip
   all combat transition points through a `combat_skipped` transition, or apply
   a name-scoped forced-attack requirement during `declare_attackers_step`.

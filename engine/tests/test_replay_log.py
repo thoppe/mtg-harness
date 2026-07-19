@@ -9,8 +9,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
-from mtg_engine.actions.models import ActivateManaAbilityAction, CastNonCreatureSpellAction, PassPriorityAction
-from mtg_engine.flow.turns import activate_mana_ability, cast_noncreature_spell as _cast_noncreature_spell, pass_priority, start_first_turn
+from mtg_engine.actions.models import ActivateManaAbilityAction, CastNonCreatureSpellAction, PassPriorityAction, ResolveChoiceAction
+from mtg_engine.flow.turns import activate_mana_ability, cast_noncreature_spell as _cast_noncreature_spell, pass_priority, resolve_pending_choice, start_first_turn
 from mtg_engine.state.zones import move_object
 
 
@@ -140,7 +140,6 @@ class ReplayLogTests(unittest.TestCase):
             ),
             repository,
         )
-
         self.assertEqual(
             [event.event_type for event in result.event_log[-7:]],
             [
@@ -208,7 +207,6 @@ class ReplayLogTests(unittest.TestCase):
             ),
             repository,
         )
-
         self.assertEqual(
             [event.event_type for event in result.event_log[-5:]],
             [
@@ -408,6 +406,17 @@ class ReplayLogTests(unittest.TestCase):
             ),
             repository,
         )
+        decision = result.state.pending_decision
+        self.assertIsNotNone(decision)
+        result = resolve_pending_choice(
+            result,
+            ResolveChoiceAction(
+                player_id="bob",
+                decision_id=decision.decision_id,
+                selected_instance_ids=("bob:1", "bob:3"),
+            ),
+            repository,
+        )
 
         non_mana_events = [event.event_type for event in result.event_log if event.event_type != "mana_added"]
         spell_cast_index = max(index for index, event_type in enumerate(non_mana_events) if event_type == "spell_cast")
@@ -417,13 +426,15 @@ class ReplayLogTests(unittest.TestCase):
                 "spell_cast",
                 "object_moved_between_zones",
                 "spell_resolved",
+                "choice_requested",
                 "object_moved_between_zones",
+                "choice_resolved",
                 "object_moved_between_zones",
                 "object_moved_between_zones",
             ],
         )
-        self.assertEqual(result.event_log[-3].payload["from_zone"], "hand")
         self.assertEqual(result.event_log[-2].payload["from_zone"], "hand")
+        self.assertEqual(result.event_log[-1].payload["from_zone"], "hand")
 
     def test_winters_grasp_replay_trace_includes_land_destruction(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)

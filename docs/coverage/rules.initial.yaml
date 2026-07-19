@@ -294,16 +294,17 @@ rules:
       - "601"
       - "608"
     status: implemented
-    scope: Casting and resolving the supported `Portal` sorcery `Mind Rot`, choosing a player target, and making that player discard two cards using deterministic hand-order selection in the current slice.
+    scope: Casting and resolving the supported `Portal` sorcery `Mind Rot`, choosing a player target, and making that player explicitly choose the lesser of two cards or their hand size to discard.
     engine_contracts:
       - docs/contracts/play-engine.md
       - docs/contracts/state-machine-transitions.md
       - docs/contracts/replay-event-log.md
+      - docs/contracts/deterministic-choices-and-hidden-zones.md
     tests:
       - engine/tests/test_priority.py
       - engine/tests/test_spells.py
       - engine/tests/test_replay_log.py
-    notes: "Current support is intentionally narrow and name-scoped to `Mind Rot`, with a documented v0 simplification that the target player discards the first two cards in hand order rather than making a separate choice."
+    notes: "Current support is intentionally narrow and name-scoped to `Mind Rot`; its public-hand choice is target-player-owned and replayable."
   - rule_key: targeted_land_destruction_sorceries_minimal
     source_rules:
       - "115"

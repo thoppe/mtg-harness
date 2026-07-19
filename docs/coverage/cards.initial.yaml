@@ -549,7 +549,7 @@ cards:
     display_name: Mind Rot
     card_instances: variable
     status: implemented
-    engine_scope: Sorcery-speed noncreature spell support for casting `Mind Rot`, choosing any player target, forcing that player to discard two cards on resolution using deterministic hand-order selection, and moving the spell from stack to graveyard.
+    engine_scope: Sorcery-speed noncreature spell support for casting `Mind Rot`, choosing any player target, making that player explicitly choose the lesser of two cards or their hand size to discard, and moving the spell from stack to graveyard.
     required_rules:
       - targeted_discard_sorceries_minimal
       - precombat_priority_minimal
@@ -559,7 +559,7 @@ cards:
       - engine/tests/test_priority.py
       - engine/tests/test_spells.py
       - engine/tests/test_replay_log.py
-    notes: "Canonical card identity keyed by Scryfall oracle_id. Current support intentionally uses deterministic hand-order discard rather than a separate player-choice action."
+    notes: "Canonical card identity keyed by Scryfall oracle_id. The public-hand discard choice is target-player-owned and replayable."
   - set_code: por
     card_key: "e9b8679d-52a9-4f0f-9365-f3e4b7a69805"
     display_name: Winter's Grasp

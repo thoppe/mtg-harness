@@ -15,9 +15,11 @@ from mtg_engine.actions.models import (
     DeclareBlockersAction,
     PassPriorityAction,
     PlayLandAction,
+    ResolveChoiceAction,
 )
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
+from mtg_engine.flow.priority import enumerate_legal_actions
 from mtg_engine.flow.turns import (
     activate_mana_ability,
     advance_to_cleanup,
@@ -28,6 +30,7 @@ from mtg_engine.flow.turns import (
     pass_priority,
     play_land,
     resolve_combat_damage,
+    resolve_pending_choice,
     start_first_turn,
     start_next_turn,
 )
@@ -656,7 +659,7 @@ class SpellTests(unittest.TestCase):
         self.assertEqual(result.state.players["alice"].graveyard, ("alice:6",))
         self.assertEqual(result.state.objects["alice:6"].oracle_id, LAVA_AXE)
 
-    def test_cast_mind_rot_discards_first_two_cards_in_target_hand_order(self) -> None:
+    def test_cast_mind_rot_target_player_chooses_two_cards(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         session = _build_mind_rot_session(repository)
 
@@ -667,7 +670,7 @@ class SpellTests(unittest.TestCase):
                 repository,
             )
 
-        result = cast_noncreature_spell(
+        pending = cast_noncreature_spell(
             session,
             CastNonCreatureSpellAction(
                 player_id="alice",
@@ -677,10 +680,105 @@ class SpellTests(unittest.TestCase):
             repository,
         )
 
-        self.assertEqual(result.state.players["bob"].hand, ("bob:3",))
-        self.assertEqual(result.state.players["bob"].graveyard, ("bob:1", "bob:2"))
+        decision = pending.state.pending_decision
+        self.assertIsNotNone(decision)
+        self.assertEqual(decision.chooser_id, "bob")
+        self.assertEqual(decision.option_ids, ("bob:1", "bob:2", "bob:3"))
+        result = resolve_pending_choice(
+            pending,
+            ResolveChoiceAction(
+                player_id="bob",
+                decision_id=decision.decision_id,
+                selected_instance_ids=("bob:2", "bob:3"),
+            ),
+            repository,
+        )
+
+        self.assertEqual(result.state.players["bob"].hand, ("bob:1",))
+        self.assertEqual(result.state.players["bob"].graveyard, ("bob:2", "bob:3"))
         self.assertEqual(result.state.players["alice"].graveyard, ("alice:4",))
         self.assertEqual(result.state.objects["alice:4"].oracle_id, MIND_ROT)
+
+    def test_mind_rot_choice_is_owned_by_target_and_enumerates_exact_pairs(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_mind_rot_session(repository)
+        for source_instance_id in session.state.players["alice"].battlefield:
+            session = activate_mana_ability(
+                session,
+                ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+                repository,
+            )
+        pending = cast_noncreature_spell(
+            session,
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:4",
+                target_instance_id="bob",
+            ),
+            repository,
+        )
+        decision = pending.state.pending_decision
+
+        actions = enumerate_legal_actions(pending.state, repository)
+        self.assertEqual(len(actions), 3)
+        self.assertTrue(all(action.player_id == "bob" for action in actions))
+        self.assertTrue(all(len(action.selected_instance_ids) == 2 for action in actions))
+        with self.assertRaises(ValueError):
+            resolve_pending_choice(
+                pending,
+                ResolveChoiceAction(
+                    player_id="alice",
+                    decision_id=decision.decision_id,
+                    selected_instance_ids=("bob:1", "bob:2"),
+                ),
+                repository,
+            )
+
+    def test_mind_rot_requires_only_the_cards_remaining_in_a_short_hand(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _build_mind_rot_session(repository)
+        shortened = move_object(
+            session.state,
+            instance_id="bob:2",
+            from_zone="hand",
+            to_zone="graveyard",
+            player_id="bob",
+        )
+        shortened = move_object(
+            shortened,
+            instance_id="bob:3",
+            from_zone="hand",
+            to_zone="graveyard",
+            player_id="bob",
+        )
+        session = replace(session, state=shortened)
+        for source_instance_id in session.state.players["alice"].battlefield:
+            session = activate_mana_ability(
+                session,
+                ActivateManaAbilityAction(player_id="alice", source_instance_id=source_instance_id),
+                repository,
+            )
+        pending = cast_noncreature_spell(
+            session,
+            CastNonCreatureSpellAction(
+                player_id="alice",
+                card_instance_id="alice:4",
+                target_instance_id="bob",
+            ),
+            repository,
+        )
+        decision = pending.state.pending_decision
+        self.assertEqual((decision.min_selections, decision.max_selections), (1, 1))
+        result = resolve_pending_choice(
+            pending,
+            ResolveChoiceAction(
+                player_id="bob",
+                decision_id=decision.decision_id,
+                selected_instance_id="bob:1",
+            ),
+            repository,
+        )
+        self.assertEqual(result.state.players["bob"].hand, ())
 
     def test_cast_winters_grasp_destroys_target_land_and_moves_spell_to_graveyard(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)

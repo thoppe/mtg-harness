@@ -75,6 +75,9 @@ The simulator should only claim support based on layer 3, never merely because l
   supported target, player, hidden-zone, discard, and pay-or-sacrifice
   triggers now use explicit chooser-owned continuations with identity
   revalidation and redacted public events.
+- The recorded `Mind Rot` deterministic hand-order limitation is complete:
+  its target player now chooses the exact discard set through the existing
+  replayable public-hand decision surface.
 
 ## Workstreams
 
@@ -209,3 +212,7 @@ completed Wave 7 trigger-resolution choice correction.
    activation, prevention, and counters.
 7. Select the smallest next manifest-backed Portal implementation set before
    widening another mechanic family or set.
+8. Preserve the completed target-player-owned `Mind Rot` discard choice in
+   `docs/exec-plans/active/004-mind-rot-discard-choice.md`.
+9. The next smallest recorded in-slice correction is attacker-owned damage
+   ordering when one attacker is blocked by multiple creatures.

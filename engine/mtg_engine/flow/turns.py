@@ -1005,12 +1005,20 @@ def _resolve_noncreature_spell(
     elif effect == "target_player_discards_two":
         if action.target_instance_id is None:
             raise ValueError("targeted sorcery requires a target")
-        resolved_state = _discard_first_cards_in_hand_order(
-            casting_state,
+        target_player_id = action.target_instance_id
+        hand = resolved_state.players[target_player_id].hand
+        discard_count = min(2, len(hand))
+        resolved_state = _queue_wave5_decision(
+            resolved_state,
             event_log,
-            player_id=action.target_instance_id,
-            count=2,
-            active_player=action.player_id,
+            chooser_id=target_player_id,
+            source_object_id=card.object_id,
+            kind="mind_rot_discard",
+            option_ids=hand,
+            min_selections=discard_count,
+            max_selections=discard_count,
+            continuation_kind="mind_rot_discard",
+            continuation=(("spell_controller_id", action.player_id),),
         )
     elif effect == "destroy_all_creatures_target_opponent_you_lose_2_per_creature":
         if action.target_instance_id is None:
@@ -1140,7 +1148,7 @@ def resolve_pending_choice(
     event_log.append(event_type="choice_resolved", active_player=action.player_id, payload=choice_payload)
     context = dict(decision.continuation)
 
-    expected_zone = "hand" if decision.continuation_kind == "wave5_discard_then_draw" else "library"
+    expected_zone = "hand" if decision.continuation_kind in {"wave5_discard_then_draw", "mind_rot_discard"} else "library"
     if decision.continuation_kind not in {None, "wave5_truce"} and not decision.continuation_kind.startswith("wave7_"):
         for instance_id in selected_ids:
             if state.objects[instance_id].zone != expected_zone:
@@ -1172,6 +1180,14 @@ def resolve_pending_choice(
                 for _ in range(count):
                     next_state = _draw_one_card_for_player_if_available(next_state, event_log, player_id=player_id)
             next_state = _draw_one_card_for_player_if_available(next_state, event_log, player_id=context["caster_id"])
+    elif kind == "mind_rot_discard":
+        next_state = _discard_specific_cards(
+            next_state,
+            event_log,
+            player_id=action.player_id,
+            instance_ids=selected_ids,
+            active_player=context["spell_controller_id"],
+        )
     elif kind == "wave5_truce":
         count = action.declared_count
         if count is None or count > 2:

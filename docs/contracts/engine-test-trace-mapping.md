@@ -70,6 +70,8 @@ Define how the current rule-family coverage should map to future engine tests an
 - Planned trace assertions:
   - `spell_cast`
   - `spell_resolved`
+  - `choice_requested`
+  - `choice_resolved`
   - `object_moved_between_zones`
 
 ### `combat_restrictions_minimal`
