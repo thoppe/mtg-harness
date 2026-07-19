@@ -10,7 +10,7 @@ The repository is intentionally starting in a harness-engineering style:
 
 ## Current Status
 
-This repository contains a manifest-backed source-ingestion workflow and a deterministic, two-player engine slice for the active `Portal`-led micro-universe. The frozen active roster implements all 200 `Portal` cards plus the explicitly declared ME4 `Rain of Daggers` mass-destruction testbed. The coverage manifests remain the authoritative statement of its exact boundaries.
+This repository contains a manifest-backed source-ingestion workflow and a deterministic, two-player engine slice for the active `Portal`-led micro-universe. The frozen active roster implements all 200 `Portal` cards plus the explicitly declared ME4 `Rain of Daggers` mass-destruction testbed. A player-safe Rich command-line surface exposes the current legal actions and valid targets during play. The coverage manifests remain the authoritative statement of the exact rules and card boundaries.
 
 ## Intended Major Components
 
@@ -41,6 +41,32 @@ Run the current lethal-damage walkthrough with:
 ```bash
 python3 demo.py
 ```
+
+## Play From The Terminal
+
+Install the package, then start a deterministic two-player Portal deck game:
+
+```bash
+mtg-harness --deck-a white.json --deck-b blue.json --seed 31
+```
+
+The default terminal surface uses Rich color to show the current turn, public
+board, priority player's hand, recent public events, and every currently legal
+action. Target and choice prompts offer only candidates returned by the
+player-scoped legal-actions API. Use `NO_COLOR=1` when a plain terminal is
+preferable.
+
+For compact, deterministic decision points, list and launch the rules-harness
+scenarios:
+
+```bash
+mtg-harness --list-scenarios
+mtg-harness --scenario combat-blockers
+```
+
+Scenarios are explicitly rules harnesses rather than constructed deck games.
+In particular, `rain-of-daggers-harness` is the scenario-only ME4 testbed and
+is never a legal Portal deck.
 
 ## Verification
 
@@ -99,13 +125,12 @@ versions.
 
 Maintain and deliberately widen the deterministic Python-first simulation backend without implying support beyond the declared slice or introducing premature UI work.
 
-## Immediate Next Work
+## Current Engine Surface
 
-The next concrete work is to extend long legal-game traces and the player-scoped
-legal-actions API within the frozen roster:
-
-- query revision-bound legal action descriptors and valid target candidates
-  through the session API; never duplicate the engine's targeting rules
-- extend seeded ten-plus-turn Portal games with replay and invariant evidence
-- use `docs/exec-plans/active/028-legal-actions-api-and-long-traces.md` for
-  this hardening work while keeping the card roster frozen
+- `mtg-harness` presents only the priority player's current legal action
+  descriptors and collects target/choice candidates through the same API.
+- Named mid-game rules-harness scenarios exercise combat, multi-target spells,
+  stack responses, private choices, cleanup, and the isolated Rain testbed.
+- Continue frozen-roster hardening through
+  `docs/exec-plans/active/028-legal-actions-api-and-long-traces.md`; preserve
+  the player-safe terminal and deterministic replay boundaries.

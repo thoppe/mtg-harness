@@ -75,3 +75,12 @@ class GameSessionAndCliTests(unittest.TestCase):
         self.assertEqual(exit_code, 0)
         started_session = run.call_args.args[0]
         self.assertEqual(started_session.state.turn.step, "precombat_main_step")
+
+    def test_cli_main_starts_a_labeled_midgame_rules_harness(self) -> None:
+        with patch("mtg_engine.cli.run_cli") as run:
+            exit_code = main(("--scenario", "combat-blockers"))
+
+        self.assertEqual(exit_code, 0)
+        started_session = run.call_args.args[0]
+        self.assertEqual(started_session.state.game_id, "scenario-combat-attackers")
+        self.assertEqual(started_session.state.turn.step, "declare_blockers_step")

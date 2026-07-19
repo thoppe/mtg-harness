@@ -15,6 +15,8 @@ from typing import Callable
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.decks.models import DeckList
 from mtg_engine.flow.deck_start import DeckGameInput
+from mtg_engine.flow.midgame_scenarios import create_midgame_session, list_midgame_scenarios
+from mtg_engine.output.cli import RichCliRenderer
 from mtg_engine.replay.serialization import write_replay_input
 from mtg_engine.services.legal_actions_api import (
     LegalActionDescriptor,
@@ -26,24 +28,31 @@ from mtg_engine.services.session import DeckGameSession, GameSession, SessionRej
 
 Input = Callable[[str], str]
 Output = Callable[[str], None]
+CandidateOutput = Callable[[tuple[TargetCandidate, ...]], None]
 
 
 def run_cli(
     session: GameSession,
     *,
     input_fn: Input = input,
-    output: Output = print,
+    output: Output | None = None,
     replay_path: str | Path | None = None,
 ) -> None:
     """Run a descriptor-driven action loop without rendering hidden zones.
 
     Replay files contain the private setup required for deterministic replay;
-    the terminal itself prints public counts, battlefield cards, and opaque
-    instance identifiers only.
+    the terminal itself renders public state plus only the priority player's
+    own hand; opaque instance identifiers are never used for selection.
     """
+    renderer = RichCliRenderer() if output is None else None
+    output = output or renderer.message
+    candidate_output: CandidateOutput | None = renderer.candidates if renderer is not None else None
     while session.state.outcome.status != "completed":
-        _print_public_state(session, output)
         player_id = session.state.turn.priority_player
+        if renderer is None:
+            _print_public_state(session, output)
+        else:
+            renderer.game_state(session, player_id)
         response = session.legal_actions_api(player_id)
         if isinstance(response, SessionRejection):
             output(f"Could not load actions: {response.code}")
@@ -51,8 +60,11 @@ def run_cli(
         if not response.actions:
             output("No enumerated legal actions; session stopped.")
             break
-        for index, action in enumerate(response.actions, start=1):
-            output(f"{index}. {_describe_action(action)}")
+        if renderer is None:
+            for index, action in enumerate(response.actions, start=1):
+                output(f"{index}. {_describe_action(action)}")
+        else:
+            renderer.actions(response)
         raw = input_fn("Choose action number (q to quit): ").strip().lower()
         if raw in {"q", "quit", "exit"}:
             break
@@ -64,7 +76,9 @@ def run_cli(
             output("Please enter one displayed action number or q.")
             continue
         descriptor = response.actions[choice - 1]
-        parameters = _collect_parameters(session, player_id, descriptor, output, input_fn)
+        parameters = _collect_parameters(
+            session, player_id, descriptor, output, input_fn, candidate_output=candidate_output
+        )
         if parameters is None:
             # Do not submit a partial descriptor.  The next loop obtains a
             # fresh revision and gives the player an opportunity to choose
@@ -113,6 +127,8 @@ def _collect_parameters(
     descriptor: LegalActionDescriptor,
     output: Output,
     input_fn: Input,
+    *,
+    candidate_output: CandidateOutput | None = None,
 ) -> dict[str, object] | None:
     """Collect precisely the descriptor slots using API-projected candidates.
 
@@ -122,7 +138,9 @@ def _collect_parameters(
     """
     selected: dict[str, object] = {}
     for slot in descriptor.parameters:
-        value = _collect_slot(session, player_id, descriptor, slot, selected, output, input_fn)
+        value = _collect_slot(
+            session, player_id, descriptor, slot, selected, output, input_fn, candidate_output=candidate_output
+        )
         if value is None:
             return None
         selected[slot.name] = value
@@ -137,15 +155,19 @@ def _collect_slot(
     selected: dict[str, object],
     output: Output,
     input_fn: Input,
+    *,
+    candidate_output: CandidateOutput | None = None,
 ) -> object | None:
     """Collect one declared parameter slot, preserving ordered selections."""
     if slot.kind in {"targets", "choice"}:
-        return _collect_many(session, player_id, descriptor, slot, selected, output, input_fn)
+        return _collect_many(
+            session, player_id, descriptor, slot, selected, output, input_fn, candidate_output=candidate_output
+        )
 
     candidates = _slot_candidates(session, player_id, descriptor, slot, selected)
     if candidates is None:
         return None
-    return _choose_candidate(candidates, slot, output, input_fn)
+    return _choose_candidate(candidates, slot, output, input_fn, candidate_output=candidate_output)
 
 
 def _collect_many(
@@ -156,6 +178,8 @@ def _collect_many(
     selected: dict[str, object],
     output: Output,
     input_fn: Input,
+    *,
+    candidate_output: CandidateOutput | None = None,
 ) -> tuple[object, ...] | None:
     """Choose zero or more API candidates, in API-confirmed order when needed."""
     values: list[object] = []
@@ -165,7 +189,7 @@ def _collect_many(
         candidates = _slot_candidates(session, player_id, descriptor, slot, partial)
         if candidates is None:
             return None
-        _print_candidates(candidates, output)
+        _print_candidates(candidates, output, candidate_output=candidate_output)
         raw = input_fn(f"Select {slot.name} number (d when done, q to cancel): ").strip().lower()
         if raw in {"q", "quit", "cancel"}:
             return None
@@ -204,10 +228,12 @@ def _choose_candidate(
     slot: ParameterSlot,
     output: Output,
     input_fn: Input,
+    *,
+    candidate_output: CandidateOutput | None = None,
 ) -> object | None:
     """Choose the single concrete candidate for scalar and composite slots."""
     while True:
-        _print_candidates(candidates, output)
+        _print_candidates(candidates, output, candidate_output=candidate_output)
         raw = input_fn(f"Select {slot.name} number (q to cancel): ").strip().lower()
         if raw in {"q", "quit", "cancel"}:
             return None
@@ -216,7 +242,15 @@ def _choose_candidate(
             return candidate.value
 
 
-def _print_candidates(candidates: tuple[TargetCandidate, ...], output: Output) -> None:
+def _print_candidates(
+    candidates: tuple[TargetCandidate, ...],
+    output: Output,
+    *,
+    candidate_output: CandidateOutput | None = None,
+) -> None:
+    if candidate_output is not None:
+        candidate_output(candidates)
+        return
     for index, candidate in enumerate(candidates, start=1):
         output(f"  {index}. {candidate.label}")
 
@@ -240,15 +274,41 @@ def main(argv: list[str] | None = None) -> int:
     current player sees that player's own hand in order to make a London
     mulligan choice; ordinary game rendering returns to public information.
     """
-    parser = argparse.ArgumentParser(description="Play a local Portal deck game")
-    parser.add_argument("--deck-a", required=True, help="JSON DeckList for player one")
-    parser.add_argument("--deck-b", required=True, help="JSON DeckList for player two")
+    parser = argparse.ArgumentParser(description="Play a local Portal deck game or a named mid-game scenario")
+    parser.add_argument("--deck-a", help="JSON DeckList for player one")
+    parser.add_argument("--deck-b", help="JSON DeckList for player two")
+    parser.add_argument("--scenario", help="start a named deterministic mid-game scenario")
+    parser.add_argument("--list-scenarios", action="store_true", help="list available mid-game scenarios")
     parser.add_argument("--player-a", default="alice")
     parser.add_argument("--player-b", default="bob")
     parser.add_argument("--starting-player", default=None)
-    parser.add_argument("--seed", required=True, type=int)
+    parser.add_argument("--seed", type=int, help="deterministic shuffle seed for a deck game")
     parser.add_argument("--save", default=None, help="write private replay input after play")
     args = parser.parse_args(argv)
+
+    if args.list_scenarios:
+        for scenario in list_midgame_scenarios():
+            category = scenario.category.replace("_", " ")
+            print(f"{scenario.name} [{category}]: {scenario.description}")
+        return 0
+
+    if args.scenario is not None:
+        if args.deck_a is not None or args.deck_b is not None:
+            parser.error("--scenario cannot be combined with --deck-a or --deck-b")
+        repo_root = Path(__file__).resolve().parents[2]
+        repository = CardRepository.from_information_directory(repo_root / "information")
+        try:
+            session = create_midgame_session(repository, args.scenario)
+        except ValueError as error:
+            parser.error(str(error))
+        scenario = next(item for item in list_midgame_scenarios() if item.name == args.scenario)
+        category = f"{scenario.category.replace('_', '-')} scenario"
+        print(f"Starting {category}: {scenario.name} — {scenario.description}")
+        run_cli(session, replay_path=args.save)
+        return 0
+
+    if args.deck_a is None or args.deck_b is None or args.seed is None:
+        parser.error("a deck game requires --deck-a, --deck-b, and --seed; use --list-scenarios to explore scenarios")
 
     def load_deck(path: str) -> DeckList:
         with Path(path).open(encoding="utf-8") as handle:

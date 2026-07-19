@@ -32,6 +32,7 @@ Contracts define the interfaces and invariants that future code must satisfy.
 - `wave6-damage-and-turn-effects.md`
 - `wave7-triggers-abilities-and-instants.md`
 - `surface-api.md`
+- `terminal-play-surface.md`
 
 ## Contract Rule
 
