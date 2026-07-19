@@ -66,5 +66,7 @@ Define the first package boundaries before writing engine code.
   declaration, and priority flow rather than direct combat and turn-state
   construction. The shared Wave 4 combat fixture now reaches that window
   through the same supported flow rather than direct combat and turn-state
-  construction.
+  construction. The shared Wave 4 attacker-legality fixture now also reaches
+  the attackers step through supported first-turn and combat-entry flow rather
+  than direct turn-state construction.
 - Keep `rules/` focused on consequences and checks, while `flow/` owns when action windows open and close.

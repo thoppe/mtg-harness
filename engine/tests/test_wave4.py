@@ -23,7 +23,6 @@ from mtg_engine.flow.turns import (
     pass_priority,
     start_first_turn,
 )
-from mtg_engine.state.models import TurnState
 from mtg_engine.state.zones import move_object
 
 
@@ -117,7 +116,7 @@ class Wave4CombatTests(unittest.TestCase):
     def test_haste_creatures_can_attack_on_the_turn_they_enter(self) -> None:
         for card_id in (RAGING_GOBLIN, RAGING_COUGAR, RAGING_MINOTAUR, VOLCANIC_DRAGON):
             with self.subTest(card_id=card_id):
-                state = _attacker_declaration_state(self.repository, card_id, turn_number=1)
+                state = _attacker_declaration_state(self.repository, card_id)
                 action = DeclareAttackersAction("alice", ("alice:1",))
 
                 self.assertIsNone(
@@ -131,7 +130,7 @@ class Wave4CombatTests(unittest.TestCase):
                 self.assertTrue(declare_attackers(TurnResult(state, ()), action, self.repository).state.objects["alice:1"].tapped)
 
     def test_haste_exception_does_not_allow_a_nonhaste_creature_to_attack_immediately(self) -> None:
-        state = _attacker_declaration_state(self.repository, SKELETAL_CROCODILE, turn_number=1)
+        state = _attacker_declaration_state(self.repository, SKELETAL_CROCODILE)
 
         self.assertEqual(
             attacker_attack_rejection_reason(
@@ -162,7 +161,7 @@ class Wave4CombatTests(unittest.TestCase):
         )
 
     def test_wall_of_swords_reuses_defender_and_flying(self) -> None:
-        attacker_state = _attacker_declaration_state(self.repository, WALL_OF_SWORDS, turn_number=2)
+        attacker_state = _attacker_declaration_state(self.repository, WALL_OF_SWORDS)
         self.assertEqual(
             attacker_attack_rejection_reason(
                 state=attacker_state,
@@ -248,11 +247,11 @@ def _combat_state(
     ).state
 
 
-def _attacker_declaration_state(repository: CardRepository, card_id: str, *, turn_number: int):
-    state = initialize_game(
+def _attacker_declaration_state(repository: CardRepository, card_id: str):
+    session = start_first_turn(initialize_game(
         SetupInput("wave-four-attackers", ("alice", "bob"), "alice", {"alice": (card_id,), "bob": ()}, {"alice": (card_id,), "bob": ()}, 1),
         repository,
-    ).state
-    state = replace(state, turn=TurnState(turn_number, "alice", "alice", "precombat_main_step"))
+    ))
+    state = session.state
     state = move_object(state, instance_id="alice:1", from_zone="hand", to_zone="battlefield", player_id="alice")
-    return replace(state, turn=TurnState(turn_number, "alice", "alice", "declare_attackers_step"))
+    return advance_to_begin_combat(replace(session, state=state)).state

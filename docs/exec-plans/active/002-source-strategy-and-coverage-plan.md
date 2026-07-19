@@ -143,6 +143,10 @@ The simulator should only claim support based on layer 3, never merely because l
   shared Wave 4 combat fixture enters the first turn, declares its attacker,
   and passes priority into the blockers declaration window through supported
   flow rather than direct combat and turn-state construction.
+- The next bounded test-harness attackers-step correction is complete: the
+  shared Wave 4 attacker-legality fixture enters the first turn and advances to
+  its attacker declaration window through supported flow rather than direct
+  turn-state construction.
 
 ## Workstreams
 
@@ -327,3 +331,5 @@ completed Wave 7 trigger-resolution choice correction.
     `docs/exec-plans/active/023-wave3-blockers-step-test-path.md`.
 29. Preserve the completed Wave 4 blockers-step test-path correction in
     `docs/exec-plans/active/024-wave4-blockers-step-test-path.md`.
+30. Preserve the completed Wave 4 attackers-step test-path correction in
+    `docs/exec-plans/active/025-wave4-attackers-step-test-path.md`.
