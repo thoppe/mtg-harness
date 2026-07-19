@@ -2,6 +2,7 @@
 
 from .cards.repository import CardRepository
 from .flow.setup import SetupInput, initialize_game
+from .flow.deck_start import DeckGameInput, initialize_deck_game, keep_london_hand, take_london_mulligan
 from .flow.turns import (
     activate_mana_ability,
     advance_to_begin_combat,
@@ -18,6 +19,7 @@ from .output import print_action_plan, print_game_snapshot, print_recent_events
 
 __all__ = [
     "CardRepository",
+    "DeckGameInput",
     "SetupInput",
     "activate_mana_ability",
     "advance_to_begin_combat",
@@ -26,6 +28,8 @@ __all__ = [
     "declare_attackers",
     "declare_blockers",
     "initialize_game",
+    "initialize_deck_game",
+    "keep_london_hand",
     "print_action_plan",
     "print_game_snapshot",
     "print_recent_events",
@@ -33,4 +37,5 @@ __all__ = [
     "resolve_combat_damage",
     "start_next_turn",
     "start_first_turn",
+    "take_london_mulligan",
 ]

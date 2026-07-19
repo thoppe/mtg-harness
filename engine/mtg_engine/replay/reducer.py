@@ -4,50 +4,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from mtg_engine.actions.models import (
-    ActivateManaAbilityAction,
-    ActivateAbilityAction,
-    AdvanceStepAction,
-    AdvanceTurnAction,
-    CastCreatureSpellAction,
-    CastNonCreatureSpellAction,
-    DeclareAttackersAction,
-    DeclareBlockersAction,
-    PassPriorityAction,
-    PlayLandAction,
-    ResolveChoiceAction,
-)
+from mtg_engine.actions.dispatch import AcceptedAction, dispatch_action
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
-from mtg_engine.flow.turns import (
-    TurnResult,
-    activate_mana_ability,
-    activate_ability,
-    advance_step,
-    advance_turn,
-    cast_creature_spell,
-    cast_noncreature_spell,
-    declare_attackers,
-    declare_blockers,
-    pass_priority,
-    play_land,
-    resolve_pending_choice,
-    start_first_turn,
-)
-
-AcceptedAction = (
-    PlayLandAction
-    | ActivateManaAbilityAction
-    | ActivateAbilityAction
-    | CastCreatureSpellAction
-    | CastNonCreatureSpellAction
-    | PassPriorityAction
-    | AdvanceStepAction
-    | AdvanceTurnAction
-    | DeclareAttackersAction
-    | DeclareBlockersAction
-    | ResolveChoiceAction
-)
+from mtg_engine.flow.turns import TurnResult, start_first_turn
 
 
 @dataclass(frozen=True)
@@ -71,30 +31,7 @@ def replay(input: ReplayInput, card_repository: CardRepository) -> TurnResult:
     for action in input.actions:
         if isinstance(session, TurnResult) and session.state.outcome.status == "completed":
             raise ValueError("cannot replay an action after the game has completed")
-        if isinstance(action, PlayLandAction):
-            session = play_land(session, action, card_repository)
-        elif isinstance(action, ActivateManaAbilityAction):
-            session = activate_mana_ability(session, action, card_repository)
-        elif isinstance(action, ActivateAbilityAction):
-            session = activate_ability(session, action, card_repository)
-        elif isinstance(action, CastCreatureSpellAction):
-            session = cast_creature_spell(session, action, card_repository)
-        elif isinstance(action, CastNonCreatureSpellAction):
-            session = cast_noncreature_spell(session, action, card_repository)
-        elif isinstance(action, PassPriorityAction):
-            session = pass_priority(session, action, card_repository)
-        elif isinstance(action, AdvanceStepAction):
-            session = advance_step(session, action)
-        elif isinstance(action, AdvanceTurnAction):
-            session = advance_turn(session, action, card_repository)
-        elif isinstance(action, DeclareAttackersAction):
-            session = declare_attackers(session, action, card_repository)
-        elif isinstance(action, DeclareBlockersAction):
-            session = declare_blockers(session, action, card_repository)
-        elif isinstance(action, ResolveChoiceAction):
-            session = resolve_pending_choice(session, action, card_repository)
-        else:
-            raise ValueError(f"unsupported replay action: {type(action).__name__}")
+        session = dispatch_action(session, action, card_repository)
 
     if not isinstance(session, TurnResult):
         raise ValueError("replay did not enter a turn")

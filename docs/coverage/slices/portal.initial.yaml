@@ -55,6 +55,7 @@ card_entries:
     oracle_id: "8445094f-008b-491a-977c-e8582d5ab72c"
   - set_code: me4
     oracle_id: "e2048201-6dc9-4cf5-916f-1d867ae8dbdd"
+    deck_eligible: false
   - set_code: por
     oracle_id: "56719f6a-1a6c-4c0a-8d21-18f7d7350b68"
   - set_code: por

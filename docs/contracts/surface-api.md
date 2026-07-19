@@ -14,11 +14,14 @@ Define the boundary between the backend engine and user-facing surfaces.
 
 ## Candidate Interface Types
 
-- In-process Python service layer for CLI workflows
+- In-process Python game-session service for CLI workflows, started from two
+  validated decks and exposing legal actions, state, accepted actions, replay,
+  and terminal outcome
 - Serialized request/response contracts for browser-facing use later
 - Replay or event stream format for inspection tools
 
 ## Open Questions
 
 - When should JSON contracts become stable?
-- Should the CLI call the engine directly or go through the same service boundary planned for browser use?
+- The CLI should call the game-session service rather than transitions directly;
+  the service is the future browser boundary.

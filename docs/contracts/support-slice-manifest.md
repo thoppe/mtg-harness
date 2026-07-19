@@ -26,6 +26,8 @@ Define the manifest shape for named implementation slices that replace reliance 
 - `card_entries`: explicit per-card source declarations, each containing:
   - `oracle_id`: canonical card identity
   - `set_code`: source set used to fetch and provenance that card's raw artifact
+  - `deck_eligible`: optional boolean; defaults to true for a declared slice
+    card and must be false for a scenario-only engine testbed
 
 ## Guarantees
 
@@ -35,6 +37,8 @@ Define the manifest shape for named implementation slices that replace reliance 
 - A rule family may exist in coverage manifests without belonging to every slice.
 - The active slice must not imply broader set support than the manifest explicitly names.
 - When `card_entries` exists, raw-source provenance should come from those per-card set declarations rather than assuming the slice-level `set_code` applies to every card.
+- Deck eligibility is narrower than engine support: a supported scenario-only
+  card may be loadable for a rules harness while excluded from legal decks.
 
 ## Freshness Rule
 

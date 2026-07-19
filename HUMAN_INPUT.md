@@ -37,6 +37,10 @@ This file captures decisions, constraints, and open questions that are explicitl
 - `Rain of Daggers` is a scenario-only engine testbed, not a Portal deck card.
   It may appear only in dedicated rules-harness scenarios; any future Portal
   deck builder or preconstructed-deck fixture must exclude it.
+- Portal Constructed v0 uses exactly 60-card main decks, a four-copy limit for
+  nonbasic cards by English name, unrestricted basic lands, 20 life, seven-card
+  opening hands, and London mulligans. Sideboards and match play are out of
+  scope for now but remain a future-compatible extension point.
 - The immediate engineering priority is adversarial verification and rules
   hardening within the frozen roster: difficult legal-action, resolution,
   replay, hidden-information, and state-invariant scenarios take precedence

@@ -139,6 +139,22 @@ class GameOutcome:
 
 
 @dataclass(frozen=True)
+class MulliganState:
+    """The private opening-hand procedure for a legal deck game.
+
+    The player order makes the otherwise simultaneous paper procedure an
+    explicit deterministic interaction surface.  Only the count is public;
+    card identities and bottom order stay in player state / replay input.
+    """
+
+    remaining_player_ids: tuple[str, ...]
+    mulligan_counts: tuple[tuple[str, int], ...]
+
+    def count_for(self, player_id: str) -> int:
+        return dict(self.mulligan_counts)[player_id]
+
+
+@dataclass(frozen=True)
 class GameState:
     game_id: str
     rng_seed: int
@@ -156,3 +172,4 @@ class GameState:
     temporary_effects: tuple[TemporaryEffect, ...] = ()
     delayed_turn_effects: tuple[DelayedTurnEffect, ...] = ()
     extra_turns: tuple[ExtraTurn, ...] = ()
+    mulligan: MulliganState | None = None

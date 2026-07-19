@@ -22,6 +22,12 @@ class CardDefinition:
         return "Land" in self.type_line
 
     @property
+    def is_basic_land(self) -> bool:
+        """Whether this card has both the Basic supertype and Land type."""
+        card_types = self.type_line.split("—", maxsplit=1)[0].split()
+        return "Basic" in card_types and "Land" in card_types
+
+    @property
     def is_creature(self) -> bool:
         return "Creature" in self.type_line
 

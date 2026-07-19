@@ -12,6 +12,7 @@ from .support_slices import load_active_support_slice
 class CardRepository:
     support_slice_key: str
     cards_by_oracle_id: dict[str, CardDefinition]
+    deck_eligible_oracle_ids: frozenset[str]
 
     @classmethod
     def from_information_directory(cls, information_dir: Path) -> "CardRepository":
@@ -41,6 +42,7 @@ class CardRepository:
         return cls(
             support_slice_key=support_slice.slice_key,
             cards_by_oracle_id=cards_by_oracle_id,
+            deck_eligible_oracle_ids=frozenset(support_slice.deck_eligible_card_keys),
         )
 
     def get(self, oracle_id: str) -> CardDefinition:

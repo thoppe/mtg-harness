@@ -2,18 +2,27 @@
 
 ## Purpose
 
-Define the explicit inputs required to create a reproducible initial game state for the current active support slice.
+Define the explicit inputs required to create a reproducible initial game state
+for the current active support slice.
 
 ## v0 Scope
 
 - Two players only
 - Active support slice only, as declared in `docs/coverage/slices/portal.initial.yaml`
-- Setup may use any multiplicity of those card identities that the scenario requires
+- Rules-harness setup may use any multiplicity of those card identities that a
+  scenario requires
 - The explicit ME4 `Rain of Daggers` testbed is allowed only in a dedicated
   rules-harness scenario. A Portal deck or future deck-construction path must
   exclude it even though it remains loadable for engine tests.
 
-## Required Setup Inputs
+## Legal Deck Game Setup
+
+Playable Portal games must begin through the validated deck path in
+`deck-construction-and-game-start.md`, not through an arbitrary ordered
+library. That path supplies profile, deck lists, deterministic shuffle,
+opening hands, and London-mulligan decisions.
+
+## Rules-Harness Setup Inputs
 
 - `game_id`: stable identifier for the game instance under test or replay
 - `players`: ordered list of exactly two player identifiers
@@ -31,10 +40,10 @@ Define the explicit inputs required to create a reproducible initial game state 
 - Tests may bypass shuffle behavior by supplying explicit ordered libraries and opening hands.
 - If a setup helper derives any value from randomness, the helper must record enough information to reproduce that derivation.
 
-## v0 Simplifications
+## Rules-Harness Simplifications
 
-- The first engine slice may use preconstructed ordered libraries rather than a full deck-construction flow.
-- The first engine slice may fix mulligans to a documented simplified path.
+- The rules harness may use preconstructed ordered libraries rather than a full deck-construction flow.
+- The rules harness may fix mulligans to a documented simplified path.
 - The first engine slice may use explicit opening hands in tests instead of draw-step derivation.
 
 ## Invalid Setup Conditions

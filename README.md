@@ -101,8 +101,11 @@ Maintain and deliberately widen the deterministic Python-first simulation backen
 
 ## Immediate Next Work
 
-The next concrete work is adversarial engine verification and rules hardening within the frozen roster:
+The next concrete work is to improve playable legal-deck sessions within the frozen roster:
 
-- add difficult legal-action, resolution, replay-equivalence, hidden-information, and state-invariant scenarios before widening the card roster
-- preserve the completed Waves 1–7 boundaries and the frozen roster unless a human explicitly reopens expansion work
-- use `docs/exec-plans/active/026-adversarial-engine-verification.md` to stage each hardening increment
+- use the Portal Constructed v0 deck path (60 cards, four-copy nonbasic limit,
+  deterministic shuffle, and London mulligan) for ordinary games
+- preserve the explicit ordered-library path for rules-harness and adversarial
+  scenarios; it is not a legal-deck surface
+- use `docs/exec-plans/active/027-portal-decks-and-playable-game.md` for
+  playable-game hardening while keeping the card roster frozen
