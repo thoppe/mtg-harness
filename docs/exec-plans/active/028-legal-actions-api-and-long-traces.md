@@ -53,6 +53,9 @@ present those actions through a player-safe Rich terminal game surface.
 - Steps 12–14 are complete: the descriptor CLI defaults to a player-safe Rich
   layout with a no-color path, named deterministic rules-harness scenarios,
   and semantic render/CLI/scenario coverage for privacy and action behavior.
+- Follow-up hardening: declaring blockers now hands the bounded combat-damage
+  continuation to the active player, so the player-scoped terminal cannot
+  stop at a legal combat state with an action owned by another player.
 
 ## Resume Here
 

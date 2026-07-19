@@ -124,6 +124,21 @@ class MidgameScenarioTests(unittest.TestCase):
         self.assertEqual(session.state.temporary_effects, ())
         self.assertEqual(session.state.delayed_turn_effects, ())
 
+    def test_declaring_blockers_hands_the_combat_continuation_to_active_player(self) -> None:
+        session = create_midgame_session(self.repository, "combat-blockers")
+        blockers = self._actions("combat-blockers", "bob")
+        declaration = next(action for action in blockers.actions if action.kind == "DeclareBlockersAction")
+        submitted = session.submit_descriptor(
+            "bob", declaration.action_id, {"blockers": ()}, blockers.state_revision,
+        )
+
+        self.assertTrue(submitted.accepted)
+        self.assertEqual(session.state.turn.priority_player, "alice")
+        continuation = session.legal_actions_api("alice")
+        self.assertNotIsInstance(continuation, SessionRejection)
+        assert not isinstance(continuation, SessionRejection)
+        self.assertTrue(any(action.kind == "AdvanceTurnAction" for action in continuation.actions))
+
     def test_unknown_scenario_is_a_launcher_error(self) -> None:
         with self.assertRaisesRegex(ValueError, "unknown mid-game scenario"):
             create_midgame_session(self.repository, "not-a-scenario")

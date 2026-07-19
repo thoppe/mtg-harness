@@ -2156,7 +2156,19 @@ def declare_blockers(
         attackers=state.combat.attackers,
         blockers=action.blockers,
     )
-    next_state = replace(next_state, turn=replace(next_state.turn, step="combat_damage_step"))
+    # The bounded v0 surface resolves combat damage through the active
+    # player's ``AdvanceTurnAction``.  Hand priority back before exposing that
+    # action, otherwise a player-scoped legal-action query for the blocker
+    # declarer sees no continuation and the terminal appears to stop.
+    next_state = replace(
+        next_state,
+        turn=replace(
+            next_state.turn,
+            step="combat_damage_step",
+            priority_player=state.turn.active_player,
+        ),
+        consecutive_passes=0,
+    )
 
     event_log = EventLog.from_events(state.game_id, session.event_log)
     event_log.append(
