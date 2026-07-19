@@ -45,6 +45,9 @@ Define the minimum legal progression points for the first deterministic engine s
 - `declare_attackers`
 - `declare_blockers`
 - `advance_step`
+- `advance_turn`
+- `activate_ability`
+- `resolve_choice`
 
 ## Guarantees
 
@@ -64,6 +67,10 @@ Define the minimum legal progression points for the first deterministic engine s
   until the stack clears.
 - The first slice may model combat with a single combat-damage checkpoint rather than broader combat variants.
 - The currently implemented turn flow reaches cleanup, emits `turn_ended`, and can hand off into the next active player's precombat main.
+- At the supported `combat_damage_step` boundary, with no pending decision,
+  legal-action enumeration exposes exactly one `advance_turn` action for the
+  active player. That action resolves combat damage, advances through cleanup,
+  and starts the next turn; it is not an arbitrary step-skipping action.
 - Full long-run game-loop completion beyond the supported subset still remains future work.
 - For every attacker blocked by multiple creatures, blocker declaration queues
   an ordered, attacking-player-owned decision before combat damage. Decisions

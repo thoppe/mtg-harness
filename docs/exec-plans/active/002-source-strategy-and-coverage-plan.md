@@ -103,6 +103,9 @@ The simulator should only claim support based on layer 3, never merely because l
   combat-damage-to-next-turn handoff now lets accepted-action replay age a
   `Capricious Sorcerer` through two turns and prove legal activation,
   resolution, state, and event equivalence.
+- The recorded turn-handoff action-surface gap is complete: legal-action
+  enumeration now exposes the replayable active-player handoff at its only
+  valid combat-damage boundary.
 
 ## Workstreams
 
@@ -259,3 +262,5 @@ completed Wave 7 trigger-resolution choice correction.
 17. Preserve the completed turn-handoff and activated-ability replay
     equivalence regression in
     `docs/exec-plans/active/012-turn-handoff-replay-equivalence.md`.
+18. Preserve the completed turn-handoff legal-action enumeration in
+    `docs/exec-plans/active/013-turn-handoff-action-enumeration.md`.

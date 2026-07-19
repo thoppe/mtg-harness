@@ -20,6 +20,7 @@ from mtg_engine.actions.models import (
     ResolveChoiceAction,
 )
 from mtg_engine.cards.repository import CardRepository
+from mtg_engine.flow.priority import enumerate_legal_actions
 from mtg_engine.flow.setup import SetupInput, initialize_game
 from mtg_engine.flow.turns import (
     activate_ability,
@@ -129,6 +130,10 @@ class ReplayReducerTests(unittest.TestCase):
             elif isinstance(action, DeclareBlockersAction):
                 direct = declare_blockers(direct, action, repository)
             elif isinstance(action, AdvanceTurnAction):
+                self.assertEqual(
+                    enumerate_legal_actions(direct.state, repository),
+                    (action,),
+                )
                 direct = advance_turn(direct, action, repository)
             elif isinstance(action, ActivateAbilityAction):
                 direct = activate_ability(direct, action, repository)

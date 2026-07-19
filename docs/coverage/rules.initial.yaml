@@ -77,7 +77,8 @@ rules:
     tests:
       - engine/tests/test_turns.py
       - engine/tests/test_spells.py
-    notes: "Broader long-run loop completion and unsupported branches remain future work."
+      - engine/tests/test_replay_reducer.py
+    notes: "The combat-damage boundary enumerates the replayable active-player turn handoff. Broader long-run loop completion and unsupported branches remain future work."
   - rule_key: precombat_priority_minimal
     source_rules:
       - "117"

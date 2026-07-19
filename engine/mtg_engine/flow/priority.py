@@ -6,6 +6,7 @@ from mtg_engine.actions.models import (
     ActivateManaAbilityAction,
     ActivateAbilityAction,
     AdvanceStepAction,
+    AdvanceTurnAction,
     CastCreatureSpellAction,
     CastNonCreatureSpellAction,
     DeclareAttackersAction,
@@ -37,6 +38,11 @@ def enumerate_legal_actions(state: GameState, card_repository: CardRepository) -
 
     if state.turn.step == "declare_blockers_step":
         return _enumerate_declare_blockers_actions(state, card_repository)
+
+    if state.turn.step == "combat_damage_step":
+        return (
+            AdvanceTurnAction(player_id=state.turn.active_player),
+        )
 
     return ()
 

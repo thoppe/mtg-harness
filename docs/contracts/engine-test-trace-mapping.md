@@ -25,6 +25,7 @@ Define how the current rule-family coverage should map to future engine tests an
 - Planned tests:
   - `engine/tests/test_turns.py`
   - `engine/tests/test_spells.py`
+  - `engine/tests/test_replay_reducer.py`
 - Planned trace assertions:
   - `turn_started`
   - `step_changed`
