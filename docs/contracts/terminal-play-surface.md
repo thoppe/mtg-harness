@@ -58,22 +58,31 @@ or leaking hidden information.
 ## Forced Progression
 
 - The terminal may auto-submit a descriptor only when it is the sole legal
-  action for the current priority player, has no parameter slots, and is
-  explicitly classified by the engine-facing surface as non-strategic forced
-  progression. It must use the ordinary descriptor submission path and the
-  current revision; it must not construct an internal action directly.
+  action for the current priority player and either (a) it has no parameter
+  slots and is explicitly classified by the engine-facing surface as
+  non-strategic forced progression, or (b) it is a public combat declaration
+  whose complete declaration is uniquely determined by the legal-actions and
+  valid-targets APIs. It must use the ordinary descriptor submission path and
+  the current revision; it must not construct an internal action directly.
 - Auto-progression is limited to steps whose only outcome is to advance an
-  already-determined rules sequence. It must never auto-select a cast, attack,
-  blocker assignment, target, cost or mana payment, private choice, ordering,
-  allocation, X value, boolean option, concession, or any other player
-  decision, even if that decision currently has one candidate.
+  already-determined rules sequence, plus API-proven uniquely determined
+  public combat declarations. A combat declaration is uniquely determined
+  only when the ordinary parameter queries yield exactly one complete legal
+  public declaration; for example, an attacker declaration whose only legal
+  result is "Declare no attackers", or a blocker declaration with exactly one
+  legal assignment. It must never auto-select among multiple attack or block
+  declarations, a cast, target, cost or mana payment, private choice,
+  ordering, allocation, X value, boolean option, concession, or any other
+  player decision, even if an individual slot currently has one candidate.
 - Before or immediately after auto-submission, the terminal must visibly emit
   a concise player-facing confirmation/event explaining the forced progression
-  (for example, "Automatically advancing to combat damage"). The event must
+  or uniquely determined declaration (for example, "Automatically advancing
+  to combat damage", "No attackers can be declared; continuing", or
+  "Automatically declaring Muck Rats blocks Charging Rhino"). The event must
   be understandable without color and must not expose descriptor payloads or
   internal identifiers.
 - If the descriptor cannot be safely classified, is stale, is rejected, or is
-  no longer the sole no-parameter legal action at the current revision, the
+  no longer the sole qualifying legal action at the current revision, the
   terminal must stop auto-progression, refresh, and present the ordinary legal
   action pane.
 
@@ -156,10 +165,11 @@ or leaking hidden information.
   not terminal-width-specific box geometry or ANSI escape sequences.
 - Tests must cover compound parameter labels and assert that normal terminal
   output contains neither raw serialized payloads nor internal identifiers.
-- End-to-end tests must distinguish forced non-strategic progression from a
-  single-option player decision: they must assert auto-submission and its
-  visible confirmation for the former, and an explicit prompt for every
-  excluded decision category.
+- End-to-end tests must distinguish forced non-strategic progression and
+  API-proven uniquely determined public combat declarations from ordinary
+  player decisions: they must assert auto-submission and its visible
+  human-readable confirmation for the former categories, and an explicit
+  prompt for every multi-option declaration and excluded decision category.
 
 ## Non-Goals
 

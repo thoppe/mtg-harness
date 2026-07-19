@@ -97,6 +97,16 @@ class GameSessionAndCliTests(unittest.TestCase):
         self.assertEqual(session.state.outcome.status, "in_progress")
         self.assertIn("Auto-advancing: resolve combat damage and begin the next turn.", lines)
 
+    def test_cli_auto_selects_an_api_proven_empty_blocker_declaration(self) -> None:
+        session = create_midgame_session(self.repository, "combat-attackers")
+        answers = iter(("1", "0", "q"))
+        lines: list[str] = []
+
+        run_cli(session, input_fn=lambda _prompt: next(answers), output=lines.append)
+
+        self.assertIn("Auto-selecting only legal declaration: Declare no blockers.", lines)
+        self.assertEqual((session.state.turn.turn_number, session.state.turn.active_player), (6, "bob"))
+
     def test_repository_root_resolves_checkout_ancestors_for_an_installed_cli(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir) / "checkout"

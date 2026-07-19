@@ -91,11 +91,12 @@ def run_cli(
         if not response.actions:
             output("No enumerated legal actions; session stopped.")
             break
-        forced_action = _forced_progression(response.actions)
-        if forced_action is not None:
-            output(f"Auto-advancing: {_progression_label(forced_action)}.")
+        automatic = _automatic_submission(session, player_id, response.actions)
+        if automatic is not None:
+            automatic_action, automatic_parameters, automatic_message = automatic
+            output(automatic_message)
             submission = session.submit_descriptor(
-                player_id, forced_action.action_id, {}, response.state_revision,
+                player_id, automatic_action.action_id, automatic_parameters, response.state_revision,
             )
             if not submission.accepted:
                 assert submission.rejection is not None
@@ -170,6 +171,32 @@ def _forced_progression(actions: tuple[LegalActionDescriptor, ...]) -> LegalActi
     if action.kind not in _FORCED_PROGRESSION_KINDS or action.parameters:
         return None
     return action
+
+
+def _automatic_submission(
+    session: GameSession,
+    player_id: str,
+    actions: tuple[LegalActionDescriptor, ...],
+) -> tuple[LegalActionDescriptor, dict[str, object], str] | None:
+    """Return an API-proven forced continuation without guessing a decision."""
+    forced = _forced_progression(actions)
+    if forced is not None:
+        return forced, {}, f"Auto-advancing: {_progression_label(forced)}."
+    if len(actions) != 1:
+        return None
+    action = actions[0]
+    if action.kind not in {"DeclareAttackersAction", "DeclareBlockersAction"} or len(action.parameters) != 1:
+        return None
+    slot = action.parameters[0]
+    candidates = _slot_candidates(session, player_id, action, slot, {})
+    if candidates is None:
+        return None
+    if len(candidates) == 1:
+        candidate = candidates[0]
+        return action, {slot.name: candidate.value}, f"Auto-selecting only legal declaration: {candidate.label}."
+    if action.kind == "DeclareAttackersAction" and not candidates and slot.minimum == 0:
+        return action, {slot.name: ()}, "Auto-selecting only legal declaration: Declare no attackers."
+    return None
 
 
 def _progression_label(action: LegalActionDescriptor) -> str:
