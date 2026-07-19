@@ -13,6 +13,7 @@ from mtg_engine.actions.models import PassPriorityAction
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.cli import _repository_root, main, run_cli
 from mtg_engine.decks.fixtures import portal_blue_starter, portal_white_starter
+from mtg_engine.flow.midgame_scenarios import create_midgame_session
 from mtg_engine.flow.setup import SetupInput
 from mtg_engine.replay.reducer import replay
 from mtg_engine.services import GameSession
@@ -84,6 +85,17 @@ class GameSessionAndCliTests(unittest.TestCase):
         started_session = run.call_args.args[0]
         self.assertEqual(started_session.state.game_id, "scenario-combat-attackers")
         self.assertEqual(started_session.state.turn.step, "declare_blockers_step")
+
+    def test_cli_auto_advances_only_the_forced_combat_continuation(self) -> None:
+        session = create_midgame_session(self.repository, "combat-blockers")
+        answers = iter(("1", "3", "q"))
+        lines: list[str] = []
+
+        run_cli(session, input_fn=lambda _prompt: next(answers), output=lines.append)
+
+        self.assertEqual((session.state.turn.turn_number, session.state.turn.active_player), (6, "bob"))
+        self.assertEqual(session.state.outcome.status, "in_progress")
+        self.assertIn("Auto-advancing: resolve combat damage and begin the next turn.", lines)
 
     def test_repository_root_resolves_checkout_ancestors_for_an_installed_cli(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

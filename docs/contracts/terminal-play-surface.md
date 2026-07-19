@@ -55,6 +55,28 @@ or leaking hidden information.
   and refreshes the state and action panes from the session. It must not retain
   or reveal candidates from the rejected revision.
 
+## Forced Progression
+
+- The terminal may auto-submit a descriptor only when it is the sole legal
+  action for the current priority player, has no parameter slots, and is
+  explicitly classified by the engine-facing surface as non-strategic forced
+  progression. It must use the ordinary descriptor submission path and the
+  current revision; it must not construct an internal action directly.
+- Auto-progression is limited to steps whose only outcome is to advance an
+  already-determined rules sequence. It must never auto-select a cast, attack,
+  blocker assignment, target, cost or mana payment, private choice, ordering,
+  allocation, X value, boolean option, concession, or any other player
+  decision, even if that decision currently has one candidate.
+- Before or immediately after auto-submission, the terminal must visibly emit
+  a concise player-facing confirmation/event explaining the forced progression
+  (for example, "Automatically advancing to combat damage"). The event must
+  be understandable without color and must not expose descriptor payloads or
+  internal identifiers.
+- If the descriptor cannot be safely classified, is stale, is rejected, or is
+  no longer the sole no-parameter legal action at the current revision, the
+  terminal must stop auto-progression, refresh, and present the ordinary legal
+  action pane.
+
 ## Human-Readable Interaction Labels
 
 - Every visible terminal state, action, source, cost, parameter prompt,
@@ -130,6 +152,10 @@ or leaking hidden information.
   not terminal-width-specific box geometry or ANSI escape sequences.
 - Tests must cover compound parameter labels and assert that normal terminal
   output contains neither raw serialized payloads nor internal identifiers.
+- End-to-end tests must distinguish forced non-strategic progression from a
+  single-option player decision: they must assert auto-submission and its
+  visible confirmation for the former, and an explicit prompt for every
+  excluded decision category.
 
 ## Non-Goals
 

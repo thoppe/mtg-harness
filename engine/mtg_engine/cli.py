@@ -30,6 +30,15 @@ Input = Callable[[str], str]
 Output = Callable[[str], None]
 CandidateOutput = Callable[[tuple[TargetCandidate, ...]], None]
 
+# These descriptors advance engine timing without asking a player to make a
+# strategic selection.  They are the only actions the terminal may submit on
+# a player's behalf when they are the sole current legal descriptor.
+_FORCED_PROGRESSION_KINDS = frozenset({
+    "AdvanceStepAction",
+    "AdvanceTurnAction",
+    "PassPriorityAction",
+})
+
 
 def _repository_root(start: Path | None = None) -> Path:
     """Find checkout-owned card and coverage artifacts for an installed CLI.
@@ -82,6 +91,16 @@ def run_cli(
         if not response.actions:
             output("No enumerated legal actions; session stopped.")
             break
+        forced_action = _forced_progression(response.actions)
+        if forced_action is not None:
+            output(f"Auto-advancing: {_progression_label(forced_action)}.")
+            submission = session.submit_descriptor(
+                player_id, forced_action.action_id, {}, response.state_revision,
+            )
+            if not submission.accepted:
+                assert submission.rejection is not None
+                output(f"Automatic action rejected: {submission.rejection.code}; refreshing actions.")
+            continue
         if renderer is None:
             for index, action in enumerate(response.actions, start=1):
                 output(f"{index}. {_describe_action(action)}")
@@ -141,6 +160,24 @@ def _describe_action(action: LegalActionDescriptor) -> str:
     slots = ", ".join(slot.name for slot in action.parameters)
     suffix = f" (requires: {slots})" if slots else ""
     return f"{action.kind}{source}{suffix}"
+
+
+def _forced_progression(actions: tuple[LegalActionDescriptor, ...]) -> LegalActionDescriptor | None:
+    """Return the sole non-strategic, parameter-free continuation if any."""
+    if len(actions) != 1:
+        return None
+    action = actions[0]
+    if action.kind not in _FORCED_PROGRESSION_KINDS or action.parameters:
+        return None
+    return action
+
+
+def _progression_label(action: LegalActionDescriptor) -> str:
+    return {
+        "AdvanceStepAction": "advance to combat",
+        "AdvanceTurnAction": "resolve combat damage and begin the next turn",
+        "PassPriorityAction": "pass priority",
+    }[action.kind]
 
 
 def _collect_parameters(
