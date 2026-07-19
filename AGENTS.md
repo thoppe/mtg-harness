@@ -40,7 +40,7 @@ This repository follows a harness-engineering approach.
 
 ## Current Focus
 
-The project has moved past pure scaffold planning into a narrow v0 engine slice backed by in-repo source artifacts and contracts.
+The project has moved past scaffold planning into a manifest-backed, narrow v0 engine slice. The active Portal-led slice has completed Waves 1–7 and is backed by in-repo source artifacts, contracts, coverage declarations, implementation, and regression tests.
 
 Initial major domains:
 
@@ -53,9 +53,9 @@ No frontend implementation should be introduced yet.
 
 ## Immediate Next Steps
 
-The ingestion scaffold already exists under `information/`, so the next agent should continue the active engine plan.
+The ingestion scaffold and the current Portal Waves 1–7 are complete. The next agent should continue the active source-strategy plan by selecting a new, bounded manifest-backed increment.
 
 1. Read `docs/exec-plans/active/002-source-strategy-and-coverage-plan.md` first and follow its `Resume Here` section.
 2. Treat the active support-slice manifest and coverage manifests as the current playable scope; do not infer support from source artifacts alone.
 3. Keep the rules envelope, coverage manifests, and source artifacts aligned before implementation code.
-4. Continue widening the engine through narrow, name-scoped `Portal` increments, preferring simple nonkeyword sorceries before adding keywords, replacement effects, or broader triggered-ability support.
+4. Preserve the completed Waves 1–7 boundaries and widen only through a new narrow, name-scoped `Portal` increment whose contracts, source artifacts, manifests, implementation, and tests land together.

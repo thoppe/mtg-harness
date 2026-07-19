@@ -6,7 +6,7 @@ Create a durable, agent-legible repository scaffold for a Python-based Magic: Th
 
 ## Status
 
-- Phase: active
+- Phase: complete
 - Owner: repository scaffold
 
 ## Tasks

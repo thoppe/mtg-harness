@@ -2,12 +2,12 @@
 
 ## Purpose
 
-Define the manifest shape for named implementation slices that replace reliance on a single hardcoded micro-universe.
+Define the manifest shape for named implementation slices that replace reliance on a hardcoded micro-universe.
 
 ## Why This Exists
 
 - Raw source scope, declared playable scope, and implemented rules scope are different concerns.
-- The current fixed micro-universe is useful for bootstrap honesty, but it does not scale cleanly as more `Portal` cards and rule families are added.
+- The current manifest-backed micro-universe provides bootstrap honesty without hardcoding its membership in the engine.
 - Named support slices let the repository expand in controlled increments without implying full-set support.
 
 ## Required Fields
@@ -49,12 +49,12 @@ Define the manifest shape for named implementation slices that replace reliance 
 - Support slices answer: "what card and rule subset is currently declared as a playable/implemented scope?"
 - Coverage manifests answer: "what individual cards and rule families are implemented, deferred, or not started?"
 
-## Initial Migration Direction
+## Current Implementation Direction
 
-- The current `portal_initial_micro_universe` should become a named support slice rather than a hardcoded repo-wide assumption.
+- The current `portal_initial_micro_universe` is the named active support slice and is loaded from its manifest rather than a hardcoded engine card list.
 - Early slices may remain small and `Portal`-only.
 - Later slices may stay Portal-led while incorporating a small number of off-set oracle identities when their source provenance is explicit in `card_entries`.
-- Engine loading may continue to use a narrow active slice in v0, but the active slice should eventually come from manifest data instead of embedded oracle ID lists.
+- Engine loading uses the one active manifest-backed slice in v0; future work may extend this only when multiple simultaneous runtime formats are explicitly contracted.
 
 ## Non-Goals
 

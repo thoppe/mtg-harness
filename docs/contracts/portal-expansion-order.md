@@ -2,18 +2,18 @@
 
 ## Purpose
 
-Declare the implementation order for every Portal card outside the active support slice. This is a planning contract, not an implementation claim: a card is supported only after source, manifest, coverage, code, and tests land together.
+Record the completed dependency-ordered Portal expansion history and preserve its boundaries for future work. This is a planning contract, not an implementation claim: a card is supported only after source, manifest, coverage, code, and tests land together.
 
 ## Ordering Rule
 
-Within a numbered wave, implement cards in the printed order. Finish the wave's rule family and edge cases before entering the next wave.
+Within a numbered wave, cards were implemented in the printed order unless a wave explicitly states otherwise. Each wave's rule family and edge cases were completed before entering the next wave.
 
-The final four entries of the next twenty are gated by shared foundations:
+The final four entries of the completed initial twenty were gated by shared foundations:
 choices/RNG before the tutors, a per-turn land-play allowance before Summer
 Bloom, and combat requirements before Alluring Scent. They must not be
 special-cased in the sorcery resolver.
 
-## Next Twenty
+## Completed Initial Twenty
 
 1. **Burning Cloak** — combines target damage with temporary power.
 2. **Monstrous Growth** — extends temporary power to toughness.
@@ -36,7 +36,7 @@ special-cased in the sorcery resolver.
 19. **Summer Bloom** — additional land-play allowance in turn state.
 20. **Alluring Scent** — forced-blocking constraint in blocker enumeration.
 
-## Remaining Ordered Waves
+## Completed Ordered Waves
 
 ### Wave 2: Temporary-stat and simple combat surface
 
@@ -278,12 +278,15 @@ pre-attack tap-ability action path. Mystic Denial introduces the narrow
 creature-or-sorcery stack target and counter operation. Neither subwave implies
 general activated abilities or counterspell support.
 
-## Deliberate Deferrals
+## Deliberate Deferrals Beyond The Completed Slice
 
-- Random selection needs a replayable RNG contract.
-- Search/shuffle needs explicit hidden-zone and shuffle semantics.
-- Instants need response priority beyond the sorcery-only surface.
-- Triggered and activated creature text needs a general event/ability model; do not special-case it.
+- Generic keyword, triggered-ability, activated-ability, replacement-effect,
+  hidden-information, search/shuffle, X-cost, instant, and multiplayer
+  frameworks remain out of scope. The completed Waves 5–7 provide only the
+  bounded, name-scoped behavior documented in their contracts.
+- A future increment must be selected from the Portal cards outside
+  `docs/coverage/slices/portal.initial.yaml` (or be an explicitly justified
+  off-set addition) and must update its contracts and coverage before code.
 
 ## Source of Truth
 

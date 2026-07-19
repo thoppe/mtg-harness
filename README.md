@@ -10,7 +10,7 @@ The repository is intentionally starting in a harness-engineering style:
 
 ## Current Status
 
-This repository now contains an initial source-ingestion workflow and a narrow engine slice for a small `Portal` micro-universe.
+This repository contains a manifest-backed source-ingestion workflow and a deterministic, two-player engine slice for the active `Portal`-led micro-universe. The active slice implements 201 cards across the completed Portal Waves 1–7, including one explicitly sourced ME4 card; the coverage manifests remain the authoritative statement of its exact boundaries.
 
 ## Intended Major Components
 
@@ -97,13 +97,13 @@ versions.
 
 ## Immediate Goal
 
-Define enough contracts and architecture to begin implementation of a Python-first simulation backend without locking in premature UI work.
+Maintain and deliberately widen the deterministic Python-first simulation backend without implying support beyond the declared slice or introducing premature UI work.
 
 ## Immediate Next Work
 
-The next concrete work remains engine-facing:
+The next concrete work is to select and stage the smallest new manifest-backed increment:
 
 - keep the active support-slice manifest, rules envelope, source scope, and coverage manifests aligned before implementing each card increment
-- extend the engine through narrow, name-scoped noncreature spell resolution before moving into broader mechanic families
-- keep coverage manifests and contracts aligned with the implemented engine path
+- choose the smallest remaining Portal limitation or a new bounded Portal card/rule increment; do not infer support from source artifacts alone
+- preserve the completed Waves 1–7 boundaries unless a new contract explicitly widens them
 - use `.codex/skills/card-source-sync/` whenever the declared source scope under `information/` changes

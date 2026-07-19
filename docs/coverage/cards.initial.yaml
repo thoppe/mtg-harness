@@ -3,7 +3,7 @@ slice: portal_initial_micro_universe
 set_summaries:
   - set_code: por
     status: partial
-    notes: "Portal support is the card set declared by docs/coverage/slices/portal.initial.yaml, including completed Waves 2 through 5."
+    notes: "Portal support is the card set declared by docs/coverage/slices/portal.initial.yaml, including completed Waves 1 through 7."
   - set_code: me4
     status: partial
     notes: "The declared support slice currently includes Rain of Daggers as an explicit off-Portal source addition used to widen reusable mass-destruction support."
