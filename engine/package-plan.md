@@ -59,4 +59,7 @@ Define the first package boundaries before writing engine code.
   direct combat and turn-state construction. The Wave 3 vigilance regression
   now likewise enters its attacker declaration window through supported
   first-turn and combat-entry flow rather than direct turn state construction.
+  The Alabaster Dragon death-trigger fixture now also enters precombat main
+  through supported first-turn flow rather than direct turn-state
+  construction.
 - Keep `rules/` focused on consequences and checks, while `flow/` owns when action windows open and close.

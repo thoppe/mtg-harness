@@ -432,7 +432,7 @@ def _attacker_declaration_state(repository: CardRepository, card_id: str):
 
 
 def _alabaster_death_state(repository: CardRepository, *, seed: int):
-    state = initialize_game(
+    bootstrap = initialize_game(
         SetupInput(
             "alabaster-death",
             ("alice", "bob"),
@@ -442,11 +442,12 @@ def _alabaster_death_state(repository: CardRepository, *, seed: int):
             seed,
         ),
         repository,
-    ).state
+    )
+    state = bootstrap.state
     state = move_object(state, instance_id="alice:1", from_zone="hand", to_zone="battlefield", player_id="alice")
     damaged_dragon = replace(state.objects["alice:1"], damage_marked=4)
-    return replace(
+    state = replace(
         state,
         objects={**state.objects, "alice:1": damaged_dragon},
-        turn=TurnState(1, "alice", "alice", "precombat_main_step"),
     )
+    return start_first_turn(replace(bootstrap, state=state)).state

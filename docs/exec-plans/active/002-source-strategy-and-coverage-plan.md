@@ -132,6 +132,9 @@ The simulator should only claim support based on layer 3, never merely because l
   3 vigilance regression enters the first turn and advances to its attacker
   declaration window through supported flow handlers rather than direct turn
   state construction.
+- The next bounded test-harness initial-turn correction is complete: the
+  Alabaster Dragon death-trigger fixture enters precombat main through the
+  supported first-turn flow rather than direct turn-state construction.
 
 ## Workstreams
 
@@ -309,3 +312,6 @@ completed Wave 7 trigger-resolution choice correction.
 26. Preserve the completed Wave 3 vigilance combat-entry test-path correction
     in
     `docs/exec-plans/active/021-wave3-vigilance-combat-entry-test-path.md`.
+27. Preserve the completed Alabaster Dragon death-trigger initial-turn
+    test-path correction in
+    `docs/exec-plans/active/022-alabaster-death-turn-action-test-path.md`.
