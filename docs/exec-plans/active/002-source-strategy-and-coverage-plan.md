@@ -198,8 +198,8 @@ than promoting its raw sources as a group.
 5. Before each implementation subwave, update source artifacts, manifest,
    coverage, rules envelope, registry, and edge-case tests together; before
    finishing, run the card-expansion freshness check above.
-6. Start Wave 7A only with the attacked-player instants, then advance through
-   Wave 7B–7D in `docs/contracts/portal-expansion-order.md`. Preserve
-   `docs/contracts/wave7-triggers-abilities-and-instants.md` as the authority
-   for registered trigger, source-snapshot, choice, activation, prevention,
-   and counter behavior.
+6. Before widening into another set, complete the recorded Wave 7
+   trigger-resolution-choice increment in
+   `docs/contracts/wave7-triggers-abilities-and-instants.md`. Preserve that
+   contract as the authority for registered triggers, source snapshots,
+   activation, prevention, counters, and the explicit remaining choice gap.

@@ -180,3 +180,22 @@ Wave 7 does not add a general rules-text interpreter, arbitrary triggered or
 activated abilities, generic replacement effects, general counterspells,
 multi-player priority, damage redirection, regeneration, or persistent hidden
 information visibility.
+
+## Recorded Limitation: Trigger-Resolution Choices
+
+The current engine records and resolves the supported Wave 7 trigger entries,
+but does **not** yet expose a chooser-owned pending-decision continuation for
+every optional or target-bearing trigger at resolution. In those paths, the
+implementation currently uses a deterministic first-legal fallback (or no
+effect where the trigger branch is not yet modeled) rather than asking the
+controller to choose or decline.
+
+This limitation affects, at minimum, optional/targeted effects for Ebon
+Dragon, Gravedigger, Ingenious Thief, Man-o'-War, Fire Imp, Fire Dragon,
+Serpent Assassin, Fire Snake, Seasoned Marshal, and Wood Elves, plus the
+"unless" payment choices for Mercenary Knight, Owl Familiar, Plant Elemental,
+Primeval Force, Thing from the Deep, and Thundering Wurm. It must be resolved
+by a dedicated trigger-choice increment before the engine claims full oracle
+fidelity for those effects. That increment must use the existing redacted
+hidden-zone decision/event rules and capture targets or payment options at the
+correct trigger-resolution boundary.
