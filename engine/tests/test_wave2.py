@@ -7,11 +7,19 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from mtg_engine.actions.models import CastNonCreatureSpellAction
+from mtg_engine.actions.models import (
+    ActivateManaAbilityAction,
+    CastNonCreatureSpellAction,
+)
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.priority import enumerate_legal_actions
 from mtg_engine.flow.setup import SetupInput, initialize_game
-from mtg_engine.flow.turns import TurnResult, _resolve_noncreature_spell
+from mtg_engine.flow.turns import (
+    TurnResult,
+    _resolve_noncreature_spell,
+    activate_mana_ability,
+    start_first_turn,
+)
 from mtg_engine.rules.characteristics import (
     effective_power,
     effective_toughness,
@@ -24,6 +32,8 @@ from mtg_engine.state.zones import move_object
 
 INFORMATION_DIR = Path(__file__).resolve().parents[2] / "information"
 PLAINS = "bc71ebf6-2056-41f7-be35-b2e5c34afa99"
+ISLAND = "b2c6aa39-2d2a-459c-a555-fb48ba993373"
+FOREST = "b34bb2dc-c1af-4d77-b0b3-a0fb342a5fc6"
 FOOT_SOLDIERS = "a768ba13-4d1c-4dce-a4a6-86a39c069c3f"
 MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
 ANACONDA = "3eff03f1-2c5f-4c59-b465-a8c4cd05e1ba"
@@ -43,13 +53,20 @@ class Wave2Tests(unittest.TestCase):
 
     def test_targeted_wave_two_sorceries_are_enumerated_for_creatures(self) -> None:
         spells = (ANGELIC_BLESSING, CLOAK_OF_FEATHERS, ALLURING_SCENT)
+        mana_sources = (PLAINS, PLAINS, ISLAND, FOREST, FOREST)
         state = initialize_game(
             SetupInput(
                 "wave2-target-enumeration",
                 ("alice", "bob"),
                 "alice",
-                {"alice": spells + (MUCK_RATS,), "bob": (PLAINS,)},
-                {"alice": spells + (MUCK_RATS,), "bob": (PLAINS,)},
+                {
+                    "alice": spells + (MUCK_RATS,) + mana_sources,
+                    "bob": (PLAINS,),
+                },
+                {
+                    "alice": spells + (MUCK_RATS,) + mana_sources,
+                    "bob": (PLAINS,),
+                },
                 21,
             ),
             self.repository,
@@ -61,23 +78,26 @@ class Wave2Tests(unittest.TestCase):
             to_zone="battlefield",
             player_id="alice",
         )
-        state = replace(
-            state,
-            players={
-                **state.players,
-                "alice": replace(
-                    state.players["alice"],
-                    mana_pool=("W", "W", "U", "G", "G"),
+        for source_instance_id in ("alice:5", "alice:6", "alice:7", "alice:8", "alice:9"):
+            state = move_object(
+                state,
+                instance_id=source_instance_id,
+                from_zone="hand",
+                to_zone="battlefield",
+                player_id="alice",
+            )
+        session = start_first_turn(TurnResult(state, ()))
+        for source_instance_id in ("alice:5", "alice:6", "alice:7", "alice:8", "alice:9"):
+            session = activate_mana_ability(
+                session,
+                ActivateManaAbilityAction(
+                    player_id="alice",
+                    source_instance_id=source_instance_id,
                 ),
-            },
-            turn=replace(
-                state.turn,
-                step="precombat_main_step",
-                priority_player="alice",
-            ),
-        )
+                self.repository,
+            )
 
-        actions = enumerate_legal_actions(state, self.repository)
+        actions = enumerate_legal_actions(session.state, self.repository)
 
         for spell_instance_id in ("alice:1", "alice:2", "alice:3"):
             self.assertIn(

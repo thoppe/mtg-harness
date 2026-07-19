@@ -43,5 +43,9 @@ Define the first package boundaries before writing engine code.
 ## Next Session Targets
 
 - Add `flow/priority.py` for explicit priority and next-action availability.
-- Stop relying on tests to inject mana or turn-state shortcuts when a normal engine path can provide them.
+- Continue replacing test-only mana or turn-state shortcuts when a normal
+  engine path can provide them. The Wave 2 targeted-spell enumeration
+  regression now produces mana through accepted basic-land activation actions;
+  remaining fixture shortcuts should be corrected only in similarly bounded
+  increments.
 - Keep `rules/` focused on consequences and checks, while `flow/` owns when action windows open and close.
