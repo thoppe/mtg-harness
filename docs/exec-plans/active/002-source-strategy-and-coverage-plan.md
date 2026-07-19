@@ -109,6 +109,9 @@ The simulator should only claim support based on layer 3, never merely because l
 - The first recorded test-harness mana shortcut is complete: Wave 2 targeted
   spell enumeration now obtains white, blue, and green mana through accepted
   basic-land activation actions rather than direct mana-pool replacement.
+- The next bounded test-harness mana correction is complete: the Treetop
+  Defense attackers-window regression obtains its two green mana through
+  accepted Forest activations rather than direct mana-pool replacement.
 
 ## Workstreams
 
@@ -271,3 +274,5 @@ completed Wave 7 trigger-resolution choice correction.
     `docs/exec-plans/active/014-wave2-mana-action-test-path.md`; continue
     replacing remaining test-only state shortcuts only as small, explicit
     evidence increments.
+20. Preserve the completed Treetop Defense mana-action correction in
+    `docs/exec-plans/active/015-treetop-defense-mana-action-test-path.md`.

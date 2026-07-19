@@ -45,7 +45,8 @@ Define the first package boundaries before writing engine code.
 - Add `flow/priority.py` for explicit priority and next-action availability.
 - Continue replacing test-only mana or turn-state shortcuts when a normal
   engine path can provide them. The Wave 2 targeted-spell enumeration
-  regression now produces mana through accepted basic-land activation actions;
-  remaining fixture shortcuts should be corrected only in similarly bounded
-  increments.
+  regression now produces mana through accepted basic-land activation actions.
+  The Treetop Defense attackers-window regression now does the same for its two
+  green mana; remaining fixture shortcuts should be corrected only in
+  similarly bounded increments.
 - Keep `rules/` focused on consequences and checks, while `flow/` owns when action windows open and close.

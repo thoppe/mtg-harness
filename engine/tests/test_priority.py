@@ -180,15 +180,19 @@ class PriorityTests(unittest.TestCase):
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         setup = SetupInput(
             "treetop-window", ("alice", "bob"), "alice",
-            {"alice": (BORDER_GUARD,), "bob": (TREETOP_DEFENSE, FOOT_SOLDIERS)},
-            {"alice": (BORDER_GUARD,), "bob": (TREETOP_DEFENSE, FOOT_SOLDIERS,)}, 7,
+            {"alice": (BORDER_GUARD,), "bob": (TREETOP_DEFENSE, FOOT_SOLDIERS, FOREST, FOREST)},
+            {"alice": (BORDER_GUARD,), "bob": (TREETOP_DEFENSE, FOOT_SOLDIERS, FOREST, FOREST)}, 7,
         )
         state = initialize_game(setup, repository).state
         state = move_object(state, instance_id="alice:1", from_zone="hand", to_zone="battlefield", player_id="alice")
         state = move_object(state, instance_id="bob:2", from_zone="hand", to_zone="battlefield", player_id="bob")
+        state = move_object(state, instance_id="bob:3", from_zone="hand", to_zone="battlefield", player_id="bob")
+        state = move_object(state, instance_id="bob:4", from_zone="hand", to_zone="battlefield", player_id="bob")
         state = with_combat_state(state, attacking_player="alice", defending_player="bob", attackers=("alice:1",), blockers={})
-        state = replace(state, players={**state.players, "bob": replace(state.players["bob"], mana_pool=("G", "G"))}, turn=TurnState(1, "alice", "bob", "declare_attackers_step"))
-        session = cast_noncreature_spell(TurnResult(state=state, event_log=()), CastNonCreatureSpellAction(player_id="bob", card_instance_id="bob:1"), repository)
+        state = replace(state, turn=TurnState(1, "alice", "bob", "declare_attackers_step"))
+        session = activate_mana_ability(TurnResult(state=state, event_log=()), ActivateManaAbilityAction("bob", "bob:3"), repository)
+        session = activate_mana_ability(session, ActivateManaAbilityAction("bob", "bob:4"), repository)
+        session = cast_noncreature_spell(session, CastNonCreatureSpellAction(player_id="bob", card_instance_id="bob:1"), repository)
         session = pass_priority(session, PassPriorityAction(player_id="bob"), repository)
         session = pass_priority(session, PassPriorityAction(player_id="alice"), repository)
         self.assertTrue(has_keyword(session.state, repository, "bob:2", "Reach"))
