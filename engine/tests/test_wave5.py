@@ -96,6 +96,32 @@ class WaveFiveTests(unittest.TestCase):
         final = resolve_pending_choice(second, ResolveChoiceAction("bob", second.state.pending_decision.decision_id), self.repo)
         self.assertEqual(final.state.players["alice"].hand, ("alice:2",))
 
+    def test_flux_rejects_foreign_wrong_and_replayed_choices_without_mutation(self) -> None:
+        state = initialize_game(
+            SetupInput("flux-rejected-choice", ("alice", "bob"), "alice", {"alice": (FLUX, RAIN), "bob": (RAIN,)}, {"alice": (FLUX,), "bob": ()}, 4), self.repo
+        ).state
+        state = move_object(state, instance_id="alice:1", from_zone="hand", to_zone="stack", player_id="alice")
+        pending = _resolve_noncreature_spell(TurnResult(state, ()), StackEntry(card_instance_id="alice:1", controller_id="alice"), self.repo)
+        decision_id = pending.state.pending_decision.decision_id
+        original_state, original_events = pending.state, pending.event_log
+
+        for invalid in (
+            ResolveChoiceAction("bob", decision_id),
+            ResolveChoiceAction("alice", "not-the-pending-decision"),
+        ):
+            with self.subTest(invalid=invalid), self.assertRaisesRegex(ValueError, "choice does not match"):
+                resolve_pending_choice(pending, invalid, self.repo)
+            self.assertEqual(pending.state, original_state)
+            self.assertEqual(pending.event_log, original_events)
+            self.assertEqual(pending.state.rng_cursor, 0)
+
+        accepted = ResolveChoiceAction("alice", decision_id)
+        after_alice = resolve_pending_choice(pending, accepted, self.repo)
+        with self.assertRaisesRegex(ValueError, "choice does not match"):
+            resolve_pending_choice(after_alice, accepted, self.repo)
+        self.assertEqual(after_alice.state.rng_cursor, 0)
+        self.assertEqual(after_alice.state.pending_decision.chooser_id, "bob")
+
     def test_gift_of_estates_does_nothing_when_its_condition_is_false(self) -> None:
         state = initialize_game(
             SetupInput("gift", ("alice", "bob"), "alice", {"alice": (GIFT_OF_ESTATES, RAIN), "bob": (RAIN,)}, {"alice": (GIFT_OF_ESTATES,), "bob": ()}, 4), self.repo

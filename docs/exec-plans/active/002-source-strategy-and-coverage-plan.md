@@ -8,7 +8,7 @@ Turn the selected external authorities into a durable repository strategy for in
 
 - Phase: active
 - Acquisition scaffold: in place for the initial micro-universe and current rules snapshot
-- Remaining blocker type: continue narrow Portal engine widening without outrunning declared coverage
+- Remaining blocker type: preserve declared coverage while adversarial verification hardens the frozen roster
 
 ## Why This Plan Exists
 
@@ -233,9 +233,9 @@ For cards:
 ## Immediate Next Actions
 
 1. Keep the support-slice manifest canonical as the engine-loadable source of active card scope.
-2. Continue widening the `Portal` engine slice in narrow increments, preferring sorceries by default but allowing isolated keyword cards when a human explicitly selects the next target.
-3. Update coverage manifests, contracts, and source artifacts in the same change that widens support.
-4. Keep any keyword expansion name-scoped and minimal rather than introducing a general keyword framework prematurely.
+2. Freeze the active 201-card roster: do not widen `Portal` or add another set unless a human explicitly reopens card expansion.
+3. Prioritize adversarial engine verification and rules hardening under `026-adversarial-engine-verification.md`.
+4. If expansion resumes, update coverage manifests, contracts, and source artifacts in the same change that widens support, and keep any new behavior name-scoped and minimal.
 
 ## Card-Expansion Freshness Check
 
@@ -253,8 +253,10 @@ Prefer links to canonical manifests over duplicated card lists. If a copied list
 
 ## Resume Here
 
-The next session should continue from the manifest-backed slice after the
-completed Wave 7 trigger-resolution choice correction.
+The current 201-card roster is frozen after completed Waves 1–7 and their
+test-path corrections. The next session should continue with adversarial
+engine verification under `026-adversarial-engine-verification.md`, not card
+or set expansion.
 
 1. Treat the active support-slice manifest as the only playable card-universe
    declaration; source artifacts alone do not imply support.
@@ -279,15 +281,15 @@ completed Wave 7 trigger-resolution choice correction.
    `docs/contracts/wave7-triggers-abilities-and-instants.md` as the authority
    for registered triggers, source snapshots, chooser-owned continuations,
    activation, prevention, and counters.
-7. Select the smallest next manifest-backed Portal implementation set before
-   widening another mechanic family or set.
+7. Do not select another manifest-backed Portal implementation set unless a
+   human explicitly reopens expansion work.
 8. Preserve the completed target-player-owned `Mind Rot` discard choice in
    `docs/exec-plans/active/004-mind-rot-discard-choice.md`.
 9. Preserve the completed attacker-owned damage-order correction in
    `docs/exec-plans/active/005-combat-damage-order-choice.md`, including its
    explicit single-multiply-blocked-attacker boundary.
-10. Select the smallest remaining recorded in-slice limitation or the smallest
-    manifest-backed `Portal` increment.
+10. Select the highest-risk adversarial scenario or invariant from the
+    hardening plan, rather than a new card increment.
 11. Preserve the completed sequential multi-attacker damage-order queue in
     `docs/exec-plans/active/006-multiple-combat-damage-order-choices.md`.
 12. Preserve the completed Ebon Dragon and Noxious Toad discard choices in

@@ -37,6 +37,7 @@ from mtg_engine.flow.turns import (
     start_first_turn,
 )
 from mtg_engine.replay.reducer import ReplayInput, replay
+from mtg_engine.state.zones import move_object
 
 
 INFORMATION_DIR = Path(__file__).resolve().parents[2] / "information"
@@ -46,6 +47,7 @@ ISLAND = "b2c6aa39-2d2a-459c-a555-fb48ba993373"
 MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
 SORCEROUS_SIGHT = "20370c3b-231f-4d9d-8b6e-f1eb25fa4b5d"
 PERSONAL_TUTOR = "90f54959-2c9b-4b8a-84c9-d6893eb43553"
+MIND_KNIVES = "f9be5566-c3df-44cc-9de4-29510c8c245f"
 RAIN_OF_TEARS = "72cecab3-519e-4a23-9623-b423a5c5a251"
 CAPRICIOUS_SORCERER = "09fe624f-c66a-46e4-a9af-7e3c3ca1a4e3"
 
@@ -321,6 +323,92 @@ class ReplayReducerTests(unittest.TestCase):
                 "card_revealed",
             ],
         )
+
+    def test_stale_personal_tutor_selection_rejects_before_shuffle_or_reveal(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        setup = SetupInput(
+            game_id="replay-reducer-stale-tutor",
+            players=("alice", "bob"),
+            starting_player="alice",
+            libraries={"alice": (ISLAND, PERSONAL_TUTOR, RAIN_OF_TEARS), "bob": (PLAINS,)},
+            opening_hands={"alice": (ISLAND, PERSONAL_TUTOR), "bob": (PLAINS,)},
+            rng_seed=75,
+        )
+        session = start_first_turn(initialize_game(setup, repository))
+        session = play_land(session, PlayLandAction("alice", "alice:1"), repository)
+        session = activate_mana_ability(session, ActivateManaAbilityAction("alice", "alice:1"), repository)
+        session = cast_noncreature_spell(session, CastNonCreatureSpellAction("alice", "alice:2"), repository)
+        session = pass_priority(session, PassPriorityAction("alice"), repository)
+        pending = pass_priority(session, PassPriorityAction("bob"), repository)
+        stale = move_object(pending.state, instance_id="alice:3", from_zone="library", to_zone="graveyard", player_id="alice")
+        stale = move_object(stale, instance_id="alice:3", from_zone="graveyard", to_zone="library", player_id="alice")
+        stale_session = type(pending)(stale, pending.event_log)
+        action = ResolveChoiceAction("alice", stale.pending_decision.decision_id, selected_instance_id="alice:3")
+
+        with self.assertRaisesRegex(ValueError, "expected library object"):
+            resolve_pending_choice(stale_session, action, repository)
+        self.assertEqual(stale_session.state.rng_cursor, 0)
+        self.assertEqual(stale_session.event_log, pending.event_log)
+        self.assertEqual(stale_session.state.objects["alice:3"].zone, "library")
+
+    def test_rejected_mind_knives_cast_preserves_rng_before_replayable_random_discard_and_shuffle(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        setup = SetupInput(
+            game_id="replay-reducer-mind-knives-rng",
+            players=("alice", "bob"), starting_player="alice",
+            libraries={
+                "alice": (SWAMP, SWAMP, MIND_KNIVES, ISLAND, PERSONAL_TUTOR, RAIN_OF_TEARS, RAIN_OF_TEARS, RAIN_OF_TEARS),
+                "bob": (PLAINS, MUCK_RATS, RAIN_OF_TEARS, PLAINS, PLAINS),
+            },
+            opening_hands={
+                "alice": (SWAMP, SWAMP, MIND_KNIVES, ISLAND, PERSONAL_TUTOR),
+                "bob": (PLAINS, MUCK_RATS, RAIN_OF_TEARS),
+            },
+            rng_seed=91,
+        )
+
+        def finish_turn(session, player_id):
+            session = advance_step(session, AdvanceStepAction(player_id, "begin_combat_step"))
+            session = declare_attackers(session, DeclareAttackersAction(player_id, ()), repository)
+            session = pass_priority(session, PassPriorityAction(player_id), repository)
+            session = pass_priority(session, PassPriorityAction("bob" if player_id == "alice" else "alice"), repository)
+            session = declare_blockers(session, DeclareBlockersAction("bob" if player_id == "alice" else "alice", {}), repository)
+            return advance_turn(session, AdvanceTurnAction(player_id), repository)
+
+        direct = start_first_turn(initialize_game(setup, repository))
+        actions: list[object] = [PlayLandAction("alice", "alice:1")]
+        direct = play_land(direct, actions[-1], repository)
+        direct = finish_turn(direct, "alice")
+        actions.extend((AdvanceStepAction("alice", "begin_combat_step"), DeclareAttackersAction("alice", ()), PassPriorityAction("alice"), PassPriorityAction("bob"), DeclareBlockersAction("bob", {}), AdvanceTurnAction("alice")))
+        direct = finish_turn(direct, "bob")
+        actions.extend((AdvanceStepAction("bob", "begin_combat_step"), DeclareAttackersAction("bob", ()), PassPriorityAction("bob"), PassPriorityAction("alice"), DeclareBlockersAction("alice", {}), AdvanceTurnAction("bob")))
+
+        rejected = CastNonCreatureSpellAction("alice", "alice:3", target_instance_id="alice")
+        before_rejection = direct
+        with self.assertRaisesRegex(ValueError, "target must be an opponent"):
+            cast_noncreature_spell(direct, rejected, repository)
+        self.assertEqual(direct, before_rejection)
+        self.assertEqual(direct.state.rng_cursor, 0)
+
+        for action in (PlayLandAction("alice", "alice:2"), ActivateManaAbilityAction("alice", "alice:1"), ActivateManaAbilityAction("alice", "alice:2"), CastNonCreatureSpellAction("alice", "alice:3", target_instance_id="bob"), PassPriorityAction("alice"), PassPriorityAction("bob")):
+            direct = ({PlayLandAction: play_land, ActivateManaAbilityAction: activate_mana_ability, CastNonCreatureSpellAction: cast_noncreature_spell, PassPriorityAction: pass_priority}[type(action)])(direct, action, repository)
+            actions.append(action)
+        self.assertEqual(direct.state.rng_cursor, 1)
+        direct = finish_turn(direct, "alice")
+        actions.extend((AdvanceStepAction("alice", "begin_combat_step"), DeclareAttackersAction("alice", ()), PassPriorityAction("alice"), PassPriorityAction("bob"), DeclareBlockersAction("bob", {}), AdvanceTurnAction("alice")))
+        direct = finish_turn(direct, "bob")
+        actions.extend((AdvanceStepAction("bob", "begin_combat_step"), DeclareAttackersAction("bob", ()), PassPriorityAction("bob"), PassPriorityAction("alice"), DeclareBlockersAction("alice", {}), AdvanceTurnAction("bob")))
+        for action in (PlayLandAction("alice", "alice:4"), ActivateManaAbilityAction("alice", "alice:4"), CastNonCreatureSpellAction("alice", "alice:5"), PassPriorityAction("alice"), PassPriorityAction("bob")):
+            direct = ({PlayLandAction: play_land, ActivateManaAbilityAction: activate_mana_ability, CastNonCreatureSpellAction: cast_noncreature_spell, PassPriorityAction: pass_priority}[type(action)])(direct, action, repository)
+            actions.append(action)
+        choice = ResolveChoiceAction("alice", direct.state.pending_decision.decision_id, selected_instance_id="alice:8")
+        direct = resolve_pending_choice(direct, choice, repository)
+        actions.append(choice)
+
+        reduced = replay(ReplayInput(setup, tuple(actions)), repository)
+        self.assertEqual(reduced.state, direct.state)
+        self.assertEqual(reduced.event_log, direct.event_log)
+        self.assertEqual(reduced.state.rng_cursor, 2)
 
     def test_rejects_an_illegal_action_log(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)

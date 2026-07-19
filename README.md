@@ -10,7 +10,7 @@ The repository is intentionally starting in a harness-engineering style:
 
 ## Current Status
 
-This repository contains a manifest-backed source-ingestion workflow and a deterministic, two-player engine slice for the active `Portal`-led micro-universe. The active slice implements 201 cards across the completed Portal Waves 1–7, including one explicitly sourced ME4 card; the coverage manifests remain the authoritative statement of its exact boundaries.
+This repository contains a manifest-backed source-ingestion workflow and a deterministic, two-player engine slice for the active `Portal`-led micro-universe. The frozen active roster implements all 200 `Portal` cards plus the explicitly declared ME4 `Rain of Daggers` mass-destruction testbed. The coverage manifests remain the authoritative statement of its exact boundaries.
 
 ## Intended Major Components
 
@@ -101,9 +101,8 @@ Maintain and deliberately widen the deterministic Python-first simulation backen
 
 ## Immediate Next Work
 
-The next concrete work is to select and stage the smallest new manifest-backed increment:
+The next concrete work is adversarial engine verification and rules hardening within the frozen roster:
 
-- keep the active support-slice manifest, rules envelope, source scope, and coverage manifests aligned before implementing each card increment
-- choose the smallest remaining Portal limitation or a new bounded Portal card/rule increment; do not infer support from source artifacts alone
-- preserve the completed Waves 1–7 boundaries unless a new contract explicitly widens them
-- use `.codex/skills/card-source-sync/` whenever the declared source scope under `information/` changes
+- add difficult legal-action, resolution, replay-equivalence, hidden-information, and state-invariant scenarios before widening the card roster
+- preserve the completed Waves 1–7 boundaries and the frozen roster unless a human explicitly reopens expansion work
+- use `docs/exec-plans/active/026-adversarial-engine-verification.md` to stage each hardening increment

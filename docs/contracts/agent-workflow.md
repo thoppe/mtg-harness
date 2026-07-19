@@ -37,13 +37,19 @@ expand or correct declared rules and card support.
 - Keep each autonomous commit focused, imperative in its message, and readily
   reversible. Do not wait to bundle several verified rule or card increments
   into one commit merely to reduce commit count.
+- After successfully completing and verifying a card/set onboarding increment
+  or a rules-hardening increment, agents must commit and push that coherent
+  stage to the configured upstream branch. No additional commit or push
+  confirmation is required unless the user has explicitly requested a
+  different branch, review workflow, or publication boundary.
 
 ## Boundaries
 
-- This contract grants commit authority only for repository-local, verified
-  rule and card work. It does not authorize pushes, pull requests, deployment,
-  external writes, destructive operations, or changes outside the requested
-  scope.
+- This contract grants commit authority for repository-local, verified rule
+  and card work and standing push authority for successfully completed
+  onboarding and rules-hardening stages. It does not authorize pull requests,
+  deployment, other external writes, destructive operations, or changes
+  outside the requested scope.
 - The active execution plan and the relevant domain contracts remain the source
   of truth for what a coherent stage must contain.
 

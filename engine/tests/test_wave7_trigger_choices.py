@@ -393,6 +393,29 @@ class WaveSevenTriggerChoiceTests(unittest.TestCase):
         self.assertEqual(declined.state.rng_cursor, 1)
         self.assertTrue(all(declined.state.objects[i].zone == "library" for i in ("alice:2", "alice:4")))
 
+    def test_wood_elves_stale_choice_still_shuffles_without_private_event_data(self) -> None:
+        state = self._state(
+            WOOD_ELVES,
+            alice_cards=(FOREST, GRIZZLY_BEARS),
+            alice_opening=1,
+        )
+        pending = self._request(state, WOOD_ELVES)
+        stale = move_object(
+            pending.state, instance_id="alice:2", from_zone="library",
+            to_zone="graveyard", player_id="alice",
+        )
+        stale = move_object(
+            stale, instance_id="alice:2", from_zone="graveyard",
+            to_zone="library", player_id="alice",
+        )
+
+        resolved = self._choose(replace(pending, state=stale), "alice:2")
+        self.assertEqual(resolved.state.objects["alice:2"].zone, "library")
+        self.assertEqual(resolved.state.rng_cursor, 1)
+        for event in resolved.event_log:
+            self.assertNotIn("option_ids", event.payload)
+            self.assertNotIn("selected_instance_ids", event.payload)
+
     def test_same_setup_and_accepted_choice_reproduce_state_and_events(self) -> None:
         results = []
         for _ in range(2):

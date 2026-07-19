@@ -9,6 +9,9 @@ Define the explicit inputs required to create a reproducible initial game state 
 - Two players only
 - Active support slice only, as declared in `docs/coverage/slices/portal.initial.yaml`
 - Setup may use any multiplicity of those card identities that the scenario requires
+- The explicit ME4 `Rain of Daggers` testbed is allowed only in a dedicated
+  rules-harness scenario. A Portal deck or future deck-construction path must
+  exclude it even though it remains loadable for engine tests.
 
 ## Required Setup Inputs
 
@@ -41,6 +44,8 @@ Define the explicit inputs required to create a reproducible initial game state 
 - Missing or duplicate player identifiers
 - Missing `rng_seed`
 - Library or opening-hand contents that cannot be reconciled with declared player card pools
+- `Rain of Daggers` in any setup declared to be a Portal deck rather than a
+  dedicated rules-harness scenario
 
 ## Related Contracts
 

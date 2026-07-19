@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from mtg_engine.actions.models import (
     ActivateManaAbilityAction,
     CastCreatureSpellAction,
+    CastNonCreatureSpellAction,
     DeclareAttackersAction,
     DeclareBlockersAction,
     PassPriorityAction,
@@ -24,6 +25,7 @@ from mtg_engine.flow.turns import (
     advance_to_cleanup,
     advance_to_begin_combat,
     cast_creature_spell,
+    cast_noncreature_spell,
     declare_attackers,
     declare_blockers,
     pass_priority,
@@ -51,9 +53,111 @@ WIND_DRAKE = "d6ffdaf0-ac08-4de9-bbce-2eab2f86bcca"
 KEEN_EYED_ARCHERS = "0ace32d6-7261-447c-9ee2-e03febaab91b"
 ANACONDA = "3eff03f1-2c5f-4c59-b465-a8c4cd05e1ba"
 WALL_OF_GRANITE = "8445094f-008b-491a-977c-e8582d5ab72c"
+DEEP_WOOD = "3f01f627-9fbd-470b-8001-974784ccf421"
+HARSH_JUSTICE = "fe4bee2c-f03f-44a4-94a4-55a06bcd0ad8"
+FALSE_PEACE = "7962db58-dbd9-4b94-8a21-a1625da4c384"
+TAUNT = "24cf7fad-233b-49fd-b2a1-a29e3e30041c"
 
 
 class CombatTests(unittest.TestCase):
+    def test_pending_multi_block_order_is_a_barrier_to_damage_and_turn_handoff(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _state_with_multiple_blockers_ready(repository)
+        session = advance_to_begin_combat(session)
+        session = declare_attackers(session, DeclareAttackersAction("alice", ("alice:4",)), repository)
+        session = _pass_attackers_window(session, repository)
+        session = declare_blockers(
+            session,
+            DeclareBlockersAction("bob", {"alice:4": ("bob:4", "bob:6")}),
+            repository,
+        )
+        before = session
+
+        with self.assertRaisesRegex(ValueError, "pending decision"):
+            resolve_combat_damage(session, repository)
+        with self.assertRaisesRegex(ValueError, "end_combat_step"):
+            advance_to_cleanup(session)
+
+        self.assertEqual(session, before)
+        self.assertEqual(session.state.turn.step, "combat_damage_step")
+        self.assertEqual(session.state.pending_decision.kind, "combat_damage_order")
+
+    def test_attacked_player_mana_and_instant_reset_priority_before_blockers(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _attacked_player_instant_fixture(repository, DEEP_WOOD, (FOREST, FOREST))
+        session = advance_to_begin_combat(session)
+        session = declare_attackers(session, DeclareAttackersAction("alice", ("alice:1",)), repository)
+        session = pass_priority(session, PassPriorityAction("alice"), repository)
+        self.assertEqual(session.state.turn.priority_player, "bob")
+
+        session = activate_mana_ability(session, ActivateManaAbilityAction("bob", "bob:2"), repository)
+        session = activate_mana_ability(session, ActivateManaAbilityAction("bob", "bob:3"), repository)
+        self.assertEqual(session.state.consecutive_passes, 0)
+        session = cast_noncreature_spell(session, CastNonCreatureSpellAction("bob", "bob:1"), repository)
+        self.assertEqual(session.state.turn.priority_player, "bob")
+        self.assertEqual(session.state.consecutive_passes, 0)
+
+        session = pass_priority(session, PassPriorityAction("bob"), repository)
+        self.assertEqual(session.state.turn.priority_player, "alice")
+        session = pass_priority(session, PassPriorityAction("alice"), repository)
+        self.assertEqual(session.state.turn.priority_player, "alice")
+        self.assertEqual(session.state.turn.step, "declare_attackers_step")
+        self.assertTrue(any(effect.kind == "prevent_attacking_damage" for effect in session.state.delayed_turn_effects))
+        session = _pass_attackers_window(session, repository)
+        self.assertEqual(session.state.turn.step, "declare_blockers_step")
+
+    def test_deep_wood_prevents_harsh_justice_retaliation_and_both_expire_at_cleanup(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _attacked_player_instant_fixture(repository, DEEP_WOOD, (FOREST, FOREST, PLAINS, PLAINS, PLAINS))
+        session = advance_to_begin_combat(session)
+        session = declare_attackers(session, DeclareAttackersAction("alice", ("alice:1",)), repository)
+        session = pass_priority(session, PassPriorityAction("alice"), repository)
+        for source_id in ("bob:2", "bob:3"):
+            session = activate_mana_ability(session, ActivateManaAbilityAction("bob", source_id), repository)
+        session = cast_noncreature_spell(session, CastNonCreatureSpellAction("bob", "bob:1"), repository)
+        session = pass_priority(session, PassPriorityAction("bob"), repository)
+        session = pass_priority(session, PassPriorityAction("alice"), repository)
+        session = pass_priority(session, PassPriorityAction("alice"), repository)
+        for source_id in ("bob:4", "bob:5", "bob:6"):
+            session = activate_mana_ability(session, ActivateManaAbilityAction("bob", source_id), repository)
+        session = cast_noncreature_spell(session, CastNonCreatureSpellAction("bob", "bob:7"), repository)
+        session = pass_priority(session, PassPriorityAction("bob"), repository)
+        session = pass_priority(session, PassPriorityAction("alice"), repository)
+        session = _pass_attackers_window(session, repository)
+        session = declare_blockers(session, DeclareBlockersAction("bob", {}), repository)
+        session = resolve_combat_damage(session, repository)
+
+        self.assertEqual(session.state.players["bob"].life_total, 20)
+        self.assertEqual(session.state.players["alice"].life_total, 20)
+        self.assertFalse(session.state.stack_entries)
+        self.assertIn("damage_prevented", [event.event_type for event in session.event_log])
+        self.assertNotIn("triggered_ability_put_on_stack", [event.event_type for event in session.event_log[-4:]])
+        session = advance_to_cleanup(session)
+        self.assertFalse(session.state.delayed_turn_effects)
+
+    def test_taunt_marker_expires_when_false_peace_skips_its_target_turn_combat(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _taunt_false_peace_fixture(repository)
+        for source_id in ("alice:3", "alice:4"):
+            session = activate_mana_ability(session, ActivateManaAbilityAction("alice", source_id), repository)
+        session = cast_noncreature_spell(session, CastNonCreatureSpellAction("alice", "alice:1", target_instance_id="bob"), repository)
+        session = _resolve_stack(session, repository)
+        session = cast_noncreature_spell(session, CastNonCreatureSpellAction("alice", "alice:2", target_instance_id="bob"), repository)
+        session = _resolve_stack(session, repository)
+        self.assertEqual({effect.kind for effect in session.state.delayed_turn_effects}, {"skip_combat", "must_attack_source"})
+
+        session = _finish_turn_without_attackers(session, repository)
+        self.assertEqual(session.state.turn.active_player, "bob")
+        skipped = advance_to_begin_combat(session)
+        self.assertEqual(skipped.state.turn.step, "end_combat_step")
+        self.assertFalse(any(effect.kind == "skip_combat" for effect in skipped.state.delayed_turn_effects))
+        finished = advance_to_cleanup(skipped)
+        self.assertFalse(finished.state.delayed_turn_effects)
+
+        session = start_next_turn(finished)
+        self.assertEqual(session.state.turn.active_player, "alice")
+        session = advance_to_begin_combat(session)
+        declare_attackers(session, DeclareAttackersAction("alice", ()), repository)
     def test_life_zero_state_based_action_ends_game(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         session = _state_with_creatures_ready_to_fight(repository, include_blocker=False)
@@ -669,6 +773,57 @@ def _state_with_creatures_ready_to_fight(repository: CardRepository, *, include_
         session = _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "bob")
         session = _develop_creature_through_normal_turns(session, repository, "bob", "bob:4")
     return _advance_to_player_main_phase(_advance_to_next_turn(session, repository), repository, "alice")
+
+
+def _attacked_player_instant_fixture(repository: CardRepository, first_instant: str, lands: tuple[str, ...]):
+    """Put a long-established attacker and an attacked-player instant in play."""
+    setup = SetupInput(
+        game_id="combat-attacked-player-instant",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={"alice": (BORDER_GUARD,), "bob": (first_instant,) + lands + ((HARSH_JUSTICE,) if len(lands) > 2 else ())},
+        opening_hands={"alice": (BORDER_GUARD,), "bob": (first_instant,) + lands + ((HARSH_JUSTICE,) if len(lands) > 2 else ())},
+        rng_seed=67,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    state = move_object(session.state, instance_id="alice:1", from_zone="hand", to_zone="battlefield", player_id="alice")
+    for index in range(len(lands)):
+        state = move_object(state, instance_id=f"bob:{index + 2}", from_zone="hand", to_zone="battlefield", player_id="bob")
+    state = replace(state, objects={**state.objects, "alice:1": replace(state.objects["alice:1"], entered_battlefield_turn=0)})
+    return replace(session, state=state)
+
+
+def _taunt_false_peace_fixture(repository: CardRepository):
+    setup = SetupInput(
+        game_id="combat-taunt-false-peace",
+        players=("alice", "bob"),
+        starting_player="alice",
+        libraries={"alice": (FALSE_PEACE, TAUNT, PLAINS, ISLAND), "bob": ()},
+        opening_hands={"alice": (FALSE_PEACE, TAUNT, PLAINS, ISLAND), "bob": ()},
+        rng_seed=71,
+    )
+    session = start_first_turn(initialize_game(setup, repository))
+    state = move_object(session.state, instance_id="alice:3", from_zone="hand", to_zone="battlefield", player_id="alice")
+    state = move_object(state, instance_id="alice:4", from_zone="hand", to_zone="battlefield", player_id="alice")
+    return replace(session, state=state)
+
+
+def _resolve_stack(session, repository: CardRepository):
+    controller = session.state.turn.priority_player
+    session = pass_priority(session, PassPriorityAction(controller), repository)
+    return pass_priority(session, PassPriorityAction(session.state.turn.priority_player), repository)
+
+
+def _finish_turn_without_attackers(session, repository: CardRepository):
+    """Advance a precombat-main turn through a declared-empty combat."""
+    active = session.state.turn.active_player
+    defender = "bob" if active == "alice" else "alice"
+    session = advance_to_begin_combat(session)
+    session = declare_attackers(session, DeclareAttackersAction(active, ()), repository)
+    session = _pass_attackers_window(session, repository)
+    session = declare_blockers(session, DeclareBlockersAction(defender, {}), repository)
+    session = resolve_combat_damage(session, repository)
+    return start_next_turn(advance_to_cleanup(session))
 
 
 def _state_with_foot_soldiers_ready(repository: CardRepository):

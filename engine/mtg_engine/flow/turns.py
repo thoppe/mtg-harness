@@ -942,6 +942,19 @@ def _resolve_noncreature_spell(
                 option_ids=options,
                 selected_card_type=selected_card_type,
                 min_selections=0 if not options else 1,
+                # The option list is only a presentation snapshot.  Retain
+                # the library object's current incarnation so a card that
+                # leaves and returns while the tutor choice is pending cannot
+                # be treated as the originally selected card.
+                continuation=(
+                    (
+                        "option_object_ids",
+                        tuple(
+                            (instance_id, resolved_state.objects[instance_id].object_id)
+                            for instance_id in options
+                        ),
+                    ),
+                ),
             ),
         )
         event_log.append(
@@ -1187,6 +1200,14 @@ def resolve_pending_choice(
     if decision.continuation_kind is None:
         # Wave 3's original tutor choice remains replay-compatible.
         selected_id = action.selected_instance_id
+        expected_object_ids = dict(context.get("option_object_ids", ()))
+        if selected_id is not None:
+            selected = state.objects[selected_id]
+            if (
+                selected.zone != "library"
+                or selected.object_id != expected_object_ids.get(selected_id)
+            ):
+                raise ValueError("selected card is no longer the expected library object")
         player = next_state.players[action.player_id]
         next_state = _shuffle_library(next_state, event_log, player_id=action.player_id)
         if selected_id is not None:
@@ -2000,8 +2021,8 @@ def advance_to_begin_combat(session: TurnResult | GameBootstrap) -> TurnResult:
     state = session.state
     require_step(state, "precombat_main_step")
     event_log = EventLog.from_events(state.game_id, session.event_log)
-    if any(effect.kind == "skip_combat" and effect.player_id == state.turn.active_player for effect in state.delayed_turn_effects):
-        remaining = tuple(effect for effect in state.delayed_turn_effects if not (effect.kind == "skip_combat" and effect.player_id == state.turn.active_player))
+    if any(effect.kind == "skip_combat" and effect.player_id == state.turn.active_player and effect.turn_number == state.turn.turn_number for effect in state.delayed_turn_effects):
+        remaining = tuple(effect for effect in state.delayed_turn_effects if not (effect.kind == "skip_combat" and effect.player_id == state.turn.active_player and effect.turn_number == state.turn.turn_number))
         skipped_state = replace(state, delayed_turn_effects=remaining, turn=replace(state.turn, step="end_combat_step"))
         event_log.append(event_type="combat_phase_skipped", active_player=state.turn.active_player, payload={"player_id": state.turn.active_player})
         event_log.append(event_type="step_changed", active_player=state.turn.active_player, payload={"turn_number": state.turn.turn_number, "from_step": "precombat_main_step", "to_step": "end_combat_step"})
@@ -2977,7 +2998,32 @@ def _cleanup_end_of_turn_state(state: GameState) -> GameState:
         instance_id: replace(card, damage_marked=0, temporary_power_bonus=0, temporary_toughness_bonus=0)
         for instance_id, card in state.objects.items()
     }
-    return replace(state, players=updated_players, objects=updated_objects, forced_block_target_object_id=None, temporary_effects=())
+    # These bounded combat-turn effects last only through the turn recorded
+    # when they were created.  In particular, a skipped combat still consumes
+    # the accompanying Taunt marker; it must not leak into a later turn.
+    current_turn_combat_effects = {
+        "prevent_attacking_damage",
+        "retaliate_attacking_damage",
+    }
+    target_turn_combat_effects = {
+        "skip_combat",
+        "must_attack_source",
+    }
+    delayed_turn_effects = tuple(
+        effect
+        for effect in state.delayed_turn_effects
+        if not (
+            (effect.kind in current_turn_combat_effects and effect.turn_number <= state.turn.turn_number)
+            or (
+                effect.kind in target_turn_combat_effects
+                and effect.player_id == state.turn.active_player
+                and effect.turn_number <= state.turn.turn_number
+            )
+        )
+    )
+    return replace(state, players=updated_players, objects=updated_objects,
+                   delayed_turn_effects=delayed_turn_effects,
+                   forced_block_target_object_id=None, temporary_effects=())
 
 
 def _add_temporary_effect(

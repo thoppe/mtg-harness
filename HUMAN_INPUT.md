@@ -31,6 +31,16 @@ This file captures decisions, constraints, and open questions that are explicitl
   into this human-input file.
 - Multiplicity within the initial micro-universe follows normal game rules and scenario setup needs
 - Initial play mode is two-player normal play structure only
+- The current active 201-card roster (all 200 Portal oracle identities plus the
+  explicitly declared ME4 `Rain of Daggers` rules testbed) is frozen. Do not
+  onboard cards or sets unless a human explicitly reopens expansion work.
+- `Rain of Daggers` is a scenario-only engine testbed, not a Portal deck card.
+  It may appear only in dedicated rules-harness scenarios; any future Portal
+  deck builder or preconstructed-deck fixture must exclude it.
+- The immediate engineering priority is adversarial verification and rules
+  hardening within the frozen roster: difficult legal-action, resolution,
+  replay, hidden-information, and state-invariant scenarios take precedence
+  over card expansion.
 - For this initial slice, oracle text is the only gameplay text authority; flavor text is never used for implementation
 - Keyword and combat-text support is limited to the active manifest and its
   bounded contracts, including the original `Flying`, `Reach`, `Swampwalk`,
@@ -70,7 +80,7 @@ This file captures decisions, constraints, and open questions that are explicitl
 - API boundary:
   - Internal Python objects only at first, or stable JSON contracts early for future browser integration?
 - Implementation progression:
-  - Which sets should follow `Portal` as the next supported vertical slices?
+  - When should card/set expansion resume after the frozen-slice hardening phase?
 
 ## Near-Term Human Inputs Needed
 
