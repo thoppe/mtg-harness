@@ -17,8 +17,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from mtg_engine.actions.dispatch import dispatch_action
 from mtg_engine.actions.models import (
+    ActivateManaAbilityAction,
     AdvanceStepAction,
     AdvanceTurnAction,
+    CastCreatureSpellAction,
+    CastNonCreatureSpellAction,
     DeclareAttackersAction,
     DeclareBlockersAction,
     PassPriorityAction,
@@ -26,6 +29,7 @@ from mtg_engine.actions.models import (
 )
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.decks import DeckList, DeckValidationError, PORTAL_CONSTRUCTED_V0, validate_deck
+from mtg_engine.decks.fixtures import portal_blue_starter, portal_white_starter
 from mtg_engine.flow.deck_start import DeckGameInput, initialize_deck_game, keep_london_hand
 from mtg_engine.flow.priority import enumerate_legal_actions
 from mtg_engine.flow.setup import SetupInput
@@ -46,34 +50,57 @@ class GeneratedLegalDeckGameTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.repository = CardRepository.from_information_directory(INFORMATION_DIR)
 
-    def _deck_input(self, seed: int = 71) -> DeckGameInput:
-        # Basic lands have no copy cap.  A mono-Plains deck keeps this bounded
-        # generator independent of which spells the random opening hand holds.
-        deck = DeckList((PLAINS,) * 60)
+    def _deck_input(self, seed: int = 71, *, starter_decks: bool = False) -> DeckGameInput:
+        """Build either the tiny outcome fixture or two real Portal starters.
+
+        The all-Plains form remains useful for the bounded deck-out outcome.
+        Long traces deliberately use the public starter fixtures so they cover
+        land development, mana, creatures, stack resolution, and combat.
+        """
+        decks = (
+            {"alice": portal_white_starter(), "bob": portal_blue_starter()}
+            if starter_decks
+            else {player_id: DeckList((PLAINS,) * 60) for player_id in PLAYERS}
+        )
         return DeckGameInput(
             game_id="generated-portal-game",
             players=PLAYERS,
             starting_player="alice",
-            decks={player_id: deck for player_id in PLAYERS},
+            decks=decks,
             rng_seed=seed,
         )
 
-    def _kept_bootstrap(self, seed: int = 71):
-        bootstrap = initialize_deck_game(self._deck_input(seed), self.repository)
+    def _kept_bootstrap(self, seed: int = 71, *, starter_decks: bool = False):
+        bootstrap = initialize_deck_game(
+            self._deck_input(seed, starter_decks=starter_decks), self.repository
+        )
         bootstrap = keep_london_hand(bootstrap, "alice")
         return keep_london_hand(bootstrap, "bob")
 
     @staticmethod
     def _choose_action(actions: tuple[object, ...]) -> object:
-        """A deterministic, intentionally boring policy over public actions."""
+        """Choose a deterministic legal action that develops a real game."""
+        has_cast = any(
+            isinstance(action, (CastCreatureSpellAction, CastNonCreatureSpellAction))
+            for action in actions
+        )
         preferred_types = (
             PlayLandAction,
+            *((ActivateManaAbilityAction,) if has_cast else ()),
+            CastCreatureSpellAction,
+            CastNonCreatureSpellAction,
             AdvanceStepAction,
-            DeclareAttackersAction,
-            DeclareBlockersAction,
             AdvanceTurnAction,
             PassPriorityAction,
         )
+        # Attack with everything and decline blocks.  These are both chosen
+        # from legal action instances, not reconstructed from battlefield IDs.
+        attacker_actions = [action for action in actions if isinstance(action, DeclareAttackersAction)]
+        if attacker_actions:
+            return max(attacker_actions, key=lambda action: len(action.attacker_ids))
+        blocker_actions = [action for action in actions if isinstance(action, DeclareBlockersAction)]
+        if blocker_actions:
+            return min(blocker_actions, key=lambda action: sum(len(ids) for ids in action.blockers.values()))
         for action_type in preferred_types:
             for action in actions:
                 if isinstance(action, action_type):
@@ -89,17 +116,22 @@ class GeneratedLegalDeckGameTests(unittest.TestCase):
                     self.assertNotIn(instance_id, locations, f"{instance_id} appears in two zones")
                     locations[instance_id] = (player_id, zone_name)
 
-        self.assertEqual(set(locations), set(state.objects), "every object has exactly one player zone")
+        for instance_id in state.stack:
+            self.assertNotIn(instance_id, locations, f"{instance_id} is both stacked and zoned")
+            locations[instance_id] = (state.objects[instance_id].owner_id, "stack")
+
+        self.assertEqual(set(locations), set(state.objects), "every object has exactly one zone or stack location")
         for instance_id, (player_id, zone_name) in locations.items():
             card = state.objects[instance_id]
             self.assertEqual(card.owner_id, player_id)
             self.assertEqual(card.zone, zone_name)
             self.assertNotEqual(card.oracle_id, RAIN_OF_DAGGERS)
-        self.assertEqual(sum(len(player.library) + len(player.hand) + len(player.battlefield) + len(player.graveyard)
-                             for player in state.players.values()), 120)
+        self.assertEqual(len(locations), 120)
 
-    def _drive(self, seed: int, maximum_actions: int) -> tuple[TurnResult, tuple[object, ...]]:
-        result = start_first_turn(self._kept_bootstrap(seed))
+    def _drive(
+        self, seed: int, maximum_actions: int, *, starter_decks: bool = False
+    ) -> tuple[TurnResult, tuple[object, ...]]:
+        result = start_first_turn(self._kept_bootstrap(seed, starter_decks=starter_decks))
         actions_taken: list[object] = []
         self._assert_zone_invariants(result)
         while len(actions_taken) < maximum_actions and result.state.outcome.status == "in_progress":
@@ -121,9 +153,34 @@ class GeneratedLegalDeckGameTests(unittest.TestCase):
         self.assertEqual(first.state.outcome.status, "in_progress")
         self.assertTrue(first_actions)
 
+    def test_portal_starter_decks_produce_a_deterministic_trace_past_ten_turns(self) -> None:
+        """A long legal-deck trace exercises actual Portal starter cards.
+
+        Every transition is selected from current enumeration, including
+        generated target choices.  The bounded result is permitted to end
+        early only if ordinary game rules produce a terminal outcome.
+        """
+        first, first_actions = self._drive(
+            seed=202, maximum_actions=360, starter_decks=True
+        )
+        second, second_actions = self._drive(
+            seed=202, maximum_actions=360, starter_decks=True
+        )
+
+        self.assertGreaterEqual(first.state.turn.turn_number, 10)
+        self.assertGreaterEqual(len(first_actions), 80)
+        self.assertEqual(first_actions, second_actions)
+        self.assertEqual(first, second)
+        self.assertIn(first.state.outcome.status, {"in_progress", "completed"})
+        for player in first.state.players.values():
+            self.assertNotIn(RAIN_OF_DAGGERS, (
+                first.state.objects[instance_id].oracle_id
+                for instance_id in player.library + player.hand + player.battlefield + player.graveyard
+            ))
+
     def test_legal_deck_start_can_project_to_compatible_session_replay(self) -> None:
         """Deck shuffle is private setup; normal action replay remains setup-compatible."""
-        bootstrap = self._kept_bootstrap(seed=91)
+        bootstrap = self._kept_bootstrap(seed=91, starter_decks=True)
         setup = SetupInput(
             game_id=bootstrap.state.game_id,
             players=PLAYERS,
@@ -148,7 +205,9 @@ class GeneratedLegalDeckGameTests(unittest.TestCase):
             rng_seed=91,
         )
         session = GameSession.from_setup(setup, self.repository)
-        for _ in range(24):
+        for _ in range(180):
+            if session.state.outcome.status == "completed":
+                break
             action = self._choose_action(session.legal_actions())
             self.assertIn(action, session.legal_actions())
             session.submit(action)  # type: ignore[arg-type]
@@ -157,6 +216,7 @@ class GeneratedLegalDeckGameTests(unittest.TestCase):
         replayed = replay(session.replay_input(), self.repository)
         self.assertEqual(replayed.state, session.state)
         self.assertEqual(replayed.event_log, session.result.event_log)
+        self.assertGreaterEqual(session.state.turn.turn_number, 10)
 
     def test_generated_legal_game_reaches_a_deterministic_empty_library_outcome(self) -> None:
         result, actions = self._drive(seed=113, maximum_actions=800)

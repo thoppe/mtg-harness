@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field, is_dataclass
+from typing import Mapping
 
 from mtg_engine.actions.dispatch import AcceptedAction, dispatch_action
 from mtg_engine.cards.repository import CardRepository
@@ -16,6 +17,54 @@ from mtg_engine.flow.priority import enumerate_legal_actions
 from mtg_engine.flow.setup import GameBootstrap, SetupInput, initialize_game
 from mtg_engine.flow.turns import TurnResult, start_first_turn
 from mtg_engine.replay.reducer import ReplayInput
+from mtg_engine.services.legal_actions_api import (
+    LegalActionApiError,
+    LegalActionsResponse,
+    ValidTargetsResponse,
+    action_for_descriptor,
+    build_legal_actions_response,
+    state_revision,
+    valid_targets_response,
+)
+
+
+@dataclass(frozen=True)
+class SessionRejection:
+    """A non-mutating, API-safe reason a descriptor request was refused."""
+
+    code: str
+    state_revision: str
+
+    def to_payload(self) -> dict[str, object]:
+        return {"accepted": False, "code": self.code, "state_revision": self.state_revision}
+
+
+@dataclass(frozen=True)
+class DescriptorSubmission:
+    """The structured result of submitting a revision-bound descriptor."""
+
+    accepted: bool
+    state_revision: str
+    rejection: SessionRejection | None = None
+
+    def to_payload(self) -> dict[str, object]:
+        payload: dict[str, object] = {"accepted": self.accepted, "state_revision": self.state_revision}
+        if self.rejection is not None:
+            payload["rejection"] = self.rejection.to_payload()
+        return payload
+
+
+def api_payload(value: object) -> object:
+    """Convert public API models to JSON-safe primitives without repr leaks."""
+    if is_dataclass(value):
+        return api_payload(asdict(value))
+    if isinstance(value, dict):
+        return {str(key): api_payload(item) for key, item in value.items()}
+    if isinstance(value, tuple):
+        return [api_payload(item) for item in value]
+    if isinstance(value, list):
+        return [api_payload(item) for item in value]
+    return value
 
 
 @dataclass
@@ -41,6 +90,69 @@ class GameSession:
 
     def legal_actions(self) -> tuple[AcceptedAction, ...]:
         return tuple(enumerate_legal_actions(self.state, self.card_repository))  # type: ignore[return-value]
+
+    @property
+    def revision(self) -> str:
+        """Opaque revision clients must echo when submitting descriptors."""
+        return state_revision(self.state)
+
+    def legal_actions_api(self, player_id: str) -> LegalActionsResponse | SessionRejection:
+        """Return only ``player_id``'s descriptors, never another player's actions."""
+        try:
+            return build_legal_actions_response(
+                self.state, self.card_repository, player_id, revision=self.revision
+            )
+        except LegalActionApiError as error:
+            return SessionRejection(error.code, self.revision)
+
+    def valid_targets_api(
+        self,
+        player_id: str,
+        action_id: str,
+        slot: str,
+        partial_selection: Mapping[str, object] | None = None,
+    ) -> ValidTargetsResponse | SessionRejection:
+        """Project remaining candidates from the authoritative legal action list."""
+        try:
+            return valid_targets_response(
+                self.state,
+                self.card_repository,
+                player_id,
+                action_id,
+                slot,
+                partial_selection,
+                revision=self.revision,
+            )
+        except LegalActionApiError as error:
+            return SessionRejection(error.code, self.revision)
+
+    def submit_descriptor(
+        self,
+        player_id: str,
+        action_id: str,
+        parameters: Mapping[str, object] | None,
+        revision: str,
+    ) -> DescriptorSubmission:
+        """Resolve and dispatch one current descriptor without exposing reducer errors.
+
+        Rejected submissions are entirely read-only.  In particular, a stale
+        client cannot consume randomness or alter the action log.
+        """
+        if revision != self.revision:
+            return DescriptorSubmission(False, self.revision, SessionRejection("stale_revision", self.revision))
+        try:
+            action = action_for_descriptor(
+                self.state, self.card_repository, player_id, action_id, parameters
+            )
+        except LegalActionApiError as error:
+            return DescriptorSubmission(False, self.revision, SessionRejection(error.code, self.revision))
+        try:
+            self.submit(action)  # type: ignore[arg-type]
+        except (TypeError, ValueError):
+            # This should be unreachable because descriptor conversion returns
+            # an enumerated action, but it preserves a safe API boundary.
+            return DescriptorSubmission(False, self.revision, SessionRejection("no_longer_legal", self.revision))
+        return DescriptorSubmission(True, self.revision)
 
     def submit(self, action: AcceptedAction) -> TurnResult:
         if self.state.outcome.status == "completed":

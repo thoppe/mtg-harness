@@ -101,11 +101,11 @@ Maintain and deliberately widen the deterministic Python-first simulation backen
 
 ## Immediate Next Work
 
-The next concrete work is to improve playable legal-deck sessions within the frozen roster:
+The next concrete work is to extend long legal-game traces and the player-scoped
+legal-actions API within the frozen roster:
 
-- use the Portal Constructed v0 deck path (60 cards, four-copy nonbasic limit,
-  deterministic shuffle, and London mulligan) for ordinary games
-- preserve the explicit ordered-library path for rules-harness and adversarial
-  scenarios; it is not a legal-deck surface
-- use `docs/exec-plans/active/027-portal-decks-and-playable-game.md` for
-  playable-game hardening while keeping the card roster frozen
+- query revision-bound legal action descriptors and valid target candidates
+  through the session API; never duplicate the engine's targeting rules
+- extend seeded ten-plus-turn Portal games with replay and invariant evidence
+- use `docs/exec-plans/active/028-legal-actions-api-and-long-traces.md` for
+  this hardening work while keeping the card roster frozen

@@ -55,7 +55,7 @@ No frontend implementation should be introduced yet.
 
 The ingestion scaffold and the current Portal Waves 1–7 are complete. The active 201-card roster is frozen; the next agent should improve the legal-deck game surface and engine confidence rather than onboarding cards.
 
-1. Read `docs/exec-plans/active/027-portal-decks-and-playable-game.md` first and follow its `Resume Here` section.
+1. Read `docs/exec-plans/active/028-legal-actions-api-and-long-traces.md` first and follow its `Resume Here` section.
 2. Treat the active support-slice manifest and coverage manifests as the current playable scope; do not infer support from source artifacts alone.
 3. Keep the rules envelope, coverage manifests, and source artifacts aligned with the frozen roster; do not infer support from source artifacts alone.
 4. Keep legal Portal deck games separate from the explicit rules harness, and stage further session/CLI/generator hardening as explicit evidence. Do not onboard cards or sets unless a human explicitly reopens expansion work.
