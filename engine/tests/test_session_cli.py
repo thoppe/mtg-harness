@@ -11,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from mtg_engine.actions.models import PassPriorityAction
 from mtg_engine.cards.repository import CardRepository
-from mtg_engine.cli import main, run_cli
+from mtg_engine.cli import _repository_root, main, run_cli
 from mtg_engine.decks.fixtures import portal_blue_starter, portal_white_starter
 from mtg_engine.flow.setup import SetupInput
 from mtg_engine.replay.reducer import replay
@@ -84,3 +84,13 @@ class GameSessionAndCliTests(unittest.TestCase):
         started_session = run.call_args.args[0]
         self.assertEqual(started_session.state.game_id, "scenario-combat-attackers")
         self.assertEqual(started_session.state.turn.step, "declare_blockers_step")
+
+    def test_repository_root_resolves_checkout_ancestors_for_an_installed_cli(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir) / "checkout"
+            nested = root / "some" / "nested" / "directory"
+            (root / "information").mkdir(parents=True)
+            (root / "docs" / "coverage" / "slices").mkdir(parents=True)
+            nested.mkdir(parents=True)
+
+            self.assertEqual(_repository_root(nested), root)

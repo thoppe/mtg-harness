@@ -31,6 +31,28 @@ Output = Callable[[str], None]
 CandidateOutput = Callable[[tuple[TargetCandidate, ...]], None]
 
 
+def _repository_root(start: Path | None = None) -> Path:
+    """Find checkout-owned card and coverage artifacts for an installed CLI.
+
+    The package deliberately does not bundle the large source-artifact tree,
+    so a non-editable install must resolve it from the checkout it is launched
+    in rather than from ``site-packages``.
+    """
+    roots = (start or Path.cwd(), Path(__file__).resolve().parents[2])
+    visited: set[Path] = set()
+    for root in roots:
+        for candidate in (root, *root.parents):
+            if candidate in visited:
+                continue
+            visited.add(candidate)
+            if (candidate / "information").is_dir() and (candidate / "docs" / "coverage" / "slices").is_dir():
+                return candidate
+    raise FileNotFoundError(
+        "could not find checkout resources (information/ and docs/coverage/slices); "
+        "run mtg-harness from an mtg-harness checkout"
+    )
+
+
 def run_cli(
     session: GameSession,
     *,
@@ -295,7 +317,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.scenario is not None:
         if args.deck_a is not None or args.deck_b is not None:
             parser.error("--scenario cannot be combined with --deck-a or --deck-b")
-        repo_root = Path(__file__).resolve().parents[2]
+        repo_root = _repository_root()
         repository = CardRepository.from_information_directory(repo_root / "information")
         try:
             session = create_midgame_session(repository, args.scenario)
@@ -314,7 +336,7 @@ def main(argv: list[str] | None = None) -> int:
         with Path(path).open(encoding="utf-8") as handle:
             return DeckList.from_payload(json.load(handle))
 
-    repo_root = Path(__file__).resolve().parents[2]
+    repo_root = _repository_root()
     repository = CardRepository.from_information_directory(repo_root / "information")
     players = (args.player_a, args.player_b)
     starting_player = args.starting_player or args.player_a
