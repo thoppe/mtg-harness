@@ -28,7 +28,7 @@ from mtg_engine.services.session import DeckGameSession, GameSession, SessionRej
 
 Input = Callable[[str], str]
 Output = Callable[[str], None]
-CandidateOutput = Callable[[tuple[TargetCandidate, ...]], None]
+CandidateOutput = Callable[[tuple[TargetCandidate, ...], str | None], None]
 
 # These descriptors advance engine timing without asking a player to make a
 # strategic selection.  They are the only actions the terminal may submit on
@@ -248,11 +248,14 @@ def _collect_many(
         candidates = _slot_candidates(session, player_id, descriptor, slot, partial)
         if candidates is None:
             return None
-        _print_candidates(candidates, output, candidate_output=candidate_output)
-        raw = input_fn(f"Select {slot.name} number (d when done, q to cancel): ").strip().lower()
+        completion_label = _completion_label(slot, values)
+        _print_candidates(
+            candidates, output, candidate_output=candidate_output, completion_label=completion_label,
+        )
+        raw = input_fn(f"Select {slot.name} number (0 when done, q to cancel): ").strip().lower()
         if raw in {"q", "quit", "cancel"}:
             return None
-        if raw in {"d", "done"}:
+        if raw == "0":
             if slot.minimum is not None and len(values) < slot.minimum:
                 output(f"Select at least {slot.minimum} value(s).")
                 continue
@@ -306,12 +309,21 @@ def _print_candidates(
     output: Output,
     *,
     candidate_output: CandidateOutput | None = None,
+    completion_label: str | None = None,
 ) -> None:
     if candidate_output is not None:
-        candidate_output(candidates)
+        candidate_output(candidates, completion_label)
         return
+    if completion_label is not None:
+        output(f"  0. {completion_label}")
     for index, candidate in enumerate(candidates, start=1):
         output(f"  {index}. {candidate.label}")
+
+
+def _completion_label(slot: ParameterSlot, values: list[object]) -> str:
+    if slot.name == "attacker_ids" and not values:
+        return "Declare no attackers"
+    return f"Finish selecting {slot.name.replace('_', ' ')}"
 
 
 def _candidate_from_input(

@@ -93,6 +93,10 @@ or leaking hidden information.
   their game meaning. For example, a blocker assignment is shown as
   "Muck Rats blocks Charging Rhino", not an array containing internal object
   identifiers; an empty assignment is shown as "Declare no blockers".
+- Optional multi-selections use `0` as the visible completion choice. At an
+  attacker declaration with no attackers selected, it is labeled
+  "0. Declare no attackers"; the terminal must not require a letter command
+  to express that ordinary game choice.
 - Presentation adapters may retain opaque descriptor payload values beneath a
   displayed label and submit those exact values after selection. This mapping
   is an implementation detail: it must not widen the candidate set, replace

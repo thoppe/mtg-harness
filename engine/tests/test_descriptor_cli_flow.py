@@ -110,7 +110,7 @@ class DescriptorCliFlowTests(unittest.TestCase):
 
         # Select descriptor 1, target 2 then target 1, and finish the optional
         # selection. The terminal receives no way to type an arbitrary object ID.
-        lines = self._run(session, ("1", "2", "1", "d"))
+        lines = self._run(session, ("1", "2", "1", "0"))
 
         self.assertEqual(
             session.submissions,
@@ -141,12 +141,25 @@ class DescriptorCliFlowTests(unittest.TestCase):
         private = TargetCandidate("opaque-choice", "alice:secret-library-card", "choice", "private card")
         session = _DescriptorSession((_response_descriptor(slot),), {slot.name: (private,)})
 
-        lines = self._run(session, ("1", "1", "d"))
+        lines = self._run(session, ("1", "1", "0"))
 
         rendered = "\n".join(lines)
         self.assertIn("private card", rendered)
         self.assertNotIn("alice:secret-library-card", rendered)
         self.assertNotIn("opaque-choice", rendered)
+
+    def test_zero_declares_no_attackers_without_a_done_command(self) -> None:
+        slot = ParameterSlot("attacker_ids", "targets", minimum=0, maximum=1, distinct=True)
+        attacker = TargetCandidate("opaque-attacker", "alice:attacker", "targets", "Border Guard (1/1)")
+        session = _DescriptorSession((_response_descriptor(slot),), {slot.name: (attacker,)})
+
+        lines = self._run(session, ("1", "0"))
+
+        self.assertEqual(
+            session.submissions,
+            [("alice", "CastNonCreatureSpellAction:opaque", {slot.name: ()}, "revision-1")],
+        )
+        self.assertIn("0. Declare no attackers", "\n".join(lines))
 
 
 if __name__ == "__main__":  # pragma: no cover

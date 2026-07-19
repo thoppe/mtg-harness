@@ -83,10 +83,14 @@ class RichCliRenderer:
             )
         self.console.print(table)
 
-    def candidates(self, candidates: tuple[TargetCandidate, ...]) -> None:
+    def candidates(
+        self, candidates: tuple[TargetCandidate, ...], completion_label: str | None = None,
+    ) -> None:
         table = Table(title="Valid choices", header_style="bold yellow")
         table.add_column("#", justify="right", style="bold cyan")
         table.add_column("Candidate")
+        if completion_label is not None:
+            table.add_row("0", completion_label)
         for index, candidate in enumerate(candidates, start=1):
             # Candidate labels are the API's player-scoped display surface;
             # opaque candidate values and ids are intentionally never rendered.
