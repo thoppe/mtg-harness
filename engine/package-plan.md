@@ -56,5 +56,7 @@ Define the first package boundaries before writing engine code.
   precombat main through the supported first-turn flow. The Treetop Defense
   attackers-window regression now also reaches that window through first-turn
   entry, step advancement, and an accepted attacker declaration rather than
-  direct combat and turn-state construction.
+  direct combat and turn-state construction. The Wave 3 vigilance regression
+  now likewise enters its attacker declaration window through supported
+  first-turn and combat-entry flow rather than direct turn state construction.
 - Keep `rules/` focused on consequences and checks, while `flow/` owns when action windows open and close.

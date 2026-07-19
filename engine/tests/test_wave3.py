@@ -12,7 +12,7 @@ from mtg_engine.cards.repository import CardRepository
 from mtg_engine.events.log import EventLog
 from mtg_engine.flow.priority import blocker_attack_rejection_reason, enumerate_legal_actions
 from mtg_engine.flow.setup import SetupInput, initialize_game
-from mtg_engine.flow.turns import TurnResult, _destroy_permanents, activate_mana_ability, advance_to_cleanup, cast_creature_spell, declare_attackers, declare_blockers, pass_priority, resolve_combat_damage, start_first_turn
+from mtg_engine.flow.turns import TurnResult, _destroy_permanents, activate_mana_ability, advance_to_begin_combat, advance_to_cleanup, cast_creature_spell, declare_attackers, declare_blockers, pass_priority, resolve_combat_damage, start_first_turn
 from mtg_engine.rules.combat import apply_state_based_actions, with_combat_state
 from mtg_engine.state.models import TurnState
 from mtg_engine.state.zones import move_object
@@ -414,12 +414,21 @@ def _combat_state(
 
 
 def _attacker_declaration_state(repository: CardRepository, card_id: str):
-    state = initialize_game(
+    bootstrap = initialize_game(
         SetupInput("wave-three-vigilance", ("alice", "bob"), "alice", {"alice": (card_id,), "bob": ()}, {"alice": (card_id,), "bob": ()}, 1),
         repository,
-    ).state
+    )
+    state = bootstrap.state
     state = move_object(state, instance_id="alice:1", from_zone="hand", to_zone="battlefield", player_id="alice")
-    return replace(state, turn=TurnState(2, "alice", "alice", "declare_attackers_step"))
+    state = replace(
+        state,
+        objects={
+            **state.objects,
+            "alice:1": replace(state.objects["alice:1"], entered_battlefield_turn=0),
+        },
+    )
+    started = start_first_turn(replace(bootstrap, state=state))
+    return advance_to_begin_combat(started).state
 
 
 def _alabaster_death_state(repository: CardRepository, *, seed: int):

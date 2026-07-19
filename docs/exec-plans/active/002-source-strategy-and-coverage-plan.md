@@ -128,6 +128,10 @@ The simulator should only claim support based on layer 3, never merely because l
   Treetop Defense attackers-window regression enters the first turn, advances
   to combat, and declares its attacker through supported flow handlers rather
   than direct combat and turn-state construction.
+- The next bounded test-harness combat-entry correction is complete: the Wave
+  3 vigilance regression enters the first turn and advances to its attacker
+  declaration window through supported flow handlers rather than direct turn
+  state construction.
 
 ## Workstreams
 
@@ -302,3 +306,6 @@ completed Wave 7 trigger-resolution choice correction.
     `docs/exec-plans/active/019-renewing-dawn-turn-action-test-path.md`.
 25. Preserve the completed Treetop Defense combat-entry test-path correction in
     `docs/exec-plans/active/020-treetop-defense-combat-entry-test-path.md`.
+26. Preserve the completed Wave 3 vigilance combat-entry test-path correction
+    in
+    `docs/exec-plans/active/021-wave3-vigilance-combat-entry-test-path.md`.
