@@ -12,7 +12,7 @@ from mtg_engine.cards.repository import CardRepository
 from mtg_engine.events.log import EventLog
 from mtg_engine.flow.priority import blocker_attack_rejection_reason, enumerate_legal_actions
 from mtg_engine.flow.setup import SetupInput, initialize_game
-from mtg_engine.flow.turns import TurnResult, _destroy_permanents, activate_mana_ability, advance_to_cleanup, cast_creature_spell, declare_attackers, declare_blockers, pass_priority, resolve_combat_damage
+from mtg_engine.flow.turns import TurnResult, _destroy_permanents, activate_mana_ability, advance_to_cleanup, cast_creature_spell, declare_attackers, declare_blockers, pass_priority, resolve_combat_damage, start_first_turn
 from mtg_engine.rules.combat import apply_state_based_actions, with_combat_state
 from mtg_engine.state.models import TurnState
 from mtg_engine.state.zones import move_object
@@ -86,7 +86,7 @@ class Wave3CombatTests(unittest.TestCase):
         ).state
         for instance_id in tuple(state.players["alice"].hand[:-1]):
             state = move_object(state, instance_id=instance_id, from_zone="hand", to_zone="battlefield", player_id="alice")
-        session = TurnResult(replace(state, turn=TurnState(1, "alice", "alice", "precombat_main_step")), ())
+        session = start_first_turn(TurnResult(state, ()))
         for instance_id in session.state.players["alice"].battlefield:
             session = activate_mana_ability(session, ActivateManaAbilityAction("alice", instance_id), self.repository)
 

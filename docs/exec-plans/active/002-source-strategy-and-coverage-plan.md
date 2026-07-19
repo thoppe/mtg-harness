@@ -115,6 +115,9 @@ The simulator should only claim support based on layer 3, never merely because l
 - The next bounded test-harness turn-state correction is complete: the same
   Treetop Defense regression reaches cleanup through accepted combat and
   turn-flow actions rather than a direct end-combat step replacement.
+- The next bounded test-harness initial-turn correction is complete: Alabaster
+  Dragon's full-cost casting regression enters precombat main through the
+  supported first-turn flow rather than direct turn-state replacement.
 
 ## Workstreams
 
@@ -281,3 +284,5 @@ completed Wave 7 trigger-resolution choice correction.
     `docs/exec-plans/active/015-treetop-defense-mana-action-test-path.md`.
 21. Preserve the completed Treetop Defense cleanup-action correction in
     `docs/exec-plans/active/016-treetop-defense-cleanup-action-path.md`.
+22. Preserve the completed Alabaster Dragon initial-turn test-path correction in
+    `docs/exec-plans/active/017-alabaster-cast-turn-action-test-path.md`.

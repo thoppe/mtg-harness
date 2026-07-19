@@ -48,6 +48,8 @@ Define the first package boundaries before writing engine code.
   regression now produces mana through accepted basic-land activation actions.
   The Treetop Defense attackers-window regression now does the same for its two
   green mana and reaches cleanup through accepted priority, combat, and
-  turn-flow actions rather than direct turn-state replacement. Other fixture
-  shortcuts should be corrected only in similarly bounded increments.
+  turn-flow actions rather than direct turn-state replacement. The Alabaster
+  Dragon full-cost casting regression now also enters precombat main through
+  the supported first-turn flow. Other fixture shortcuts should be corrected
+  only in similarly bounded increments.
 - Keep `rules/` focused on consequences and checks, while `flow/` owns when action windows open and close.
