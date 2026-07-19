@@ -99,6 +99,10 @@ The simulator should only claim support based on layer 3, never merely because l
 - The recorded replay-reducer choice evidence gap is complete: `Personal
   Tutor` selection, deterministic shuffle, reveal, and library-top placement
   now have a direct state-and-event equivalence regression.
+- The recorded replay-reducer activation evidence gap is complete: an explicit
+  combat-damage-to-next-turn handoff now lets accepted-action replay age a
+  `Capricious Sorcerer` through two turns and prove legal activation,
+  resolution, state, and event equivalence.
 
 ## Workstreams
 
@@ -252,3 +256,6 @@ completed Wave 7 trigger-resolution choice correction.
     in `docs/exec-plans/active/010-noncreature-replay-equivalence.md`.
 16. Preserve the completed choice-resolution replay equivalence regression in
     `docs/exec-plans/active/011-choice-replay-equivalence.md`.
+17. Preserve the completed turn-handoff and activated-ability replay
+    equivalence regression in
+    `docs/exec-plans/active/012-turn-handoff-replay-equivalence.md`.

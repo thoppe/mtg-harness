@@ -10,6 +10,7 @@ from mtg_engine.actions.models import (
     ActivateManaAbilityAction,
     ActivateAbilityAction,
     AdvanceStepAction,
+    AdvanceTurnAction,
     CastCreatureSpellAction,
     CastNonCreatureSpellAction,
     DeclareAttackersAction,
@@ -2298,6 +2299,26 @@ def advance_to_cleanup(session: TurnResult | GameBootstrap) -> TurnResult:
         },
     )
     return TurnResult(state=current_state, event_log=event_log.events)
+
+
+def advance_turn(
+    session: TurnResult | GameBootstrap,
+    action: AdvanceTurnAction,
+    card_repository: CardRepository,
+) -> TurnResult:
+    """Run the existing automatic end-of-turn sequence from combat damage."""
+    state = session.state
+    if action.player_id != state.turn.active_player:
+        raise ValueError("only the active player may advance the turn")
+    require_step(state, "combat_damage_step")
+    if state.pending_decision is not None:
+        raise ValueError("turn handoff requires the pending decision to resolve")
+
+    completed_combat = resolve_combat_damage(session, card_repository)
+    cleaned_up = advance_to_cleanup(completed_combat)
+    if cleaned_up.state.outcome.status == "completed":
+        return cleaned_up
+    return start_next_turn(cleaned_up)
 
 
 def start_next_turn(session: TurnResult | GameBootstrap) -> TurnResult:

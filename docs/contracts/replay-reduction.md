@@ -30,14 +30,18 @@ combat state, and stack state.
 ## v0 Migration
 
 - Existing trace tests remain useful event-vocabulary checks.
-- The reducer now covers setup, first-turn start, land play, mana abilities,
-  casting, priority passing, and the current combat declarations. Equivalence
+- The reducer now covers setup, first-turn start, land play, mana and supported
+  nonmana abilities, casting, priority passing, the current combat
+  declarations, and an explicit turn handoff from combat damage through
+  cleanup into the next precombat main. Equivalence
   tests cover land play, mana production, creature casting, targeted
   noncreature casting and resolution, both stack passes, and an empty combat
   through attacker and blocker declaration. A `Personal Tutor` regression also
   covers private choice resolution, deterministic shuffle, reveal, and
-  library-top placement; add equivalent tests as each remaining action family
-  is widened.
+  library-top placement. A `Capricious Sorcerer` regression crosses two turn
+  handoffs before activation, proving source aging, activation, stack
+  resolution, state, and event equivalence; add equivalent tests as each
+  remaining action family is widened.
 
 ## Related Contracts
 

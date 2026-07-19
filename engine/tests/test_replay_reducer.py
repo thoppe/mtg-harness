@@ -7,8 +7,10 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from mtg_engine.actions.models import (
+    ActivateAbilityAction,
     ActivateManaAbilityAction,
     AdvanceStepAction,
+    AdvanceTurnAction,
     CastCreatureSpellAction,
     CastNonCreatureSpellAction,
     DeclareAttackersAction,
@@ -20,8 +22,10 @@ from mtg_engine.actions.models import (
 from mtg_engine.cards.repository import CardRepository
 from mtg_engine.flow.setup import SetupInput, initialize_game
 from mtg_engine.flow.turns import (
+    activate_ability,
     activate_mana_ability,
     advance_step,
+    advance_turn,
     cast_creature_spell,
     cast_noncreature_spell,
     declare_attackers,
@@ -42,9 +46,102 @@ MUCK_RATS = "bca13a12-6723-4a5e-8f1b-21646a8b3e7e"
 SORCEROUS_SIGHT = "20370c3b-231f-4d9d-8b6e-f1eb25fa4b5d"
 PERSONAL_TUTOR = "90f54959-2c9b-4b8a-84c9-d6893eb43553"
 RAIN_OF_TEARS = "72cecab3-519e-4a23-9623-b423a5c5a251"
+CAPRICIOUS_SORCERER = "09fe624f-c66a-46e4-a9af-7e3c3ca1a4e3"
 
 
 class ReplayReducerTests(unittest.TestCase):
+    def test_replays_turn_handoffs_and_aged_activated_ability(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        setup = SetupInput(
+            game_id="replay-reducer-activated-ability",
+            players=("alice", "bob"),
+            starting_player="alice",
+            libraries={
+                "alice": (
+                    ISLAND,
+                    ISLAND,
+                    ISLAND,
+                    CAPRICIOUS_SORCERER,
+                    PLAINS,
+                    PLAINS,
+                    PLAINS,
+                    PLAINS,
+                ),
+                "bob": (SWAMP, SWAMP, SWAMP, SWAMP, SWAMP, SWAMP, SWAMP),
+            },
+            opening_hands={
+                "alice": (ISLAND, ISLAND, ISLAND, CAPRICIOUS_SORCERER),
+                "bob": (SWAMP,),
+            },
+            rng_seed=76,
+        )
+
+        actions: list[object] = []
+        for turn_number in range(1, 7):
+            active = "alice" if turn_number % 2 else "bob"
+            defending = "bob" if active == "alice" else "alice"
+            if turn_number in {1, 3, 5}:
+                land_id = {1: "alice:1", 3: "alice:2", 5: "alice:3"}[turn_number]
+                actions.append(PlayLandAction(active, land_id))
+            if turn_number == 5:
+                actions.extend(
+                    (
+                        ActivateManaAbilityAction(active, "alice:1"),
+                        ActivateManaAbilityAction(active, "alice:2"),
+                        ActivateManaAbilityAction(active, "alice:3"),
+                        CastCreatureSpellAction(active, "alice:4"),
+                        PassPriorityAction(active),
+                        PassPriorityAction(defending),
+                    )
+                )
+            actions.extend(
+                (
+                    AdvanceStepAction(active, "begin_combat_step"),
+                    DeclareAttackersAction(active, ()),
+                    PassPriorityAction(active),
+                    PassPriorityAction(defending),
+                    DeclareBlockersAction(defending, {}),
+                    AdvanceTurnAction(active),
+                )
+            )
+        actions.extend(
+            (
+                ActivateAbilityAction("alice", "alice:4", target_instance_id="bob"),
+                PassPriorityAction("alice"),
+                PassPriorityAction("bob"),
+            )
+        )
+
+        direct = start_first_turn(initialize_game(setup, repository))
+        for action in actions:
+            if isinstance(action, PlayLandAction):
+                direct = play_land(direct, action, repository)
+            elif isinstance(action, ActivateManaAbilityAction):
+                direct = activate_mana_ability(direct, action, repository)
+            elif isinstance(action, CastCreatureSpellAction):
+                direct = cast_creature_spell(direct, action, repository)
+            elif isinstance(action, PassPriorityAction):
+                direct = pass_priority(direct, action, repository)
+            elif isinstance(action, AdvanceStepAction):
+                direct = advance_step(direct, action)
+            elif isinstance(action, DeclareAttackersAction):
+                direct = declare_attackers(direct, action, repository)
+            elif isinstance(action, DeclareBlockersAction):
+                direct = declare_blockers(direct, action, repository)
+            elif isinstance(action, AdvanceTurnAction):
+                direct = advance_turn(direct, action, repository)
+            elif isinstance(action, ActivateAbilityAction):
+                direct = activate_ability(direct, action, repository)
+
+        reduced = replay(ReplayInput(setup=setup, actions=tuple(actions)), repository)
+
+        self.assertEqual(reduced.state, direct.state)
+        self.assertEqual(reduced.event_log, direct.event_log)
+        self.assertEqual(reduced.state.turn.turn_number, 7)
+        self.assertEqual(reduced.state.players["bob"].life_total, 19)
+        self.assertEqual(reduced.state.objects["alice:4"].zone, "battlefield")
+        self.assertTrue(reduced.state.objects["alice:4"].tapped)
+
     def test_replays_land_mana_creature_cast_and_stack_passes(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         setup = SetupInput(

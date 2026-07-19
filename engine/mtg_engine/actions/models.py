@@ -156,6 +156,13 @@ class AdvanceStepAction:
 
 
 @dataclass(frozen=True)
+class AdvanceTurnAction:
+    """Complete combat damage, cleanup, and the next-turn handoff."""
+
+    player_id: str
+
+
+@dataclass(frozen=True)
 class DeclareAttackersAction:
     player_id: str
     attacker_ids: tuple[str, ...]

@@ -8,6 +8,7 @@ from mtg_engine.actions.models import (
     ActivateManaAbilityAction,
     ActivateAbilityAction,
     AdvanceStepAction,
+    AdvanceTurnAction,
     CastCreatureSpellAction,
     CastNonCreatureSpellAction,
     DeclareAttackersAction,
@@ -23,6 +24,7 @@ from mtg_engine.flow.turns import (
     activate_mana_ability,
     activate_ability,
     advance_step,
+    advance_turn,
     cast_creature_spell,
     cast_noncreature_spell,
     declare_attackers,
@@ -41,6 +43,7 @@ AcceptedAction = (
     | CastNonCreatureSpellAction
     | PassPriorityAction
     | AdvanceStepAction
+    | AdvanceTurnAction
     | DeclareAttackersAction
     | DeclareBlockersAction
     | ResolveChoiceAction
@@ -82,6 +85,8 @@ def replay(input: ReplayInput, card_repository: CardRepository) -> TurnResult:
             session = pass_priority(session, action, card_repository)
         elif isinstance(action, AdvanceStepAction):
             session = advance_step(session, action)
+        elif isinstance(action, AdvanceTurnAction):
+            session = advance_turn(session, action, card_repository)
         elif isinstance(action, DeclareAttackersAction):
             session = declare_attackers(session, action, card_repository)
         elif isinstance(action, DeclareBlockersAction):
