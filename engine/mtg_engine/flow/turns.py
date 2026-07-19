@@ -2339,15 +2339,20 @@ def advance_turn(
     action: AdvanceTurnAction,
     card_repository: CardRepository,
 ) -> TurnResult:
-    """Run the existing automatic end-of-turn sequence from combat damage."""
+    """Complete combat if needed, then run cleanup and start the next turn."""
     state = session.state
     if action.player_id != state.turn.active_player:
         raise ValueError("only the active player may advance the turn")
-    require_step(state, "combat_damage_step")
     if state.pending_decision is not None:
         raise ValueError("turn handoff requires the pending decision to resolve")
 
-    completed_combat = resolve_combat_damage(session, card_repository)
+    if state.turn.step == "combat_damage_step":
+        completed_combat = resolve_combat_damage(session, card_repository)
+    elif state.turn.step == "end_combat_step":
+        completed_combat = session
+    else:
+        raise ValueError("turn handoff requires combat_damage_step or end_combat_step")
+
     cleaned_up = advance_to_cleanup(completed_combat)
     if cleaned_up.state.outcome.status == "completed":
         return cleaned_up

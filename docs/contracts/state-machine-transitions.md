@@ -71,6 +71,11 @@ Define the minimum legal progression points for the first deterministic engine s
   legal-action enumeration exposes exactly one `advance_turn` action for the
   active player. That action resolves combat damage, advances through cleanup,
   and starts the next turn; it is not an arbitrary step-skipping action.
+- At `end_combat_step`, including a combat skipped by `False Peace`, legal-
+  action enumeration exposes exactly one active-player `advance_turn` action.
+  It performs the remaining postcombat, end, and cleanup transitions before
+  starting the next turn. This structural continuation prevents an otherwise
+  in-progress, supported game state from having no legal action.
 - Full long-run game-loop completion beyond the supported subset still remains future work.
 - For every attacker blocked by multiple creatures, blocker declaration queues
   an ordered, attacking-player-owned decision before combat damage. Decisions

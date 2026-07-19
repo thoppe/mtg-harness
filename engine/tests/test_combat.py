@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from mtg_engine.actions.models import (
     ActivateManaAbilityAction,
+    AdvanceTurnAction,
     CastCreatureSpellAction,
     CastNonCreatureSpellAction,
     DeclareAttackersAction,
@@ -22,6 +23,7 @@ from mtg_engine.flow.setup import SetupInput, initialize_game
 from mtg_engine.flow.priority import enumerate_legal_actions
 from mtg_engine.flow.turns import (
     activate_mana_ability,
+    advance_turn,
     advance_to_cleanup,
     advance_to_begin_combat,
     cast_creature_spell,
@@ -158,6 +160,31 @@ class CombatTests(unittest.TestCase):
         self.assertEqual(session.state.turn.active_player, "alice")
         session = advance_to_begin_combat(session)
         declare_attackers(session, DeclareAttackersAction("alice", ()), repository)
+
+    def test_false_peace_skipped_combat_exposes_and_accepts_turn_handoff(self) -> None:
+        repository = CardRepository.from_information_directory(INFORMATION_DIR)
+        session = _taunt_false_peace_fixture(repository)
+        for source_id in ("alice:3", "alice:4"):
+            session = activate_mana_ability(session, ActivateManaAbilityAction("alice", source_id), repository)
+        session = cast_noncreature_spell(
+            session,
+            CastNonCreatureSpellAction("alice", "alice:1", target_instance_id="bob"),
+            repository,
+        )
+        session = _resolve_stack(session, repository)
+        session = _finish_turn_without_attackers(session, repository)
+
+        skipped = advance_to_begin_combat(session)
+        self.assertEqual(skipped.state.turn.step, "end_combat_step")
+        self.assertEqual(
+            enumerate_legal_actions(skipped.state, repository),
+            (AdvanceTurnAction("bob"),),
+        )
+
+        continued = advance_turn(skipped, AdvanceTurnAction("bob"), repository)
+        self.assertEqual(continued.state.turn.active_player, "alice")
+        self.assertEqual(continued.state.turn.step, "precombat_main_step")
+        self.assertEqual(continued.state.outcome.status, "in_progress")
     def test_life_zero_state_based_action_ends_game(self) -> None:
         repository = CardRepository.from_information_directory(INFORMATION_DIR)
         session = _state_with_creatures_ready_to_fight(repository, include_blocker=False)
@@ -798,7 +825,7 @@ def _taunt_false_peace_fixture(repository: CardRepository):
         game_id="combat-taunt-false-peace",
         players=("alice", "bob"),
         starting_player="alice",
-        libraries={"alice": (FALSE_PEACE, TAUNT, PLAINS, ISLAND), "bob": ()},
+        libraries={"alice": (FALSE_PEACE, TAUNT, PLAINS, ISLAND, PLAINS), "bob": (PLAINS,)},
         opening_hands={"alice": (FALSE_PEACE, TAUNT, PLAINS, ISLAND), "bob": ()},
         rng_seed=71,
     )

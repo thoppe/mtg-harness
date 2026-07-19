@@ -44,6 +44,11 @@ def enumerate_legal_actions(state: GameState, card_repository: CardRepository) -
             AdvanceTurnAction(player_id=state.turn.active_player),
         )
 
+    if state.turn.step == "end_combat_step":
+        return (
+            AdvanceTurnAction(player_id=state.turn.active_player),
+        )
+
     return ()
 
 

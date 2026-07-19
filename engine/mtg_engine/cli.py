@@ -78,6 +78,11 @@ def run_cli(
     renderer = RichCliRenderer() if output is None else None
     output = output or renderer.message
     candidate_output: CandidateOutput | None = renderer.candidates if renderer is not None else None
+    # A rejected automatic descriptor leaves the session at the same revision.
+    # Remember that revision so an adapter bug or a stale projection cannot
+    # repeatedly submit the same action without ever returning control to the
+    # player.
+    auto_attempted_revisions: set[str] = set()
     while session.state.outcome.status != "completed":
         player_id = session.state.turn.priority_player
         if renderer is None:
@@ -91,16 +96,24 @@ def run_cli(
         if not response.actions:
             output("No enumerated legal actions; session stopped.")
             break
-        automatic = _automatic_submission(session, player_id, response.actions)
+        automatic = (
+            None
+            if response.state_revision in auto_attempted_revisions
+            else _automatic_submission(session, player_id, response.actions)
+        )
         if automatic is not None:
             automatic_action, automatic_parameters, automatic_message = automatic
             output(automatic_message)
+            auto_attempted_revisions.add(response.state_revision)
             submission = session.submit_descriptor(
                 player_id, automatic_action.action_id, automatic_parameters, response.state_revision,
             )
             if not submission.accepted:
                 assert submission.rejection is not None
-                output(f"Automatic action rejected: {submission.rejection.code}; refreshing actions.")
+                output(
+                    f"Automatic action rejected: {submission.rejection.code}; "
+                    "choose a legal action explicitly."
+                )
             continue
         if renderer is None:
             for index, action in enumerate(response.actions, start=1):
@@ -191,11 +204,23 @@ def _automatic_submission(
     candidates = _slot_candidates(session, player_id, action, slot, {})
     if candidates is None:
         return None
+    if action.kind == "DeclareAttackersAction":
+        # Target candidates are individual attackers, whereas the descriptor
+        # takes a tuple of attackers.  An optional attacker can also be
+        # omitted, so one candidate alone does not make the declaration unique.
+        if len(candidates) == 1 and slot.minimum == slot.maximum == 1:
+            candidate = candidates[0]
+            return (
+                action,
+                {slot.name: (candidate.value,)},
+                f"Auto-selecting only legal declaration: {candidate.label} attacks.",
+            )
+        if not candidates and slot.minimum == 0:
+            return action, {slot.name: ()}, "Auto-selecting only legal declaration: Declare no attackers."
+        return None
     if len(candidates) == 1:
         candidate = candidates[0]
         return action, {slot.name: candidate.value}, f"Auto-selecting only legal declaration: {candidate.label}."
-    if action.kind == "DeclareAttackersAction" and not candidates and slot.minimum == 0:
-        return action, {slot.name: ()}, "Auto-selecting only legal declaration: Declare no attackers."
     return None
 
 

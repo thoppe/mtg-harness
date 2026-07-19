@@ -84,7 +84,14 @@ or leaking hidden information.
 - If the descriptor cannot be safely classified, is stale, is rejected, or is
   no longer the sole qualifying legal action at the current revision, the
   terminal must stop auto-progression, refresh, and present the ordinary legal
-  action pane.
+  action pane. An automatic submission must never be retried at an unchanged
+  state revision. A rejected or non-progressing automatic submission is a
+  player-visible safe stop, not a loop.
+- A target candidate is not automatically a complete multi-target declaration.
+  For example, a lone legal attacker is submitted as the one-item
+  `attacker_ids` declaration only when attacking is mandatory; if declaring no
+  attackers remains legal, that is still a player decision and the terminal
+  presents both choices.
 
 ## Human-Readable Interaction Labels
 

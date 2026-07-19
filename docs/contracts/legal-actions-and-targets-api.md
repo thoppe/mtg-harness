@@ -10,6 +10,11 @@ creating a second action-validation or targeting rules system.
 - A response is bound to a game-state revision and acting player.
 - Every returned action descriptor is executable only by its declared player at
   that revision; stale or forged submissions reject without state mutation.
+- Every supported, in-progress transition state exposes either an actionable
+  descriptor for its current priority/decision player or a documented automatic
+  transition. In particular, an `end_combat_step` reached by a skipped combat
+  retains an active-player structural continuation rather than becoming an
+  empty legal-action response.
 - Target candidates derive from the same engine predicates used by action
   enumeration and transition validation.
 - Player and spectator responses reveal only information visible to that role.
