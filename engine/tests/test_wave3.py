@@ -13,8 +13,7 @@ from mtg_engine.events.log import EventLog
 from mtg_engine.flow.priority import blocker_attack_rejection_reason, enumerate_legal_actions
 from mtg_engine.flow.setup import SetupInput, initialize_game
 from mtg_engine.flow.turns import TurnResult, _destroy_permanents, activate_mana_ability, advance_to_begin_combat, advance_to_cleanup, cast_creature_spell, declare_attackers, declare_blockers, pass_priority, resolve_combat_damage, start_first_turn
-from mtg_engine.rules.combat import apply_state_based_actions, with_combat_state
-from mtg_engine.state.models import TurnState
+from mtg_engine.rules.combat import apply_state_based_actions
 from mtg_engine.state.zones import move_object
 
 
@@ -403,14 +402,30 @@ def _combat_state(
     for player_id, cards in (("alice", alice_cards), ("bob", bob_cards)):
         for index in range(1, len(cards) + 1):
             state = move_object(state, instance_id=f"{player_id}:{index}", from_zone="hand", to_zone="battlefield", player_id=player_id)
-    state = with_combat_state(
+    state = replace(
         state,
-        attacking_player="alice",
-        defending_player="bob",
-        attackers=(attacker_id,),
-        blockers={},
+        objects={
+            **state.objects,
+            attacker_id: replace(state.objects[attacker_id], entered_battlefield_turn=0),
+        },
     )
-    return replace(state, turn=TurnState(1, "alice", "bob", "declare_blockers_step"))
+    session = start_first_turn(TurnResult(state, ()))
+    session = advance_to_begin_combat(session)
+    session = declare_attackers(
+        session,
+        DeclareAttackersAction(player_id="alice", attacker_ids=(attacker_id,)),
+        repository,
+    )
+    session = pass_priority(
+        session,
+        PassPriorityAction(player_id="alice"),
+        repository,
+    )
+    return pass_priority(
+        session,
+        PassPriorityAction(player_id="bob"),
+        repository,
+    ).state
 
 
 def _attacker_declaration_state(repository: CardRepository, card_id: str):

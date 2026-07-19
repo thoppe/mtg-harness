@@ -61,5 +61,8 @@ Define the first package boundaries before writing engine code.
   first-turn and combat-entry flow rather than direct turn state construction.
   The Alabaster Dragon death-trigger fixture now also enters precombat main
   through supported first-turn flow rather than direct turn-state
+  construction. The shared Wave 3 combat fixture now likewise reaches the
+  blockers declaration window through supported first-turn, attacker
+  declaration, and priority flow rather than direct combat and turn-state
   construction.
 - Keep `rules/` focused on consequences and checks, while `flow/` owns when action windows open and close.
