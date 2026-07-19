@@ -120,17 +120,24 @@ def run_cli(
                 output(f"{index}. {_describe_action(action)}")
         else:
             renderer.actions(response)
-        raw = input_fn("Choose action number (q to quit): ").strip().lower()
+        raw = input_fn("Choose action number (Enter = pass priority; q to quit): ").strip().lower()
         if raw in {"q", "quit", "exit"}:
             break
-        try:
-            choice = int(raw)
-            if not 1 <= choice <= len(response.actions):
-                raise ValueError
-        except ValueError:
-            output("Please enter one displayed action number or q.")
-            continue
-        descriptor = response.actions[choice - 1]
+        if not raw:
+            descriptor = next((action for action in response.actions if action.kind == "PassPriorityAction"), None)
+            if descriptor is None:
+                output("Pass priority is not legal here; choose a displayed action number or q.")
+                continue
+            output("Passing priority.")
+        else:
+            try:
+                choice = int(raw)
+                if not 1 <= choice <= len(response.actions):
+                    raise ValueError
+            except ValueError:
+                output("Please enter one displayed action number, Enter to pass priority, or q.")
+                continue
+            descriptor = response.actions[choice - 1]
         parameters = _collect_parameters(
             session, player_id, descriptor, output, input_fn, candidate_output=candidate_output
         )
@@ -146,6 +153,8 @@ def run_cli(
             assert submission.rejection is not None
             output(f"Action rejected: {submission.rejection.code}; refreshing actions.")
 
+    if session.state.outcome.status == "completed":
+        output(_outcome_message(session))
     if replay_path is not None:
         write_replay_input(replay_path, session.replay_input())
         output(f"Replay saved to {replay_path}")
@@ -230,6 +239,22 @@ def _progression_label(action: LegalActionDescriptor) -> str:
         "AdvanceTurnAction": "resolve combat damage and begin the next turn",
         "PassPriorityAction": "pass priority",
     }[action.kind]
+
+
+def _outcome_message(session: GameSession) -> str:
+    """Return a concise final result without relying on raw outcome payloads."""
+    outcome = session.state.outcome
+    winner_id = getattr(outcome, "winner_id", None)
+    if winner_id is not None:
+        result = f"Game over — {winner_id} wins"
+    else:
+        result = "Game over — no winner"
+    reason = {
+        "life_total_zero_or_less": "a player's life total reached 0 or less",
+        "draw_from_empty_library": "a player tried to draw from an empty library",
+        "last_chance": "the last-chance turn ended",
+    }.get(getattr(outcome, "reason", None), "the game reached a terminal outcome")
+    return f"{result}: {reason}."
 
 
 def _collect_parameters(

@@ -34,6 +34,7 @@ class MidgameScenarioTests(unittest.TestCase):
             [
                 "combat-attackers",
                 "combat-blockers",
+                "combat-lethal",
                 "forked-lightning-targets",
                 "mystic-denial-response",
                 "private-choice",
@@ -65,6 +66,16 @@ class MidgameScenarioTests(unittest.TestCase):
         block = next(action for action in blockers.actions if action.kind == "DeclareBlockersAction")
         self.assertEqual(block.player_id, "bob")
         self.assertEqual(self._actions("combat-blockers", "alice").actions, ())
+
+    def test_combat_lethal_offers_an_unblocked_lethal_attacker(self) -> None:
+        session = create_midgame_session(self.repository, "combat-lethal")
+        actions = self._actions("combat-lethal", "alice")
+        attack = next(action for action in actions.actions if action.kind == "DeclareAttackersAction")
+        candidates = session.valid_targets_api("alice", attack.action_id, "attacker_ids")
+        self.assertNotIsInstance(candidates, SessionRejection)
+        assert not isinstance(candidates, SessionRejection)
+        self.assertEqual([candidate.label for candidate in candidates.candidates], ["Charging Rhino (4/4)"])
+        self.assertEqual(session.state.players["bob"].life_total, 4)
 
     def test_forked_lightning_exposes_only_current_creature_targets_and_allocations(self) -> None:
         session = create_midgame_session(self.repository, "forked-lightning-targets")

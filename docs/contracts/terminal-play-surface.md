@@ -54,6 +54,13 @@ or leaking hidden information.
 - A stale or rejected submission displays the structured, player-safe rejection
   and refreshes the state and action panes from the session. It must not retain
   or reveal candidates from the rejected revision.
+- When the session reaches a completed outcome, the terminal must visibly say
+  that the game is over and identify the winner (when one exists) and a concise
+  player-facing outcome reason before returning to the shell.
+- At the ordinary action prompt, pressing Enter with no action number submits
+  the current `PassPriorityAction` when that descriptor is legal. The prompt
+  must advertise this default. If passing is not legal, Enter explains that
+  fact and leaves the player at the same action pane.
 
 ## Forced Progression
 
@@ -153,6 +160,9 @@ or leaking hidden information.
   combat-response timing, multiple blockers and damage ordering, stack
   responses/countering, a multi-target or allocation spell, a private
   choice/search, and a turn-effect or cleanup-expiry boundary.
+- The catalog includes a named combat-lethal scenario whose ordinary combat
+  declaration and automatic combat resolution visibly demonstrate a win by
+  combat damage.
 - Scenario start follows the ordinary session, descriptor, validation, event,
   and replay paths. A scenario may not install hand-authored legal actions or
   bypass ordinary action dispatch.

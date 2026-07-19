@@ -77,6 +77,10 @@ _SCENARIOS = (
         "Bob assigns two blockers after Alice attacks with a Charging Rhino.",
     ),
     MidgameScenario(
+        "combat-lethal",
+        "Alice can attack with an unblocked Charging Rhino to win by combat damage.",
+    ),
+    MidgameScenario(
         "forked-lightning-targets",
         "Alice chooses one or more creature targets and divides four damage.",
     ),
@@ -115,6 +119,7 @@ def create_midgame_session(card_repository: CardRepository, name: str) -> GameSe
     builders = {
         "combat-attackers": _combat_attackers,
         "combat-blockers": _combat_blockers,
+        "combat-lethal": _combat_lethal,
         "forked-lightning-targets": _forked_lightning_targets,
         "mystic-denial-response": _mystic_denial_response,
         "private-choice": _private_choice,
@@ -186,6 +191,17 @@ def _combat_blockers(card_repository: CardRepository) -> GameSession:
         combat=CombatState("alice", "bob", ("alice:1",), {}, was_attacked=True),
         turn=TurnState(5, "alice", "bob", "declare_blockers_step"),
     )
+    return _with_state(session, state)
+
+
+def _combat_lethal(card_repository: CardRepository) -> GameSession:
+    session = _session(card_repository, "scenario-combat-lethal", (CHARGING_RHINO,), ())
+    state = _to_battlefield(session.state, "alice", "alice:1")
+    state = _midgame_turn(state, step="declare_attackers_step")
+    state = replace(state, players={
+        **state.players,
+        "bob": replace(state.players["bob"], life_total=4),
+    })
     return _with_state(session, state)
 
 

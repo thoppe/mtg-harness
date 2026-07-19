@@ -47,10 +47,10 @@ class GameSessionAndCliTests(unittest.TestCase):
         self.assertEqual(replayed.state, session.state)
         self.assertEqual(replayed.event_log, session.result.event_log)
 
-    def test_cli_uses_numeric_actions_saves_replay_and_does_not_print_hidden_card_name(self) -> None:
+    def test_cli_enter_passes_priority_saves_replay_and_does_not_print_hidden_card_name(self) -> None:
         session = GameSession.from_setup(self.setup, self.repository)
         lines: list[str] = []
-        answers = iter(("3", "q"))  # pass priority is the third first-turn action
+        answers = iter(("", "q"))
         with tempfile.TemporaryDirectory() as temp_dir:
             replay_path = Path(temp_dir) / "game.json"
             run_cli(session, input_fn=lambda _prompt: next(answers), output=lines.append, replay_path=replay_path)
@@ -61,6 +61,19 @@ class GameSessionAndCliTests(unittest.TestCase):
         self.assertNotIn("Muck Rats", rendered)
         self.assertNotIn("SECRET", rendered)
         self.assertIn("hand=1", rendered)
+        self.assertIn("Passing priority.", lines)
+
+    def test_cli_announces_a_combat_damage_win(self) -> None:
+        session = create_midgame_session(self.repository, "combat-lethal")
+        lines: list[str] = []
+        answers = iter(("1", "1", "0"))
+
+        run_cli(session, input_fn=lambda _prompt: next(answers), output=lines.append)
+
+        self.assertEqual(session.state.outcome.status, "completed")
+        self.assertEqual(session.state.outcome.winner_id, "alice")
+        self.assertEqual(session.state.outcome.reason, "life_total_zero_or_less")
+        self.assertIn("Game over — alice wins: a player's life total reached 0 or less.", lines)
 
     def test_cli_main_starts_a_validated_deck_game_after_kept_hands(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

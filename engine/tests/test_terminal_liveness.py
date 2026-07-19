@@ -123,7 +123,7 @@ class TerminalLivenessTests(unittest.TestCase):
 
         run_cli(session, input_fn=quit_at_first_live_choice, output=lines.append)  # type: ignore[arg-type]
 
-        self.assertEqual(prompts, ["Choose action number (q to quit): "])
+        self.assertEqual(prompts, ["Choose action number (Enter = pass priority; q to quit): "])
         self.assertEqual(len(session.submission_revisions), 1)
         self.assertEqual(len(session.action_revisions), 2)
         self.assertEqual(len(set(session.action_revisions)), len(session.action_revisions))
@@ -153,7 +153,7 @@ class TerminalLivenessTests(unittest.TestCase):
             output=lines.append,
         )
 
-        self.assertEqual(prompts, ["Choose action number (q to quit): "])
+        self.assertEqual(prompts, ["Choose action number (Enter = pass priority; q to quit): "])
         self.assertEqual(session.submission_revisions, [])
         self.assertEqual(session.state.turn.step, "declare_attackers_step")
         self.assertIsNone(session.state.combat)
@@ -173,7 +173,7 @@ class TerminalLivenessTests(unittest.TestCase):
             )
 
         self.assertEqual(session.submissions, 1)
-        self.assertEqual(prompts, ["Choose action number (q to quit): "])
+        self.assertEqual(prompts, ["Choose action number (Enter = pass priority; q to quit): "])
         self.assertIn(
             "Automatic action rejected: forced_action_rejected; choose a legal action explicitly.",
             lines,
